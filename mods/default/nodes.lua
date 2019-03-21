@@ -43,7 +43,7 @@ minetest.register_node("default:leaves", {
 
 minetest.register_node("default:tree", {
 	description = "Tree",
-	tiles={"default_tree.png"},
+	tiles={"default_tree_top.png","default_tree.png"},
 	paramtype2="facedir",
 	on_place=minetest.rotate_node,
 	groups = {tree=1,choppy=2,flammable=1},
