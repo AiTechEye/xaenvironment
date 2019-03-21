@@ -11,6 +11,34 @@ default:cobble
 --]]
 
 
+minetest.register_node("default:sapling", {
+	description = "Tree sapling (not working yet)",
+	tiles={"default_treesapling.png"},
+	groups = {leaves=1,dig_immediate=3,snappy=3,leafdecay=3,flammable=1},
+	sounds = default.node_sound_leaves_defaults(),
+	attached_node = 1,
+	drawtype = "plantlike",
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+})
+
+
+minetest.register_node("default:leaves", {
+	description = "Leaves",
+	tiles={"default_leaves.png"},
+	groups = {leaves=1,snappy=3,leafdecay=3,flammable=1},
+	sounds = default.node_sound_leaves_defaults(),
+	drawtype = "allfaces_optional",
+	paramtype = "light",
+	drop ={
+		max_items = 1,
+		items = {
+			{items = {"default:sapling"}, rarity = 25},
+			{items = {"default:leaves"}}
+		}
+	}
+})
 
 
 minetest.register_node("default:tree", {
