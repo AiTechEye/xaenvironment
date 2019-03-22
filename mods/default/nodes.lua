@@ -163,7 +163,7 @@ minetest.register_node("default:water_source", {
 	liquid_alternative_flowing = "default:water_flowing",
 	liquid_alternative_source = "default:water_source",
 	liquid_viscosity = 1,
-	post_effect_color = {a = 100, r = 30, g = 60, b = 90},
+	post_effect_color = {a = 100, r = 0, g = 20, b = 85},
 	sounds = default.node_sound_water_defaults(),
 })
 
@@ -207,7 +207,7 @@ minetest.register_node("default:water_flowing", {
 	liquid_alternative_flowing = "default:water_flowing",
 	liquid_alternative_source = "default:water_source",
 	liquid_viscosity = 1,
-	post_effect_color = {a = 100, r = 30, g = 60, b = 90},
+	post_effect_color = {a = 100, r = 0, g = 20, b = 85},
 	sounds = default.node_sound_water_defaults(),
 })
 
