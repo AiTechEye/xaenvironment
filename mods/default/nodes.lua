@@ -8,6 +8,7 @@ default:dirt_with_grass
 default:dirt
 default:stone
 default:cobble
+default:sandstone
 --]]
 
 
@@ -101,6 +102,13 @@ minetest.register_node("default:gravel", {
 			{items = {"default:gravel"}}
 		}
 	}
+})
+
+minetest.register_node("default:sandstone", {
+	description = "Sand stone",
+	tiles={"default_sandstone.png"},
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:sand", {
