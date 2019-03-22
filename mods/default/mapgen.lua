@@ -8,13 +8,14 @@ minetest.register_biome({
 	depth_top = 5,
 	depth_filler = 5,
 	node_stone = "default:stone",
-	node_water = "default:water_source",
-	node_river_water = "default_water_source",
+	node_water = "default:salt_water_source",
+	node_river_water = "default:salt_water_source",
 	y_min = -31000,
 	y_max = 0,
 	heat_point = 50,
 	humidity_point = 50,
 })
+
 
 minetest.register_biome({
 	name = "grassland",
@@ -22,9 +23,9 @@ minetest.register_biome({
 	depth_top = 1,
 	node_filler = "default:dirt",
 	depth_filler = 5,
-	node_stone = "default:stone",
-	node_water = "default:water_source",
-	node_river_water = "default:water_source",
+	--node_stone = "default:stone",
+	--node_water = "default:water_source",
+	--node_river_water = "default:water_source",
 	y_min = 1,
 	y_max = 31000,
 	heat_point = 50,

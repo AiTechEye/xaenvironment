@@ -71,50 +71,6 @@ minetest.register_node("default:dirt", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-minetest.register_node("default:water_source", {
-	description = "Water source",
-	tiles={"default_water.png"},
-	alpha =150,
-	groups = {water=1, liquid=1, cools_lava=1},
-	drawtype = "liquid",
-	paramtype = "light",
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	drop = "",
-	drowning = 1,
-	liquidtype = "source",
-	liquid_alternative_flowing = "default:water_flowing",
-	liquid_alternative_source = "default:water_source",
-	liquid_viscosity = 1,
-	pos_effect_color = {a = 100, r = 30, g = 60, b = 90},
-	sounds = default.node_sound_water_defaults(),
-})
-
-minetest.register_node("default:water_flowing", {
-	description = "Water flowing",
-	tiles={"default_water.png"},
-	alpha =150,
-	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
-	drawtype = "flowingliquid",
-	paramtype = "light",
-	paramtype2 = "flowingliquid",
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	drop = "",
-	drowning = 1,
-	liquidtype = "flowing",
-	liquid_alternative_flowing = "default:water_flowing",
-	liquid_alternative_source = "default:water_source",
-	liquid_viscosity = 1,
-	pos_effect_color = {a = 100, r = 30, g = 60, b = 90},
-	sounds = default.node_sound_water_defaults(),
-})
-
-
 --||||||||||||||||
 -- ======================= Stone
 --||||||||||||||||
@@ -159,4 +115,187 @@ minetest.register_node("default:sand", {
 			{items = {"default:sand"}}
 		}
 	}
+})
+
+--||||||||||||||||
+-- ======================= Water
+--||||||||||||||||
+
+
+minetest.register_node("default:water_source", {
+	description = "Water source",
+	tiles={"default_water.png"},
+--[[ adding this later
+	tiles={
+		{
+			name = "default_water.png",
+			backface_culling = false,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		},
+		{
+			name = "default_water.png",
+			backface_culling = true,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		}
+	},
+--]]
+	alpha =150,
+	groups = {water=1, liquid=1, cools_lava=1},
+	drawtype = "liquid",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:water_flowing",
+	liquid_alternative_source = "default:water_source",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 100, r = 30, g = 60, b = 90},
+	sounds = default.node_sound_water_defaults(),
+})
+
+minetest.register_node("default:water_flowing", {
+	description = "Water flowing",
+	--tiles={"default_water.png"},
+	special_tiles={
+		{
+			name = "default_water.png",
+			backface_culling = false,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		},
+		{
+			name = "default_water.png",
+			backface_culling = true,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		}
+	},
+	alpha =150,
+	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	drawtype = "flowingliquid",
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "default:water_flowing",
+	liquid_alternative_source = "default:water_source",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 100, r = 30, g = 60, b = 90},
+	sounds = default.node_sound_water_defaults(),
+})
+
+minetest.register_node("default:salt_water_source", {
+	description = "Salt water source",
+	tiles={"default_salt_water.png"},
+--[[ adding this later
+	tiles={
+		{
+			name = "default_salt_water.png",
+			backface_culling = false,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		},
+		{
+			name = "default_salt_water.png",
+			backface_culling = true,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		}
+	},
+--]]
+	alpha =150,
+	groups = {water=1, liquid=1, cools_lava=1},
+	drawtype = "liquid",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:salt_water_flowing",
+	liquid_alternative_source = "default:salt_water_source",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
+	sounds = default.node_sound_water_defaults(),
+})
+
+minetest.register_node("default:salt_water_flowing", {
+	description = "Salt water flowing",
+	--tiles={"default_salt_water.png"},
+	special_tiles={
+		{
+			name = "default_salt_water.png",
+			backface_culling = false,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		},
+		{
+			name = "default_salt_water.png",
+			backface_culling = true,
+		--	animation = {
+		--		type = "vertical_frames",
+		--		aspect_w = 16,
+		--		aspect_h = 16,
+		--		length = 2,
+		--	}
+		}
+	},
+	alpha =150,
+	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	drawtype = "flowingliquid",
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "default:salt_water_flowing",
+	liquid_alternative_source = "default:salt_water_source",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
+	sounds = default.node_sound_water_defaults(),
 })
