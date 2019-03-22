@@ -132,31 +132,28 @@ minetest.register_node("default:sand", {
 
 minetest.register_node("default:water_source", {
 	description = "Water source",
-	tiles={"default_water.png"},
---[[ adding this later
 	tiles={
 		{
-			name = "default_water.png",
+			name = "default_water_animated.png",
 			backface_culling = false,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		},
 		{
-			name = "default_water.png",
+			name = "default_water_animated.png",
 			backface_culling = true,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		}
 	},
---]]
 	alpha =150,
 	groups = {water=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
@@ -177,27 +174,26 @@ minetest.register_node("default:water_source", {
 
 minetest.register_node("default:water_flowing", {
 	description = "Water flowing",
-	--tiles={"default_water.png"},
 	special_tiles={
 		{
-			name = "default_water.png",
+			name = "default_water_animated.png",
 			backface_culling = false,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		},
 		{
 			name = "default_water.png",
 			backface_culling = true,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		}
 	},
 	alpha =150,
@@ -221,31 +217,28 @@ minetest.register_node("default:water_flowing", {
 
 minetest.register_node("default:salt_water_source", {
 	description = "Salt water source",
-	tiles={"default_salt_water.png"},
---[[ adding this later
 	tiles={
 		{
-			name = "default_salt_water.png",
+			name = "default_salt_water_animated.png",
 			backface_culling = false,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		},
 		{
-			name = "default_salt_water.png",
+			name = "default_salt_water_animated.png",
 			backface_culling = true,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		}
 	},
---]]
 	alpha =150,
 	groups = {water=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
@@ -266,27 +259,26 @@ minetest.register_node("default:salt_water_source", {
 
 minetest.register_node("default:salt_water_flowing", {
 	description = "Salt water flowing",
-	--tiles={"default_salt_water.png"},
 	special_tiles={
 		{
-			name = "default_salt_water.png",
+			name = "default_salt_water_animated.png",
 			backface_culling = false,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		},
 		{
-			name = "default_salt_water.png",
+			name = "default_salt_water_animated.png",
 			backface_culling = true,
-		--	animation = {
-		--		type = "vertical_frames",
-		--		aspect_w = 16,
-		--		aspect_h = 16,
-		--		length = 2,
-		--	}
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
 		}
 	},
 	alpha =150,
