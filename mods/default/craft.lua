@@ -79,10 +79,6 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="default:cobble",
-	recipe={{"default:stick","default:stick","default:stick"},},
-})
-minetest.register_craft({
 	output="default:furnace",
 	recipe={
 		{"group:stone","group:stone","group:stone"},
@@ -92,7 +88,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="default:sand 1",
+	output="default:sand",
 	recipe={
 		{"default:sand","default:sand","default:sand"},
 	},
@@ -107,12 +103,74 @@ minetest.register_craft({
 	},
 })
 
-
-
+minetest.register_craft({
+	output="default:bronze_ingot 9",
+	recipe={
+		{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+		{"default:copper_ingot","default:tin_ingot","default:copper_ingot"},
+		{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+	},
+})
 
 --||||||||||||||||
 -- ======================= COOKING
 --||||||||||||||||
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:copper_ingot",
+	recipe = "default:copper_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:tin_ingot",
+	recipe = "default:tin_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:uranium_ingot",
+	recipe = "default:uranium_lump",
+	cooktime = 20,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:uraniumactive_ingot",
+	recipe = "default:uranium_ingot",
+	cooktime = 500,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:gold_ingot",
+	recipe = "default:gold_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:iron_ingot",
+	recipe = "default:iron_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:silver_ingot",
+	recipe = "default:silver_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:steel_ingot",
+	recipe = "default:iron_ingot",
+	cooktime = 10,
+})
 
 minetest.register_craft({
 	type = "cooking",

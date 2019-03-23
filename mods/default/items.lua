@@ -21,45 +21,52 @@ minetest.register_craftitem("default:uraniumactive_ingot", {
 })
 
 minetest.register_craftitem("default:copper_ingot", {
-	description = "Copper",
+	description = "Copper ingot",
 	inventory_image = "default_ingot_copper.png",
 	groups = {metal=1},
 })
 minetest.register_craftitem("default:bronze_ingot", {
-	description = "Bronze",
+	description = "Bronze ingot",
 	inventory_image = "default_ingot_bronze.png",
 	groups = {metal=1},
 })
 
 minetest.register_craftitem("default:uranium_ingot", {
-	description = "Uranium",
+	description = "Uranium ingot",
 	inventory_image = "default_ingot_uranium.png",
 	groups = {metal=1},
 })
 
 minetest.register_craftitem("default:gold_ingot", {
-	description = "Gold ",
+	description = "Gold ingot",
 	inventory_image = "default_ingot_gold.png",
 	groups = {metal=1},
 })
 
 minetest.register_craftitem("default:tin_ingot", {
-	description = "Tin",
+	description = "Tin ingot",
 	inventory_image = "default_ingot_tin.png",
 	groups = {metal=1},
 })
 
 minetest.register_craftitem("default:iron_ingot", {
-	description = "Iron",
+	description = "Iron ingot",
 	inventory_image = "default_ingot_iron.png",
 	groups = {metal=1},
 })
 
 minetest.register_craftitem("default:steel_ingot", {
-	description = "Steel",
+	description = "Steel ingot",
 	inventory_image = "default_ingot_steel.png",
 	groups = {metal=1},
 })
+
+minetest.register_craftitem("default:silver_ingot", {
+	description = "Silver ingot",
+	inventory_image = "default_ingot_silver.png",
+	groups = {metal=1},
+})
+
 
 --||||||||||||||||
 -- ======================= Lumps

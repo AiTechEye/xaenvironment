@@ -75,7 +75,7 @@ minetest.register_node("default:furnace", {
 		return 0
 	end,
 	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		if from_list == to_list then
+		if from_list == "fuel" and from_list == to_list then
 			return count
 		end
 		return 0
@@ -114,12 +114,9 @@ minetest.register_node("default:furnace", {
 
 --result
 
-
-
-
-
 		if burntime > 0 or newtime > 0 then
 			local result,after=minetest.get_craft_result({method="cooking", width=1, items={cook_stack}})
+
 			local new_cook
 			if inv:room_for_item("fried", result.item) then
 -- new fuel
@@ -157,10 +154,18 @@ minetest.register_node("default:furnace", {
 				end
 			end
 		end
+
+
+
 --formspec
+		if cook_stack:get_count() == 0 then
+			burntime = 0
+		end
+
+
 		local label = ""
 
-		if meta:get_int("cooking_fulltime") ~= 0 then
+		if meta:get_int("cooking_fulltime") ~= 0 and burntime ~= 0 then
 			label = "label[3.6,0.2;" .. (100 - math.floor(cooking_time / meta:get_int("cooking_fulltime") * 100)) .."%]"
 		end
 
@@ -180,6 +185,8 @@ minetest.register_node("default:furnace", {
 		if burntime > 0 then
 			return true
 		else
+			meta:set_int("time",0)
+			meta:set_int("cooking_time",0)
 			return false
 		end
 	end
