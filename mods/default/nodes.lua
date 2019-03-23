@@ -208,7 +208,7 @@ minetest.register_node("default:uranium_ore", {
 
 minetest.register_node("default:ice", {
 	description = "Ice",
-	tiles={"default_ice.png},
+	tiles={"default_ice.png"},
 	groups = {cracky=3},
 	sounds = default.node_sound_glass_defaults(),
 })
