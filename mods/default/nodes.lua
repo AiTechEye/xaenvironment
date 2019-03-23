@@ -154,7 +154,7 @@ minetest.register_node("default:water_source", {
 			}
 		}
 	},
-	alpha =150,
+	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
 	paramtype = "light",
@@ -168,7 +168,7 @@ minetest.register_node("default:water_source", {
 	liquid_alternative_flowing = "default:water_flowing",
 	liquid_alternative_source = "default:water_source",
 	liquid_viscosity = 1,
-	post_effect_color = {a = 100, r = 0, g = 20, b = 85},
+	post_effect_color = {a = 110, r = 42, g = 128, b = 231},
 	sounds = default.node_sound_water_defaults(),
 })
 
@@ -186,7 +186,7 @@ minetest.register_node("default:water_flowing", {
 			}
 		},
 		{
-			name = "default_water.png",
+			name = "default_water_animated.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
@@ -196,7 +196,7 @@ minetest.register_node("default:water_flowing", {
 			}
 		}
 	},
-	alpha =150,
+	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
@@ -211,7 +211,7 @@ minetest.register_node("default:water_flowing", {
 	liquid_alternative_flowing = "default:water_flowing",
 	liquid_alternative_source = "default:water_source",
 	liquid_viscosity = 1,
-	post_effect_color = {a = 100, r = 0, g = 20, b = 85},
+	post_effect_color = {a = 110, r = 42, g = 128, b = 231},
 	sounds = default.node_sound_water_defaults(),
 })
 
