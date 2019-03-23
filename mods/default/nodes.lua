@@ -206,6 +206,12 @@ minetest.register_node("default:uranium_ore", {
 -- ======================= Water
 --||||||||||||||||
 
+minetest.register_node("default:ice", {
+	description = "Ice",
+	tiles={"default_ice.png},
+	groups = {cracky=3},
+	sounds = default.node_sound_glass_defaults(),
+})
 
 minetest.register_node("default:water_source", {
 	description = "Water source",

@@ -1,3 +1,7 @@
+--||||||||||||||||
+-- ======================= Sounds
+--||||||||||||||||
+
 default.node_sound_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "", gain = 1}
@@ -52,7 +56,7 @@ end
 default.node_sound_leaves_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dig =	a.footstep or {name = "default_leaves_step", gain = 1}
+	a.dig =		a.footstep or {name = "default_leaves_step", gain = 1}
 	a.dug =		a.dug or {name = "default_leaves_dug", gain = 1}
 	a.place =		a.place or {name = "default_place", gain = 1}
 	return a
@@ -66,3 +70,16 @@ default.node_sound_gravel_defaults=function(a)
 	a.place =		a.place or {name = "default_gravel_place", gain = 1}
 	return a
 end
+
+default.node_sound_glass_defaults=function(a)
+	a = a or {}
+	--a.footstep =	a.footstep or {name = "", gain = 1}
+	--a.dig =		a.dig or {name = "", gain = 1}
+	--a.dug =		a.dug or {name = "default_break_glass", gain = 1}
+	--a.place =		a.place or {name = "", gain = 1}
+	return a
+end
+
+--||||||||||||||||
+-- ======================= Trees
+--||||||||||||||||

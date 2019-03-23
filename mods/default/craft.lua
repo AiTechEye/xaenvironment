@@ -141,7 +141,7 @@ minetest.register_craft({
 	type = "cooking",
 	output = "default:uraniumactive_ingot",
 	recipe = "default:uranium_ingot",
-	cooktime = 500,
+	cooktime = 100,
 })
 
 minetest.register_craft({
