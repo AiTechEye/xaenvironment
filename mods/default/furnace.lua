@@ -134,17 +134,17 @@ minetest.register_node("default:furnace", {
 					cook_stack:take_item()
 					inv:set_stack("cook",cook_slot,cook_stack)
 					new_cook = true
+					return true
 				end
 -- new cook
 				if new_cook or (cooking_time <= 0 and burntime <= 0) then
 					local slots = {1,2,3,4,1,2,3,4}
 					cook_slot = math.random(1,4) 
-
+					cooking_time = result.time
 					for i=cook_slot,cook_slot+4 do
 						cook_slot = slots[i]
 						cook_stack=inv:get_stack("cook",cook_slot)
 						if cook_stack:get_count()>0 then
-							cooking_time = result.time
 							meta:set_int("cooking_time",cooking_time)
 							meta:set_int("cooking_fulltime",cooking_time)
 							meta:set_int("cook_slot",cook_slot)

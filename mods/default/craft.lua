@@ -197,3 +197,9 @@ minetest.register_craft({
 	recipe = "group:stick",
 	burntime = 1,
 })
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "default:coal_lump",
+	burntime = 40,
+})
