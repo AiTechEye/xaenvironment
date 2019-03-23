@@ -90,3 +90,13 @@ minetest.register_craftitem("default:silver_lump", {
 	description = "Silver lump",
 	inventory_image = "default_lump_silver.png",
 })
+
+minetest.register_craftitem("default:uranium_lump", {
+	description = "Uranium lump",
+	inventory_image = "default_lump_uranium.png",
+})
+
+minetest.register_craftitem("default:electric_lump", {
+	description = "Electric lump",
+	inventory_image = "default_lump_electric.png",
+})

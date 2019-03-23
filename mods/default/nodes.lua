@@ -126,6 +126,83 @@ minetest.register_node("default:sand", {
 })
 
 --||||||||||||||||
+-- ======================= Ores
+--||||||||||||||||
+
+
+minetest.register_node("default:coal_ore", {
+	description = "Coal ore",
+	tiles={"default_stone.png^default_ore_coal.png"},
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:coal_lump",
+})
+
+minetest.register_node("default:iron_ore", {
+	description = "Iron ore",
+	tiles={"default_stone.png^default_ore_iron.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:iron_lump",
+})
+
+minetest.register_node("default:copper_ore", {
+	description = "Copper ore",
+	tiles={"default_stone.png^default_ore_copper.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:copper_lump",
+})
+
+minetest.register_node("default:tin_ore", {
+	description = "Tin ore",
+	tiles={"default_stone.png^default_ore_tin.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:tin_lump",
+})
+
+minetest.register_node("default:silver_ore", {
+	description = "Silver ore",
+	tiles={"default_stone.png^default_ore_silver.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:silver_lump",
+})
+
+minetest.register_node("default:gold_ore", {
+	description = "Gold ore",
+	tiles={"default_stone.png^default_ore_gold.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:gold_lump",
+})
+
+minetest.register_node("default:electric_ore", {
+	description = "Electric ore",
+	tiles={"default_stone.png^default_ore_electric.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:electric_lump",
+})
+
+minetest.register_node("default:electric_ore", {
+	description = "Electric ore",
+	tiles={"default_stone.png^default_ore_electric.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:electric_lump",
+})
+
+minetest.register_node("default:uranium_ore", {
+	description = "Uranium ore",
+	tiles={"default_stone.png^default_ore_uranium.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	drop="default:uranium_lump",
+})
+
+--||||||||||||||||
 -- ======================= Water
 --||||||||||||||||
 
@@ -239,7 +316,7 @@ minetest.register_node("default:salt_water_source", {
 			}
 		}
 	},
-	alpha =150,
+	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
 	paramtype = "light",
@@ -281,7 +358,7 @@ minetest.register_node("default:salt_water_flowing", {
 			}
 		}
 	},
-	alpha =150,
+	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
