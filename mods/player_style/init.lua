@@ -1,5 +1,13 @@
 player_style={registered_profiles={},players={}}
 
+minetest.register_on_player_hpchange(function(player,hp_change,modifer)
+	if player and modifer.type == "fall" then
+		hp_change = hp_change*4
+	end
+	return hp_change
+end,true)
+
+
 player_style.register_profile=function(def)
 	def=def or {}
 	player_style.registered_profiles[def.name or "default"]={
