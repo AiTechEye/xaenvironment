@@ -114,7 +114,7 @@ minetest.register_node("default:sandstone", {
 minetest.register_node("default:sand", {
 	description = "Sand",
 	tiles={"default_sand.png"},
-	groups = {crumbly=3},
+	groups = {crumbly=3,sand=1},
 	sounds = default.node_sound_dirt_defaults(),
 	drop ={
 		max_items = 1,
@@ -323,7 +323,7 @@ minetest.register_node("default:salt_water_source", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1},
+	groups = {saltwater=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -365,7 +365,7 @@ minetest.register_node("default:salt_water_flowing", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	groups = {saltwater=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",

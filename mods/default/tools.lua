@@ -18,7 +18,7 @@ minetest.register_tool("default:admin_pickaxe", {
 	description ="Admin pickaxe",
 	range = 15,
 	inventory_image = "default_admin_pickaxe.png",
-	groups = {admin_tool = 1},
+	groups = {admin_tool=1,not_in_creative_inventory=1},
 	tool_capabilities = {
 		full_punch_interval = 0.20,
 		max_drop_level = 3,

@@ -40,7 +40,7 @@ minetest.register_biome({
 	node_filler = "default:dirt",
 	depth_filler = 5,
 	--node_stone = "default:stone",
-	node_water = "default:water_source",
+	--node_water = "default:water_source",
 	--node_river_water = "default:water_source",
 	node_riverbed = "default:sand",
 	depth_riverbed = 3,
