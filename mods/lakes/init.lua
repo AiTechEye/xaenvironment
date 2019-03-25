@@ -74,6 +74,7 @@ minetest.register_on_generated(function(min, max, seed)
 				if y >= def.min_y and y <= def.max_y and minetest.get_node({x=min.x,y=min.y+y,z=min.z}).name == def.spawn_in then
 					def.pos = {x=min.x,y=min.y+y,z=min.z}
 					lakes.set_lake(def)
+					break
 				end
 			end
 		end
