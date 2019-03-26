@@ -51,6 +51,7 @@ minetest.register_tool("default:cudgel", {
 		damage_groups = {fleshy=3},
 	},
 	groups = {flammable = 2,stick=1},
+	sound=default.tool_breaks_defaults()
 })
 
 minetest.register_tool("default:pick_flint", {
@@ -65,6 +66,7 @@ minetest.register_tool("default:pick_flint", {
 		},
 		damage_groups={fleshy=2},
 	},
+	sound=default.tool_breaks_defaults()
 })
 
 minetest.register_tool("default:axe_flint", {
@@ -79,6 +81,7 @@ minetest.register_tool("default:axe_flint", {
 		},
 		damage_groups={fleshy=2},
 	},
+	sound=default.tool_breaks_defaults()
 })
 
 minetest.register_tool("default:axe_flint", {
@@ -93,6 +96,7 @@ minetest.register_tool("default:axe_flint", {
 		},
 		damage_groups={fleshy=2},
 	},
+	sound=default.tool_breaks_defaults()
 })
 
 minetest.register_tool("default:shovel_flint", {
@@ -107,6 +111,7 @@ minetest.register_tool("default:shovel_flint", {
 		},
 		damage_groups={fleshy=2},
 	},
+	sound=default.tool_breaks_defaults()
 })
 
 minetest.register_tool("default:vineyardknife_flint", {
@@ -121,4 +126,5 @@ minetest.register_tool("default:vineyardknife_flint", {
 		},
 		damage_groups={fleshy=2},
 	},
+	sound=default.tool_breaks_defaults()
 })

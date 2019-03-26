@@ -80,6 +80,12 @@ default.node_sound_glass_defaults=function(a)
 	return a
 end
 
+default.tool_breaks_defaults=function(a)
+	a = a or {}
+	a.breaks =	"default_tool_breaks"
+	return a
+end
+
 --||||||||||||||||
 -- ======================= Trees
 --||||||||||||||||
