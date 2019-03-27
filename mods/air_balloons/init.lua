@@ -1,4 +1,13 @@
 minetest.register_craft({
+	output="air_balloons:balloon",
+	recipe={
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+		{"group:wood","group:tree","default:furnace"},
+	},
+})
+
+minetest.register_craft({
 	output="air_balloons:gastank_empty",
 	recipe={
 		{"","default:iron_ingot",""},
@@ -10,42 +19,10 @@ minetest.register_craft({
 minetest.register_craft({
 	output="air_balloons:gastank",
 	recipe={
-		{"air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas"},
-		{"air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas"},
+		{"materials:plant_extracts_gas","materials:plant_extracts_gas","materials:plant_extracts_gas"},
+		{"materials:plant_extracts_gas","materials:plant_extracts_gas","materials:plant_extracts_gas"},
 		{"","air_balloons:gastank_empty",""},
 	},
-})
-
-minetest.register_craft({
-	output="air_balloons:plant_extracts",
-	recipe={
-		{"group:leaves","group:leaves","group:leaves"},
-		{"group:leaves","group:leaves","group:leaves"},
-	},
-})
-
-minetest.register_craft({
-	type = "cooking",
-	output = "air_balloons:plant_extracts_gas",
-	recipe = "air_balloons:plant_extracts",
-	cooktime = 10,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "air_balloons:plant_extracts_gas",
-	burntime = 10,
-})
-
-minetest.register_craftitem("air_balloons:plant_extracts", {
-	description = "Plant extracts",
-	inventory_image = "air_balloons_plant_extracts.png",
-})
-
-minetest.register_craftitem("air_balloons:plant_extracts_gas", {
-	description = "Plant extracts gas",
-	inventory_image = "air_balloons_plant_extracts_gas.png",
-	groups = {flammable = 1},
 })
 
 minetest.register_tool("air_balloons:balloon", {
@@ -215,14 +192,13 @@ minetest.register_entity("air_balloons:balloon",{
 		end
 
 		local p = self.object:get_pos()
-		if not self.rise and self.dir.y > -0.1 and minetest.get_node({x=p.x,y=p.y-1,z=p.z}).name == "air" then
+		if not self.rise and self.dir.y > -0.1 and minetest.get_node({x=p.x,y=p.y-0.6,z=p.z}).name == "air" then
 			self.dir.y = self.dir.y - 0.1
 			self.rep = true
 		elseif not self.rise and math.abs(self.dir.y) > 0.1 then
 			self.dir.y = self.dir.y*0.95
 			self.rep = true
 		end
-
 		if not (self.move or self.rise or self.rep) then
 			self.speed = 0
 			self.dir.y = 0
