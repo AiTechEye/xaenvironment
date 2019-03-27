@@ -62,7 +62,7 @@ minetest.register_tool("default:pick_flint", {
 		full_punch_interval = 1,
 		max_drop_level = 0,
 		groupcaps = {
-			cracky={times={[2]=1.9,[3]=0.9},uses=20,maxlevel=1},
+			cracky={times={[2]=1,[3]=1.5},uses=20,maxlevel=1},
 		},
 		damage_groups={fleshy=2},
 	},

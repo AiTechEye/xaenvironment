@@ -87,6 +87,7 @@ minetest.register_node("default:dirt", {
 
 minetest.register_node("default:stone", {
 	description = "Stone",
+	drop = "default:cobble",
 	tiles={"default_stone.png"},
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
