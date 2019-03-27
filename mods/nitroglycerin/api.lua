@@ -402,7 +402,7 @@ minetest.register_entity("nitroglycerin:dust",{
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
 	visual = "cube",
 	visual_size = {x=1,y=1},
-	textures ={"air.png"},
+	textures ={"default_air.png"},
 	spritediv = {x=1, y=1},
 	initial_sprite_basepos = {x=0, y=0},
 	is_visible = true,
@@ -460,7 +460,7 @@ minetest.register_entity("nitroglycerin:playerp",{
 	physical =true,
 	collisionbox = {-0.5,-0.5,-0.5,0.5,1.5,0.5},
 	visual = "sprite",
-	textures ={"air.png"},
+	textures ={"default_air.png"},
 	pointable=false,
 	on_punch=function(self)
 		local v=self.object:get_velocity().y
