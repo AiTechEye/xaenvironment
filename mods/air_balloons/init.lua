@@ -1,17 +1,110 @@
+minetest.register_craft({
+	output="air_balloons:gastank_empty",
+	recipe={
+		{"","default:iron_ingot",""},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+	},
+})
+
+minetest.register_craft({
+	output="air_balloons:gastank",
+	recipe={
+		{"air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas"},
+		{"air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas","air_balloons:plant_extracts_gas"},
+		{"","air_balloons:gastank_empty",""},
+	},
+})
+
+minetest.register_craft({
+	output="air_balloons:plant_extracts",
+	recipe={
+		{"group:leaves","group:leaves","group:leaves"},
+		{"group:leaves","group:leaves","group:leaves"},
+	},
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "air_balloons:plant_extracts_gas",
+	recipe = "air_balloons:plant_extracts",
+	cooktime = 10,
+})
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "air_balloons:plant_extracts_gas",
+	burntime = 10,
+})
+
+minetest.register_craftitem("air_balloons:plant_extracts", {
+	description = "Plant extracts",
+	inventory_image = "air_balloons_plant_extracts.png",
+})
+
+minetest.register_craftitem("air_balloons:plant_extracts_gas", {
+	description = "Plant extracts gas",
+	inventory_image = "air_balloons_plant_extracts_gas.png",
+	groups = {flammable = 1},
+})
+
 minetest.register_tool("air_balloons:balloon", {
 	description = "Air baloon",
 	inventory_image = "air_balloons_item.png",
-	--groups={not_in_creative_inventory=1},
+	groups={dig_immediate=3},
 	on_place=function(itemstack, user, pointed_thing)
 		if pointed_thing.type=="node" then
-			local en=minetest.add_entity(pointed_thing.above,"air_balloons:balloon")
-			en:get_luaentity().owner = user:get_player_name()
+			local en=minetest.add_entity(pointed_thing.above,"air_balloons:balloon"):get_luaentity()
+			en.owner = user:get_player_name()
+			local data = itemstack:to_table()
+			local meta = minetest.deserialize(data.metadata) or {fuel=0}
+			en.fuel = meta.fuel or 0
 			itemstack:take_item()
-
 		end
 		return itemstack	
 	end,
 })
+
+minetest.register_node("air_balloons:gastank", {
+	description = "Air balloon gastank",
+	tiles = {"air_balloons_gastank.png"},
+	groups={dig_immediate=3},
+	drawtype = "mesh",
+	mesh = "air_balloons_gastank.obj",
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.25, -0.5, -0.25, 0.25, 0.5, 0.25},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.25, -0.5, -0.25, 0.25, 0.5, 0.25},
+		}
+	}
+})
+
+minetest.register_node("air_balloons:gastank_empty", {
+	description = "Air balloon gastank (empty)",
+	tiles = {"air_balloons_gastank.png"},
+	groups={dig_immediate=3},
+	drawtype = "mesh",
+	mesh = "air_balloons_gastank.obj",
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.25, -0.5, -0.25, 0.25, 0.5, 0.25},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.25, -0.5, -0.25, 0.25, 0.5, 0.25},
+		}
+	}
+})
+
 
 minetest.register_entity("air_balloons:balloon",{
 	hp_max = 20,
@@ -19,7 +112,7 @@ minetest.register_entity("air_balloons:balloon",{
 	--weight = 0,
 	collisionbox = {-2,-0.5,-2,2,7,2},
 	visual = "mesh",
-	mesh = "air_balloons.obj",
+	mesh = "air_balloons.b3d",
 	visual_size = {x=1,y=1},
 	textures ={"air_balloons_material1.png"},
 	spritediv = {x=1, y=1},
@@ -29,6 +122,17 @@ minetest.register_entity("air_balloons:balloon",{
 	on_rightclick=function(self, clicker,name)
 		if clicker:is_player() and clicker:get_player_name() == self.owner then
 
+			if self.fuel<1000 and clicker:get_wielded_item():get_name() == "air_balloons:gastank" then
+				local i = clicker:get_wield_index()
+				local inv = clicker:get_inventory()
+				local stack = inv:get_stack("main", i)
+				stack:take_item()
+				inv:set_stack("main", i,stack)
+				self.fuel = self.fuel + 200
+				minetest.chat_send_player(self.owner, self.fuel .." fuel")
+				return
+			end
+
 			if self.user then
 				self.user:set_detach()
 				self.user = nil
@@ -36,40 +140,38 @@ minetest.register_entity("air_balloons:balloon",{
 				self.user = clicker
 				self.user:set_attach(self.object, "",{x = 0, y = -5, z = 0}, {x = 0, y = 0, z = 0})
 			end
---e.user:get_attach()
---user:set_eye_offset({x = 0, y = -10, z = 5}, {x = 0, y = 0, z = 0})
---
-
-
-			
 			return self
 		end
-
-
-
-
 	end,
-
-
 	on_punch=function(self,puncher)
 		if puncher:is_player() and (self.owner == "" or (puncher:get_player_name() == self.owner)) then
-			puncher:get_inventory():add_item("main","air_balloons:balloon")
-	--		minetest.add_item(self.object:get_pos(),self.drop)
+			local item = ItemStack("air_balloons:balloon")
+			local data = item:to_table()
+			data.metadata = minetest.serialize({fuel=self.fuel})
+			puncher:get_inventory():add_item("main",data)
 			self.object:remove()
 			return self
 		end
 	end,
+	anim=function(self,typ)
+		if self.an ~= typ then
+			self.an = typ
+			if typ=="on" then
+				self.object:set_animation({x=5,y=10},0,0)
+			else
+				self.object:set_animation({x=0,y=1},0,0)
+			end
+		end
+	end,
 	on_activate=function(self, staticdata)
-		self.owner = staticdata
 		self.dir = {x=0,y=0,z=0}
-		---if not aliveai_nitroglycerine.new_dust then self.object:remove() return self end
-		--self.drop=aliveai_nitroglycerine.new_dust.drop
-		--self.object:set_properties({textures = aliveai_nitroglycerine.new_dust.t})
-		--self.object:set_acceleration({x=0,y=-10,z=0})
-		--return self
+		local s = minetest.deserialize(staticdata) or {}
+		if not s.owner then return end
+		self.owner = s.owner
+		self.fuel = s.fuel
 	end,
 	get_staticdata = function(self)
-		return self.owner
+		return minetest.serialize({fuel=self.fuel,owner=self.owner})
 	end,
 	on_step=function(self, dtime)
 		self.time=self.time+dtime
@@ -81,88 +183,65 @@ minetest.register_entity("air_balloons:balloon",{
 			self.dir.z = d.z
 			local key = self.user:get_player_control()
 
-
 			if key.up then
 				if self.speed <2 then
 					self.speed = self.speed + 0.1
 				end
-				self.vset = true
+				self.move = true
 			end
-			if key.jump then
+			if key.jump and self.fuel > 0 then
 				if self.dir.y < 1 then
 					self.dir.y = self.dir.y + 0.1
+					self.anim(self,"on")
+					self.rise = true
 				end
-				self.vset = true
+
+				self.fuel = self.fuel -1
+				minetest.chat_send_player(self.owner, self.fuel .." fuel left")
 			elseif key.sneak then
+				self.anim(self,"off")
 				if self.dir.y > -1 then
 					self.dir.y = self.dir.y - 0.1
+					self.rise = true
 				end
-				self.vset = true
+			else
+				self.anim(self,"off")
 			end
 		end
 
-		if not self.vset then
-
-			if self.speed > 0.1 then
-				self.speed = self.speed * 0.95
-				self.rep = true
-			end
-
-			local p = self.object:get_pos()
-
-			if self.dir.y > -0.1 and minetest.get_node({x=p.x,y=p.y-1,z=p.z}).name == "air" then
-				self.dir.y = self.dir.y - 0.1
-				self.rep = true
-			elseif math.abs(self.dir.y) > 0.1 then
-				self.dir.y = self.dir.y*0.95
-				self.rep = true
-			end
+		if not self.move and self.speed > 0.1 then
+			self.speed = self.speed * 0.95
+			self.rep = true
 		end
-		if not self.vset and not self.rep then
+
+		local p = self.object:get_pos()
+		if not self.rise and self.dir.y > -0.1 and minetest.get_node({x=p.x,y=p.y-1,z=p.z}).name == "air" then
+			self.dir.y = self.dir.y - 0.1
+			self.rep = true
+		elseif not self.rise and math.abs(self.dir.y) > 0.1 then
+			self.dir.y = self.dir.y*0.95
+			self.rep = true
+		end
+
+		if not (self.move or self.rise or self.rep) then
 			self.speed = 0
 			self.dir.y = 0
 		end
-		self.vset = nil
 		self.rep = nil
+		self.move = nil
+		self.rise = nil
+
 		self.object:set_velocity({
 			x=self.dir.x*self.speed,
 			y=self.dir.y,
 			z=self.dir.z*self.speed,
 		})
 
-
-
 --not in water
-
-
---[[
-
-		
-		if not self.rounded and x+y+z<1 then
-			self.object:set_pos({x=math.floor(pos.x),y=math.floor(pos.y),z=math.floor(pos.z)})
-			self.rounded=1
-		end
-
-		local u=minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name]
-		if u and u.walkable then
-			local n=minetest.registered_nodes[minetest.get_node(pos).name]
-			if n and n.buildable_to and minetest.registered_nodes[self.drop] then
-				minetest.set_node(pos,{name=self.drop})
-				self.object:remove()
-			else
-				self.on_punch2(self)
-			end
-			return self
-		elseif self.timer2<0 then
-			self.on_punch2(self)
-		end
-		return self
-
---]]
 	end,
 	time=0,
 	timer=0.1,
-	timer2=10,
+	fuel=0,
 	speed=0,
 	owner="",
 })
