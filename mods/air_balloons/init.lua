@@ -99,14 +99,17 @@ minetest.register_entity("air_balloons:balloon",{
 	on_rightclick=function(self, clicker,name)
 		if clicker:is_player() and clicker:get_player_name() == self.owner then
 
-			if self.fuel<1000 and clicker:get_wielded_item():get_name() == "air_balloons:gastank" then
-				local i = clicker:get_wield_index()
-				local inv = clicker:get_inventory()
-				local stack = inv:get_stack("main", i)
-				stack:take_item()
-				inv:set_stack("main", i,stack)
-				self.fuel = self.fuel + 200
-				minetest.chat_send_player(self.owner, self.fuel .." fuel")
+			if clicker:get_wielded_item():get_name() == "air_balloons:gastank" then
+				if self.fuel<1000 then
+					local i = clicker:get_wield_index()
+					local inv = clicker:get_inventory()
+					local stack = inv:get_stack("main", i)
+					stack:take_item()
+					inv:set_stack("main", i,stack)
+					inv:add_item("main","air_balloons:gastank_empty")
+					self.fuel = self.fuel + 200
+					minetest.chat_send_player(self.owner, self.fuel .." fuel")
+				end
 				return
 			end
 
@@ -154,6 +157,9 @@ minetest.register_entity("air_balloons:balloon",{
 		self.time=self.time+dtime
 		if self.time<self.timer then return self end
 		self.time=0
+
+		local p = self.object:get_pos()
+		local n = minetest.get_node({x=p.x,y=p.y-0.6,z=p.z}).name
 		if self.user then
 			local d = self.user:get_look_dir()
 			self.dir.x = d.x
@@ -175,7 +181,7 @@ minetest.register_entity("air_balloons:balloon",{
 
 				self.fuel = self.fuel -1
 				minetest.chat_send_player(self.owner, self.fuel .." fuel left")
-			elseif key.sneak then
+			elseif key.sneak and n == "air" then
 				self.anim(self,"off")
 				if self.dir.y > -1 then
 					self.dir.y = self.dir.y - 0.1
@@ -191,8 +197,7 @@ minetest.register_entity("air_balloons:balloon",{
 			self.rep = true
 		end
 
-		local p = self.object:get_pos()
-		if not self.rise and self.dir.y > -0.1 and minetest.get_node({x=p.x,y=p.y-0.6,z=p.z}).name == "air" then
+		if not self.rise and self.dir.y > -0.1 and n == "air" then
 			self.dir.y = self.dir.y - 0.1
 			self.rep = true
 		elseif not self.rise and math.abs(self.dir.y) > 0.1 then
