@@ -116,6 +116,13 @@ minetest.register_craft({
 -- ======================= COOKING
 --||||||||||||||||
 
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:glass",
+	recipe = "group:sand",
+})
+
 minetest.register_craft({
 	type = "cooking",
 	output = "default:copper_ingot",
@@ -202,4 +209,115 @@ minetest.register_craft({
 	type = "fuel",
 	recipe = "default:coal_lump",
 	burntime = 40,
+})
+--||||||||||||||||
+-- ======================= Metal
+--||||||||||||||||
+minetest.register_craft({
+	output="default:ironblock",
+	recipe={
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:iron_ingot",
+	recipe={{"default:ironblock"}}
+})
+minetest.register_craft({
+	output="default:goldblock",
+	recipe={
+		{"default:gold_ingot","default:gold_ingot","default:gold_ingot"},
+		{"default:gold_ingot","default:gold_ingot","default:gold_ingot"},
+		{"default:gold_ingot","default:gold_ingot","default:gold_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:gold_ingot",
+	recipe={{"default:goldblock"}}
+})
+minetest.register_craft({
+	output="default:silverblock",
+	recipe={
+		{"default:silver_ingot","default:silver_ingot","default:silver_ingot"},
+		{"default:silver_ingot","default:silver_ingot","default:silver_ingot"},
+		{"default:silver_ingot","default:silver_ingot","default:silver_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:silver_ingot 9",
+	recipe={{"default:silverblock"}}
+})
+minetest.register_craft({
+	output="default:uraniumblock",
+	recipe={
+		{"default:uranium_ingot","default:uranium_ingot","default:uranium_ingot"},
+		{"default:uranium_ingot","default:uranium_ingot","default:uranium_ingot"},
+		{"default:uranium_ingot","default:uranium_ingot","default:uranium_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:uranium_ingot 9",
+	recipe={{"default:uraniumblock"}}
+})
+minetest.register_craft({
+	output="default:copperblock",
+	recipe={
+		{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+		{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+		{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:copper_ingot 9",
+	recipe={{"default:copperblock"}}
+})
+minetest.register_craft({
+	output="default:steelblock",
+	recipe={
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:steel_ingot 9",
+	recipe={{"default:steelblock"}}
+})
+minetest.register_craft({
+	output="default:tinblock",
+	recipe={
+		{"default:tin_ingot","default:tin_ingot","default:tin_ingot"},
+		{"default:tin_ingot","default:tin_ingot","default:tin_ingot"},
+		{"default:tin_ingot","default:tin_ingot","default:tin_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:tin_ingot 9",
+	recipe={{"default:tinblock"}}
+})
+minetest.register_craft({
+	output="default:bronzeblock",
+	recipe={
+		{"default:bronze_ingot","default:bronze_ingot","default:bronze_ingot"},
+		{"default:bronze_ingot","default:bronze_ingot","default:bronze_ingot"},
+		{"default:bronze_ingot","default:bronze_ingot","default:bronze_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:bronze_ingot 9",
+	recipe={{"default:bronzeblock"}},
+})
+minetest.register_craft({
+	output="default:uraniumactiveblock",
+	recipe={
+		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
+		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
+		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
+	},
+})
+minetest.register_craft({
+	output="default:uraniumactive_ingot 9",
+	recipe={{"default:uraniumactiveblock"}},
 })

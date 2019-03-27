@@ -41,6 +41,15 @@ minetest.register_node("default:leaves", {
 	}
 })
 
+minetest.register_node("default:glass", {
+	description = "Glass",
+	tiles={"default_glass_with_frame.png","default_glass.png"},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	paramtype = "light",
+	paramtype2 = "glasslikeliquidelevel",
+})
 
 minetest.register_node("default:tree", {
 	description = "Tree",
@@ -381,4 +390,69 @@ minetest.register_node("default:salt_water_flowing", {
 	liquid_viscosity = 1,
 	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
 	sounds = default.node_sound_water_defaults(),
+})
+
+--||||||||||||||||
+-- ======================= Metal
+--||||||||||||||||
+
+minetest.register_node("default:ironblock", {
+	description = "Ironblock",
+	tiles={"default_ironblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:goldblock", {
+	description = "Goldblock",
+	tiles={"default_goldblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:uraniumactiveblock", {
+	description = "Active uraniumblock",
+	tiles={"default_uraniumactiveblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:silverblock", {
+	description = "Silverblock",
+	tiles={"default_silverblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:uraniumblock", {
+	description = "Uraniumblock",
+	tiles={"default_uraniumblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:copperblock", {
+	description = "Copperblock",
+	tiles={"default_copperblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:steelblock", {
+	description = "Steelblock",
+	tiles={"default_steelblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:tinblock", {
+	description = "Tinblock",
+	tiles={"default_tinblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:diamondblock", {
+	description = "Diamondblock",
+	tiles={"default_diamondblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
+})
+minetest.register_node("default:bronzeblock", {
+	description = "Bronzeblock",
+	tiles={"default_bronzeblock.png"},
+	groups = {cracky=1},
+	sounds = default.node_sound_metal_defaults(),
 })
