@@ -81,11 +81,6 @@ default.node_sound_glass_defaults=function(a)
 end
 
 default.tool_breaks_defaults=function(a)
-
---This is test, the diamond stuff is the result
---creating a full toolset, ore & block from 1 texture + name... maybe ingots / lumps ill see how it works
-
-
 	a = a or {}
 	a.breaks =	"default_tool_breaks"
 	return a
@@ -93,8 +88,12 @@ end
 
 default.registry_mineral=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
-
 	local mod = minetest.get_current_modname() ..":"
+
+--This is test, the diamond stuff is the result
+--creating a full toolset, ore & block from 1 texture + name... maybe ingots / lumps ill see how it works
+
+
 --[[
 	def.name = "diamound"
 	def.block_texture = "default_diamondblock.png"
