@@ -86,20 +86,71 @@ default.tool_breaks_defaults=function(a)
 	return a
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 default.registry_mineral=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
+
 
 --This is test, the diamond stuff is the result
 --creating a full toolset, ore & block from 1 texture + name... maybe ingots / lumps ill see how it works
 
 
---[[
-	def.name = "diamound"
-	def.block_texture = "default_diamondblock.png"
-
---]]
-
+--def.drop
+--def.dropingot
+--lump
+	if not def.not_drop_and_ingot then
+		def.lump = def.lump or {}
+		def.drop = mod .. def.name .. "_lump"
+		def.lump.description = def.lump.description or 		uname .." lump"
+		def.lump.inventory_image = def.block_texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
+		minetest.register_craftitem(mod .. def.name .. "_lump", def.lump)
+	elseif def.drop then
+		if def.drop.name then
+			def.drop.name = def.drop.name
+		else
+			def.drop.name = def.name
+		end
+		if not def.drop.inventory_image:find(".png") then
+			def.drop.inventory_image = def.block_texture .. "^default_alpha_gem_" .. def.drop.inventory_image ..".png^[makealpha:0,255,0"
+		end
+		def.dropingot = def.drop.name
+		def.drop.description = def.drop.description or 		uname
+		minetest.register_craftitem(mod .. def.drop.name, def.drop)
+	end
+--ingot
+	if not def.not_drop_and_ingot then
+		def.ingot = def.ingot or {}
+		def.dropingot = mod .. def.name .. "_ingot"
+		def.ingot.description = def.ingot.description or 		uname .." ingot"
+		def.ingot.inventory_image = def.block_texture .. "^default_alpha_ingot.png^[makealpha:0,255,0"
+		minetest.register_craftitem(mod .. def.name .. "_ingot", def.ingot)
+		if def.lump then
+			minetest.register_craft({
+				type = "cooking",
+				output = mod .. def.name .. "_ingot",
+				recipe = mod .. def.name .. "_lump",
+				cooktime = 10,
+			})
+		end
+	end
 --block
 	if not def.not_block then
 		def.blocknode = def.blocknode or {}
@@ -108,10 +159,25 @@ default.registry_mineral=function(def)
 		def.blocknode.sounds =	def.blocknode.sounds or	default.node_sound_metal_defaults()
 		def.blocknode.groups =	def.blocknode.groups or	{cracky=1}
 		minetest.register_node(mod .. def.name .."block", def.blocknode)
+		if def.dropingot then
+			minetest.register_craft({
+				output=mod .. def.name .."block",
+				recipe={
+					{def.dropingot,def.dropingot,def.dropingot},
+					{def.dropingot,def.dropingot,def.dropingot},
+					{def.dropingot,def.dropingot,def.dropingot},
+				},
+			})
+			minetest.register_craft({
+				output=def.dropingot .. " 9",
+				recipe={{mod .. def.name .."block"},},
+			})
+		end
 	end
 --ore
 	if not def.not_ore then
 		def.orenode = def.orenode or {}
+		def.orenode.drop = def.drop
 		def.orenode.tiles =	def.orenode.tiles or			{def.block_texture .. "^default_alpha_ore.png"}
 		def.orenode.description =	def.orenode.description or	uname .. " ore"
 		def.orenode.sounds =	def.orenode.sounds or	default.node_sound_stone_defaults()
@@ -133,6 +199,14 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2}
 		},
 		minetest.register_tool(mod .. def.name .. "_pick", def.pick)
+		minetest.register_craft({
+			output=mod .. def.name .. "_pick",
+			recipe={
+				{def.dropingot,def.dropingot,def.dropingot},
+				{"","default:stick",""},
+				{"","default:stick",""},
+			},
+		})
 	end
 --shovel
 	if not def.not_shovel then
@@ -149,6 +223,14 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=1},
 		},
 		minetest.register_tool(mod .. def.name .. "_shovel", def.shovel)
+		minetest.register_craft({
+			output=mod .. def.name .. "_shovel",
+			recipe={
+				{"",def.dropingot,""},
+				{"","default:stick",""},
+				{"","default:stick",""},
+			},
+		})
 	end
 --axe
 	if not def.not_axe then
@@ -165,6 +247,14 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2},
 		}
 		minetest.register_tool(mod .. def.name .. "_axe", def.axe)
+		minetest.register_craft({
+			output=mod .. def.name .. "_axe",
+			recipe={
+				{def.dropingot,def.dropingot,""},
+				{def.dropingot,"default:stick",""},
+				{"","default:stick",""},
+			},
+		})
 	end
 --vineyardknife
 	if not def.not_vineyardknife then
@@ -181,8 +271,16 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2},
 		},
 		minetest.register_tool(mod .. def.name .. "_vineyardknife", def.vineyardknife)
+		minetest.register_craft({
+			output=mod .. def.name .. "_vineyardknife",
+			recipe={
+				{"",def.dropingot,def.dropingot},
+				{"","","def.dropingot"},
+				{"","default:stick",""},
+			},
+		})
 	end
-
+--hoe
 	if not def.not_hoe then
 		def.hoe = def.hoe or {}
 		def.hoe.sound = default.tool_breaks_defaults()
@@ -193,57 +291,23 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=5},
 		},
 		minetest.register_tool(mod .. def.name .. "_hoe", def.hoe)
+		minetest.register_craft({
+			output=mod .. def.name .. "_hoe",
+			recipe={
+				{def.dropingot,def.dropingot,""},
+				{"","default:stick",""},
+				{"","default:stick",""},
+			},
+		})
 	end
-
-
-
---[[
-
-
-	item_texture1 or nil
-	item_texture1 or nil
-	item_name1 or nil
-	item_name2 or nil
-
-	def.ingot_texture or nil
-	def.lump_texture or nil
-
-	def.craft_ingots_to_block = def.craft_ingots_to_block or true
-	def.craft_block_to_ingots = def.craft_block_to_ingots or true
-	def.smelt_lump_to_ingot = def.smelt_lump_to_ingot or true
-
-
-
-
-minetest.register_craft({
-	output="default:block",
-	recipe={
-		{"default:_ingot","default:_ingot","default:_ingot"},
-		{"default:_ingot","default:_ingot","default:_ingot"},
-		{"default:_ingot","default:_ingot","default:_ingot"},
-	},
-})
-minetest.register_craft({
-	output="default:ingot 9",
-	recipe={{"default:block"}}
-})
-
-minetest.register_craft({
-	type = "cooking",
-	output = "default:_ingot",
-	recipe = "default:_ingot",
-	cooktime = 10,
-})
-minetest.register_craftitem("default:_ingot", {
-	description = "ingot",
-	inventory_image = "default_ingot_.png",
-	groups = {metal=1},
-})
-minetest.register_craftitem("_lump", {
-	description = " lump",
-	inventory_image = "default_lump_.png",
-})
---]]
-
 end
-default.registry_mineral({name="diamond",block_texture="default_diamondblock.png"})
+default.registry_mineral({
+	name="diamond",
+	block_texture="default_diamondblock.png",
+	drop={inventory_image="diamond"},
+	not_drop_and_ingot = true
+
+})
+
+
+
