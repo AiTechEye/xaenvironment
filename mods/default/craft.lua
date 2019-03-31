@@ -52,6 +52,19 @@ minetest.register_craft({
 })
 
 --||||||||||||||||
+-- ======================= Node-tools
+--||||||||||||||||
+
+minetest.register_craft({
+	output="default:workbench",
+	recipe={
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:wood","default:wood","default:wood"},
+		{"default:tree","default:wood","default:tree"},
+	},
+})
+
+--||||||||||||||||
 -- ======================= Items
 --||||||||||||||||
 

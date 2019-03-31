@@ -445,12 +445,6 @@ minetest.register_node("default:tinblock", {
 	groups = {cracky=1},
 	sounds = default.node_sound_metal_defaults(),
 })
-minetest.register_node("default:diamondblock", {
-	description = "Diamondblock",
-	tiles={"default_diamondblock.png"},
-	groups = {cracky=1},
-	sounds = default.node_sound_metal_defaults(),
-})
 minetest.register_node("default:bronzeblock", {
 	description = "Bronzeblock",
 	tiles={"default_bronzeblock.png"},

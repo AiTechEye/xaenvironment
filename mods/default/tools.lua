@@ -84,21 +84,6 @@ minetest.register_tool("default:axe_flint", {
 	sound=default.tool_breaks_defaults()
 })
 
-minetest.register_tool("default:axe_flint", {
-	description ="Flint axe",
-	inventory_image = "default_axe_flint.png",
-	groups = {tool=1,flint=1},
-	tool_capabilities = {
-		full_punch_interval = 1,
-		max_drop_level = 0,
-		groupcaps = {
-			choppy={times={[1]=2,[2]=1.9,[3]=1.2},uses=20,maxlevel=1},
-		},
-		damage_groups={fleshy=2},
-	},
-	sound=default.tool_breaks_defaults()
-})
-
 minetest.register_tool("default:shovel_flint", {
 	description ="Flint shovel",
 	inventory_image = "default_shovel_flint.png",
