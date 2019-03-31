@@ -4,106 +4,190 @@ minetest.register_craftitem("default:stick", {
 	inventory_image = "default_stick.png",
 	groups = {flammable = 1,stick=1},
 })
-minetest.register_craftitem("default:flint", {
-	description = "Flint",
-	inventory_image = "default_flint.png",
-	groups = {flint=1},
-})
 
 --||||||||||||||||
--- ======================= Ingots
+-- ======================= minerals
 --||||||||||||||||
 
-minetest.register_craftitem("default:uraniumactive_ingot", {
-	description = "Active uranium",
-	inventory_image = "default_ingot_uraniumactive.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="coal",
+	texture="default_copperblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
+	regular_additional_craft={{
+		type = "fuel",
+		recipe = "default:coal_lump",
+		burntime = 40,
+	}}
 })
 
-minetest.register_craftitem("default:copper_ingot", {
-	description = "Copper ingot",
-	inventory_image = "default_ingot_copper.png",
-	groups = {metal=1},
-})
-minetest.register_craftitem("default:bronze_ingot", {
-	description = "Bronze ingot",
-	inventory_image = "default_ingot_bronze.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="flint",
+	texture="default_flintblock.png",
+	not_ore=true,
+	not_lump=true,
+	not_ingot=true,
+	drop={inventory_image="flint"},
+	block={
+		groups={cracky=3,stone=1},
+		sounds=default.node_sound_stone_defaults()
+	},
+	regular_additional_craft={
+
+	{output="default:flint_pick",
+	recipe={
+		{"default:flint","default:flint","default:flint"},
+		{"","default:stick",""},
+		{"","default:stick",""},
+	}},
+	{output="default:flint_shovel",
+	recipe={
+		{"","default:flint",""},
+		{"","default:stick",""},
+		{"","default:stick",""},
+	}},
+	{output="default:flint_axe",
+	recipe={
+		{"default:flint","default:flint",""},
+		{"default:flint","default:stick",""},
+		{"","default:stick",""},
+	}},
+	{output="default:flint_hoe",
+	recipe={
+		{"default:flint","default:flint",""},
+		{"","default:stick",""},
+		{"","default:stick",""},
+	}},
+	{output="default:flint_vineyardknife",
+	recipe={
+		{"default:flint","default:flint",""},
+		{"","default:stick",""},
+		{"","default:stick",""},
+	}},
+	{output="default:flint",
+	recipe={
+		{"default:gravel","default:gravel","default:gravel"},
+		{"default:gravel","default:gravel","default:gravel"},
+		{"default:gravel","default:gravel","default:gravel"},
+	}}
+}})
+
+default.registry_mineral({
+	name="copper",
+	texture="default_copperblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
-minetest.register_craftitem("default:uranium_ingot", {
-	description = "Uranium ingot",
-	inventory_image = "default_ingot_uranium.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="tin",
+	texture="default_tinblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
-minetest.register_craftitem("default:gold_ingot", {
-	description = "Gold ingot",
-	inventory_image = "default_ingot_gold.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="bronze",
+	texture="default_bronzeblock.png",
+	not_lump = true,
+	not_ore = true,
+	regular_additional_craft={{
+		output="default:bronze_ingot 9",
+		recipe={
+			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+			{"default:copper_ingot","default:tin_ingot","default:copper_ingot"},
+			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
+		}
+	}}
 })
 
-minetest.register_craftitem("default:tin_ingot", {
-	description = "Tin ingot",
-	inventory_image = "default_ingot_tin.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="iron",
+	texture="default_ironblock.png",
+	lump={inventory_image="default_lump_iron.png"},
+	ore={tiles={"default_stone.png^default_ore_iron.png"}}
 })
 
-minetest.register_craftitem("default:iron_ingot", {
-	description = "Iron ingot",
-	inventory_image = "default_ingot_iron.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="steel",
+	texture="default_steelblock.png",
+	not_lump = true,
+	not_ore = true,
+	regular_additional_craft={{
+		type = "cooking",
+		output = "default:steel_ingot",
+		recipe = "default:iron_ingot",
+		cooktime = 10
+	}}
 })
 
-minetest.register_craftitem("default:steel_ingot", {
-	description = "Steel ingot",
-	inventory_image = "default_ingot_steel.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="gold",
+	texture="default_goldblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
-minetest.register_craftitem("default:silver_ingot", {
-	description = "Silver ingot",
-	inventory_image = "default_ingot_silver.png",
-	groups = {metal=1},
+default.registry_mineral({
+	name="silver",
+	texture="default_silverblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
-
---||||||||||||||||
--- ======================= Lumps
---||||||||||||||||
-
-minetest.register_craftitem("default:tin_lump", {
-	description = "Tin lump",
-	inventory_image = "default_lump_tin.png",
+default.registry_mineral({
+	name="diamond",
+	texture="default_diamondblock.png",
+	drop={inventory_image="diamond"},
+	not_lump = true,
+	not_ingot = true
 })
 
-minetest.register_craftitem("default:copper_lump", {
-	description = "Copper lump",
-	inventory_image = "default_lump_copper.png",
-})
-minetest.register_craftitem("default:gold_lump", {
-	description = "Gold lump",
-	inventory_image = "default_lump_gold.png",
-})
-minetest.register_craftitem("default:iron_lump", {
-	description = "Iron lump",
-	inventory_image = "default_lump_iron.png",
-})
-minetest.register_craftitem("default:coal_lump", {
-	description = "Coal lump",
-	inventory_image = "default_lump_coal.png",
-})
-minetest.register_craftitem("default:silver_lump", {
-	description = "Silver lump",
-	inventory_image = "default_lump_silver.png",
+default.registry_mineral({
+	name="electric",
+	texture="default_electricblock.png",
+	not_ingot=true,
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
-minetest.register_craftitem("default:uranium_lump", {
-	description = "Uranium lump",
-	inventory_image = "default_lump_uranium.png",
+default.registry_mineral({
+	name="uranium",
+	texture="default_uraniumblock.png",
 })
 
-minetest.register_craftitem("default:electric_lump", {
-	description = "Electric lump",
-	inventory_image = "default_lump_electric.png",
+default.registry_mineral({
+	name="uraniumactive",
+	texture="default_uraniumactiveblock.png",
+	not_lump=true,
+	not_ore=true,
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
+	regular_additional_craft={{
+		type = "cooking",
+		output = "default:uraniumactive_ingot",
+		recipe = "default:uranium_ingot",
+		cooktime = 100
+	}}
 })
