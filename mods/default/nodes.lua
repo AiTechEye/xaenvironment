@@ -11,12 +11,11 @@ default:cobble
 default:sandstone
 --]]
 
-minetest.register_node("default:apple", {
-	description = "Tree sapling",
+default.register_eatable("node","default:apple",1,4,{
+	description = "Apple",
 	inventory_image="default_apple.png",
 	tiles={"default_apple.png"},
-	on_use = minetest.item_eat(1,"default:apple"),
-	groups = {leaves=1,dig_immediate=3,snappy=3,leafdecay=3,flammable=1,eatable=1,gaps=4},
+	groups = {dig_immediate=3,snappy=3,flammable=1},
 	sounds = default.node_sound_leaves_defaults(),
 	attached_node = 1,
 	drawtype = "plantlike",
@@ -148,83 +147,6 @@ minetest.register_node("default:sand", {
 			{items = {"default:sand"}}
 		}
 	}
-})
-
---||||||||||||||||
--- ======================= Ores
---||||||||||||||||
-
-
-minetest.register_node("default:coal_ore", {
-	description = "Coal ore",
-	tiles={"default_stone.png^default_ore_coal.png"},
-	groups = {cracky=3},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:coal_lump",
-})
-
-minetest.register_node("default:iron_ore", {
-	description = "Iron ore",
-	tiles={"default_stone.png^default_ore_iron.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:iron_lump",
-})
-
-minetest.register_node("default:copper_ore", {
-	description = "Copper ore",
-	tiles={"default_stone.png^default_ore_copper.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:copper_lump",
-})
-
-minetest.register_node("default:tin_ore", {
-	description = "Tin ore",
-	tiles={"default_stone.png^default_ore_tin.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:tin_lump",
-})
-
-minetest.register_node("default:silver_ore", {
-	description = "Silver ore",
-	tiles={"default_stone.png^default_ore_silver.png"},
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:silver_lump",
-})
-
-minetest.register_node("default:gold_ore", {
-	description = "Gold ore",
-	tiles={"default_stone.png^default_ore_gold.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:gold_lump",
-})
-
-minetest.register_node("default:electric_ore", {
-	description = "Electric ore",
-	tiles={"default_stone.png^default_ore_electric.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:electric_lump",
-})
-
-minetest.register_node("default:electric_ore", {
-	description = "Electric ore",
-	tiles={"default_stone.png^default_ore_electric.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:electric_lump",
-})
-
-minetest.register_node("default:uranium_ore", {
-	description = "Uranium ore",
-	tiles={"default_stone.png^default_ore_uranium.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
-	drop="default:uranium_lump",
 })
 
 --||||||||||||||||

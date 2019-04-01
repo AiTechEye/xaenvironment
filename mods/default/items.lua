@@ -11,7 +11,7 @@ minetest.register_craftitem("default:stick", {
 
 default.registry_mineral({
 	name="coal",
-	texture="default_copperblock.png",
+	texture="default_coalblock.png",
 	not_pick=true,
 	not_axe=true,
 	not_shovel=true,
