@@ -138,6 +138,21 @@ default.workbench.register_craft=function(c)
 	table.insert(default.workbench.registered_crafts,c)
 end
 
+default.date=function(a,c)
+	if a=="get" then
+		return os.time()
+	else
+		if a=="s" then
+			return os.difftime(os.time(), c)
+		elseif a=="m" then
+			return os.difftime(os.time(), c) / 60
+		elseif a=="h" then
+			return os.difftime(os.time(), c) / (60 * 60)
+		elseif a=="d" then
+			return os.difftime(os.time(), c) / (24 * 60 * 60)
+		end
+	end
+end
 
 default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
@@ -170,8 +185,9 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	minetest["register_" .. kind](name, def)
 
 	if kind ~= "tool" then
+		def.groups.not_in_creative_inventory = 1
 		minetest.register_tool(def.name .. "_eaten", {
-			description = def.description .. " (eaten)",
+			description = def.description,
 			inventory_image = def.inventory_image or def.tiles[1],
 			groups = def.groups,
 			on_use = def.on_use

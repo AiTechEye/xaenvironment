@@ -15,15 +15,47 @@ default.register_eatable("node","default:apple",1,4,{
 	description = "Apple",
 	inventory_image="default_apple.png",
 	tiles={"default_apple.png"},
-	groups = {dig_immediate=3,snappy=3,flammable=1},
+	groups = {dig_immediate=3,snappy=3,flammable=1,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
-	attached_node = 1,
 	drawtype = "plantlike",
 	paramtype = "light",
 	sunlight_propagetes = true,
 	walkable = false,
 	visual_scale = 0.5,
 	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, -0.1, 0.1}},
+	after_place_node = function(pos, placer)
+		minetest.set_node(pos,{name="default:apple",param2=1})
+	end,
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+		if oldnode.param2 == 0 then
+			minetest.set_node(pos,{name="default:apple_spawner"})
+			minetest.get_meta(pos):set_int("date",default.date("get"))
+			minetest.get_node_timer(pos):start(10)
+		end
+	end
+})
+
+minetest.register_node("default:apple_spawner", {
+	description = "Apple spawner",
+	tiles={"default_treesapling.png"},
+	groups = {not_in_creative_inventory=1},
+	drop = "",
+	drawtype = "airlike",
+	paramtype = "light",
+	pointable = false,
+	sunlight_propagetes = true,
+	walkable = false,
+	on_timer = function (pos, elapsed)
+		local date = minetest.get_meta(pos):get_int("date")
+		if default.date("m",date) > 30 then
+			if minetest.find_node_near(pos,1,"default:leaves") then
+				minetest.set_node(pos,{name="default:apple",param2=0})
+			else
+				minetest.remove_node(pos)
+			end
+		end
+		return true
+	end
 })
 
 minetest.register_node("default:sapling", {
