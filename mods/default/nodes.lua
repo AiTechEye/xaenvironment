@@ -11,6 +11,21 @@ default:cobble
 default:sandstone
 --]]
 
+minetest.register_node("default:apple", {
+	description = "Tree sapling",
+	inventory_image="default_apple.png",
+	tiles={"default_apple.png"},
+	on_use = minetest.item_eat(1,"default:apple"),
+	groups = {leaves=1,dig_immediate=3,snappy=3,leafdecay=3,flammable=1,eatable=1,gaps=4},
+	sounds = default.node_sound_leaves_defaults(),
+	attached_node = 1,
+	drawtype = "plantlike",
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+	visual_scale = 0.5,
+	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, -0.1, 0.1}},
+})
 
 minetest.register_node("default:sapling", {
 	description = "Tree sapling (not working yet)",
@@ -392,6 +407,97 @@ minetest.register_node("default:salt_water_flowing", {
 	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
 	sounds = default.node_sound_water_defaults(),
 })
+
+--||||||||||||||||
+-- ======================= Lava
+--||||||||||||||||
+
+minetest.register_node("default:lava_source", {
+	description = "Lava source",
+	tiles={
+		{
+			name = "default_lava_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		},
+		{
+			name = "default_lava_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		}
+	},
+	groups = {lava=1, liquid=1},
+	drawtype = "liquid",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	light_source=13,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	damage_per_second = 9,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:lava_flowing",
+	liquid_alternative_source = "default:lava_source",
+	liquid_viscosity = 20,
+	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
+})
+
+minetest.register_node("default:lava_flowing", {
+	description = "Lava flowing",
+	special_tiles={
+		{
+			name = "default_lava_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		},
+		{
+			name = "default_lava_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		}
+	},
+	groups = {lava=1, liquid=1,not_in_creative_inventory=1},
+	drawtype = "flowingliquid",
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	light_source=13,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	damage_per_second = 9,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "default:lava_flowing",
+	liquid_alternative_source = "default:lava_source",
+	liquid_viscosity = 20,
+	post_effect_color = {a = 240, r = 255, g = 55, b = 0}
+})
+
+
 
 --||||||||||||||||
 -- ======================= Metal
