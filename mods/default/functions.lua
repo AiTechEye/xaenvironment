@@ -200,6 +200,7 @@ default.registry_mineral=function(def)
 		def.dropingot = def.drop.name
 		def.drop.description = def.drop.description or 		uname
 		minetest.register_craftitem(def.drop.name, def.drop)
+		def.drop = def.drop.name
 	end
 --ingot
 	if not def.not_ingot then
