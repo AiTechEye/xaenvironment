@@ -394,3 +394,16 @@ default.registry_mineral=function(def)
 		end
 	end
 end
+
+minetest.register_abm({
+	nodenames={"group:leafdecay"},
+	neighbors={"air"},
+	interval=10,
+	chance=5,
+	action=function(pos,node,active_object_count,active_object_count_wider)
+		if not minetest.find_node_near(pos,5,{"group:tree"}) then
+			minetest.add_item(pos,minetest.get_node_drops(node.name)[1])
+			minetest.remove_node(pos)
+		end
+	end
+})

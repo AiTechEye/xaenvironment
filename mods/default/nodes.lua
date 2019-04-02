@@ -15,7 +15,7 @@ default.register_eatable("node","default:apple",1,4,{
 	description = "Apple",
 	inventory_image="default_apple.png",
 	tiles={"default_apple.png"},
-	groups = {dig_immediate=3,snappy=3,flammable=1,attached_node=1},
+	groups = {dig_immediate=3,leafdecay=3,snappy=3,flammable=1,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
 	drawtype = "plantlike",
 	paramtype = "light",
@@ -28,8 +28,10 @@ default.register_eatable("node","default:apple",1,4,{
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		if oldnode.param2 == 0 then
+			local meta = minetest.get_meta(pos)
 			minetest.set_node(pos,{name="default:apple_spawner"})
-			minetest.get_meta(pos):set_int("date",default.date("get"))
+			meta:set_int("date",default.date("get"))
+			meta:set_int("growtime",math.random(1,30))
 			minetest.get_node_timer(pos):start(10)
 		end
 	end
@@ -46,8 +48,8 @@ minetest.register_node("default:apple_spawner", {
 	sunlight_propagetes = true,
 	walkable = false,
 	on_timer = function (pos, elapsed)
-		local date = minetest.get_meta(pos):get_int("date")
-		if default.date("m",date) > 30 then
+		local meta = minetest.get_meta(pos)
+		if default.date("m",meta:get_int("date")) > meta:get_int("growtime") then
 			if minetest.find_node_near(pos,1,"default:leaves") then
 				minetest.set_node(pos,{name="default:apple",param2=0})
 			else
@@ -59,17 +61,50 @@ minetest.register_node("default:apple_spawner", {
 })
 
 minetest.register_node("default:sapling", {
-	description = "Tree sapling (not working yet)",
+	description = "Tree sapling",
+	inventory_image="default_treesapling.png",
 	tiles={"default_treesapling.png"},
-	groups = {leaves=1,dig_immediate=3,snappy=3,leafdecay=3,flammable=1},
+	groups = {leaves=1,dig_immediate=3,snappy=3,flammable=1},
 	sounds = default.node_sound_leaves_defaults(),
 	attached_node = 1,
 	drawtype = "plantlike",
 	paramtype = "light",
 	sunlight_propagetes = true,
 	walkable = false,
+	after_place_node = function(pos, placer)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") > 0 then
+			local meta = minetest.get_meta(pos)
+			meta:set_int("date",default.date("get"))
+			meta:set_int("growtime",math.random(10,60))
+			minetest.get_node_timer(pos):start(10)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") and minetest.get_node_light(pos,0.5) >= 13 then
+			local meta = minetest.get_meta(pos)
+			if default.date("m",meta:get_int("date")) >= meta:get_int("growtime") then
+				local applm = math.random(5,20)
+				minetest.remove_node(pos)
+				minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("default").."/schematics/default_tree.mts", "random", {}, false)
+				for z=-3,3 do
+				for x=-3,3 do
+				for y=4,10 do
+					local pos2 = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+					if math.random(1,applm) == 1 and minetest.get_node(pos2).name == "default:leaves" then
+						local meta = minetest.get_meta(pos2)
+						minetest.set_node(pos2,{name="default:apple_spawner"})
+						meta:set_int("date",default.date("get"))
+						meta:set_int("growtime",math.random(1,30))
+						minetest.get_node_timer(pos2):start(10)
+					end
+				end
+				end
+				end
+			end
+			return true
+		end
+	end
 })
-
 
 minetest.register_node("default:leaves", {
 	description = "Leaves",
@@ -149,8 +184,9 @@ minetest.register_node("default:cobble", {
 minetest.register_node("default:gravel", {
 	description = "Gravel",
 	tiles={"default_gravel.png"},
-	groups = {crumbly=2},
+	groups = {crumbly=2,falling_node=1},
 	sounds = default.node_sound_gravel_defaults(),
+	drowning = 1,
 	drop ={
 		max_items = 1,
 		items = {
@@ -170,8 +206,9 @@ minetest.register_node("default:sandstone", {
 minetest.register_node("default:sand", {
 	description = "Sand",
 	tiles={"default_sand.png"},
-	groups = {crumbly=3,sand=1},
+	groups = {crumbly=3,sand=1,falling_node=1},
 	sounds = default.node_sound_dirt_defaults(),
+	drowning = 1,
 	drop ={
 		max_items = 1,
 		items = {
@@ -193,7 +230,7 @@ minetest.register_node("default:ice", {
 })
 
 minetest.register_node("default:water_source", {
-	description = "Water source",
+	description = "Water source (fresh water)",
 	tiles={
 		{
 			name = "default_water_animated.png",

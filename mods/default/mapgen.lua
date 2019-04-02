@@ -1,6 +1,54 @@
 minetest.register_alias("mapgen_stone","default:stone")
 minetest.register_alias("mapgen_water_source","default:salt_water_source")
 minetest.register_alias("mapgen_river_water_source","default:water_source")
+minetest.register_alias("mapgen_lava_source","default:lava_source")
+
+--minetest.set_mapgen_setting("mgv7_lava_depth",-50)
+
+minetest.register_ore({
+	ore_type       = "blob",
+	ore            = "default:lava_source",
+	wherein        = "default:stone",
+	clust_scarcity = 17 * 17* 17,
+	clust_size = 10,
+	y_min          = -31000,
+	y_max          = -50,
+})
+
+minetest.register_ore({
+	ore_type       = "blob",
+	ore            = "default:gravel",
+	wherein        = "default:stone",
+	clust_scarcity = 20 * 20 * 20,
+	clust_size = 5,
+	y_min          = -31000,
+	y_max          = 31000,
+})
+
+minetest.register_ore({
+	ore_type       = "blob",
+	ore            = "default:sand",
+	wherein        = "default:stone",
+	clust_scarcity = 20 * 20 * 20,
+	clust_size = 5,
+	y_min          = -31000,
+	y_max          = 31000,
+})
+
+minetest.register_ore({
+	ore_type       = "scatter",
+	ore            = "default:apple",
+	wherein        = "default:leaves",
+	clust_scarcity = 8 * 8 * 8,
+	clust_num_ores = 2,
+	clust_size     = 3,
+	y_min          = 0,
+	y_max          = 200,
+})
+
+--||||||||||||||||
+-- ======================= biomes
+--||||||||||||||||
 
 minetest.register_biome({
 	name = "ocean",
