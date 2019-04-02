@@ -160,6 +160,8 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups.gaps=gaps
 	def.on_use=function(itemstack, user, pointed_thing)
 		local eat = 65536/gaps
+		minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
+
 		if not minetest.registered_tools[itemstack:get_name()] then
 			local item = ItemStack(itemstack:get_name() .."_eaten")
 			item = item:to_table()
