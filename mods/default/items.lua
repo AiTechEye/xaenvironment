@@ -21,7 +21,12 @@ default.registry_mineral({
 		type = "fuel",
 		recipe = "default:coal_lump",
 		burntime = 40,
-	}}
+	}},
+	ore_settings={
+		clust_num_ores=5,
+		clust_size=5,
+		y_max=50,
+	}
 })
 
 default.registry_mineral({
@@ -83,6 +88,12 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ore_settings={
+		clust_scarcity= 10 * 10 * 10,
+		clust_num_ores=4,
+		clust_size=6,
+		y_max=-50,
+	}
 })
 
 default.registry_mineral({
@@ -93,6 +104,12 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ore_settings={
+		clust_scarcity= 10 * 10 * 10,
+		clust_num_ores=4,
+		clust_size=6,
+		y_max=-50,
+	}
 })
 
 default.registry_mineral({
@@ -114,7 +131,13 @@ default.registry_mineral({
 	name="iron",
 	texture="default_ironblock.png",
 	lump={inventory_image="default_lump_iron.png"},
-	ore={tiles={"default_stone.png^default_ore_iron.png"}}
+	ore={tiles={"default_stone.png^default_ore_iron.png"}},
+	ore_settings={
+		clust_scarcity= 12 * 12 * 12,
+		clust_num_ores=4,
+		clust_size=7,
+		y_max=5,
+	}
 })
 
 default.registry_mineral({
@@ -138,6 +161,12 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ore_settings={
+		clust_scarcity= 20 * 20 * 20,
+		clust_num_ores=3,
+		clust_size=7,
+		y_max=-70,
+	}
 })
 
 default.registry_mineral({
@@ -148,6 +177,12 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ore_settings={
+		clust_scarcity= 20 * 20 * 20,
+		clust_num_ores=3,
+		clust_size=7,
+		y_max=-70,
+	}
 })
 
 default.registry_mineral({
@@ -155,7 +190,13 @@ default.registry_mineral({
 	texture="default_diamondblock.png",
 	drop={inventory_image="diamond"},
 	not_lump = true,
-	not_ingot = true
+	not_ingot = true,
+	ore_settings={
+		clust_scarcity= 25 * 25 * 25,
+		clust_num_ores=2,
+		clust_size=8,
+		y_max=-90,
+	}
 })
 
 default.registry_mineral({
@@ -167,11 +208,23 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ore_settings={
+		clust_scarcity= 30 * 30 * 30,
+		clust_num_ores=1,
+		clust_size=9,
+		y_max=-100,
+	}
 })
 
 default.registry_mineral({
 	name="uranium",
 	texture="default_uraniumblock.png",
+	ore_settings={
+		clust_scarcity= 32 * 32 * 32,
+		clust_num_ores=2,
+		clust_size=10,
+		y_max=-100,
+	}
 })
 
 default.registry_mineral({
