@@ -12,26 +12,23 @@ minetest.register_node("fire:basic_flame", {
 	floodable = true,
 	damage_per_second = 5,
 	drop = "",
---[[ adding this later
 	tiles = {
 		{
 			name = "fire_basic_flame_animated.png",
 			animation = {
 				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
+				aspect_w = 8,
+				aspect_h = 8,
 				length = 1
 			},
 		},
 	},
---]]
-
 })
 
 minetest.register_node("fire:not_igniter", {
 	description = "Fire (not igniter)",
 	tiles={"fire_basic_flame.png"},
-	groups = {fire=1,dig_immediate=3,not_in_creative_inventory=1},
+	groups = {fire=1,dig_immediate=3,igniter=1,not_in_creative_inventory=1},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
@@ -42,6 +39,44 @@ minetest.register_node("fire:not_igniter", {
 	floodable = true,
 	damage_per_second = 5,
 	drop = "",
+	tiles = {
+		{
+			name = "fire_basic_flame_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1
+			},
+		},
+	},
+})
+
+minetest.register_node("fire:permanent_flame", {
+	description = "Permanent fire",
+	tiles={"fire_basic_flame.png"},
+	groups = {dig_immediate=3,igniter=2,not_in_creative_inventory=1},
+	sounds = default.node_sound_defaults(),
+	drawtype = "firelike",
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+	light_source = 13,
+	buildable_to =true,
+	floodable = true,
+	damage_per_second = 5,
+	drop = "",
+	tiles = {
+		{
+			name = "fire_basic_flame_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1
+			},
+		},
+	},
 })
 
 minetest.register_abm({
@@ -49,6 +84,45 @@ minetest.register_abm({
 	interval = 1,
 	chance = 20,
 	action = function(pos, node, active_object_count, active_object_count_wider)
+		if minetest.get_item_group(node.name,"igniter") > 1 and #minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:flammable"}) > 0 then
+			return
+		end
 		minetest.remove_node(pos)
 	end,
+})
+
+minetest.register_abm({
+	nodenames = {"group:igniter"},
+	interval = 1,
+	chance = 20,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local ig = minetest.get_item_group(node.name,"igniter")
+		if ig == 1 then
+			return
+		elseif ig == 2 then
+			local flam = minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:flammable"})
+			for _, np in pairs(flam) do
+				if math.random(1,3) == 1 then
+					minetest.set_node(np,{name="fire:not_igniter"})
+				else
+					local npp = minetest.find_node_near(np,1.5,{"air"})
+					if npp and npp.x then
+						minetest.set_node(npp,{name="fire:not_igniter"})
+					end
+				end
+			end
+		elseif ig == 3 then
+			local flam = minetest.find_nodes_in_area(vector.add(pos,2),vector.subtract(pos,2),{"group:flammable"})
+			for _, np in pairs(flam) do
+				if math.random(1,2) == 1 then
+					minetest.set_node(np,{name="fire:basic_flame"})
+				else
+					local npp = minetest.find_node_near(np,1,"air")
+					if npp and npp.x then
+						minetest.set_node(npp,{name="fire:basic_flame"})
+					end
+				end
+			end
+		end
+	end
 })
