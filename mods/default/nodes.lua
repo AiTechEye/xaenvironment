@@ -11,19 +11,78 @@ default:cobble
 default:sandstone
 --]]
 
-minetest.register_node("default:torch_floor", {
+minetest.register_node("default:torch", {
 	description = "Torch",
-	drop = "default:torch_floor",
 	tiles={"default_torch.png"},
-	groups = {dig_immediate=3,flammable=3,attached_node=1,igniter=1},
-	sounds = default.node_sound_wood_defaults(),
+	wield_scale = {x=2,y=2,z=2},
+	groups = {dig_immediate=3,flammable=3,igniter=1},
 	drawtype = "mesh",
 	mesh="default_torch.obj",
 	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagetes = true,
+	on_place=function(itemstack, placer, pointed_thing)
+		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"attached_node")>0 then
+			return itemstack
+		end
+		local fdw=minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
+		if fdw == 1 then
+			minetest.set_node(pointed_thing.above,{name="default:torch_floor",param2=fdw})
+		else
+			minetest.set_node(pointed_thing.above,{name="default:torch_lean",param2=fdw})
+		end
+		local meta = minetest.get_meta(pointed_thing.above)
+		meta:set_int("date",default.date("get"))
+		meta:set_int("hours",math.random(24,72))
+		minetest.get_node_timer(pointed_thing.above):start(10)
+		itemstack:take_item()
+		return itemstack
+	end,
+})
+
+
+minetest.register_node("default:torch_floor", {
+	description = "Torch",
+	drop = "default:torch",
+	tiles={"default_torch.png"},
+	groups = {dig_immediate=3,flammable=3,igniter=1,attached_node=1,not_in_creative_inventory=1},
+	sounds = default.node_sound_wood_defaults(),
+	floodable = true,
+	drawtype = "mesh",
+	mesh="default_torch.obj",
+	paramtype = "light",
+	paramtype2 = "facedir",
 	sunlight_propagetes = true,
 	walkable = false,
 	light_source = 10,
+	damage_per_second = 2,
 	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, 0.2, 0.1}},
+	on_timer = function (pos, elapsed)
+		local meta = minetest.get_meta(pos)
+		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+			minetest.remove_node(pos)
+			return false
+		end
+		return true
+	end
+})
+
+minetest.register_node("default:torch_lean", {
+	description = "Torch",
+	drop = "default:torch",
+	tiles={"default_torch.png"},
+	groups = {dig_immediate=3,flammable=3,igniter=1,not_in_creative_inventory=1,attached_node=1},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype = "mesh",
+	floodable = true,
+	mesh="default_torch_lean.obj",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagetes = true,
+	walkable = false,
+	light_source = 10,
+	damage_per_second = 2,
+	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.3, 0.1, 0, 0.3}},
 	after_place_node = function(pos, placer)
 		local meta = minetest.get_meta(pos)
 		meta:set_int("date",default.date("get"))
