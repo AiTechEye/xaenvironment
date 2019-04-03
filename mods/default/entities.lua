@@ -1,11 +1,6 @@
 local builtin_item = minetest.registered_entities["__builtin:item"]
 
 local item = {
-	--set_item = function(self,itemstring)
-		--builtin_item.set_item(self,itemstring)
-		--local stack = ItemStack(itemstring)
-		--self.flammable = minetest.get_item_group(stack:get_name(),"flammable")
-	--end,
 	burn_up = function(self)
 		local pos = self.object:get_pos()
 		self.object:remove()
@@ -60,7 +55,6 @@ local item = {
 			end
 		end
 
-		
 		if not self.in_viscosity and def.liquid_viscosity>0 then
 			local s = def.liquid_viscosity
 			local v = self.object:get_velocity()
@@ -78,7 +72,15 @@ local item = {
 				self.object:set_acceleration({x=0, y=0, z=0})
 				self.object:set_velocity({x=0, y=0 , z=0})
 			elseif self.flammable == 0 then
+				local def2 = minetest.registered_items[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name]
 				local v = self.object:get_velocity()
+
+				if v.y == 0 and def2 and not def2.walkable then
+					v.y = -0.3
+				elseif v.y == 0 and def2 and def2.walkable then
+					v.x = 0
+					v.z = 0
+				end
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=v.y, z=math.floor((v.z*0.95)*100)/100})
 			end
 		end
