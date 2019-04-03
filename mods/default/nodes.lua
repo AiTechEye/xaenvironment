@@ -118,7 +118,9 @@ minetest.register_node("default:leaves", {
 		max_items = 1,
 		items = {
 			{items = {"default:sapling"}, rarity = 25},
-			{items = {"default:leaves"}}
+			{items = {"default:stick"}, rarity = 10},
+			{items = {"default:leaves"}},
+
 		}
 	}
 })
