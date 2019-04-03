@@ -80,8 +80,8 @@ default.registry_mineral({
 	}},
 	{output="default:flint_vineyardknife",
 	recipe={
-		{"default:flint","default:flint",""},
-		{"","default:stick",""},
+		{"","default:flint",""},
+		{"","default:flint","default:flint"},
 		{"","default:stick",""},
 	}},
 	{output="default:flint",

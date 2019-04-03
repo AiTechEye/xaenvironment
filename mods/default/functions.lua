@@ -91,7 +91,7 @@ default.workbench.get_craft_result=function(list)
 	local a = minetest.get_craft_result({method = "normal",width = 3, items = list})
 	local regcraft = a.item:get_name()
 	if regcraft~="" then
-		return regcraft
+		return a.item
 	end
 
 	for _,i1 in pairs(default.workbench.registered_crafts) do
