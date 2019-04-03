@@ -37,6 +37,13 @@ minetest.register_craft({
 	output="default:stick 4",
 	recipe={{"default:wood"}},
 })
+minetest.register_craft({
+	output="default:torch_floor 4",
+	recipe={
+		{"","default:coal_lump",""},
+		{"","default:stick",""},
+	},
+})
 
 --||||||||||||||||
 -- ======================= Nodes

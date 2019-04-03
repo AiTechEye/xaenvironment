@@ -11,6 +11,35 @@ default:cobble
 default:sandstone
 --]]
 
+minetest.register_node("default:torch_floor", {
+	description = "Torch",
+	drop = "default:torch_floor",
+	tiles={"default_torch.png"},
+	groups = {dig_immediate=3,flammable=3,attached_node=1,igniter=1},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype = "mesh",
+	mesh="default_torch.obj",
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+	light_source = 10,
+	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, 0.2, 0.1}},
+	after_place_node = function(pos, placer)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("date",default.date("get"))
+		meta:set_int("hours",math.random(24,72))
+		minetest.get_node_timer(pos):start(10)
+	end,
+	on_timer = function (pos, elapsed)
+		local meta = minetest.get_meta(pos)
+		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+			minetest.remove_node(pos)
+			return false
+		end
+		return true
+	end
+})
+
 default.register_eatable("node","default:apple",1,4,{
 	description = "Apple",
 	inventory_image="default_apple.png",
