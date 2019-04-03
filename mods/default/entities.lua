@@ -1,9 +1,8 @@
 local builtin_item = minetest.registered_entities["__builtin:item"]
 
 local item = {
-	burn_up = function(self)
+	burn = function(self)
 		local pos = self.object:get_pos()
-		self.object:remove()
 		minetest.add_particlespawner({
 			amount = math.random(3,7),
 			time =0.2,
@@ -13,10 +12,10 @@ local item = {
 			maxvel = {x=0.1, y=1, z=0.1},
 			minacc = {x=0, y=2, z=0},
 			maxacc = {x=0, y=0, z=0},
-			minexptime = 1,
-			maxexptime = 5,
-			minsize = 2,
-			maxsize = 5,
+			minexptime = 2,
+			maxexptime = 7,
+			minsize = 1,
+			maxsize = 3,
 			texture = "default_item_smoke.png",
 			collisiondetection = true,
 		})
@@ -35,7 +34,6 @@ local item = {
 			if count ~= nil then
 				item = string.sub(item,1,count-1)
 			end
-
 			self.flammable = minetest.get_item_group(item,"flammable")
 		end
 
@@ -48,10 +46,14 @@ local item = {
 				end
 				self.igniter_burn_timer = 0
 			end
+			self.smoketimer = (self.smoketimer or 0) -dtime
 			self.igniter_burn_timer = self.igniter_burn_timer + igniter*self.heat_sensitivity
 			if self.igniter_burn_timer > 10 then
-				self.burn_up(self)
+				self.object:remove()
 				return
+			elseif self.smoketimer <= 0 then
+				self.burn(self)
+				self.smoketimer = 1
 			end
 		end
 

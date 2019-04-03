@@ -16,17 +16,29 @@ default.registry_mineral({
 	not_axe=true,
 	not_shovel=true,
 	not_hoe=true,
+	not_ingot=true,
 	not_vineyardknife=true,
-	regular_additional_craft={{
-		type = "fuel",
-		recipe = "default:coal_lump",
-		burntime = 40,
-	}},
+	regular_additional_craft={
+		{
+			type = "fuel",
+			recipe = "default:coal_lump",
+			burntime = 40,
+		},
+		{output="default:coalblock",recipe={
+			{"default:coal_lump","default:coal_lump","default:coal_lump"},
+			{"default:coal_lump","default:coal_lump","default:coal_lump"},
+			{"default:coal_lump","default:coal_lump","default:coal_lump"},
+		}},
+		{output="default:coal_lump 9",recipe={
+			{"default:coalblock"},
+		}},
+	},
 	ore_settings={
 		clust_num_ores=5,
 		clust_size=5,
 		y_max=50,
 	}
+
 })
 
 default.registry_mineral({
