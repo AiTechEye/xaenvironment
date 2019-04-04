@@ -18,12 +18,21 @@ default.registry_mineral({
 	not_hoe=true,
 	not_ingot=true,
 	not_vineyardknife=true,
-	block={sounds=default.node_sound_stone_defaults()},
+	block={
+		groups={cracky=3,flammable=1},
+		sounds=default.node_sound_stone_defaults(),
+	},
+	lump={groups={flammable=1}},
 	regular_additional_craft={
 		{
 			type = "fuel",
 			recipe = "default:coal_lump",
 			burntime = 40,
+		},
+		{
+			type = "fuel",
+			recipe = "default:coalblock",
+			burntime = 360,
 		},
 		{output="default:coalblock",recipe={
 			{"default:coal_lump","default:coal_lump","default:coal_lump"},
@@ -39,7 +48,6 @@ default.registry_mineral({
 		clust_size=5,
 		y_max=50,
 	}
-
 })
 
 default.registry_mineral({

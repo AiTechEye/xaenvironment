@@ -576,7 +576,7 @@ minetest.register_node("default:lava_flowing", {
 	liquid_alternative_flowing = "default:lava_flowing",
 	liquid_alternative_source = "default:lava_source",
 	liquid_viscosity = 20,
-	post_effect_color = {a = 240, r = 255, g = 55, b = 0}
+	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
 })
 
 
