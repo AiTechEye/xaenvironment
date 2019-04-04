@@ -102,24 +102,34 @@ minetest.register_abm({
 		elseif ig == 2 then
 			local flam = minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:flammable"})
 			for _, np in pairs(flam) do
+				local ndef = minetest.registered_nodes[minetest.get_node(np).name]
 				if math.random(1,3) == 1 then
-					minetest.set_node(np,{name="fire:not_igniter"})
+					if not (ndef.on_burn and ndef.on_burn(np)) then
+						minetest.set_node(np,{name="fire:not_igniter"})
+					end
 				else
-					local npp = minetest.find_node_near(np,1.5,{"air"})
-					if npp and npp.x then
-						minetest.set_node(npp,{name="fire:not_igniter"})
+					if not (ndef.on_ignite and ndef.on_ignite(np)) then
+						local npp = minetest.find_node_near(np,1.5,{"air"})
+						if npp and npp.x then
+							minetest.set_node(npp,{name="fire:not_igniter"})
+						end
 					end
 				end
 			end
-		elseif ig == 3 then
+		else
 			local flam = minetest.find_nodes_in_area(vector.add(pos,2),vector.subtract(pos,2),{"group:flammable"})
 			for _, np in pairs(flam) do
+				local ndef = minetest.registered_nodes[minetest.get_node(np).name]
 				if math.random(1,2) == 1 then
-					minetest.set_node(np,{name="fire:basic_flame"})
+					if not (ndef.on_burn and ndef.on_burn(np)) then
+						minetest.set_node(np,{name="fire:basic_flame"})
+					end
 				else
-					local npp = minetest.find_node_near(np,1,"air")
-					if npp and npp.x then
-						minetest.set_node(npp,{name="fire:basic_flame"})
+					if not (ndef.on_ignite and ndef.on_ignite(np)) then
+						local npp = minetest.find_node_near(np,1,"air")
+						if npp and npp.x then
+							minetest.set_node(npp,{name="fire:basic_flame"})
+						end
 					end
 				end
 			end
