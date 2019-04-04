@@ -8,9 +8,6 @@ default.get_fuel=function(stack)
 	if time==0 then
 		time=minetest.get_item_group(stack:get_name(),"igniter")
 	end
-	if time==0 then
-		time=minetest.get_item_group(stack:get_name(),"tempsurvive_add")
-	end
 	return time
 end
 
@@ -109,7 +106,7 @@ local timer =  function (pos, elapsed)
 				cook_stack:take_item()
 				inv:set_stack("cook",cook_slot,cook_stack)
 				new_cook = true
-				return true
+				--return true
 			end
 -- new cook
 			if new_cook or (cooking_time <= 0 and burntime <= 0) then
@@ -205,7 +202,7 @@ minetest.register_node("default:furnace_active", {
 	description = "Furnace",
 	drop = "default:furnace",
 	tiles = {"default_cobble.png","default_fire.png"},
-	groups = {stone=2,cracky=2},
+	groups = {stone=2,cracky=2,not_in_creative_inventory=1},
 	drawtype="mesh",
 	mesh="default_furnace.b3d",
 	light_source = 10,
