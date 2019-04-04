@@ -206,7 +206,6 @@ default.registry_mineral=function(def)
 		def.drop = mod .. def.name .. "_lump"
 		def.lump.description = def.lump.description or 		uname .." lump"
 		def.lump.inventory_image = def.lump.inventory_image or def.texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
-		def.lump.groups = def.lump.groups
 		minetest.register_craftitem(mod .. def.name .. "_lump", def.lump)
 	elseif def.drop then
 		if def.drop.name then
@@ -218,7 +217,6 @@ default.registry_mineral=function(def)
 			def.drop.inventory_image = def.texture .. "^default_alpha_gem_" .. def.drop.inventory_image ..".png^[makealpha:0,255,0"
 		end
 		def.dropingot = def.drop.name
-		def.drop.groups = def.drop.groups
 		def.drop.description = def.drop.description or 		uname
 		minetest.register_craftitem(def.drop.name, def.drop)
 		def.drop = def.drop.name
@@ -291,7 +289,6 @@ default.registry_mineral=function(def)
 		def.pick.sound = default.tool_breaks_defaults()
 		def.pick.description = def.pick.description or 		 uname .." pickaxe"
 		def.pick.inventory_image = def.pick.inventory_image or	def.texture .. "^default_alpha_pick.png^[makealpha:0,255,0"
-		def.pick.groups = def.pick.groups
 		def.pick.tool_capabilities = def.pick.tool_capabilities or		{
 			full_punch_interval = 1,
 			max_drop_level = 0,
@@ -316,7 +313,6 @@ default.registry_mineral=function(def)
 		def.shovel.description = def.shovel.description or 			uname .." shovel"
 		def.shovel.inventory_image = def.shovel.inventory_image or	def.texture .. "^default_alpha_shovel.png^[makealpha:0,255,0"
 		def.shovel.sound = default.tool_breaks_defaults()
-		def.shovel.groups = def.shovel.groups
 		def.shovel.tool_capabilities = def.shovel.tool_capabilities or		{
 			full_punch_interval = 1.1,
 			max_drop_level = 0,
@@ -341,7 +337,6 @@ default.registry_mineral=function(def)
 		def.axe.sound = default.tool_breaks_defaults()
 		def.axe.description = def.axe.description or 			uname .." axe"
 		def.axe.inventory_image = def.axe.inventory_image or	def.texture .. "^default_alpha_axe.png^[makealpha:0,255,0"
-		def.axe.groups = def.axe.groups
 		def.axe.tool_capabilities = def.axe.tool_capabilities or		{
 			full_punch_interval = 1,
 			max_drop_level = 0,
@@ -366,7 +361,6 @@ default.registry_mineral=function(def)
 		def.vineyardknife.sound = default.tool_breaks_defaults()
 		def.vineyardknife.description = def.vineyardknife.description or 		uname .." vineyardknife"
 		def.vineyardknife.inventory_image = def.vineyardknife.inventory_image or	def.texture .. "^default_alpha_vineyardknife.png^[makealpha:0,255,0"
-		def.vineyardknife.groups = def.vineyardknife.groups
 		def.vineyardknife.tool_capabilities = def.vineyardknife.tool_capabilities or		{
 			full_punch_interval = 0.5,
 			max_drop_level = 0,
@@ -391,7 +385,6 @@ default.registry_mineral=function(def)
 		def.hoe.sound = default.tool_breaks_defaults()
 		def.hoe.description = def.hoe.description or 		uname .." hoe"
 		def.hoe.inventory_image = def.hoe.inventory_image or	def.texture .. "^default_alpha_hoe.png^[makealpha:0,255,0"
-		def.hoe.groups = def.hoe.group
 		def.hoe.tool_capabilities = def.tool_capabilities or		{
 			full_punch_interval = 2,
 			damage_groups={fleshy=5},
