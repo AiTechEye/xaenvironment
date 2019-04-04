@@ -45,3 +45,14 @@ minetest.register_craft({
 		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
 	}
 })
+
+minetest.override_item("default:coalblock",{
+	on_burn=function(pos)
+		minetest.remove_node(pos)
+		nitroglycerin.explode(pos,{radius=2,set="air"})
+	end,
+	on_ignite=function(pos)
+		minetest.remove_node(pos)
+		nitroglycerin.explode(pos,{radius=2,set="air"})
+	end
+})
