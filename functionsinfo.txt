@@ -66,6 +66,7 @@ default.registry_mineral({
 	lump={
 			description	nil/""
 			inventory_image	nil/"img.png"
+			groups		nil/table
 	}
 
 
@@ -73,6 +74,7 @@ default.registry_mineral({
 			name		nil/""
 			inventory_image	nil/"img.png"/diamond/longcrystal/round(tinemeald/oval/crystal/quartz/emeald
 			description	nil/""
+			groups		nil/table
 	}
 
 
@@ -80,6 +82,7 @@ default.registry_mineral({
 	ingot={
 			description	nil/""
 			inventory_image	nil/"img.png"
+			groups		nil/table
 	},
 
 
@@ -88,7 +91,7 @@ default.registry_mineral({
 			tiles		tiles/table
 			description	nil/""
 			sounds		nil/sounds
-			groups		nil/group
+			groups		nil/table
 	}
 
 
@@ -97,7 +100,7 @@ default.registry_mineral({
 			tiles		tiles/table
 			description	nil/""
 			sounds		nil/sounds
-			groups		nil/group
+			groups		nil/table
 	}
 
 
@@ -116,6 +119,7 @@ default.registry_mineral({
 			description	nil/""
 			sounds		nil/sounds
 			inventory_image	nil/"img.png"
+			groups		nil/table
 			tool_capabilities	nil or	{
 						full_punch_interval
 						max_drop_level
@@ -130,6 +134,7 @@ default.registry_mineral({
 			description	nil/""
 			sounds		nil/sounds
 			inventory_image	nil/"img.png"
+			groups		nil/table
 			tool_capabilities	nil or	{
 						full_punch_interval
 						max_drop_level
@@ -144,6 +149,7 @@ default.registry_mineral({
 			description	nil/""
 			sounds		nil/sounds
 			inventory_image	nil/"img.png"
+			groups		nil/table
 			tool_capabilities	nil or	{
 						full_punch_interval
 						max_drop_level
@@ -158,6 +164,7 @@ default.registry_mineral({
 			description	nil/""
 			sounds		nil/sounds
 			inventory_image	nil/"img.png"
+			groups		nil/table
 			tool_capabilities	nil or	{
 						full_punch_interval
 						max_drop_level
@@ -172,6 +179,7 @@ default.registry_mineral({
 			description	nil/""
 			sounds		nil/sounds
 			inventory_image	nil/"img.png"
+			groups		nil/table
 			tool_capabilities	nil or	{
 						full_punch_interval
 						max_drop_level
