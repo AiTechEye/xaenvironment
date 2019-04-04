@@ -18,6 +18,7 @@ default.registry_mineral({
 	not_hoe=true,
 	not_ingot=true,
 	not_vineyardknife=true,
+	block={sounds=default.node_sound_stone_defaults()},
 	regular_additional_craft={
 		{
 			type = "fuel",
@@ -328,6 +329,7 @@ default.registry_mineral({
 	block={groups={cracky=1}},
 	not_lump = true,
 	not_ingot = true,
+	block={sounds=default.node_sound_stone_defaults()},
 	ore_settings={
 		clust_scarcity= 25 * 25 * 25,
 		clust_num_ores=2,

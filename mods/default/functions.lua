@@ -205,7 +205,7 @@ default.registry_mineral=function(def)
 		def.lump = def.lump or {}
 		def.drop = mod .. def.name .. "_lump"
 		def.lump.description = def.lump.description or 		uname .." lump"
-		def.lump.inventory_image = def.texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
+		def.lump.inventory_image = def.lump.inventory_image or def.texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
 		minetest.register_craftitem(mod .. def.name .. "_lump", def.lump)
 	elseif def.drop then
 		if def.drop.name then
@@ -268,6 +268,7 @@ default.registry_mineral=function(def)
 		def.ore.description =	def.ore.description or	uname .. " ore"
 		def.ore.sounds =	def.ore.sounds or	default.node_sound_stone_defaults()
 		def.ore.groups =	def.ore.groups or	{cracky=2}
+
 		minetest.register_node(mod .. def.name .. "_ore", def.ore)
 
 		def.ore_settings = def.ore_settings or {}
