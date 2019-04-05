@@ -16,3 +16,15 @@ default.register_tree({
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_pear_tree.mts", "random", nil, false)
 	end
 })
+
+default.register_door({
+	name="pear_wood_door",
+	description = "Pear wood door",
+	texture="plants_pear_wood.png",
+	burnable = true,
+	craft={
+		{"plants:pear_wood","plants:pear_wood",""},
+		{"plants:pear_wood","plants:pear_wood",""},
+		{"plants:pear_wood","plants:pear_wood",""}
+	}
+})
