@@ -5,6 +5,70 @@ minetest.register_craftitem("default:stick", {
 	groups = {flammable = 1,stick=1},
 })
 
+
+--||||||||||||||||
+-- ======================= trees
+--||||||||||||||||
+
+
+default.register_tree({
+	name="apple",
+	fruit={
+		hp=1,
+		gaps=4,
+		description = "Apple",
+		tiles={"default_apple.png"},
+		inventory_image="default_apple.png",
+	},
+	tree={tiles={"default_tree_top.png","default_tree_top.png","default_tree.png"}},
+	sapling={tiles={"default_treesapling.png"}},
+	wood={tiles={"default_wood.png"}},
+	leaves={tiles={"default_leaves.png"}},
+	schematic=minetest.get_modpath("default").."/schematics/default_tree.mts",
+	sapling_place_schematic=function(pos)
+		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("default").."/schematics/default_tree.mts", "random", nil, false)
+	end
+})
+
+minetest.register_lbm({
+	name="default:to_appletree",
+	nodenames={"default:tree"},
+	run_at_every_load =true,
+	action=function(pos,node)
+		minetest.swap_node(pos,{name="default:apple_tree"})
+	end
+})
+
+minetest.register_lbm({
+	name="default:to_applewood",
+	nodenames={"default:wood"},
+	run_at_every_load =true,
+	action=function(pos,node)
+		minetest.swap_node(pos,{name="default:apple_wood"})
+	end
+})
+
+minetest.register_lbm({
+	name="default:to_appleleaves",
+	nodenames={"default:leaves"},
+	run_at_every_load =true,
+	action=function(pos,node)
+		minetest.swap_node(pos,{name="default:apple_leaves"})
+	end
+})
+
+minetest.register_lbm({
+	name="default:to_applespawner",
+	nodenames={"default:apple_spawner"},
+	run_at_every_load =true,
+	action=function(pos,node)
+		minetest.swap_node(pos,{name="default:fruit_spawner"})
+	end
+})
+
+
+
+
 --||||||||||||||||
 -- ======================= minerals
 --||||||||||||||||
