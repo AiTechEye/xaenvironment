@@ -410,3 +410,140 @@ default.registry_mineral=function(def)
 		end
 	end
 end
+
+default.defpos=function(pos,n)
+	local no = minetest.registered_nodes[minetest.get_node(pos).name]
+	return no and no[n] or nil
+end
+
+default.defname=function(name,n)
+	local no = minetest.registered_nodes[name]
+	return no and no[n] or nil
+end
+
+default.register_door=function(def)
+	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local mod = minetest.get_current_modname() ..":"
+	local name = mod .. def.name
+	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,door=1}
+
+	groups.flammable = def.burnable and 1 or nil
+
+minetest.register_node(name,{
+	description = def.description or uname,
+	groups = groups,
+	drawtype="nodebox",
+	paramtype="light",
+	paramtype2 = "facedir",
+	tiles = {def.texture},
+	paramtype = "light",
+	sounds = def.sounds or default.node_sound_wood_defaults(),
+	selection_box={
+		type="fixed",
+		fixed={-0.5, -0.5, 0.375, 0.5, 1.5, 0.5}
+	},
+	collision_box={
+		type="fixed",
+		fixed={-0.5, -0.5, 0.375, 0.5, 1.5, 0.5}
+	},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, 0.375, 0.5, -0.4, 0.5},
+			{-0.5, 1.4, 0.375, 0.5, 1.5, 0.5},
+			{0.375, -0.4, 0.375, 0.5, 1.4, 0.5},
+			{-0.5, -0.5, 0.375, -0.4, 1.4, 0.5},
+			{-0.5, -0.5, 0.4, 0.5, 1.4, 0.475},
+		}
+	},
+	on_rightclick = function(pos)
+		local pp=minetest.get_node(pos).param2
+		local meta=minetest.get_meta(pos)
+		if meta:get_int("locked")==1 then return end
+		local p=meta:get_int("p")
+		if pp==2 and p==2 then
+			minetest.swap_node(pos, {name=name, param2=3})
+			minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==3 and p==2 then
+			minetest.swap_node(pos, {name=name, param2=2})
+			minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==0 and p==0 then
+			minetest.swap_node(pos, {name=name, param2=1})
+			minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==1 and p==0 then
+			minetest.swap_node(pos, {name=name, param2=0})
+			minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})	
+		elseif pp==3 and p==3 then
+			minetest.swap_node(pos, {name=name, param2=0})
+			minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==0 and p==3 then
+			minetest.swap_node(pos, {name=name, param2=3})
+			minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==1 and p==1 then
+			minetest.swap_node(pos, {name=name, param2=2})
+			minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+		elseif pp==2 and p==1 then
+			minetest.swap_node(pos, {name=name, param2=1})
+			minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+		else
+			meta:set_int("autoopen",1)
+			minetest.get_node_timer(pos):start(0.2)
+		end
+	end,
+	on_construct=function(pos)
+		local meta=minetest.get_meta(pos)
+		meta:set_int("p",minetest.get_node(pos).param2)
+		minetest.get_node_timer(pos):start(1)
+		meta:set_int("n",1)
+	end,
+	on_timer = function (pos, elapsed)
+		local meta=minetest.get_meta(pos)
+		local n=meta:get_int("n")
+		meta:set_int("n",n-1)
+		local rd={x={0,2},z={1,3}}
+		local x=rd.x[math.random(1,2)]
+		local z=rd.z[math.random(1,2)]
+		if default.defpos({x=pos.x+1,y=pos.y,z=pos.z},"walkable") or default.defpos({x=pos.x-1,y=pos.y,z=pos.z,"walkable"}) then
+			meta:set_int("p",rd.x[math.random(1,2)])
+			minetest.swap_node(pos, {name = name, param2=x})
+			n=0
+		elseif default.defpos({x=pos.x,y=pos.y,z=pos.z+1},"walkable") or default.defpos({x=pos.x,y=pos.y,z=pos.z-1},"walkable") then
+			meta:set_int("p",rd.z[math.random(1,2)])
+			minetest.swap_node(pos, {name = name, param2=z})
+			n=0
+		end
+		if n<1 then
+			if meta:get_int("autoopen")==1 then
+				minetest.registered_nodes[name].on_rightclick(pos)
+			end
+			return
+		end
+		return true
+	end,
+	after_place_node = function(pos, placer)
+		minetest.get_node_timer(pos):stop()
+	end,
+	mesecons = {
+		receptor = {state = "off"},
+		effector = {
+		action_on = function (pos, node)
+			minetest.get_meta(pos):set_int("locked",1)
+		end,
+		action_off = function (pos, node)
+			minetest.get_meta(pos):set_int("locked",0)
+		end,
+	}}
+})
+	minetest.register_craft({
+		output = name,
+		recipe = def.craft
+	})
+
+	if def.burnable then
+		minetest.register_craft({
+			type = "fuel",
+			recipe = name,
+			burntime = 10,
+		})
+	end
+end

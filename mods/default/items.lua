@@ -5,6 +5,17 @@ minetest.register_craftitem("default:stick", {
 	groups = {flammable = 1,stick=1},
 })
 
+default.register_door({
+	name="apple_wood_door",
+	description = "Apple wood door",
+	texture="default_wood.png",
+	burnable = true,
+	craft={
+		{"default:apple_wood","default:apple_wood",""},
+		{"default:apple_wood","default:apple_wood",""},
+		{"default:apple_wood","default:apple_wood",""}
+	}
+})
 
 --||||||||||||||||
 -- ======================= trees
