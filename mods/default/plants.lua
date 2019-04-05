@@ -78,7 +78,7 @@ default.register_tree=function(def)
 	def.sapling.on_timer = def.sapling.on_timer or function (pos, elapsed)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
 			local meta = minetest.get_meta(pos)
-			if default.date("s",meta:get_int("date")) >= meta:get_int("growtime") then
+			if default.date("m",meta:get_int("date")) >= meta:get_int("growtime") then
 				local applm = math.random(5,20)
 				minetest.remove_node(pos)
 				schematic(pos)
@@ -186,7 +186,7 @@ minetest.register_node("default:fruit_spawner", {
 	walkable = false,
 	on_timer = function (pos, elapsed)
 		local meta = minetest.get_meta(pos)
-		if default.date("s",meta:get_int("date")) > meta:get_int("growtime") then
+		if default.date("m",meta:get_int("date")) > meta:get_int("growtime") then
 			if minetest.find_node_near(pos,1,"group:leaves") then
 				minetest.set_node(pos,{name=meta:get_string("fruit"),param2=0})
 			else
