@@ -152,7 +152,7 @@ default.register_chair=function(def)
 		on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 			local v=player:get_player_velocity()
 			if v.x~=0 or v.y~=0 or v.z~=0 then return end
-			player:set_pos({x=pos.x,y=pos.y,z=pos.z})
+			player:set_pos({x=pos.x,y=pos.y-0.2,z=pos.z})
 			local pname=player:get_player_name()
 			if default.player_attached[pname] then
 				player:set_physics_override(1, 1, 1)
@@ -162,14 +162,13 @@ default.register_chair=function(def)
 					default.player_set_animation(player, "stand")
 				end,player,pname)
 			else
+				local v = player:get_player_velocity()
+					if math.abs(v.x)+math.abs(v.z) > 0 then
+					return
+				end
 				player:set_physics_override(0, 0, 0)
 				minetest.after(0.3, function(player,pname)
-					player:set_eye_offset({x=0,y=-7,z=2}, {x=0,y=0,z=0})
-					default.player_attached[pname]=true
-					default.player_set_animation(player, "sit")
-				end,player,pname)
-				minetest.after(0.3, function(player,pname)
-					player:set_eye_offset({x=0,y=-7,z=2}, {x=0,y=0,z=0})
+					player:set_eye_offset({x=0,y=-2,z=2}, {x=0,y=0,z=0})
 					default.player_attached[pname]=true
 					default.player_set_animation(player, "sit")
 				end,player,pname)
@@ -183,7 +182,6 @@ default.register_chair=function(def)
 		end,
 		on_construct=function(pos)
 			local meta=minetest.get_meta(pos)
-			minetest.get_node_timer(pos):start(1)
 			meta:set_int("n",20)
 			meta:set_int("y",0)
 		end,
