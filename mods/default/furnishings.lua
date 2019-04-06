@@ -70,11 +70,16 @@ default.register_door=function(def)
 		on_construct=function(pos)
 			local meta=minetest.get_meta(pos)
 			meta:set_int("p",minetest.get_node(pos).param2)
-			minetest.get_node_timer(pos):start(1)
 			meta:set_int("n",1)
 		end,
-		after_place_node = function(pos, placer)
-			minetest.get_node_timer(pos):stop()
+		on_place=function(itemstack, placer, pointed_thing)
+			local p = pointed_thing.under
+			if default.defpos({x=p.x,y=p.y+1,z=p.z},"buildable_to") then
+				local fd=minetest.dir_to_facedir(placer:get_look_dir())
+				minetest.set_node({x=p.x,y=p.y+1,z=p.z},{name=name,param2=fd})
+				itemstack:take_item()
+				return itemstack
+			end
 		end,
 		mesecons = {
 			receptor = {state = "off"},
@@ -265,7 +270,7 @@ default.register_chest=function(def)
 						"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
 						"list[current_player;main;0,4.2;8,4;]" ..
 						"listring[current_player;main]" ..
-						"listring[current_name;main]"
+						"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 					)
 				end,pname,pos)
 			end
