@@ -17,3 +17,7 @@ minetest.register_craft({
 	recipe = "materials:plant_extracts_gas",
 	burntime = 10,
 })
+minetest.register_craft({
+	output="materials:piece_of_wood 8",
+	recipe={{"group:wood","group:wood"}},
+})
