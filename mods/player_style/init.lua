@@ -11,6 +11,13 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	return hp_change
 end,true)
 
+minetest.register_on_respawnplayer(function(player)
+	player_style.player_attached[player:get_player_name()] = nil
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	player_style.player_attached[player:get_player_name()] = nil
+end)
 
 player_style.register_profile=function(def)
 	def=def or {}
