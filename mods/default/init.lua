@@ -1,10 +1,13 @@
 default={
 	workbench={
 		registered_crafts={}
-	}
+	},
+	player_attached = player_style.player_attached,
+	player_set_animation = player_style.set_animation,
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")
+dofile(minetest.get_modpath("default") .. "/furnishings.lua")
 dofile(minetest.get_modpath("default") .. "/plants.lua")
 
 dofile(minetest.get_modpath("default") .. "/nodes.lua")
