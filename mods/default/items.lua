@@ -20,8 +20,9 @@ default.register_door({
 default.register_chair({
 	name = "apple_wood",
 	description = "Apple wood chair",
-	flammable = true,
+	burnable = true,
 	texture = "default_wood.png",
+	craft={{"group:stick","",""},{"default:apple_wood","",""},{"group:stick","",""}}
 })
 
 --||||||||||||||||

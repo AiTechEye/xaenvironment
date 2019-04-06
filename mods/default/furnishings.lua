@@ -87,6 +87,7 @@ default.register_door=function(def)
 			end,
 		}}
 	})
+
 	minetest.register_craft({
 		output = name,
 		recipe = def.craft
@@ -201,10 +202,7 @@ default.register_chair=function(def)
 
 	minetest.register_craft({
 		output = name,
-		recipe = {{"group:stick","",""},
-			{"group:wood","",""},
-			{"group:stick","",""},
-		}
+		recipe = def.craft
 	})
 	if def.burnable then
 		minetest.register_craft({
