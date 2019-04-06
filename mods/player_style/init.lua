@@ -1,4 +1,8 @@
-player_style={registered_profiles={},players={}}
+player_style={
+	players={},
+	registered_profiles={},
+	player_attached={},
+}
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and modifer.type == "fall" then
@@ -32,13 +36,18 @@ end
 
 player_style.register_profile()
 
-player_style.set_animation=function(name,type)
+player_style.set_animation=function(name,typ,n)
 	local user=player_style.players[name]
-	
-	if user and user.current ~= type and player_style.registered_profiles[user.profile].visual=="mesh" then
-		user.current = type
-		local a=player_style.registered_profiles[user.profile].animation[type]
-		user.player:set_animation({x=a.x,y=a.y},a.speed,0)
+
+	if not user and type(name) =="userdata" then
+		name = name:get_player_name()
+		user=player_style.players[name]
+	end
+
+	if user and user.current ~= typ and player_style.registered_profiles[user.profile].visual=="mesh" then
+		user.current = typ
+		local a=player_style.registered_profiles[user.profile].animation[typ]
+		user.player:set_animation({x=a.x,y=a.y},n or a.speed,0)
 	end
 end
 
@@ -76,25 +85,29 @@ minetest.register_on_leaveplayer(function(player)
 	end, name)
 end)
 
+local attached_players = player_style.player_attached
 
 minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name=player:get_player_name()
-		local user=player_style.players[name]
-		local key=player:get_player_control()
-		local a="stand"
 
-		if key.up or key.down or key.left or key.right then
-			a="walk"
-			if key.sneak then
-				a="sneak"
+		if not attached_players[name] then
+			local user=player_style.players[name]
+			local key=player:get_player_control()
+			local a="stand"
+
+			if key.up or key.down or key.left or key.right then
+				a="walk"
+				if key.sneak then
+					a="sneak"
+				end
+			elseif key.LMB or key.RMB then
+				a="mine"
+			elseif player:get_hp()<=0 then
+				a="lay"
 			end
-		elseif key.LMB or key.RMB then
-			a="mine"
-		elseif player:get_hp()<=0 then
-			a="lay"
+			player_style.set_animation(name,a)
 		end
-		player_style.set_animation(name,a)
 	end
 end)
 
