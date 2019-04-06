@@ -25,6 +25,28 @@ default.register_chair({
 	craft={{"group:stick","",""},{"default:apple_wood","",""},{"group:stick","",""}}
 })
 
+default.register_chest({
+	name = "chest",
+	description = "Chest",
+	burnable = true,
+	texture="default_wood.png",
+	craft={
+		{"default:apple_wood","default:apple_wood","default:apple_wood"},
+		{"default:apple_wood","","default:apple_wood"},
+		{"default:apple_wood","default:apple_wood","default:apple_wood"}
+	}
+})
+
+default.register_chest({
+	name = "locked_chest",
+	description = "Locked chest",
+	locked = true,
+	burnable = true,
+	texture="default_wood.png",
+	craft={{"default:chest","default:steel_ingot"}},
+})
+
+
 --||||||||||||||||
 -- ======================= trees
 --||||||||||||||||

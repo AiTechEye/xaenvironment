@@ -212,3 +212,82 @@ default.register_chair=function(def)
 		})
 	end
 end
+
+default.register_chest=function(def)
+	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local mod = minetest.get_current_modname() ..":"
+	local name = mod .. def.name
+	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chest=1}
+	local tiles
+	local locked = def.locked
+	groups.flammable = def.burnable and 1 or nil
+
+	if def.texture and string.find(def.texture,".png") then
+		tiles = {
+			def.texture .."^default_chest_top.png",
+			def.texture .."^default_chest_top.png",
+			def.texture .."^default_chest_side.png",
+			def.texture .."^default_chest_side.png",
+			def.texture .."^default_chest_side.png",
+			def.locked and def.texture .."^default_chest_front_locked.png" or def.texture .."^default_chest_front.png",
+		}
+	end
+
+
+	minetest.register_node(name,{
+		description = def.description or uname .. " chest",
+		groups = groups,
+	--	drawtype="nodebox",
+	--	paramtype="light",
+		paramtype2 = "facedir",
+		tiles = tiles or def.tiles,
+		paramtype = "light",
+		sounds = def.sounds or default.node_sound_wood_defaults(),
+		after_place_node = function(pos, placer, itemstack)
+			local meta = minetest.get_meta(pos)
+			local pname = placer:get_player_name()
+			meta:get_inventory():set_size("main", 32)
+			if locked then
+				meta:set_string("owner",pname)
+				meta:set_string("infotext","Locked chest (" .. pname .. ")")
+			else
+				meta:set_string("infotext","Chest")
+			end
+		end,
+		on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+			local meta = minetest.get_meta(pos)
+			local owner = meta:get_string("owner")
+			local pname = player:get_player_name()
+			if owner == "" or owner == pname or minetest.check_player_privs(pname, {protection_bypass=true}) then
+				minetest.after(0.1, function(pname,pos)
+					return minetest.show_formspec(pname, "default.chest",
+						"size[8,8]" ..
+						"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+						"list[current_player;main;0,4.2;8,4;]" ..
+						"listring[current_player;main]" ..
+						"listring[current_name;main]"
+					)
+				end,pname,pos)
+			end
+
+		end,
+		can_dig = function(pos, player)
+			local meta = minetest.get_meta(pos)
+			local owner = meta:get_string("owner")
+			local pname = player:get_player_name()
+			return (owner == "" or owner == pname or minetest.check_player_privs(pname, {protection_bypass=true})) and meta:get_inventory():is_empty("main")
+		end,
+	})
+
+	minetest.register_craft({
+		output = name,
+		recipe = def.craft
+	})
+	if def.burnable then
+		minetest.register_craft({
+			type = "fuel",
+			recipe = name,
+			burntime = 10,
+		})
+	end
+end
