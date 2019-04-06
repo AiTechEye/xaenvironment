@@ -96,3 +96,12 @@ minetest.register_node("beds:bed", {
 		end
 	end
 })
+
+minetest.register_craft({
+	output="beds:bed",
+	recipe={
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+		{"group:wood","group:wood","group:wood"},
+	},
+})
+
