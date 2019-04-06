@@ -28,3 +28,10 @@ default.register_door({
 		{"plants:pear_wood","plants:pear_wood",""}
 	}
 })
+
+default.register_chair({
+	name = "pear_wood",
+	description = "Pear wood chair",
+	flammable = true,
+	texture = "plants_pear_wood.png",
+})
