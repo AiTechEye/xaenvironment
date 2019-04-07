@@ -2,6 +2,7 @@ minetest.register_tool(":", {
 	type = "none",
 	wield_image = "wieldhand.png",
 	wield_scale={x=1,y=1,z=2},
+	groups={not_in_creative_inventory=1},
 	tool_capabilities = {
 		full_punch_interval = 1,
 		max_drop_level = 0,

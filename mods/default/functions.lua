@@ -86,6 +86,37 @@ default.tool_breaks_defaults=function(a)
 	return a
 end
 
+default.workbench.get_craft_recipe=function(item)
+	if item then
+		local a = minetest.get_all_craft_recipes(item)
+		if a then
+			for _,c in pairs(a) do
+				if c.type and c.type == "cooking" then
+					return {item=c.items[1],output=item,type="cooking"}
+				end
+			end
+		end
+	end
+
+	local craft = minetest.get_craft_recipe(item)
+
+	if craft.type then
+		return craft
+	end
+	for _,it in pairs(default.workbench.registered_crafts) do
+		if it.output == item then
+			local its = {}
+			for _,i2 in pairs(it.recipe) do
+			for _,i3 in pairs(i2) do
+				table.insert(its,i3)
+			end
+			end
+			return {output=it.output,type = it.type,items = its}
+		end
+	end
+	return {}
+end
+
 default.workbench.get_craft_result=function(list)
 
 	local a = minetest.get_craft_result({method = "normal",width = 3, items = list})
@@ -106,7 +137,6 @@ default.workbench.get_craft_result=function(list)
 				break
 			end
 			s = s + 1
-
 		end
 			if br then
 				break
@@ -135,6 +165,8 @@ default.workbench.register_craft=function(c)
 		error("efault.workbench.register_craft: recipe table expected")
 		return
 	end
+	c.type = "workbench"
+	c.mathod = "workbench"
 	table.insert(default.workbench.registered_crafts,c)
 end
 

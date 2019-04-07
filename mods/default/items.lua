@@ -5,6 +5,12 @@ minetest.register_craftitem("default:stick", {
 	groups = {flammable = 1,stick=1},
 })
 
+minetest.register_craftitem("default:unknown", {
+	description = "Unknown item",
+	inventory_image = "default_unknown.png",
+	groups = {not_in_creative_inventory=1},
+})
+
 default.register_door({
 	name="apple_wood_door",
 	description = "Apple wood door",
