@@ -23,9 +23,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output="default:workbench",
 	recipe={
-		{"group:tree","group:tree","group:tree"},
-		{"group:tree","group:tree","group:tree"},
-		{"group:tree","group:tree","group:tree"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"group:wood","group:wood","group:wood"},
+		{"group:tree","group:wood","group:tree"},
 	},
 })
 
