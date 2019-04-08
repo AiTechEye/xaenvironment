@@ -10,7 +10,7 @@ default.register_plant=function(def)
 	def.drawtype = def.drawtype or			"plantlike"
 	def.tiles = def.tiles or				{"default_leaves.png"}
 
-	def.groups = def.groups or				{plant=1,dig_immediate=2,flammable=1}
+	def.groups = def.groups or				{plant=1,attached_node=1,dig_immediate=2,flammable=1}
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
 	def.sunlight_propagetes = def.sunlight_propagetes or	true
 	def.buildable_to = def.buildable_to or			true
@@ -40,7 +40,7 @@ default.register_plant=function(def)
 	ddef.noise_params.spread = ddef.noise_params.spread or	{x = 150, y = 150, z = 150}	
 	ddef.noise_params.seed = ddef.noise_params.seed or	2	
 	ddef.noise_params.octaves = ddef.noise_params.octaves or	3	
-	ddef.noise_params.persist = ddef.noise_params.persist or	0.66	
+	ddef.noise_params.persist = ddef.noise_params.persist or	0.2	
 
 	minetest.register_decoration(ddef)
 
