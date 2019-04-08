@@ -36,3 +36,15 @@ default.register_chair({
 	texture = "plants_pear_wood.png",
 	craft={{"group:stick","",""},{"plants:pear_wood","",""},{"group:stick","",""}}
 })
+
+for i,c in pairs({"d8e41d","b21db5","601db5","bb91f0","e4d9f3","fd0084","6f86ff","ff3030","ff4d00","ffb047","ffb0c5","a6421f"}) do
+	default.register_plant({
+		name="daisybush" .. i,
+		description = "Daisy bush",
+		tiles={"plants_pear_tree_top.png^[colorize:#"..c.."ff^plants_daisybushflower.png^[makealpha:0,255,0"},
+		decoration={noise_params={
+			offset=-0.001,
+			scale=0.003,
+		}},
+	})
+end
