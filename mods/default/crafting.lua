@@ -21,6 +21,11 @@ end)
 default.workbench.set_form=function(pos,add)
 	local meta = minetest.get_meta(pos)
 	local page = meta:get_int("page")
+
+	local but_size = meta:get_string("but_size")
+	local x_add = tonumber(meta:get_string("x_add"))
+	local y_add = tonumber(meta:get_string("y_add"))
+
 	local craftguide_items = ""
 	add = add or ""
 	local x=-0.2
@@ -30,15 +35,30 @@ default.workbench.set_form=function(pos,add)
 		if not it then
 			break
 		end
-		craftguide_items = craftguide_items .. "item_image_button[" .. x .. "," .. y .. ";0.7,0.7;".. it ..";guide_item#" .. it .. ";]"
-		x = x + 0.5
-		if x >= 3.8 then
+		craftguide_items = craftguide_items .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. it ..";guide_item#" .. it .. ";]"
+		x = x + x_add
+		if x >= x_add*7 then
 			x = -0.2
-			y = y + 0.6
+			y = y + y_add
 		end
 	end
 
-	meta:set_string("formspec",
+
+
+
+
+
+	if meta:get_int("craftguide") == 1 then
+		meta:set_string("formspec",
+			"size[8,12]" ..
+			craftguide_items ..
+			"list[current_player;main;0,8.3;8,4;]" ..
+			"image_button[3.1,7.1;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
+			"image_button[3.9,7.1;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
+			add
+		)
+	else
+		meta:set_string("formspec",
 		"size[8,11]" ..
 		"list[context;craft;4,0;3,3;]" ..
 		"list[context;output;7,1;1,1;]" ..
@@ -50,22 +70,16 @@ default.workbench.set_form=function(pos,add)
 		"listring[current_player;main]" ..
 		"listring[current_name;output]" ..
 		"listring[current_player;main]" ..
-
 		craftguide_items ..
-
 		"image_button[-0.2,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
 		"image_button[0.3,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
-
 		add
-	)
+		)
+	end
+
 end
 
-minetest.register_node("default:workbench", {
-	description = "Workbench",
-	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2},
-	sounds = default.node_sound_wood_defaults(),
-	on_receive_fields=function(pos, formname, pressed, sender)
+local on_receive_fields=function(pos, formname, pressed, sender)
 		local meta = minetest.get_meta(pos)
 		if pressed.guidefront then
 			local page = meta:get_int("page")
@@ -86,13 +100,21 @@ minetest.register_node("default:workbench", {
 			return
 		end
 
+		local but_size = meta:get_string("but_size")
+		local x_add = tonumber(meta:get_string("x_add"))
+		local y_add = tonumber(meta:get_string("y_add"))
+		local x_start = tonumber(meta:get_string("x_start"))
+		local y_start_crafring = tonumber(meta:get_string("y_start_crafring"))
+		local y_start_cooking = tonumber(meta:get_string("y_start_cooking"))
+		local y_label = tonumber(meta:get_string("y_label"))
+
 		for i,it in pairs(pressed) do
 			if  string.sub(i,1,11) == "guide_item#" then
 				local item = string.sub(i,12,-1)
 
 				local craft = default.workbench.get_craft_recipe(item)
-				local x = -0.2
-				local y = 4
+				local x = x_start
+				local y = y_start_crafring
 				local itlist = ""
 
 				if craft.items and (craft.type == "normal" or craft.type == "workbench") then
@@ -115,14 +137,14 @@ minetest.register_node("default:workbench", {
 							it2s = "default:unknown"
 							kind = ""
 						end
-						itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";0.7,0.7;".. it2s ..";guide_" .. kind .."#" .. but ..";" .. label .."]"
-						x = x + 0.5
-						if x >= 1.2 then
-							x = -0.2
-							y = y + 0.6
+						itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. it2s ..";guide_" .. kind .."#" .. but ..";" .. label .."]"
+						x = x + x_add
+						if x >= x_add*2 then
+							x = x_start
+							y = y + y_add
 						end
 					end
-					itlist = itlist .. (craft.type == "workbench" and "item_image_button[1.7,4.6;0.7,0.7;default:workbench;guide_item#default:workbench;]" or "")
+					itlist = itlist .. (craft.type == "workbench" and "item_image_button[" .. (x_start+x_add*4) .. "," .. (y_start_crafring+y_add) .. ";" .. but_size ..";default:workbench;guide_item#default:workbench;]" or "")
 				elseif craft.type and craft.type == "cooking" and craft.item then
 					local kind = "item"
 					local label = ""
@@ -134,10 +156,10 @@ minetest.register_node("default:workbench", {
 					end
 
 					itlist = ""
-					.. "item_image_button[" .. x .. "," .. y .. ";0.7,0.7;".. craft.item ..";guide_" .. kind .."#" .. itkind ..";" .. label .. "]"
+					.. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. craft.item ..";guide_" .. kind .."#" .. itkind ..";" .. label .. "]"
 					.. "label[" .. (x+0.3) .. "," .. (y-0.4) .. ";Cooking]"
-					.. "item_image_button[" .. (x+0.5) .. "," .. y .. ";0.7,0.7;default:furnace;guide_item#default:furnace;]"
-					..  "item_image_button[" .. (x+1) .. "," .. y .. ";0.7,0.7;".. craft.output ..";guide_item#" .. craft.output ..";]"
+					.. "item_image_button[" .. (x+x_add) .. "," .. y .. ";" .. but_size ..";default:furnace;guide_item#default:furnace;]"
+					..  "item_image_button[" .. (x+x_add*2) .. "," .. y .. ";" .. but_size ..";".. craft.output ..";guide_item#" .. craft.output ..";]"
 				end
 
 				default.workbench.set_form(pos,itlist)
@@ -145,22 +167,29 @@ minetest.register_node("default:workbench", {
 			elseif string.sub(i,1,12) == "guide_group#" then
 				local groupname = string.sub(i,13,-1)
 				local group = default.workbench.groups_list[groupname] or {}
-				local x = -0.2
-				local y = 4.5
-				local itlist = "label[-0.2,4;" .. groupname .."]"
+				local x = x_start
+				local y = y_start_cooking
+				local itlist = "label[-0.2," .. y_label .. ";" .. groupname .."]"
 				for _,nam in pairs(group) do
-					itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";0.7,0.7;".. nam ..";guide_item#" ..nam ..";]"
-					x = x + 0.5
+					itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. nam ..";guide_item#" ..nam ..";]"
+					x = x + x_add
 					if x >= 3.8 then
-						x = -0.2
-						y = y + 0.6
+						x = x_start
+						y = y + y_add
 					end
 				end
 				default.workbench.set_form(pos,itlist)
 				return
 			end
 		end
-	end,
+end
+
+minetest.register_node("default:workbench", {
+	description = "Workbench",
+	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
+	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	on_receive_fields=on_receive_fields,
 	after_place_node = function(pos, placer, itemstack)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -170,6 +199,15 @@ minetest.register_node("default:workbench", {
 		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Workbench")
 		meta:set_int("page", 1)
+
+		meta:set_string("but_size", "0.7,0.7")
+		meta:set_string("x_start", -0.2)
+		meta:set_string("x_add", 0.5)
+		meta:set_string("y_add", 0.6)
+		meta:set_string("y_start_crafring", 4)
+		meta:set_string("y_start_cooking", 4.5)
+		meta:set_string("y_label", 4)
+
 		default.workbench.set_form(pos)
 	end,
 	on_timer = function (pos, elapsed)
@@ -216,4 +254,32 @@ minetest.register_node("default:workbench", {
 		local inv = minetest.get_meta(pos):get_inventory()
 		return inv:is_empty("craft") and inv:is_empty("stock")
 	end
+})
+
+minetest.register_node("default:craftguide", {
+	description = "Craftguide",
+	tiles={"default_craftgreed.png^default_unknown.png"},
+	groups = {dig_immediate=3,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	on_receive_fields=on_receive_fields,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}},
+	paramtype2="wallmounted",
+	paramtype = "light",
+	sunlight_propagates = true,
+	after_place_node = function(pos, placer, itemstack)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("page", 1)
+
+		meta:set_string("but_size", "1,1")
+		meta:set_string("x_start", -0.2)
+		meta:set_string("x_add", 0.8)
+		meta:set_string("y_add", 0.9)
+		meta:set_string("y_start_crafring", 5)
+		meta:set_string("y_start_cooking", 5.5)
+		meta:set_string("y_label", 5)
+		meta:set_int("craftguide", 1)
+		default.workbench.set_form(pos)
+		 minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
+	end,
 })
