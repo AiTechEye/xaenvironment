@@ -1,15 +1,18 @@
-
-
---[[
-default:tree
-default:wood
-
-default:dirt_with_grass
-default:dirt
-default:stone
-default:cobble
-default:sandstone
---]]
+minetest.register_node("default:stick_on_ground", {
+	description = "Stick",
+	drop="default:stick",
+	tiles={"default_tree.png"},
+	groups = {stick=1,dig_immediate=3,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.05,-0.5,-0.5,0.05,-0.45,0.5}},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	walkable=false,
+	on_construct = function(pos)
+		minetest.swap_node(pos,{name="default:stick_on_ground",param2=math.random(0,3)})
+	end
+})
 
 minetest.register_node("default:torch", {
 	description = "Torch",

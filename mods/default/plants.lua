@@ -26,6 +26,9 @@ default.register_tree=function(def)
 	def.tree.on_place = def.tree.on_place or 			minetest.rotate_node
 	def.tree.groups = def.tree.groups or				 {tree=1,choppy=2,flammable=1}
 	def.tree.sounds = def.tree.sounds or 				default.node_sound_wood_defaults()
+	def.tree.on_construct = def.tree.on_construct or 			function(pos, placer)
+									minetest.get_meta(pos):set_int("placed",1)
+								end
 	minetest.register_node(mod .. def.name .. "_tree", def.tree)
 
 -- wood

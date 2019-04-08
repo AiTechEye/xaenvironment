@@ -12,6 +12,14 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:craftguide",
+	recipe={
+		{"group:stick","group:stick",""},
+		{"group:stick","group:stick",""},
+	},
+})
+
+minetest.register_craft({
 	output="default:furnace",
 	recipe={
 		{"group:stone","group:stone","group:stone"},
@@ -50,9 +58,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
-	output="default:wood 4",
-	recipe={{"default:tree"}},
+	output="default:furnace",
+	recipe={
+		{"group:stone","group:stone","group:stone"},
+		{"group:stone","","group:stone"},
+		{"group:stone","group:stone","group:stone"},
+	},
 })
+
+
 
 minetest.register_craft({
 	output="default:sand",

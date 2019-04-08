@@ -28,12 +28,28 @@ minetest.register_abm({
 })
 
 minetest.register_abm({
+	nodenames={"group:tree"},
+	neighbors={"group:spreading_dirt_type"},
+	interval=10,
+	chance=50,
+	action=function(pos,node,active_object_count,active_object_count_wider)
+		for x=-1,1,1 do
+		for z=-1,1,1 do
+			if math.random(1,4) == 1 and minetest.get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "air" and minetest.get_meta(pos):get_int("placed") == 0 then
+				minetest.set_node({x=pos.x+x,y=pos.y,z=pos.z+z},{name="default:stick_on_ground"})
+			end
+		end
+		end
+	end
+})
+
+minetest.register_abm({
 	nodenames={"group:spreading_dirt_type"},
 	interval=10,
 	chance=50,
 	action=function(pos,node,active_object_count,active_object_count_wider)
 		local u = {x=pos.x,y=pos.y+1,z=pos.z}
-		if (minetest.get_node_light(u,0.5) or 0) < 13 or minetest.get_item_group(minetest.get_node(u).name,"liquid") > 0 then
+		if (minetest.get_node_light(u,0.5) or 0) < 10 or minetest.get_item_group(minetest.get_node(u).name,"liquid") > 0 then
 			minetest.set_node(pos,{name="default:dirt"})
 		end
 	end
