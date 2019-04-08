@@ -22,6 +22,11 @@ dofile(minetest.get_modpath("default") .. "/entities.lua")
 dofile(minetest.get_modpath("default") .. "/block_modifiers.lua")
 
 
+minetest.register_on_newplayer(function(player)
+	player:get_inventory():add_item("main","default:craftguide")
+end)
+
+
 
 
 
