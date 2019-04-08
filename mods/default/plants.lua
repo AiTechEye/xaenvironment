@@ -1,3 +1,52 @@
+default.register_plant=function(def)
+	local mod = minetest.get_current_modname() ..":"
+	local name = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local ddef = table.copy(def.decoration or {})
+
+	def.decoration = nil
+
+	def = def or {}
+	def.description = def.description or			name
+	def.drawtype = def.drawtype or			"plantlike"
+	def.tiles = def.tiles or				{"default_leaves.png"}
+
+	def.groups = def.groups or				{plant=1,dig_immediate=2,flammable=1}
+	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
+	def.sunlight_propagetes = def.sunlight_propagetes or	true
+	def.buildable_to = def.buildable_to or			true
+	def.floodable = def.floodable or 			true
+	def.paramtype = def.paramtype or			"light"
+	def.walkable = def.walkable or			false
+	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
+
+	minetest.register_node(mod .. def.name, def)
+
+
+	ddef.decoration = def.name
+	ddef.deco_type = ddef.deco_type or			"simple"
+	ddef.place_on = ddef.place_on or 			{"default:dirt_with_grass"}
+	ddef.sidelen = ddef.sidelen or				16
+	ddef.biomes = ddef.biomes or				{"grassland"}
+	ddef.y_min = ddef.y_min or				1
+	ddef.y_max = ddef.y_max or				31000
+	ddef.height = ddef.height or				1
+	ddef.height_max = ddef.height_max or			1
+	ddef.spawn_by = ddef.spawn_by or			"default:dirt_with_grass"
+	ddef.num_spawn_by = ddef.num_spawn_by or		1
+
+	ddef.noise_params = ddef.noise_params or		{}
+	ddef.noise_params.offset = ddef.noise_params.offset or	0.006	
+	ddef.noise_params.scale = ddef.noise_params.scale or	 0.007	
+	ddef.noise_params.spread = ddef.noise_params.spread or	{x = 150, y = 150, z = 150}	
+	ddef.noise_params.seed = ddef.noise_params.seed or	2	
+	ddef.noise_params.octaves = ddef.noise_params.octaves or	3	
+	ddef.noise_params.persist = ddef.noise_params.persist or	0.66	
+
+	minetest.register_decoration(ddef)
+
+
+end
+
 default.register_tree=function(def)
 
 	if type(def.name) ~= "string" then
