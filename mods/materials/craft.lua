@@ -21,3 +21,12 @@ minetest.register_craft({
 	output="materials:piece_of_wood 8",
 	recipe={{"group:wood","group:wood"}},
 })
+
+minetest.register_craft({
+	output="materials:mixed_wood",
+	recipe={
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","group:stick","group:stick"},
+	},
+})
