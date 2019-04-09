@@ -13,7 +13,10 @@ default.register_plant=function(def)
 	def.groups = def.groups or				{}
 	def.groups.plant = def.groups.plant or			1
 	def.groups.attached_node = def.groups.attached_node or	1
-	def.groups.dig_immediate = def.groups.dig_immediate or	3
+	def.groups.snappy = def.groups.snappy or		3
+
+
+
 	def.groups.flammable = def.groups.flammable or		1
 
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()

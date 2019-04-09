@@ -77,45 +77,6 @@ default.register_tree({
 	end
 })
 
-minetest.register_lbm({
-	name="default:to_appletree",
-	nodenames={"default:tree"},
-	run_at_every_load =true,
-	action=function(pos,node)
-		minetest.swap_node(pos,{name="default:apple_tree"})
-	end
-})
-
-minetest.register_lbm({
-	name="default:to_applewood",
-	nodenames={"default:wood"},
-	run_at_every_load =true,
-	action=function(pos,node)
-		minetest.swap_node(pos,{name="default:apple_wood"})
-	end
-})
-
-minetest.register_lbm({
-	name="default:to_appleleaves",
-	nodenames={"default:leaves"},
-	run_at_every_load =true,
-	action=function(pos,node)
-		minetest.swap_node(pos,{name="default:apple_leaves"})
-	end
-})
-
-minetest.register_lbm({
-	name="default:to_applespawner",
-	nodenames={"default:apple_spawner"},
-	run_at_every_load =true,
-	action=function(pos,node)
-		minetest.swap_node(pos,{name="default:fruit_spawner"})
-	end
-})
-
-
-
-
 --||||||||||||||||
 -- ======================= minerals
 --||||||||||||||||
@@ -249,7 +210,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			choppy={times={[1]=2,[2]=1.8,[3]=1.5},uses=17,maxlevel=2}
+			snappy={times={[1]=2,[2]=1.8,[3]=1.5},uses=17,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -312,7 +273,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			choppy={times={[1]=2,[2]=1.8,[3]=1.5},uses=20,maxlevel=2}
+			snappy={times={[1]=2,[2]=1.8,[3]=1.5},uses=20,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -357,7 +318,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
-			choppy={times={[1]=1.9,[2]=1.7,[3]=1.4},uses=22,maxlevel=2}
+			snappy={times={[1]=1.9,[2]=1.7,[3]=1.4},uses=22,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -403,7 +364,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			choppy={times={[1]=1.8,[2]=1.6,[3]=1.3},uses=25,maxlevel=2}
+			snappy={times={[1]=1.8,[2]=1.6,[3]=1.3},uses=25,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -483,7 +444,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
-			choppy={times={[1]=1.5,[2]=1.2,[3]=1},uses=30,maxlevel=2}
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.1},uses=50,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
 	}}
@@ -543,7 +504,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
-			choppy={times={[1]=1.3,[2]=1,[3]=0.9},uses=33,maxlevel=2}
+			snappy={times={[1]=1,[2]=0.5,[3]=0},uses=55,maxlevel=2}
 		},
 		damage_groups={fleshy=4}
 	}}

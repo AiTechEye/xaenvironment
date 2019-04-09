@@ -8,7 +8,7 @@ minetest.register_tool(":", {
 		max_drop_level = 0,
 		groupcaps={
 			crumbly = {times={[2]=3, [3]=0.7}, uses=0, maxlevel=1},
-			snappy = {times={[3]=0.4}, uses=0, maxlevel=1},
+			snappy = {times={[2]=2,[3]=0.7}, uses=0, maxlevel=1},
 			oddly_breakable_by_hand = {times={[1]=5,[2]=4,[3]=3}, uses=0},
 			dig_immediate={times={[1]=2,[2]=1,[3]=0}, uses=0}
 		},
