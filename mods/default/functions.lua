@@ -200,6 +200,9 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
 	def.groups.eatable=hp
 	def.groups.gaps=gaps
+
+if gaps > 1 then
+
 	def.on_use=function(itemstack, user, pointed_thing)
 		local eat = 65536/gaps
 		minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
@@ -226,8 +229,16 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 		end
 	end
 
+else
+def.on_use=minetest.item_eat(hp)
+end
+	if kind == "node" then
+		def.groups.dig_immediate=3
+	end
+
 	minetest["register_" .. kind](name, def)
 
+if gaps > 1 then
 	if kind ~= "tool" then
 		local groups = table.copy(def.groups)
 		groups.not_in_creative_inventory = 1
@@ -238,6 +249,7 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 			on_use = def.on_use
 		})	
 	end
+end
 end
 
 default.registry_mineral=function(def)

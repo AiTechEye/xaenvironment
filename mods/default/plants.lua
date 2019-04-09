@@ -6,7 +6,7 @@ default.register_plant=function(def)
 	def.decoration = nil
 
 	def = def or {}
-	def.description = def.description or			name
+	def.description = def.description or			string.gsub(name,"_"," ")
 	def.drawtype = def.drawtype or			"plantlike"
 	def.tiles = def.tiles or				{"default_leaves.png"}
 
