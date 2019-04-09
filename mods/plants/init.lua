@@ -114,3 +114,64 @@ default.register_plant({
 		{items = {"plants:dolls_eyes"}}
 	}}
 })
+
+default.register_plant({
+	name="cow_parsnip",
+	tiles={"plants_cow_parsnip.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.015,
+		seed=3365,
+	}},
+	damage_per_second=4,
+	groups={dig_immediate=1},
+	on_punch=function(pos,node,player,pointed_thing)
+		if player:get_wielded_item():get_name() == "" then
+			default.punch(player,player,4)
+		end
+	end,
+	visual_scale=2.5,
+	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,2,0.25}}
+})
+default.register_plant({
+	name="cow_parsnip_big",
+	tiles={"plants_cow_parsnip.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.015,
+		seed=3365,
+	}},
+	damage_per_second=4,
+	groups={dig_immediate=1},
+	on_punch=function(pos,node,player,pointed_thing)
+		if player:get_wielded_item():get_name() == "" then
+			default.punch(player,player,4)
+		end
+	end,
+	visual_scale=3.5,
+	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,3,0.25}}
+})
+
+
+default.register_plant({
+	name="anthriscus_sylvestris_big",
+	tiles={"plants_cow_parsnip.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.015,
+		seed=3365,
+	}},
+	visual_scale=1.3,
+	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}}
+})
+
+default.register_plant({
+	name="anthriscus_sylvestris",
+	tiles={"plants_cow_parsnip.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.015,
+		seed=3365,
+	}},
+	visual_scale=1.1,
+})
