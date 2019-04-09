@@ -48,3 +48,17 @@ for i,c in pairs({"d8e41d","b21db5","601db5","bb91f0","e4d9f3","fd0084","6f86ff"
 		}},
 	})
 end
+
+default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff"})
+default.register_plant({
+	name="lonicera_tatarica",
+	tiles={"plants_lonicera_tatarica.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.003,
+	}},
+	drop={max_items = 1,items = {
+		{items = {"plants:lonicera_tatarica_berries"}, rarity = 3},
+		{items = {"plants:lonicera_tatarica"}}
+	}}
+})
