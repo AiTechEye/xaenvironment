@@ -45,6 +45,7 @@ for i,c in pairs({"d8e41d","b21db5","601db5","bb91f0","e4d9f3","fd0084","6f86ff"
 		decoration={noise_params={
 			offset=-0.001,
 			scale=0.003,
+			seed=80*i,
 		}},
 	})
 end
@@ -60,5 +61,56 @@ default.register_plant({
 	drop={max_items = 1,items = {
 		{items = {"plants:lonicera_tatarica_berries"}, rarity = 3},
 		{items = {"plants:lonicera_tatarica"}}
+	}}
+})
+
+default.register_plant({
+	name="verbena",
+	tiles={"plants_verbena.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.003,
+		seed=545,
+	}}
+})
+
+default.register_plant({
+	name="lantana",
+	tiles={"plants_lantana.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.003,
+		seed=8745,
+	}}
+})
+
+default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
+	inventory_image="plats_dolls_eyes_berries.png",
+	on_eat=function(itemstack, user, pointed_thing)
+		local r = math.random(30,60)
+		local s = math.random(1,9999)
+		local name = user:get_player_name()
+		default.set_on_player_death(name,"dolls_eyes" .. s,true)
+		for i=0,math.random(3,10) do
+			minetest.after(r+i*0.1,function(name,user,s)
+				if default.get_on_player_death(name,"dolls_eyes" .. s) then
+					default.punch(user,user,2)
+				end
+			end,name,user,s)
+		end
+	end
+})
+
+default.register_plant({
+	name="dolls_eyes",
+	tiles={"plants_dolls_eyes.png"},
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.005,
+		seed=3454365,
+	}},
+	drop={max_items = 1,items = {
+		{items = {"plants:dolls_eyes_berries 3"}, rarity = 2},
+		{items = {"plants:dolls_eyes"}}
 	}}
 })
