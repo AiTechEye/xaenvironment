@@ -119,12 +119,12 @@ default.register_plant({
 	name="cow_parsnip",
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
-		offset=-0.0015,
+		offset=0.0015,
 		scale=0.015,
 		seed=3365,
 	}},
 	damage_per_second=4,
-	groups={dig_immediate=1},
+	groups={snappy=1},
 	on_punch=function(pos,node,player,pointed_thing)
 		if player:get_wielded_item():get_name() == "" then
 			default.punch(player,player,4)
@@ -138,12 +138,12 @@ default.register_plant({
 	name="cow_parsnip_big",
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
-		offset=-0.0015,
+		offset=0.0015,
 		scale=0.015,
 		seed=3365,
 	}},
 	damage_per_second=4,
-	groups={dig_immediate=3},
+	groups={snappy=3},
 	on_punch=function(pos,node,player,pointed_thing)
 		if player:get_wielded_item():get_name() == "" then
 			default.punch(player,player,4)
@@ -180,13 +180,33 @@ default.register_plant({
 	visual_scale=1.1,
 })
 
+for i=1,5 do
+default.register_plant({
+	name="grass" .. i,
+	description = "Grass",
+	tiles={"plants_grass"..i..".png"},
+	drop="plants:grass3",
+	decoration={noise_params={
+		offset=0.2,
+		scale=0.01,
+		spread={x=3,y=3,z=3},
+		seed=0,
+	},
+},
+	groups={spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	after_place_node=function(pos, placer)
+		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
+	end
+})
+end
+
 minetest.register_lbm({
 	name="plants:spreading_plant",
 	nodenames={"group:spreading_plant"},
 	run_at_every_load = true,
 	action=function(pos,node)
 		if math.random(0,minetest.get_item_group(node.name,"spreading_plant")) == 1 then
-			local p = minetest.find_nodes_in_area_under_air(vector.add(pos, 2),vector.subtract(pos, 2),{"group:spreading_dirt_type"})
+			local p = minetest.find_nodes_in_area_under_air(vector.add(pos, 1),vector.subtract(pos, 1),{"group:spreading_dirt_type"})
 			if #p > 0 then
 				local p2 = p[1]
 				minetest.set_node({x=p2.x,y=p2.y+1,z=p2.z},node)
