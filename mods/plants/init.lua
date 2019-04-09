@@ -130,6 +130,7 @@ default.register_plant({
 			default.punch(player,player,4)
 		end
 	end,
+	groups={spreading_plant=2},
 	visual_scale=2.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,2,0.25}}
 })
@@ -142,12 +143,13 @@ default.register_plant({
 		seed=3365,
 	}},
 	damage_per_second=4,
-	groups={dig_immediate=1},
+	groups={dig_immediate=3},
 	on_punch=function(pos,node,player,pointed_thing)
 		if player:get_wielded_item():get_name() == "" then
 			default.punch(player,player,4)
 		end
 	end,
+	groups={spreading_plant=1},
 	visual_scale=3.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,3,0.25}}
 })
@@ -161,6 +163,7 @@ default.register_plant({
 		scale=0.015,
 		seed=3365,
 	}},
+	groups={spreading_plant=3},
 	visual_scale=1.3,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}}
 })
@@ -173,5 +176,21 @@ default.register_plant({
 		scale=0.015,
 		seed=3365,
 	}},
+	groups={spreading_plant=2},
 	visual_scale=1.1,
+})
+
+minetest.register_lbm({
+	name="plants:spreading_plant",
+	nodenames={"group:spreading_plant"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		if math.random(0,minetest.get_item_group(node.name,"spreading_plant")) == 1 then
+			local p = minetest.find_nodes_in_area_under_air(vector.add(pos, 2),vector.subtract(pos, 2),{"group:spreading_dirt_type"})
+			if #p > 0 then
+				local p2 = p[1]
+				minetest.set_node({x=p2.x,y=p2.y+1,z=p2.z},node)
+			end
+		end
+	end
 })
