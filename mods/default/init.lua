@@ -4,6 +4,7 @@ default={
 	},
 	player_attached = player_style.player_attached,
 	player_set_animation = player_style.set_animation,
+	on_player_death = {},
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")
@@ -20,14 +21,3 @@ dofile(minetest.get_modpath("default") .. "/items.lua")
 dofile(minetest.get_modpath("default") .. "/craft.lua")
 dofile(minetest.get_modpath("default") .. "/entities.lua")
 dofile(minetest.get_modpath("default") .. "/block_modifiers.lua")
-
-
-minetest.register_on_newplayer(function(player)
-	player:get_inventory():add_item("main","default:craftguide")
-end)
-
-
-
-
-
-

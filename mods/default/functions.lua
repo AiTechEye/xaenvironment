@@ -1,3 +1,35 @@
+minetest.register_on_newplayer(function(player)
+	player:get_inventory():add_item("main","default:craftguide")
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local name = player:get_player_name()
+	if default.on_player_death[name] then
+		for i,v in pairs(default.on_player_death[name]) do
+			if type(v) == "function" then
+				v(player)
+			end
+		end
+	end
+	default.on_player_death[name] = nil
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	default.on_player_death[player:get_player_name()]()
+	default.on_player_death[name] = nil
+end)
+
+default.get_on_player_death=function(name,event)
+	local a = default.on_player_death[name] or {}
+	return a[event]
+end
+
+default.set_on_player_death=function(name,event,value)
+	default.on_player_death[name] = default.on_player_death[name] or {}
+	default.on_player_death[name][event]=value
+end
+
+
 --||||||||||||||||
 -- ======================= Sounds
 --||||||||||||||||
@@ -196,42 +228,58 @@ default.defname=function(name,n)
 	return no and no[n] or nil
 end
 
+default.punch=function(ob1,ob2,hp)
+	if type(ob1)~="userdata" or type(ob2)~="userdata" then return end
+	hp=hp or 1
+	if ob1:get_luaentity() and ob1:get_luaentity().itemstring then ob1:remove() return end
+	ob1:punch(ob2,1,{full_punch_interval=1,damage_groups={fleshy=hp}})
+	if ob1:get_hp()<=0 then
+		return true
+	end
+	return false	
+end
+
 default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
 	def.groups.eatable=hp
 	def.groups.gaps=gaps
 
-if gaps > 1 then
+	if gaps > 1 then
 
-	def.on_use=function(itemstack, user, pointed_thing)
-		local eat = 65536/gaps
-		minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
-
-		if not minetest.registered_tools[itemstack:get_name()] then
-			local item = ItemStack(itemstack:get_name() .."_eaten")
-			item = item:to_table()
-			item.metadata = minetest.serialize({eat = eat})
-			item.wear = eat
-			user:get_inventory():add_item("main",item)
-			minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
-			return itemstack
-		else
-			local item = itemstack:to_table()
-			local meta = minetest.deserialize(item.metadata)
-			if not meta then
-				meta = {eat = eat}
-				item.metadata = minetest.serialize({eat = eat})
-				itemstack:replace(item)
-			end
-			minetest.do_item_eat(hp,nil,ItemStack(itemstack:get_name()),user,pointed_thing)
-			itemstack:add_wear(meta.eat)
-			return itemstack
+		local on_eat = def.on_eat or function()
 		end
+
+		def.on_use=function(itemstack, user, pointed_thing)
+			local eat = 65536/gaps
+			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
+			if not minetest.registered_tools[itemstack:get_name()] then
+				local item = ItemStack(itemstack:get_name() .."_eaten")
+				item = item:to_table()
+				item.metadata = minetest.serialize({eat = eat})
+				item.wear = eat
+				user:get_inventory():add_item("main",item)
+				minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
+				on_eat(itemstack, user, pointed_thing)
+				return itemstack
+			else
+				local item = itemstack:to_table()
+				local meta = minetest.deserialize(item.metadata)
+				if not meta then
+					meta = {eat = eat}
+					item.metadata = minetest.serialize({eat = eat})
+					itemstack:replace(item)
+				end
+				minetest.do_item_eat(hp,nil,ItemStack(itemstack:get_name()),user,pointed_thing)
+				itemstack:add_wear(meta.eat)
+				on_eat(itemstack, user, pointed_thing)
+				return itemstack
+			end
+		end
+
+	else
+		def.on_use=minetest.item_eat(hp)
 	end
 
-else
-def.on_use=minetest.item_eat(hp)
-end
 	if kind == "node" then
 		def.groups.dig_immediate=3
 	end
