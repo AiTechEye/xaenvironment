@@ -54,9 +54,17 @@ lakes.set_lake=function(def)
 		and nodes[data[area:index(c.x+1,c.y,c.z-1)]]
 		and nodes[data[area:index(c.x-1,c.y,c.z-1)]]
 		and nodes[data[area:index(c.x-1,c.y,c.z+1)]]
-		and nodes[data[area:index(c.x,c.y-1,c.z)]]
-		and ((y == 0 and data[area:index(c.x,c.y+1,c.z)] == c_air) or (y<0 and data[area:index(c.x,c.y+1,c.z)] == c_source)) then
-			data[area:index(c.x,c.y,c.z)] = c_source
+		and nodes[data[area:index(c.x,c.y-1,c.z)]] then
+			local uid = data[area:index(c.x,c.y+1,c.z)]
+			if y~=0 and uid == c_source then
+				data[area:index(c.x,c.y,c.z)] = c_source
+			else
+				local ndef = minetest.registered_items[minetest.get_name_from_content_id(uid)]
+				if uid == c_air or (ndef and not ndef.walkable) then
+					data[area:index(c.x,c.y,c.z)] = c_source
+					data[area:index(c.x,c.y+1,c.z)] = c_air
+				end
+			end
 		end
 	end
 	end
