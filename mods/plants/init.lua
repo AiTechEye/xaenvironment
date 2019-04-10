@@ -174,7 +174,7 @@ default.register_plant({
 			default.punch(player,player,4)
 		end
 	end,
-	groups={spreading_plant=2},
+	groups={spreading_plant=20},
 	visual_scale=2.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,2,0.25}}
 })
@@ -193,7 +193,7 @@ default.register_plant({
 			default.punch(player,player,4)
 		end
 	end,
-	groups={spreading_plant=1},
+	groups={spreading_plant=16},
 	visual_scale=3.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,3,0.25}}
 })
@@ -207,7 +207,7 @@ default.register_plant({
 		scale=0.015,
 		seed=3365,
 	}},
-	groups={spreading_plant=3},
+	groups={spreading_plant=15},
 	visual_scale=1.3,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}}
 })
@@ -220,7 +220,7 @@ default.register_plant({
 		scale=0.015,
 		seed=3365,
 	}},
-	groups={spreading_plant=2},
+	groups={spreading_plant=10},
 	visual_scale=1.1,
 })
 
