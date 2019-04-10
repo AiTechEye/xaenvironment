@@ -58,6 +58,41 @@ minetest.register_lbm({
 
 
 
+minetest.register_abm({
+	nodenames={"group:igniter"},
+	neighbors={"group:cools_lava"},
+	interval=2,
+	chance=1,
+	action=function(pos,node,active_object_count,active_object_count_wider)
+		if node.name == "default:lava_flowing" then
+			minetest.set_node(pos,{name="default:cooledlava"})
+
+--[[ maybe testing more later
+			local p = minetest.find_nodes_in_area_under_air(vector.add(pos, 1),vector.subtract(pos, 1),{"group:cools_lava"})
+			if #p > 0 then
+				for i,p1 in pairs(p) do
+					local up1 = {x=p1.x,y=p1.y+1,z=p1.z}
+					local up2 = {x=p1.x,y=p1.y+2,z=p1.z}
+					if p1.y <= pos.y then
+						print(111)
+						minetest.set_node(p1,{name="default:cooledlava"})
+						minetest.set_node(up1,{name="default:cooledlava"})
+						if minetest.get_node(up2).name == "air" then
+							minetest.set_node(up2,{name="default:cooledlava"})
+						end
+					end
+				end
+			end
+--]]
+		elseif node.name == "default:lava_source" then
+			minetest.set_node(pos,{name="default:obsidian"})
+		elseif node.name == "default:lava_source" then
+			minetest.set_node(pos,{name="default:obsidian"})
+		else
+			minetest.remove_node(pos)
+		end
+	end
+})
 
 
 

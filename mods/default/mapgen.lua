@@ -5,15 +5,7 @@ minetest.register_alias("mapgen_lava_source","default:lava_source")
 
 --minetest.set_mapgen_setting("mgv7_lava_depth",-50)
 
-minetest.register_ore({
-	ore_type= "blob",
-	ore = "default:lava_source",
-	wherein = "default:stone",
-	clust_scarcity = 17 * 17* 17,
-	clust_size = 10,
-	y_min = -31000,
-	y_max = -50,
-})
+
 
 minetest.register_ore({
 	ore_type = "blob",

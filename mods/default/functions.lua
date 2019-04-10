@@ -379,8 +379,8 @@ default.registry_mineral=function(def)
 			ore		=	mod .. def.name .. "_ore",
 			wherein		=	def.ore_settings.wherein or		"default:stone",
 			clust_scarcity	=	def.ore_settings.clust_scarcity or	8 * 8 * 8,
-			clust_num_ores	=	def.ore_settings.clust_num_ores or	2,
-			clust_size		=	def.ore_settings.clust_size	or	3,
+			clust_num_ores	=	def.ore_settings.clust_num_ores or	5,
+			clust_size		=	def.ore_settings.clust_size	or	5,
 			y_min		=	def.ore_settings.y_min	or	-31000,
 			y_max		=	def.ore_settings.y_max	or	-50,
 		})

@@ -1,6 +1,19 @@
+minetest.register_node("default:obsidian", {
+	description = "Obsidian",
+	tiles={"default_obsidian.png"},
+	groups = {cracky=1,level=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("default:cooledlava", {
+	description = "Cooled lava",
+	tiles={"default_cooledlava.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:ladder", {
 	description = "Ladder",
-	drop="default:stick",
 	tiles={"default_wood.png"},
 	groups = {ladder=1,choppy=3,oddly_breakable_by_hand=3,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
@@ -130,6 +143,23 @@ minetest.register_node("default:torch_lean", {
 	end
 })
 
+minetest.register_node("default:glass_tabletop", {
+	description = "Glass tabletop",
+	tiles={"default_glass_with_frame.png"}, --,"default_glass.png"
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+		}
+	},
+})
+
 minetest.register_node("default:glass", {
 	description = "Glass",
 	tiles={"default_glass_with_frame.png","default_glass.png"},
@@ -165,7 +195,6 @@ minetest.register_node("default:stone", {
 	tiles={"default_stone.png"},
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
-
 })
 minetest.register_node("default:cobble", {
 	description = "Cobble",

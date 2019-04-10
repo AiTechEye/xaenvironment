@@ -106,6 +106,13 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="default:glass_tabletop 4",
+	recipe={
+		{"default:glass","default:glass"},
+	},
+})
+
+minetest.register_craft({
 	type = "cooking",
 	output = "default:stone",
 	recipe = "default:cobble",

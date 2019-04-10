@@ -11,8 +11,6 @@ minetest.register_craftitem("default:unknown", {
 	groups = {not_in_creative_inventory=1},
 })
 
-
-
 default.register_chest({
 	name = "chest",
 	description = "Chest",
@@ -230,7 +228,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			snappy={times={[1]=2,[2]=1.8,[3]=1.5},uses=20,maxlevel=2}
+			snappy={times={[1]=2,[2]=1.5,[3]=1.3},uses=20,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -275,7 +273,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
-			snappy={times={[1]=1.9,[2]=1.7,[3]=1.4},uses=22,maxlevel=2}
+			snappy={times={[1]=1.8,[2]=1.4,[3]=1.2},uses=22,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -321,7 +319,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			snappy={times={[1]=1.8,[2]=1.6,[3]=1.3},uses=25,maxlevel=2}
+			snappy={times={[1]=1.5,[2]=1.2,[3]=0.8},uses=35,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}}
@@ -377,7 +375,7 @@ default.registry_mineral({
 		full_punch_interval = 1,
 		max_drop_level = 2,
 		groupcaps = {
-			cracky={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=1}
+			cracky={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=3}
 		},
 		damage_groups={fleshy=4}
 	}},
@@ -401,7 +399,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
-			snappy={times={[1]=1.1,[2]=0.6,[3]=0.1},uses=50,maxlevel=2}
+			snappy={times={[1]=1.2,[2]=1,[3]=0.5},uses=50,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
 	}}
@@ -433,38 +431,12 @@ default.registry_mineral({
 		clust_size=10,
 		y_max=-100,
 	},
-	pick={tool_capabilities={
-		full_punch_interval = 1,
-		max_drop_level = 2,
-		groupcaps = {
-			cracky={times={[1]=1.95,[2]=0.95,[3]=0.45},uses=33,maxlevel=1}
-		},
-		damage_groups={fleshy=4}
-	}},
-	shovel={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 3,
-		groupcaps = {
-			crumbly={times={[1]=2.5,[2]=0.6,[3]=0.3},uses=33,maxlevel=3}
-		},
-		damage_groups={fleshy=3}
-	}},
-	axe={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 3,
-		groupcaps = {
-			choppy={times={[1]=1.5,[2]=0.8,[3]=0.5},uses=33,maxlevel=2}
-		},
-		damage_groups={fleshy=6}
-	}},
-	vineyardknife={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 2,
-		groupcaps = {
-			snappy={times={[1]=1,[2]=0.5,[3]=0},uses=55,maxlevel=2}
-		},
-		damage_groups={fleshy=4}
-	}}
+	not_ingot=true,
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
 })
 
 default.registry_mineral({
