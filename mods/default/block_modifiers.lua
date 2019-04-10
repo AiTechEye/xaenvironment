@@ -1,3 +1,66 @@
+minetest.register_lbm({
+	name="default:2tree",
+	nodenames={"default:apple_tree"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_tree"})
+	end
+})
+minetest.register_lbm({
+	name="default:2wood",
+	nodenames={"default:apple_wood"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_wood"})
+	end
+})
+minetest.register_lbm({
+	name="default:2leaves",
+	nodenames={"default:apple_leaves"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_leaves"})
+	end
+})
+minetest.register_lbm({
+	name="default:2sapling",
+	nodenames={"default:apple_treesapling"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_treesapling"})
+	end
+})
+minetest.register_lbm({
+	name="default:2apple",
+	nodenames={"default:apple"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple"})
+	end
+})
+
+minetest.register_lbm({
+	name="default:2chair",
+	nodenames={"default:apple_wood_chair"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_wood_chair"})
+	end
+})
+minetest.register_lbm({
+	name="default:2door",
+	nodenames={"default:apple_wood_door"},
+	run_at_every_load = true,
+	action=function(p,node)
+		minetest.set_node(p,{name="plants:apple_wood_door"})
+	end
+})
+
+
+
+
+
+
 minetest.register_abm({
 	nodenames={"group:leafdecay"},
 	neighbors={"air"},

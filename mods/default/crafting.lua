@@ -259,6 +259,8 @@ minetest.register_node("default:workbench", {
 minetest.register_node("default:craftguide", {
 	description = "Craftguide",
 	tiles={"default_craftgreed.png^default_unknown.png"},
+	wield_image="default_craftgreed.png^default_unknown.png",
+	inventory_image="default_craftgreed.png^default_unknown.png",
 	groups = {dig_immediate=3,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,

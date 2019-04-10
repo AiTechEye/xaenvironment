@@ -11,25 +11,7 @@ minetest.register_craftitem("default:unknown", {
 	groups = {not_in_creative_inventory=1},
 })
 
-default.register_door({
-	name="apple_wood_door",
-	description = "Apple wood door",
-	texture="default_wood.png",
-	burnable = true,
-	craft={
-		{"default:apple_wood","default:apple_wood",""},
-		{"default:apple_wood","default:apple_wood",""},
-		{"default:apple_wood","default:apple_wood",""}
-	}
-})
 
-default.register_chair({
-	name = "apple_wood",
-	description = "Apple wood chair",
-	burnable = true,
-	texture = "default_wood.png",
-	craft={{"group:stick","",""},{"default:apple_wood","",""},{"group:stick","",""}}
-})
 
 default.register_chest({
 	name = "chest",
@@ -50,31 +32,6 @@ default.register_chest({
 	burnable = true,
 	texture="default_wood.png",
 	craft={{"default:chest","default:steel_ingot"}},
-})
-
-
---||||||||||||||||
--- ======================= trees
---||||||||||||||||
-
-
-default.register_tree({
-	name="apple",
-	fruit={
-		hp=1,
-		gaps=4,
-		description = "Apple",
-		tiles={"default_apple.png"},
-		inventory_image="default_apple.png",
-	},
-	tree={tiles={"default_tree_top.png","default_tree_top.png","default_tree.png"}},
-	sapling={tiles={"default_treesapling.png"}},
-	wood={tiles={"default_wood.png"}},
-	leaves={tiles={"default_leaves.png"}},
-	schematic=minetest.get_modpath("default").."/schematics/default_tree.mts",
-	sapling_place_schematic=function(pos)
-		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("default").."/schematics/default_tree.mts", "random", nil, false)
-	end
 })
 
 --||||||||||||||||

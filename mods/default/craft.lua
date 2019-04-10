@@ -20,6 +20,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="default:ladder",
+	recipe={
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","","group:stick"},
+		{"group:stick","group:stick","group:stick"},
+	},
+})
+
+minetest.register_craft({
 	output="default:furnace",
 	recipe={
 		{"group:stone","group:stone","group:stone"},

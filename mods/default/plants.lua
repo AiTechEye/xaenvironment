@@ -78,7 +78,7 @@ default.register_tree=function(def)
 
 	def.tree = def.tree or					{}
 	def.tree.description = def.tree.description or			name .. " tree"
-	def.tree.tiles = def.tree.tiles or				{"default_tree_top.png","default_tree_top.png","default_tree.png"}
+	def.tree.tiles = def.tree.tiles or				{"default_tree.png","default_tree.png","default_tree.png"}
 	def.tree.paramtype2 = def.tree.paramtype2 or			"facedir"
 	def.tree.on_place = def.tree.on_place or 			minetest.rotate_node
 	def.tree.groups = def.tree.groups or				 {tree=1,choppy=2,flammable=1}
@@ -118,7 +118,7 @@ default.register_tree=function(def)
 
 	def.sapling = def.sapling or					{}
 	def.sapling.description = def.sapling.description or		name .. "tree sapling"
-	def.sapling.tiles = def.sapling.tiles or				{"default_treesapling.png"}
+	def.sapling.tiles = def.sapling.tiles or				{"default_stick.png"}
 	def.sapling.inventory_image = def.sapling.inventory_image or	def.sapling.tiles[1]
 	def.sapling.paramtype = def.sapling.paramtype or			"light"
 	def.sapling.drawtype = def.sapling.drawtype or			"plantlike"

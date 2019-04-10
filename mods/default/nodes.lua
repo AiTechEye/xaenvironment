@@ -1,3 +1,31 @@
+minetest.register_node("default:ladder", {
+	description = "Ladder",
+	drop="default:stick",
+	tiles={"default_wood.png"},
+	groups = {ladder=1,choppy=3,oddly_breakable_by_hand=3,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4375, -0.5, -0.35, 0.4375, -0.4375, -0.25},
+			{-0.4375, -0.5, -0.05, 0.4375, -0.4375, 0.05},
+			{-0.4375, -0.5, 0.25, 0.4375, -0.4375, 0.35},
+			{-0.5, -0.5, -0.5, -0.4375, -0.375, 0.5},
+			{0.4375, -0.5, -0.5, 0.5, -0.375, 0.5},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {{-0.5, -0.5, -0.5, 0.5, -0.375, 0.5}}
+	},
+	climbable = true,
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	legacy_wallmounted=true,
+	walkable=false,
+})
+
 minetest.register_node("default:stick_on_ground", {
 	description = "Stick",
 	drop="default:stick",
