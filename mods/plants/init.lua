@@ -1,3 +1,47 @@
+--||||||||||||||||
+-- ======================= trees
+--||||||||||||||||
+
+default.register_tree({
+	name="apple",
+	fruit={
+		hp=1,
+		gaps=4,
+		description = "Apple",
+		tiles={"plants_apple.png"},
+		inventory_image="plants_apple.png",
+	},
+	tree={tiles={"plants_apple_tree_top.png","plants_apple_tree_top.png","plants_apple_tree.png"}},
+	sapling={tiles={"plants_apple_treesapling.png"}},
+	wood={tiles={"plants_apple_wood.png"}},
+	leaves={tiles={"plants_apple_leaves.png"}},
+	schematic=minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts",
+	sapling_place_schematic=function(pos)
+		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts", "random", nil, false)
+	end
+})
+
+
+default.register_door({
+	name="apple_wood_door",
+	description = "Apple wood door",
+	texture="plants_apple_wood.png",
+	burnable = true,
+	craft={
+		{"plants:apple_wood","plants:apple_wood",""},
+		{"plants:apple_wood","plants:apple_wood",""},
+		{"plants:apple_wood","plants:apple_wood",""}
+	}
+})
+
+default.register_chair({
+	name = "apple_wood",
+	description = "Apple wood chair",
+	burnable = true,
+	texture = "plants_apple_wood.png",
+	craft={{"group:stick","",""},{"plants:apple_wood","",""},{"group:stick","",""}}
+})
+
 default.register_tree({
 	name="pear",
 	fruit={
