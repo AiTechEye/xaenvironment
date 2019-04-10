@@ -38,6 +38,8 @@ player_style.register_profile=function(def)
 				},
 		eye_height =	def.eye_height or 1.6,
 		step_height =	def.step_height or 0.7,
+		hotbar =		hotbar or "player_api_hotbar.png",
+		hotbar_selected =	hotbar_selected or "player_api_hotbar_selected.png",
 	}
 end
 
@@ -79,6 +81,9 @@ minetest.register_on_joinplayer(function(player)
 
 	player_style.set_animation(name,"stand")
 
+	player:hud_set_hotbar_image(profile.hotbar)
+	player:hud_set_hotbar_selected_image(profile.hotbar_selected)
+
 end)
 
 minetest.register_on_respawnplayer(function(player)
@@ -117,4 +122,3 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
-
