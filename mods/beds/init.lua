@@ -90,7 +90,7 @@ minetest.register_node("beds:bed", {
 		(f==0 and default.defpos({x=p.x,y=p.y,z=p.z+1},"buildable_to")) or
 		(f==1 and default.defpos({x=p.x+1,y=p.y,z=p.z},"buildable_to")) or
 		(f==3 and default.defpos({x=p.x-1,y=p.y,z=p.z},"buildable_to")) then
-			minetest.set_node(p,{name="beds:bed",param2=fd})
+			minetest.set_node(p,{name="beds:bed",param2=f})
 			itemstack:take_item()
 			return itemstack
 		end
