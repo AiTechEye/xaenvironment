@@ -198,9 +198,17 @@ minetest.register_node("default:stone", {
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
+
 minetest.register_node("default:cobble", {
 	description = "Cobble",
 	tiles={"default_cobble.png"},
+	groups = {stone=1,cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("default:mossycobble", {
+	description = "Mossy cobble",
+	tiles={"default_cobble.png^default_stonemoss.png"},
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
