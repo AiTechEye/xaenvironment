@@ -17,9 +17,9 @@ default.register_chest({
 	burnable = true,
 	texture="default_wood.png",
 	craft={
-		{"default:apple_wood","default:apple_wood","default:apple_wood"},
-		{"default:apple_wood","","default:apple_wood"},
-		{"default:apple_wood","default:apple_wood","default:apple_wood"}
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","","group:wood"},
+		{"group:wood","group:wood","group:wood"}
 	}
 })
 
