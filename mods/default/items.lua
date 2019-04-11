@@ -306,7 +306,7 @@ default.registry_mineral({
 	not_lump = true,
 	not_ore = true,
 	regular_additional_craft={{
-		output="default:bronze_ingot 15",
+		output="default:bronze_ingot 8",
 		recipe={
 			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
 			{"default:copper_ingot","default:tin_ingot","default:copper_ingot"},
