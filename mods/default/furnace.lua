@@ -164,7 +164,7 @@ end
 minetest.register_node("default:furnace", {
 	description = "Furnace",
 	tiles = {"default_cobble.png","default_air.png"},
-	groups = {stone=2,cracky=2},
+	groups = {stone=2,cracky=3},
 	drawtype="mesh",
 	mesh="default_furnace.b3d",
 	paramtype = "light",

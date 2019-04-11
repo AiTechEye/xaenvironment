@@ -49,6 +49,7 @@ default.registry_mineral({
 		groups={cracky=3,flammable=1},
 		sounds=default.node_sound_stone_defaults(),
 	},
+	ore={groups={cracky=3}},
 	lump={groups={flammable=1}},
 	regular_additional_craft={
 		{
@@ -238,7 +239,7 @@ default.registry_mineral({
 	name="iron",
 	texture="default_ironblock.png",
 	lump={inventory_image="default_lump_iron.png"},
-	ore={tiles={"default_stone.png^default_ore_iron.png"}},
+	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
 	ore_settings={
 		clust_scarcity= 12 * 12 * 12,
 		clust_num_ores=4,
