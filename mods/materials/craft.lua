@@ -1,4 +1,13 @@
 minetest.register_craft({
+	output="materials:piece_of_cloth",
+	recipe={
+		{"plants:cotton","plants:cotton","plants:cotton"},
+		{"plants:cotton","plants:cotton","plants:cotton"},
+		{"plants:cotton","plants:cotton","plants:cotton"},
+	},
+})
+
+minetest.register_craft({
 	output="materials:plant_extracts",
 	recipe={
 		{"group:leaves","group:leaves","group:leaves"},
