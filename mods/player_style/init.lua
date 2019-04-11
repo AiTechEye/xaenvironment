@@ -38,8 +38,8 @@ player_style.register_profile=function(def)
 				},
 		eye_height =	def.eye_height or 1.6,
 		step_height =	def.step_height or 0.7,
-		hotbar =		hotbar or "player_api_hotbar.png",
-		hotbar_selected =	hotbar_selected or "player_api_hotbar_selected.png",
+		hotbar =		def.hotbar or "player_api_hotbar.png",
+		hotbar_selected =	def.hotbar_selected or "player_api_hotbar_selected.png",
 	}
 end
 
