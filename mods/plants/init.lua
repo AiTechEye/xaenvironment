@@ -268,7 +268,7 @@ default.register_plant({
 		{items = {"plants:wild_cotton"}}
 	}},
 	decoration={noise_params={
-		offset=-0.025,
+		offset=-0.001,
 		scale=0.003,
 		seed=765,
 	}}
