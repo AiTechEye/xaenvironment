@@ -259,3 +259,23 @@ minetest.register_lbm({
 		end
 	end
 })
+
+default.register_plant({
+	name="wild_cotton",
+	tiles={"plants_wildcotton.png"},
+		drop={max_items = 1,items = {
+		{items = {"plants:cotton"}, rarity = 3},
+		{items = {"plants:wild_cotton"}}
+	}},
+	decoration={noise_params={
+		offset=-0.025,
+		scale=0.003,
+		seed=765,
+	}}
+})
+
+minetest.register_craftitem("plants:cotton", {
+	description = "Cotton",
+	inventory_image = "plants_cotton.png",
+	groups = {flammable = 1},
+})
