@@ -1,3 +1,22 @@
+minetest.register_craft({
+	output="fire:flint_and_steel",
+	recipe={{"default:flint","default:steel_ingot"},},
+})
+
+minetest.register_tool("fire:flint_and_steel", {
+	description = "Flint and steel",
+	inventory_image = "fire_flint_and_steel.png",
+	sound=default.tool_breaks_defaults(),
+	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.type=="node" and minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"flammable") > 0 and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
+			minetest.set_node(pointed_thing.above,{name="fire:basic_flame"})
+			itemstack:add_wear(1000)
+		end
+		return itemstack
+	end,
+
+})
+
 minetest.register_node("fire:basic_flame", {
 	description = "Fire",
 	tiles={"fire_basic_flame.png"},
@@ -116,7 +135,7 @@ minetest.register_abm({
 					end
 				end
 			end
-		else
+		elseif node.name ~= "air" then
 			local flam = minetest.find_nodes_in_area(vector.add(pos,2),vector.subtract(pos,2),{"group:flammable"})
 			for _, np in pairs(flam) do
 				local ndef = minetest.registered_nodes[minetest.get_node(np).name]
