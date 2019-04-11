@@ -262,15 +262,16 @@ minetest.register_lbm({
 
 default.register_plant({
 	name="wild_cotton",
+	groups={spreading_plant=20},
 	tiles={"plants_wildcotton.png"},
 		drop={max_items = 1,items = {
 		{items = {"plants:cotton"}, rarity = 3},
 		{items = {"plants:wild_cotton"}}
 	}},
 	decoration={noise_params={
-		offset=-0.001,
-		scale=0.003,
-		seed=765,
+		offset=-0.0015,
+		scale=0.005,
+		seed=765675,
 	}}
 })
 
