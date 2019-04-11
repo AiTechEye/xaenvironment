@@ -230,6 +230,7 @@ default.register_plant({
 	description = "Grass",
 	tiles={"plants_grass"..i..".png"},
 	drop="plants:grass3",
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
 	decoration={noise_params={
 		offset=0.2,
 		scale=0.01,
