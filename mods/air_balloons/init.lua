@@ -3,7 +3,7 @@ minetest.register_craft({
 	recipe={
 		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
 		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
-		{"group:wood","group:tree","default:furnace"},
+		{"group:wood","default:chest","default:furnace"},
 	},
 })
 
