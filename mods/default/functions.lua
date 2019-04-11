@@ -330,7 +330,7 @@ default.registry_mineral=function(def)
 		def.ingot.description = def.ingot.description or 		uname .." ingot"
 		def.ingot.inventory_image = def.texture .. "^default_alpha_ingot.png^[makealpha:0,255,0"
 		minetest.register_craftitem(mod .. def.name .. "_ingot", def.ingot)
-		if def.lump then
+		if not def.not_ingot_craft and def.lump then
 			minetest.register_craft({
 				type = "cooking",
 				output = mod .. def.name .. "_ingot",
@@ -347,7 +347,7 @@ default.registry_mineral=function(def)
 		def.block.sounds =	def.block.sounds or	default.node_sound_metal_defaults()
 		def.block.groups =	def.block.groups or	{cracky=2}
 		minetest.register_node(mod .. def.name .."block", def.block)
-		if def.dropingot then
+		if not def.not_block_craft and def.dropingot then
 			minetest.register_craft({
 				output=mod .. def.name .."block",
 				recipe={
@@ -372,11 +372,13 @@ default.registry_mineral=function(def)
 		def.ore.groups =	def.ore.groups or	{cracky=2}
 
 		minetest.register_node(mod .. def.name .. "_ore", def.ore)
-
+	end
+--ore settings
+	if not def.not_ore or (def.ore_settings and def.ore_settings.ore) then
 		def.ore_settings = def.ore_settings or {}
 		minetest.register_ore({
 			ore_type		=	"scatter",
-			ore		=	mod .. def.name .. "_ore",
+			ore		=	def.ore_settings.ore or		mod .. def.name .. "_ore",
 			wherein		=	def.ore_settings.wherein or		"default:stone",
 			clust_scarcity	=	def.ore_settings.clust_scarcity or	8 * 8 * 8,
 			clust_num_ores	=	def.ore_settings.clust_num_ores or	5,
@@ -385,6 +387,8 @@ default.registry_mineral=function(def)
 			y_max		=	def.ore_settings.y_max	or	-50,
 		})
 	end
+
+
 --pick
 	if not def.not_pick then
 		def.pick = def.pick or {}

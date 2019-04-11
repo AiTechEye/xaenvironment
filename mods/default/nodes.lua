@@ -151,6 +151,7 @@ minetest.register_node("default:glass_tabletop", {
 	drawtype = "glasslike_framed_optional",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
 	drawtype="nodebox",
 	node_box = {
 		type = "fixed",
@@ -166,6 +167,7 @@ minetest.register_node("default:glass", {
 	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
+	sunlight_propagates = true,
 	paramtype = "light",
 	paramtype2 = "glasslikeliquidelevel",
 })

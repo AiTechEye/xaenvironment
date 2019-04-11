@@ -40,7 +40,7 @@ minetest.register_craft({
 minetest.register_craft({
 	output="default:workbench",
 	recipe={
-		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
 		{"group:wood","group:wood","group:wood"},
 		{"group:tree","group:wood","group:tree"},
 	},

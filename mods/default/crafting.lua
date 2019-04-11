@@ -43,11 +43,6 @@ default.workbench.set_form=function(pos,add)
 		end
 	end
 
-
-
-
-
-
 	if meta:get_int("craftguide") == 1 then
 		meta:set_string("formspec",
 			"size[8,12]" ..
@@ -229,6 +224,7 @@ minetest.register_node("default:workbench", {
 			if listname == "output" then
 				local inv = minetest.get_meta(pos):get_inventory()
 				default.workbench.take_from_craftgreed(inv,"craft")
+				minetest.get_node_timer(pos):start(0.1)
 			end
 			if listname == "craft" then
 				minetest.get_node_timer(pos):start(0.1)
@@ -244,6 +240,7 @@ minetest.register_node("default:workbench", {
 		if from_list == "output" then
 			local inv = minetest.get_meta(pos):get_inventory()
 			default.workbench.take_from_craftgreed(inv,"craft")
+			minetest.get_node_timer(pos):start(0.1)
 		end
 		if to_list == "craft" or from_list == "craft" then
 			minetest.get_node_timer(pos):start(0.1)

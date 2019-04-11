@@ -37,6 +37,61 @@ default.register_chest({
 --||||||||||||||||
 
 default.registry_mineral({
+	name="carbon",
+	texture="default_carbon.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_ore=true,
+	not_vineyardknife=true,
+	block={
+		groups={cracky=3,flammable=1},
+		sounds=default.node_sound_stone_defaults(),
+		drop="default:carbon_lump 3",
+	},
+	ore={groups={cracky=3}},
+	lump={groups={flammable=1}},
+	regular_additional_craft={
+		{output="default:carbonblock",recipe={
+			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},
+			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},
+			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},
+		}},
+		{
+			type = "fuel",
+			recipe = "default:carbon_lump",
+			burntime = 10,
+		},
+		{
+			type = "fuel",
+			recipe = "default:carbonblock",
+			burntime = 50,
+		},
+		{
+		type = "cooking",
+		output = "default:carbon_lump",
+		recipe = "group:tree",
+		cooktime = 10
+		},
+	},
+	workbench_additional_craft={
+		{output="default:steel_lump",recipe={{"default:carbon_ingot","default:iron_ingot"}}}
+	},
+	ore_settings={
+		ore="default:carbonblock",
+		clust_scarcity = 26*26*26,
+		ore_type="blob",
+		clust_num_ores=10,
+		clust_size=4,
+		y_max=20,
+		y_min=-20,
+		wherein="default:dirt",
+	}
+})
+
+
+default.registry_mineral({
 	name="coal",
 	texture="default_coalblock.png",
 	not_pick=true,
@@ -117,8 +172,8 @@ default.registry_mineral({
 	}},
 	{output="default:flint_vineyardknife",
 	recipe={
-		{"","default:flint",""},
 		{"","default:flint","default:flint"},
+		{"","","default:flint"},
 		{"","default:stick",""},
 	}},
 	{output="default:flint",
@@ -283,15 +338,8 @@ default.registry_mineral({
 default.registry_mineral({
 	name="steel",
 	texture="default_steelblock.png",
-	not_lump = true,
 	not_ore = true,
 	block={groups={cracky=1}},
-	regular_additional_craft={{
-		type = "cooking",
-		output = "default:steel_ingot",
-		recipe = "default:iron_ingot",
-		cooktime = 10
-	}},
 	pick={tool_capabilities={
 		full_punch_interval = 1,
 		max_drop_level = 3,

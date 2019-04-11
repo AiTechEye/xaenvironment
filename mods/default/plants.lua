@@ -20,7 +20,7 @@ default.register_plant=function(def)
 	def.groups.flammable = def.groups.flammable or		1
 
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
-	def.sunlight_propagetes = def.sunlight_propagetes or	true
+	def.sunlight_propagetes = def.sunlight_propagates or	true
 	def.buildable_to = def.buildable_to or			true
 	def.floodable = def.floodable or 			true
 	def.paramtype = def.paramtype or			"light"
@@ -108,7 +108,7 @@ default.register_tree=function(def)
 	def.leaves.tiles = def.leaves.tiles or				{"default_leaves.png"}
 	def.leaves.paramtype = def.leaves.paramtype or			"light"
 	def.leaves.drawtype = def.leaves.drawtype or			"allfaces_optional"
-	def.leaves.sunlight_propagetes = def.leaves.sunlight_propagetes or	true
+	def.leaves.sunlight_propagates = def.leaves.sunlight_propagates or	true
 	def.leaves.groups = def.leaves.groups or			{leaves=1,snappy=3,leafdecay=3,flammable=2}
 	def.leaves.sounds = def.leaves.sounds or 			default.node_sound_leaves_defaults()
 	def.leaves.drop = def.leaves.drop or 				{max_items = 1,items = {{items = {mod .. def.name .. "_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {mod .. def.name .. "_leaves"}}}}
@@ -122,7 +122,7 @@ default.register_tree=function(def)
 	def.sapling.inventory_image = def.sapling.inventory_image or	def.sapling.tiles[1]
 	def.sapling.paramtype = def.sapling.paramtype or			"light"
 	def.sapling.drawtype = def.sapling.drawtype or			"plantlike"
-	def.sapling.sunlight_propagetes = def.sapling.sunlight_propagetes or	true
+	def.sapling.sunlight_propagates = def.sapling.sunlight_propagates or	true
 	def.sapling.groups = def.sapling.groups or			{sapling=1,dig_immediate=3,snappy=3,flammable=3}
 	def.sapling.sounds = def.sapling.sounds or 			default.node_sound_leaves_defaults()
 	def.sapling.attached_node = def.sapling.attached_node or		1
@@ -194,7 +194,7 @@ default.register_tree=function(def)
 				sounds = def.fruit.sounds or				default.node_sound_leaves_defaults(),
 				drawtype = def.fruit.drawtype or			"plantlike",
 				paramtype = def.fruit.paramtype or			"light",
-				sunlight_propagetes = def.fruit.sunlight_propagetes or	true,
+				sunlight_propagates = def.fruit.sunlight_propagates or	true,
 				walkable =def.fruit.walkable or				false,
 				visual_scale = def.fruit.visual_scale or			0.5,
 				selection_box = def.fruit.selection_box or		{type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, -0.1, 0.1}},
@@ -242,7 +242,7 @@ minetest.register_node("default:fruit_spawner", {
 	drawtype = "airlike",
 	paramtype = "light",
 	pointable = false,
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	walkable = false,
 	on_timer = function (pos, elapsed)
 		local meta = minetest.get_meta(pos)
