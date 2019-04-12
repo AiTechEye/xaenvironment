@@ -30,7 +30,7 @@ default.register_door({
 	craft={
 		{"plants:apple_wood","plants:apple_wood",""},
 		{"plants:apple_wood","plants:apple_wood",""},
-		{"plants:apple_wood","plants:apple_wood",""}
+		{"plants:apple_wood","plants:apple_wood",""},
 	}
 })
 
@@ -40,6 +40,15 @@ default.register_chair({
 	burnable = true,
 	texture = "plants_apple_wood.png",
 	craft={{"group:stick","",""},{"plants:apple_wood","",""},{"group:stick","",""}}
+})
+
+default.register_fence({
+	name = "apple_wood",
+	texture = "plants_apple_wood.png",
+	craft={
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","plants:apple_wood","group:stick"},
+	}
 })
 
 default.register_tree({
@@ -70,6 +79,15 @@ default.register_door({
 		{"plants:pear_wood","plants:pear_wood",""},
 		{"plants:pear_wood","plants:pear_wood",""},
 		{"plants:pear_wood","plants:pear_wood",""}
+	}
+})
+
+default.register_fence({
+	name = "pear_wood",
+	texture = "plants_pear_wood.png",
+	craft={
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","plants:pear_wood","group:stick"},
 	}
 })
 
