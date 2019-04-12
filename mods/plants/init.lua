@@ -262,18 +262,39 @@ minetest.register_lbm({
 
 default.register_plant({
 	name="wild_cotton",
-	groups={spreading_plant=20},
 	tiles={"plants_wildcotton.png"},
-		drop={max_items = 1,items = {
-		{items = {"plants:cotton"}, rarity = 3},
-		{items = {"plants:wild_cotton"}}
-	}},
 	decoration={noise_params={
 		offset=-0.0015,
 		scale=0.005,
-		seed=765675,
-	}}
+		seed=3454365,
+	}},
+	on_construct=function(pos)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"dirt") > 0 then
+			local meta = minetest.get_meta(pos)
+			meta:set_int("date",default.date("get"))
+			meta:set_int("spreadtime",math.random(5,30))
+			minetest.get_node_timer(pos):start(10)
+		end
+	end,
+	on_timer=function(pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"dirt") > 0 and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
+			local meta = minetest.get_meta(pos)
+			if default.date("m",meta:get_int("date")) >= meta:get_int("spreadtime") then
+				local np = minetest.find_nodes_in_area_under_air(vector.add(pos, 1),vector.subtract(pos, 1),{"group:dirt"})
+				if #np > 0 then
+					local p = np[1]
+					minetest.set_node({x=p.x,y=p.y+1,z=p.z},{name="plants:wild_cotton"})
+				end
+				meta:set_int("date",default.date("get"))
+				meta:set_int("spreadtime",math.random(5,30))
+
+			end
+			return true
+		end
+	end
 })
+
+minetest.register_craft({output="plants:cotton",recipe={{"plants:wild_cotton"}}})
 
 minetest.register_craftitem("plants:cotton", {
 	description = "Cotton",
