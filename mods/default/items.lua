@@ -303,10 +303,10 @@ default.registry_mineral({
 default.registry_mineral({
 	name="bronze",
 	texture="default_bronzeblock.png",
-	not_lump = true,
+	--not_lump = true,
 	not_ore = true,
 	regular_additional_craft={{
-		output="default:bronze_ingot 8",
+		output="default:bronze_lump 8",
 		recipe={
 			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
 			{"default:copper_ingot","default:tin_ingot","default:copper_ingot"},

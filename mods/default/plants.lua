@@ -136,7 +136,7 @@ default.register_tree=function(def)
 		end
 	end
 	def.sapling.on_timer = def.sapling.on_timer or function (pos, elapsed)
-		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") > 0 and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
 			local meta = minetest.get_meta(pos)
 			if default.date("m",meta:get_int("date")) >= meta:get_int("growtime") then
 				local applm = math.random(5,20)
