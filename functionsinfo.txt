@@ -1,5 +1,43 @@
 
 ======================
+==== default.register_chest(def)
+======================
+
+default.register_chest({
+	name = "locked_chest",			--Required
+	description = "Locked chest",
+	locked = true,
+	burnable = true,
+	texture="default_wood.png",			--Required
+	craft={{"default:chest","default:steel_ingot"}},
+})
+
+
+======================
+==== default.register_fence(def)
+======================
+
+default.register_fence({
+	name = "apple_wood",			--Required
+	texture = "plants_apple_wood.png",		--Required
+	craft={{"group:stick","group:stick","group:stick"}}
+})
+
+
+======================
+==== default.register_chair(def)
+======================
+
+default.register_chair({
+	name = "apple_wood",		--Required
+	description = "Apple wood chair",
+	burnable = true,
+	texture = "plants_apple_wood.png",	--Required
+	craft={{"group:stick","wood",""}}
+})
+
+
+======================
 ==== default.workbench.register_craft(def)
 ======================
 
@@ -44,6 +82,63 @@ gaps		number			parts to eat,
 def		item def / table
 
 ======================
+==== default.register_door(def)
+======================
+
+default.register_door({
+	name="apple_wood_door",		--Required: name of item
+	description = "Apple wood door",
+	texture="plants_apple_wood.png",
+	burnable = true,
+	craft={
+		{"plants:apple_wood","plants:apple_wood",""},
+		{"plants:apple_wood","plants:apple_wood",""},
+		{"plants:apple_wood","plants:apple_wood",""},
+	}
+})
+
+======================
+==== default.register_plant(def)
+======================
+
+this is just registering a node with default settings,but you can change all of them
+default.register_plant({
+	name="anthriscus_sylvestris",		--Required: name of item
+	description			string/nil	
+	tiles={"parsnip.png"},			--tiles
+	decoration={noise_params={
+		offset=-0.0015,
+		scale=0.015,
+		seed=3365,
+	}},
+	groups={spreading_plant=10},
+	visual_scale=1.1,
+})
+
+======================
+==== default.register_tree(def)
+======================
+
+default.register_tree({
+	name="apple",		--Required: name of items
+	fruit={			--Spawning fruits
+		hp=1,
+		gaps=4,
+		description = "Apple",
+		tiles={"plants_apple.png"},
+		inventory_image="plants_apple.png",
+	},
+	tree={tiles={"tree_top.png","tree_top.png","tree.png"}},	-- tree
+	sapling={tiles={"plants_apple_treesapling.png"}},	--sapling
+	wood={tiles={"plants_apple_wood.png"}},		--wood
+	leaves={tiles={"plants_apple_leaves.png"}},		--leaves
+	schematic=modpath.."tree.mts",			--Required: genrating the tree
+	sapling_place_schematic=function(pos)		--Required: growing tree from sapling
+		minetest.place_schematic(pos, modpat ..tree.mts)
+	end
+})
+
+======================
 ==== default.registry_mineral(def)
 ======================
 auto generating mineral items: block, ore, lump, ingot, pick, shovel axe, vineyardknife, hoe and crafting
@@ -77,6 +172,7 @@ default.registry_mineral({
 
 
 	not_ingot				nil/true	--disable ingot
+	not_ingot_craft			nil/true	--disable automatic recipe
 	ingot={
 			description	nil/""
 			inventory_image	nil/"img.png"
@@ -84,6 +180,7 @@ default.registry_mineral({
 
 
 	not_block				nil/true	--disable block
+	not_block_craft			nil/true	--disable automatic recipe
 	block={
 			tiles		tiles/table
 			description	nil/""
@@ -101,7 +198,8 @@ default.registry_mineral({
 	}
 
 
-	ore_settings			nil/table 
+	ore_settings			nil/table		can be used even not_ore = true through name
+			name		nil/string
 			wherein		nil/"node"
 			clust_scarcity	nil/number
 			clust_num_ores	nil/number
