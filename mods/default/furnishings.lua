@@ -1,3 +1,43 @@
+default.register_fence=function(def)
+	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local mod = minetest.get_current_modname() ..":"
+	local name = mod .. def.name
+
+	def.groups =  def.groups or			{}
+	def.groups.choppy = def.groups.choppy or	2
+	def.groups.fence = def.groups.fence or		1
+	def.groups.flammable = def.groups.flammable or	1
+	def.sounds = def.sounds or			default.node_sound_wood_defaults()
+	def.connects_to = def.connects_to or		{"group:choppy"},
+
+	minetest.register_node(name .."_fence", {
+		description = def.description or string.gsub(uname,"_"," ") .. " fence",
+		inventory_image = def.texture  .. "^default_alpha_fence.png^[makealpha:0,255,0",
+		tiles={def.texture},
+		groups = def.groups,
+		sounds = def.sounds,
+		drawtype = "nodebox",
+		paramtype = "light",
+		paramtype2 = "facedir",
+		connects_to=def.connects_to,
+		node_box = {
+			type = "connected",
+			connect_front={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, -0.5, 0.0625, 0.375, -0.0625},{-0.0625, -0.25, -0.5, 0.0625, -0.125, -0.0625}},
+			connect_back={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, 0.0625, 0.0625, 0.375, 0.5},{-0.0625, -0.25, 0.0625, 0.0625, -0.125, 0.5}},
+			connect_right={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{0.0625, 0.25, -0.0625, 0.5, 0.375, 0.0625},{0.0625, -0.25, -0.0625, 0.5, -0.125, 0.0625}},
+			connect_left={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.5, 0.25, -0.0625, -0.0625, 0.375, 0.0625},{-0.5, -0.25, -0.0625, -0.0625, -0.125, 0.0625}},
+			fixed = {-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},
+		}
+	})
+
+	if def.craft then
+		minetest.register_craft({
+			output = name .. "_fence 6",
+			recipe = def.craft
+		})
+	end
+end
+
 default.register_door=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"

@@ -66,16 +66,6 @@ minetest.register_craft({
 -- ======================= Nodes
 --||||||||||||||||
 
-
-minetest.register_craft({
-	output="default:wood_fence 6",
-	recipe={
-		{"group:stick","group:wood","group:stick"},
-		{"group:stick","group:wood","group:stick"},
-	},
-})
-
-
 minetest.register_craft({
 	output="default:furnace",
 	recipe={

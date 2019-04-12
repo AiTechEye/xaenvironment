@@ -1,23 +1,3 @@
-minetest.register_node("default:wood_fence", {
-	description = "Wood fence",
-	tiles={"default_wood.png"},
-	groups = {choppy=3,flammable=1},
-	sounds = default.node_sound_wood_defaults(),
-	drawtype = "nodebox",
-	paramtype = "light",
-	paramtype2 = "facedir",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.44, -0.5, 0, -0.2, 0.5, 0.0625},
-			{0.2, -0.5, 0, 0.44, 0.5, 0.0625},
-			{-0.12, -0.5, 0, 0.12, 0.5, 0.0625},
-			{-0.5, -0.4375, -0.0625, 0.5, -0.3125, 0},
-			{-0.5, 0.25, -0.0625, 0.5, 0.375, 0},
-		}
-	},
-})
-
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},
