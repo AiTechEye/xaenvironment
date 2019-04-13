@@ -172,6 +172,65 @@ minetest.register_node("default:glass", {
 	paramtype2 = "glasslikeliquidelevel",
 })
 
+--||||||||||||||||
+-- ======================= grass
+--||||||||||||||||
+minetest.register_node("default:dirt_with_red_tundragrass", {
+	description = "Dirt with red tundragrass",
+	drop="default:tundra_dirt",
+	tiles={"default_tundra_redgrass.png","default_tundradirt.png","default_tundradirt.png^default_tundra_redgrass_side.png"},
+	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dirt_with_tundragrass", {
+	description = "Dirt with tundragrass",
+	drop="default:tundra_dirt",
+	tiles={"default_tundra_grass.png","default_tundradirt.png","default_tundradirt.png^default_tundra_grass_side.png"},
+	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+
+minetest.register_node("default:tundra_dirt", {
+	description = "Tundra dirt",
+	tiles={"default_tundradirt.png"},
+	groups = {dirt=1,crumbly=1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dirt_with_snow", {
+	description = "Dirt with snow",
+	drop="default:dirt",
+	tiles={"default_snow.png","default_dirt.png","default_dirt.png^default_snow_side.png"},
+	groups = {dirt=1,crumbly=3,cools_lava=1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dirt_with_dry_grass", {
+	description = "Dirt with dry grass",
+	drop="default:dirt",
+	tiles={"default_dry_grass.png","default_dirt.png","default_dirt.png^default_dry_grass_side.png"},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dirt_with_jungle_grass", {
+	description = "Dirt with jungle grass",
+	drop="default:dirt",
+	tiles={"default_jungle_grass.png","default_dirt.png","default_dirt.png^default_jungle_grass_side.png"},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dirt_with_coniferous_grass", {
+	description = "Dirt with coniferous grass",
+	drop="default:dirt",
+	tiles={"default_coniferous_grass.png","default_dirt.png","default_dirt.png^default_coniferous_grass_side.png"},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
 minetest.register_node("default:dirt_with_grass", {
 	description = "Dirt with grass",
 	drop="default:dirt",
@@ -254,10 +313,48 @@ minetest.register_node("default:sand", {
 -- ======================= Water
 --||||||||||||||||
 
+minetest.register_node("default:snowblock_thin", {
+	description = "Thin snowblock",
+	tiles={"default_snow.png"},
+	groups = {snowy=1,crumbly=3,cools_lava=1},
+	sounds = default.node_sound_dirt_defaults(),
+	walkable=false,
+	buildable_to=true,
+	drowning = 1,
+	drawtype = "glasslike",
+	post_effect_color = {a = 255, r = 255, g = 255, b =255},
+})
+
+minetest.register_node("default:snowblock", {
+	description = "Snowblock",
+	tiles={"default_snow.png"},
+	groups = {snowy=1,crumbly=3,cools_lava=1,fall_damage_add_percent=-25,disable_jump=1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:snow", {
+	description = "Snow",
+	tiles={"default_snow.png"},
+	inventory_image="default_snowball.png",
+	wield_image="default_snowball.png",
+	wield_scale = {x=0.5,y=0.5,z=2},
+	groups = {snowy=1,crumbly=3,falling_node=1,cools_lava=1},
+	buildable_to=true,
+	sounds = default.node_sound_dirt_defaults(),
+	drawtype="nodebox",
+	walkable=false,
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
+		}
+	},
+})
+
 minetest.register_node("default:ice", {
 	description = "Ice",
 	tiles={"default_ice.png"},
-	groups = {cracky=3},
+	groups = {cracky=3,slippery=10},
 	sounds = default.node_sound_glass_defaults(),
 })
 
