@@ -175,26 +175,25 @@ minetest.register_node("default:glass", {
 --||||||||||||||||
 -- ======================= grass
 --||||||||||||||||
-minetest.register_node("default:dirt_with_red_tundragrass", {
-	description = "Dirt with red tundragrass",
-	drop="default:tundra_dirt",
-	tiles={"default_tundra_redgrass.png","default_tundradirt.png","default_tundradirt.png^default_tundra_redgrass_side.png"},
+minetest.register_node("default:dirt_with_red_permafrost_grass", {
+	description = "Dirt with red permafrost  grass",
+	drop="default:permafrost_dirt",
+	tiles={"default_permafrost_redgrass.png","default_permafrostdirt.png","default_permafrostdirt.png^default_permafrost_redgrass_side.png"},
 	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-minetest.register_node("default:dirt_with_tundragrass", {
-	description = "Dirt with tundragrass",
-	drop="default:tundra_dirt",
-	tiles={"default_tundra_grass.png","default_tundradirt.png","default_tundradirt.png^default_tundra_grass_side.png"},
+minetest.register_node("default:dirt_with_permafrost_grass", {
+	description = "Dirt with permafrost grass",
+	drop="default:permafrost_dirt",
+	tiles={"default_permafrost_grass.png","default_permafrostdirt.png","default_permafrostdirt.png^default_permafrost_grass_side.png"},
 	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-
-minetest.register_node("default:tundra_dirt", {
-	description = "Tundra dirt",
-	tiles={"default_tundradirt.png"},
+minetest.register_node("default:permafrost_dirt", {
+	description = "Permafrost dirt",
+	tiles={"default_permafrostdirt.png"},
 	groups = {dirt=1,crumbly=1},
 	sounds = default.node_sound_dirt_defaults(),
 })
