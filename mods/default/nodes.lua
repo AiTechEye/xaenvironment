@@ -286,6 +286,21 @@ minetest.register_node("default:gravel", {
 	}
 })
 
+minetest.register_node("default:desert_sand", {
+	description = "Desert sand",
+	tiles={"default_desert_sand.png"},
+	groups = {crumbly=3,sand=1,falling_node=1},
+	sounds = default.node_sound_dirt_defaults(),
+	drowning = 1,
+	drop ={
+		max_items = 1,
+		items = {
+			{items = {"default:flint"}, rarity = 8},
+			{items = {"default:sand"}}
+		}
+	}
+})
+
 minetest.register_node("default:sandstone", {
 	description = "Sand stone",
 	tiles={"default_sandstone.png"},
