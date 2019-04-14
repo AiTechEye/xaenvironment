@@ -4,6 +4,7 @@
 
 default.register_tree({
 	name="apple",
+	mapgen={biomes={"deciduous"}},
 	fruit={
 		hp=1,
 		gaps=4,
@@ -53,6 +54,7 @@ default.register_fence({
 
 default.register_tree({
 	name="pear",
+	mapgen={biomes={"deciduous","tropic"}},
 	fruit={
 		hp=1,
 		gaps=4,
@@ -99,6 +101,68 @@ default.register_chair({
 	craft={{"group:stick","",""},{"plants:pear_wood","",""},{"group:stick","",""}}
 })
 
+default.register_tree({
+	name="pine",
+	mapgen={biomes={"all"}}, --"deciduous"
+	tree={tiles={"plants_pine_tree_top.png","plants_pine_tree_top.png","plants_pine_tree.png"}},
+	sapling={tiles={"plants_pine_treesapling.png"}},
+	wood={tiles={"plants_pine_wood.png"}},
+	leaves={tiles={"plants_pine_needels.png"}},
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_pine_tree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_pine_tree2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_pine_tree3.mts"
+	},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=7,[2]=7,[3]=6}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_pine_tree" .. r .. ".mts", "random", nil, false)
+	end,
+	mapgen={
+		biomes={"coniferous","coniferous_foggy"}, --"deciduous"
+		place_on={"default:dirt_with_coniferous_grass"},
+		noise_params={
+			offset=0.001,
+			scale=0.0004,
+		}
+	}
+})
+
+default.register_tree({
+	name="fir",
+	tree={tiles={"plants_fir_tree_top.png","plants_fir_tree_top.png","plants_fir_tree.png"}},
+	sapling={tiles={"plants_fir_treesapling.png"}},
+	wood={tiles={"plants_fir_wood.png"}},
+	leaves={tiles={"plants_fir_needels.png"}},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=5,[2]=6,[3]=6,[4]=3}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_fir_tree" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_fir_tree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_fir_tree2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_fir_tree3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_fir_tree4.mts"
+	},
+	mapgen={
+		biomes={"coniferous","coniferous_foggy"}, --"deciduous"
+		place_on={"default:dirt_with_coniferous_grass"},
+		noise_params={
+			offset=0.001,
+			scale=0.0004,
+		}
+	}
+
+})
+
+
+--||||||||||||||||
+-- ======================= plants
+--||||||||||||||||
+
 for i,c in pairs({"d8e41d","b21db5","601db5","bb91f0","e4d9f3","fd0084","6f86ff","ff3030","ff4d00","ffb047","ffb0c5","a6421f"}) do
 	default.register_plant({
 		name="daisybush" .. i,
@@ -115,6 +179,7 @@ end
 default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff"})
 default.register_plant({
 	name="lonicera_tatarica",
+	biomes={"deciduous"},
 	tiles={"plants_lonicera_tatarica.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -128,6 +193,7 @@ default.register_plant({
 
 default.register_plant({
 	name="verbena",
+	biomes={"deciduous"},
 	tiles={"plants_verbena.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -138,6 +204,7 @@ default.register_plant({
 
 default.register_plant({
 	name="lantana",
+	biomes={"deciduous","deciduous_grassland","coniferous"},
 	tiles={"plants_lantana.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -165,6 +232,7 @@ default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
 
 default.register_plant({
 	name="dolls_eyes",
+	biomes={"tropic","jungle"},
 	tiles={"plants_dolls_eyes.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -179,6 +247,7 @@ default.register_plant({
 
 default.register_plant({
 	name="cow_parsnip",
+	biomes={"deciduous"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=0.0015,
@@ -198,6 +267,7 @@ default.register_plant({
 })
 default.register_plant({
 	name="cow_parsnip_big",
+	biomes={"deciduous"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=0.0015,
@@ -219,6 +289,7 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris_big",
+	biomes={"deciduous","tropic","jungle"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -232,6 +303,7 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris",
+	biomes={"deciduous","tropic","jungle"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -249,13 +321,15 @@ default.register_plant({
 	tiles={"plants_grass"..i..".png"},
 	drop="plants:grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
-	decoration={noise_params={
-		offset=0.2,
-		scale=0.01,
-		spread={x=3,y=3,z=3},
-		seed=0,
+	decoration={
+		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
+		noise_params={
+			offset=0.2,
+			scale=0.01,
+			spread={x=3,y=3,z=3},
+			seed=0,
+		},
 	},
-},
 	groups={spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
 		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
@@ -280,6 +354,7 @@ minetest.register_lbm({
 
 default.register_plant({
 	name="wild_cotton",
+	biomes={"deciduous","tropic","jungle","grass_land","semi_desert"},
 	tiles={"plants_wildcotton.png"},
 	decoration={noise_params={
 		offset=-0.0015,
