@@ -34,7 +34,7 @@ default.register_plant=function(def)
 	ddef.deco_type = ddef.deco_type or			"simple"
 	ddef.place_on = ddef.place_on or 			{"default:dirt_with_grass"}
 	ddef.sidelen = ddef.sidelen or				16
-	ddef.biomes = ddef.biomes or				{"grassland"}
+	ddef.biomes = ddef.biomes or				{"grass_land"}
 	ddef.y_min = ddef.y_min or				1
 	ddef.y_max = ddef.y_max or				31000
 	ddef.height = ddef.height or				1
@@ -61,8 +61,12 @@ default.register_tree=function(def)
 		error("name (string) required!")
 	elseif type(def.sapling_place_schematic) ~= "function" then
 		error("sapling_place_schematic (function) required!")
-	elseif type(def.schematic) ~= "string" then
+	elseif def.schematic and type(def.schematic) ~= "string" then
 		error("schematic (string) required!")
+	elseif def.schematics and type(def.schematics) ~= "table" then
+		error("schematics (stable) required!")
+	elseif not (def.schematic or def.schematics or def.schematic_spawner) then
+		error("schematic (string) or schematics (table) or schematic_spawner (bool) required!")
 	end
 
 	local mod = minetest.get_current_modname() ..":"
@@ -215,25 +219,63 @@ default.register_tree=function(def)
 		end
 	end
 
-	def.mapgen = def.mapgen or {}
-	minetest.register_decoration({
-		deco_type = def.mapgen.deco_type or		"schematic",
-		place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
-		sidelen = def.mapgen.sidelen or			16,
-		noise_params = def.mapgen.noise_params or	{
-								offset = 0.006,
-								scale = 0.002,
-								spread = {x = 250, y = 250, z = 250},
-								seed = 2,
-								octaves = 3,
-								persist = 0.66
-							},
-		biomes = def.mapgen.biomes or		{"grassland"},
-		y_min = def.mapgen.y_min or		1,
-		y_max = def.mapgen.y_max or		31000,
-		schematic = def.schematic			,
-		flags = def.mapgen.flags or			"place_center_x, place_center_z",
-	})
+	def.mapgen = def.mapgen or						{}
+	def.mapgen.noise_params = def.mapgen.noise_params or			{}
+	def.mapgen.noise_params.offset = def.mapgen.noise_params.offset or	0.006
+	def.mapgen.noise_params.scale = def.mapgen.noise_params.scale or		0.002
+	def.mapgen.noise_params.spread = def.mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
+	def.mapgen.noise_params.seed = def.mapgen.noise_params.seed or		2
+	def.mapgen.noise_params.octaves = def.mapgen.noise_params.octaves or	3
+	def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
+
+	if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
+		def.mapgen.biomes = default.registered_bios
+	end
+
+	if def.schematic_spawner then
+		minetest.register_node(mod .. def.name .. "_decoration_spawner", {
+			tiles={"default_wood.png"},
+			groups={decoration_spawner=1,not_in_creative_inventory=1},
+			on_decoration_spawn = schematic
+		})
+		minetest.register_decoration({
+			decoration = name .. "_decoration_spawner"	,
+			deco_type = def.mapgen.deco_type or		"simple",
+			place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
+			sidelen = def.mapgen.sidelen or			16,
+			noise_params = def.mapgen.noise_params	,
+			biomes = def.mapgen.biomes or		{"grass_land"},
+			y_min = def.mapgen.y_min or		1,
+			y_max = def.mapgen.y_max or		31000,
+			flags = def.mapgen.flags or			"place_center_x, place_center_z",
+		})
+	elseif def.schematic then
+		minetest.register_decoration({
+			deco_type = def.mapgen.deco_type or		"schematic",
+			place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
+			sidelen = def.mapgen.sidelen or			16,
+			noise_params = def.mapgen.noise_params	,
+			biomes = def.mapgen.biomes or		{"grass_land"},
+			y_min = def.mapgen.y_min or		1,
+			y_max = def.mapgen.y_max or		31000,
+			schematic = def.schematic			,
+			flags = def.mapgen.flags or			"place_center_x, place_center_z",
+		})
+	elseif def.schematics then
+		for i,v in pairs(def.schematics) do
+			minetest.register_decoration({
+				deco_type = def.mapgen.deco_type or		"schematic",
+				place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
+				sidelen = def.mapgen.sidelen or			16,
+				noise_params = def.mapgen.noise_params	,
+				biomes = def.mapgen.biomes or		{"grass_land"},
+				y_min = def.mapgen.y_min or		1,
+				y_max = def.mapgen.y_max or		31000,
+				schematic = v			,
+				flags = def.mapgen.flags or			"place_center_x, place_center_z",
+			})
+		end
+	end
 end
 
 minetest.register_node("default:fruit_spawner", {
@@ -255,4 +297,15 @@ minetest.register_node("default:fruit_spawner", {
 		end
 		return true
 	end
+})
+
+minetest.register_lbm({
+	name="default:decoration_spawner",
+	nodenames={"group:decoration_spawner"},
+	run_at_every_load =true,
+	action=function(pos,node)
+		print(minetest.pos_to_string(pos))
+		minetest.registered_nodes[node.name].on_decoration_spawn(pos)
+	end
+
 })

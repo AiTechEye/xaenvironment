@@ -5,6 +5,7 @@ default={
 	player_attached = player_style.player_attached,
 	player_set_animation = player_style.set_animation,
 	on_player_death = {},
+	registered_bios={},
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")
