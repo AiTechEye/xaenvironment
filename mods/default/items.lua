@@ -38,6 +38,48 @@ minetest.register_tool("default:admin_pickaxe", {
 	},
 })
 
+minetest.register_tool("default:quantum_pick", {
+	description ="Quantum tool",
+	inventory_image = "default_quantumblock.png^default_alpha_pick.png^[makealpha:0,255,0",
+	tool_capabilities = {
+		full_punch_interval = 0.20,
+		max_drop_level = 3,
+		groupcaps = {
+			fleshy={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+			choppy={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+			bendy={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+			cracky={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+			crumbly={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+			snappy={times={[1]=0,[2]=0,[3]=0},uses=100,maxlevel=3},
+		},
+		damage_groups={fleshy=19},
+	},
+})
+
+
+minetest.register_on_dignode(function(pos, oldnode, digger)
+	if digger and digger:get_wielded_item():get_name() == "default:quantum_pick" then
+		local inv = digger:get_inventory()
+		if inv:room_for_item("main",oldnode.name) then
+			local name = digger:get_player_name()
+			local n = 0
+			local r = math.random(1,10)
+			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 10),vector.add(pos,5),{oldnode.name})) do
+				if not minetest.is_protected(p,name) then
+					inv:add_item("main",minetest.get_node_drops(minetest.get_node(p).name)[1])
+					minetest.remove_node(p)
+					minetest.check_for_falling(p)
+					n = n + 1
+					if n > 9+r then
+						return
+					end
+				end
+			end
+		end
+	end
+end)
+
+
 minetest.register_tool("default:cudgel", {
 	description = "Wooden cudgel",
 	inventory_image = "default_stick.png",
