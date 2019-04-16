@@ -120,7 +120,7 @@ default.register_tree({
 		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_pine_tree" .. r .. ".mts", "random", nil, false)
 	end,
 	mapgen={
-		biomes={"coniferous","coniferous_foggy"}, --"deciduous"
+		biomes={"coniferous","coniferous_foggy"},
 		place_on={"default:dirt_with_coniferous_grass"},
 		noise_params={
 			offset=0.001,
@@ -148,16 +148,62 @@ default.register_tree({
 		minetest.get_modpath("plants").."/schematics/plants_fir_tree4.mts"
 	},
 	mapgen={
-		biomes={"coniferous","coniferous_foggy"}, --"deciduous"
+		biomes={"coniferous","coniferous_foggy"},
 		place_on={"default:dirt_with_coniferous_grass"},
 		noise_params={
 			offset=0.001,
 			scale=0.0004,
 		}
 	}
-
 })
 
+default.register_tree({
+	name="jungle",
+	tree={tiles={"plants_jungle_tree_top.png","plants_jungle_tree_top.png","plants_jungle_tree.png"}},
+	sapling={tiles={"plants_jungle_treesapling.png"}},
+	wood={tiles={"plants_jungle_wood.png"}},
+	leaves={tiles={"plants_jungle_leavs.png"},groups={leaves=1,snappy=3,leafdecay=14,flammable=2}},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=5,[2]=4,[3]=12,[4]=4}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_jungle_tree" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_jungle_tree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_jungle_tree2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_jungle_tree3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_jungle_tree4.mts",
+	},
+	mapgen={
+		biomes={"jungle","swamp",},
+		place_on={"default:dirt_with_jungle_grass"},
+		noise_params={
+			offset=0.001,
+			scale=0.0004,
+		}
+	}
+})
+
+minetest.register_decoration({
+	deco_type = "schematic",
+	sidelen = 16,
+	noise_params = {
+			offset=0.1,
+			scale=0.04,
+			spread = {x = 250, y = 250, z = 250},
+			seed = 3,
+			octaves = 3,
+			persist = 0.66,
+
+	},
+	biomes={"jungle","swamp",},
+	place_on={"default:dirt_with_jungle_grass"},
+	y_min = 1,
+	y_max = 31000,
+	schematic = minetest.get_modpath("plants").."/schematics/plants_jungletree_massive.mts",
+	flags = "place_center_x, place_center_z",
+})
 
 --||||||||||||||||
 -- ======================= plants
