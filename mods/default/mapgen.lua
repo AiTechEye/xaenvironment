@@ -107,33 +107,6 @@ default.register_bios({
 		arctic=			{0,50,grass="default:snow",stone="default:ice",dirt="default:ice"},
 })
 
-minetest.register_tool("default:a", {
-	description = "a",
-	inventory_image = "default_stick.png",
-	on_use=function(itemstack, user, pointed_thing)
-		local p = user:get_pos()
-
-minetest.chat_send_all(minetest.get_heat(p) .." " .. minetest.get_humidity(p))
-
-
-		--print(minetest.get_perlin({offset=50,scale=50,spread={x=1000,y=1000,z=1000},seed=5349,octaves=3,persist=0.5,lacunarity=2,flags="default"}):get2d({x=p.x,y=p.z}))
-	end
-})
-
-
-
-
-
-
-
-		
-
-
-
-
-
-
-
 --||||||||||||||||
 -- =======================Decorations
 --||||||||||||||||

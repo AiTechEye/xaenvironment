@@ -113,7 +113,7 @@ default.register_tree=function(def)
 	def.leaves.paramtype = def.leaves.paramtype or			"light"
 	def.leaves.drawtype = def.leaves.drawtype or			"allfaces_optional"
 	def.leaves.sunlight_propagates = def.leaves.sunlight_propagates or	true
-	def.leaves.groups = def.leaves.groups or			{leaves=1,snappy=3,leafdecay=3,flammable=2}
+	def.leaves.groups = def.leaves.groups or			{leaves=1,snappy=3,leafdecay=5,flammable=2}
 	def.leaves.sounds = def.leaves.sounds or 			default.node_sound_leaves_defaults()
 	def.leaves.drop = def.leaves.drop or 				{max_items = 1,items = {{items = {mod .. def.name .. "_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {mod .. def.name .. "_leaves"}}}}
 	minetest.register_node(mod .. def.name .. "_leaves", def.leaves)
@@ -194,7 +194,7 @@ default.register_tree=function(def)
 				description = def.fruit.description or 			fruit_name,
 				inventory_image = def.fruit.inventory_image or 		"default_apple.png",
 				tiles = def.fruit.tiles or				{"default_apple.png"},
-				groups = def.fruit.groups or				{dig_immediate=3,leafdecay=3,snappy=3,flammable=3,attached_node=1},
+				groups = def.fruit.groups or				{dig_immediate=3,leafdecay=5,snappy=3,flammable=3,attached_node=1},
 				sounds = def.fruit.sounds or				default.node_sound_leaves_defaults(),
 				drawtype = def.fruit.drawtype or			"plantlike",
 				paramtype = def.fruit.paramtype or			"light",

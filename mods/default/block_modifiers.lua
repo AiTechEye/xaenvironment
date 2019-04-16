@@ -40,7 +40,7 @@ minetest.register_abm({
 	interval=5,
 	chance=10,
 	action=function(pos,node,active_object_count,active_object_count_wider)
-		if not minetest.find_node_near(pos,5,{"group:tree"}) then
+		if not minetest.find_node_near(pos,minetest.get_item_group(node.name,"leafdecay"),{"group:tree"}) then
 			if math.random(1,5) == 1 then
 				minetest.add_item(pos,minetest.get_node_drops(node.name)[1])
 			end
@@ -51,7 +51,7 @@ minetest.register_abm({
 })
 
 minetest.register_abm({
-	nodenames={"group:dirt"},
+	nodenames={"default:dirt"},
 	neighbors={"group:spreading_dirt_type"},
 	interval=10,
 	chance=50,
