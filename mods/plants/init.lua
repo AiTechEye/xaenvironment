@@ -111,11 +111,12 @@ default.register_tree({
 	schematics={
 		minetest.get_modpath("plants").."/schematics/plants_pine_tree1.mts",
 		minetest.get_modpath("plants").."/schematics/plants_pine_tree2.mts",
-		minetest.get_modpath("plants").."/schematics/plants_pine_tree3.mts"
+		minetest.get_modpath("plants").."/schematics/plants_pine_tree3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_pine_tree4.mts"
 	},
 	sapling_place_schematic=function(pos)
 		local r = math.random(1,3)
-		local rad = {[1]=7,[2]=7,[3]=6}
+		local rad = {[1]=7,[2]=7,[3]=6,[4]=2}
 		rad = rad[r]
 		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_pine_tree" .. r .. ".mts", "random", nil, false)
 	end,
@@ -195,7 +196,6 @@ minetest.register_decoration({
 			seed = 3,
 			octaves = 3,
 			persist = 0.66,
-
 	},
 	biomes={"jungle","swamp",},
 	place_on={"default:dirt_with_jungle_grass"},
@@ -204,6 +204,27 @@ minetest.register_decoration({
 	schematic = minetest.get_modpath("plants").."/schematics/plants_jungletree_massive.mts",
 	flags = "place_center_x, place_center_z",
 })
+
+for i=1,4 do
+minetest.register_decoration({
+	deco_type = "schematic",
+	sidelen = 16,
+	noise_params = {
+			offset=0.0001,
+			scale=0.0004,
+			spread = {x = 250, y = 250, z = 250},
+			seed = 1+i,
+			octaves = 3,
+			persist = 0.66,
+	},
+	biomes={"cold_coniferous","coniferous_foggy","cold_grassland"},
+	place_on={"default:dirt_with_snow"},
+	y_min = 1,
+	y_max = 31000,
+	schematic = minetest.get_modpath("plants").."/schematics/plants_snowtree" .. i ..".mts",
+	flags = "place_center_x, place_center_z",
+})
+end
 
 --||||||||||||||||
 -- ======================= plants
