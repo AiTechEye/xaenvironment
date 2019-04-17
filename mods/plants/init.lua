@@ -54,7 +54,7 @@ default.register_fence({
 
 default.register_tree({
 	name="pear",
-	mapgen={biomes={"deciduous","tropic"}},
+	mapgen={biomes={"deciduous"}},
 	fruit={
 		hp=1,
 		gaps=4,
@@ -185,7 +185,7 @@ default.register_tree({
 		}
 	}
 })
-
+--[[
 minetest.register_decoration({
 	deco_type = "schematic",
 	sidelen = 16,
@@ -204,7 +204,7 @@ minetest.register_decoration({
 	schematic = minetest.get_modpath("plants").."/schematics/plants_jungletree_massive.mts",
 	flags = "place_center_x, place_center_z",
 })
-
+--]]
 for i=1,4 do
 minetest.register_decoration({
 	deco_type = "schematic",
@@ -225,6 +225,59 @@ minetest.register_decoration({
 	flags = "place_center_x, place_center_z",
 })
 end
+
+default.register_tree({
+	name="palm",
+	tree={tiles={"plants_palm_tree_top.png","plants_palm_tree_top.png","plants_palm_tree.png"}},
+	sapling={tiles={"plants_palm_treesapling.png"}},
+	wood={tiles={"plants_palm_wood.png"}},
+	leaves={tiles={"plants_jungle_leavs.png"},groups={leaves=1,snappy=3,leafdecay=14,flammable=2}},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=12,[2]=4,[3]=18,[4]=19}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_palm" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_palm1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm4.mts",
+	},
+	mapgen={
+		biomes={"tropic",},
+		place_on={"default:dirt_with_grass","default:sand"},
+		noise_params={
+			offset=0.0003,
+			scale=0.00012,
+		}
+	}
+})
+
+minetest.register_node("plants:coconut", {
+	description = "Coconut",
+	drawtype = "plantlike",
+	tiles={"plants_coconut.png"},
+	groups = {choppy = 3, dig_immediate = 3},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_node("plants:coconut_broken", {
+	description = "Broken coconut",
+	drawtype = "plantlike",
+	tiles={"plants_coconut2.png"},
+	groups = {choppy = 3, dig_immediate = 3},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_wood_defaults(),
+})
+
+
+
 
 --||||||||||||||||
 -- ======================= plants
