@@ -273,6 +273,7 @@ default.register_tree=function(def)
 				y_max = def.mapgen.y_max or		31000,
 				schematic = v			,
 				flags = def.mapgen.flags or			"place_center_x, place_center_z",
+				rotation = "random",
 			})
 		end
 	end
