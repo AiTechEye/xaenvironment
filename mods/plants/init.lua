@@ -367,7 +367,7 @@ default.register_plant({
 
 default.register_plant({
 	name="cow_parsnip",
-	biomes={"deciduous"},
+	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=0.0015,
@@ -409,7 +409,7 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris_big",
-	biomes={"deciduous","tropic","jungle"},
+	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -423,7 +423,7 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris",
-	biomes={"deciduous","tropic","jungle"},
+	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
 	decoration={noise_params={
 		offset=-0.0015,
@@ -438,9 +438,11 @@ for i=1,5 do
 default.register_plant({
 	name="grass" .. i,
 	description = "Grass",
+	biomes={"deciduous","deciduous_grassland","tropic","grass_land","coniferous","coniferous_foggy"},
 	tiles={"plants_grass"..i..".png"},
 	drop="plants:grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+
 	decoration={
 		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
 		noise_params={
@@ -455,6 +457,29 @@ default.register_plant({
 		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
 	end
 })
+default.register_plant({
+	name="dry_grass" .. i,
+	description = "Dry grass",
+	biomes={"savanna"},
+	tiles={"plants_dry_grass"..i..".png"},
+	drop="plants:dry_grass3",
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+
+	decoration={
+		place_on={"default:dirt_with_dry_grass"},
+		noise_params={
+			offset=0.2,
+			scale=0.01,
+			spread={x=3,y=3,z=3},
+			seed=0,
+		},
+	},
+	groups={spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	after_place_node=function(pos, placer)
+		minetest.set_node(pos,{name="plants:dry_grass"..math.random(1,5)})
+	end
+})
+
 end
 
 minetest.register_lbm({
