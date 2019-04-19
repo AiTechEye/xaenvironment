@@ -9,6 +9,7 @@ default.register_plant=function(def)
 	def.description = def.description or			string.gsub(name,"_"," ")
 	def.drawtype = def.drawtype or			"plantlike"
 	def.tiles = def.tiles or				{"default_leaves.png"}
+	def.waving = def.waving or				1
 
 	def.groups = def.groups or				{}
 	def.groups.plant = def.groups.plant or			1
@@ -39,8 +40,8 @@ default.register_plant=function(def)
 	ddef.y_max = ddef.y_max or				31000
 	ddef.height = ddef.height or				1
 	ddef.height_max = ddef.height_max or			1
-	ddef.spawn_by = ddef.spawn_by or			"default:dirt_with_grass"
-	ddef.num_spawn_by = ddef.num_spawn_by or		1
+--	ddef.spawn_by = ddef.spawn_by or			"default:dirt_with_grass"
+--	ddef.num_spawn_by = ddef.num_spawn_by or		1
 
 	ddef.noise_params = ddef.noise_params or		{}
 	ddef.noise_params.offset = ddef.noise_params.offset or	0.006	
@@ -49,6 +50,10 @@ default.register_plant=function(def)
 	ddef.noise_params.seed = ddef.noise_params.seed or	2	
 	ddef.noise_params.octaves = ddef.noise_params.octaves or	3	
 	ddef.noise_params.persist = ddef.noise_params.persist or	0.2	
+
+	if ddef.biomes and ddef.biomes[1] == "all" then
+		ddef.biomes = default.registered_bios_list
+	end
 
 	minetest.register_decoration(ddef)
 
@@ -111,6 +116,7 @@ default.register_tree=function(def)
 	def.leaves.description = def.leaves.description or			name .. " leaves"
 	def.leaves.tiles = def.leaves.tiles or				{"default_leaves.png"}
 	def.leaves.paramtype = def.leaves.paramtype or			"light"
+	def.leaves.waving = def.leaves.waving or			1
 	def.leaves.drawtype = def.leaves.drawtype or			"allfaces_optional"
 	def.leaves.sunlight_propagates = def.leaves.sunlight_propagates or	true
 	def.leaves.groups = def.leaves.groups or			{leaves=1,snappy=3,leafdecay=5,flammable=2}
@@ -229,7 +235,7 @@ default.register_tree=function(def)
 	def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
 
 	if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
-		def.mapgen.biomes = default.registered_bios
+		def.mapgen.biomes = default.registered_bios_list
 	end
 
 	if def.schematic_spawner then
