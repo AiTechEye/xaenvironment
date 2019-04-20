@@ -4,6 +4,9 @@
 
 default.register_tree({
 	name="apple",
+	chair = true,
+	door = true,
+	fence = true,
 	mapgen={biomes={"deciduous"}},
 	fruit={
 		hp=1,
@@ -22,38 +25,11 @@ default.register_tree({
 	end
 })
 
-
-default.register_door({
-	name="apple_wood_door",
-	description = "Apple wood door",
-	texture="plants_apple_wood.png",
-	burnable = true,
-	craft={
-		{"plants:apple_wood","plants:apple_wood",""},
-		{"plants:apple_wood","plants:apple_wood",""},
-		{"plants:apple_wood","plants:apple_wood",""},
-	}
-})
-
-default.register_chair({
-	name = "apple_wood",
-	description = "Apple wood chair",
-	burnable = true,
-	texture = "plants_apple_wood.png",
-	craft={{"group:stick","",""},{"plants:apple_wood","",""},{"group:stick","",""}}
-})
-
-default.register_fence({
-	name = "apple_wood",
-	texture = "plants_apple_wood.png",
-	craft={
-		{"group:stick","group:stick","group:stick"},
-		{"group:stick","plants:apple_wood","group:stick"},
-	}
-})
-
 default.register_tree({
 	name="pear",
+	chair = true,
+	door = true,
+	fence = true,
 	mapgen={biomes={"deciduous"}},
 	fruit={
 		hp=1,
@@ -72,37 +48,11 @@ default.register_tree({
 	end
 })
 
-default.register_door({
-	name="pear_wood_door",
-	description = "Pear wood door",
-	texture="plants_pear_wood.png",
-	burnable = true,
-	craft={
-		{"plants:pear_wood","plants:pear_wood",""},
-		{"plants:pear_wood","plants:pear_wood",""},
-		{"plants:pear_wood","plants:pear_wood",""}
-	}
-})
-
-default.register_fence({
-	name = "pear_wood",
-	texture = "plants_pear_wood.png",
-	craft={
-		{"group:stick","group:stick","group:stick"},
-		{"group:stick","plants:pear_wood","group:stick"},
-	}
-})
-
-default.register_chair({
-	name = "pear_wood",
-	description = "Pear wood chair",
-	burnable = true,
-	texture = "plants_pear_wood.png",
-	craft={{"group:stick","",""},{"plants:pear_wood","",""},{"group:stick","",""}}
-})
-
 default.register_tree({
 	name="pine",
+	chair = true,
+	door = true,
+	fence = true,
 	mapgen={biomes={"all"}}, --"deciduous"
 	tree={tiles={"plants_pine_tree_top.png","plants_pine_tree_top.png","plants_pine_tree.png"}},
 	sapling={tiles={"plants_pine_treesapling.png"}},
@@ -132,6 +82,9 @@ default.register_tree({
 
 default.register_tree({
 	name="fir",
+	chair = true,
+	door = true,
+	fence = true,
 	tree={tiles={"plants_fir_tree_top.png","plants_fir_tree_top.png","plants_fir_tree.png"}},
 	sapling={tiles={"plants_fir_treesapling.png"}},
 	wood={tiles={"plants_fir_wood.png"}},
@@ -160,6 +113,9 @@ default.register_tree({
 
 default.register_tree({
 	name="jungle",
+	chair = true,
+	door = true,
+	fence = true,
 	tree={tiles={"plants_jungle_tree_top.png","plants_jungle_tree_top.png","plants_jungle_tree.png"}},
 	sapling={tiles={"plants_jungle_treesapling.png"}},
 	wood={tiles={"plants_jungle_wood.png"}},
@@ -228,6 +184,9 @@ end
 
 default.register_tree({
 	name="palm",
+	chair = true,
+	door = true,
+	fence = true,
 	tree={tiles={"plants_palm_tree_top.png","plants_palm_tree_top.png","plants_palm_tree.png"}},
 	sapling={tiles={"plants_palm_treesapling.png"}},
 	wood={tiles={"plants_palm_wood.png"}},
@@ -276,8 +235,37 @@ minetest.register_node("plants:coconut_broken", {
 	sounds = default.node_sound_wood_defaults(),
 })
 
-
-
+default.register_tree({
+	name="acacia",
+	chair = true,
+	door = true,
+	fence = true,
+	tree={tiles={"plants_acacia_tree_top.png","plants_acacia_tree_top.png","plants_acacia_tree.png"}},
+	sapling={tiles={"plants_acacia_treesapling.png"}},
+	wood={tiles={"plants_acacia_wood.png"}},
+	leaves={tiles={"plants_acacia_leaves.png"},groups={leaves=1,snappy=3,leafdecay=10,flammable=2}},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		r=4
+		local rad = {[1]=8,[2]=11,[3]=6,[4]=3}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_acacia_tree" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_acacia_tree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_acacia_tree2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_acacia_tree3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_acacia_tree4.mts",
+	},
+	mapgen={
+		biomes={"savanna",},
+		place_on={"default:dirt_with_dry_grass"},
+		noise_params={
+			offset=0.003,
+			scale=0.0012,
+		}
+	}
+})
 
 --||||||||||||||||
 -- ======================= plants
