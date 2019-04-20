@@ -261,8 +261,8 @@ default.register_tree({
 		biomes={"savanna",},
 		place_on={"default:dirt_with_dry_grass"},
 		noise_params={
-			offset=0.003,
-			scale=0.0012,
+			offset=0.00003,
+			scale=0.000012,
 		}
 	}
 })
