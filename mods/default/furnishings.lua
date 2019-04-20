@@ -8,7 +8,7 @@ default.register_fence=function(def)
 	def.groups.fence = def.groups.fence or		1
 	def.groups.flammable = def.groups.flammable or	1
 	def.sounds = def.sounds or			default.node_sound_wood_defaults()
-	def.connects_to = def.connects_to or		{"group:choppy"},
+	def.connects_to = def.connects_to or		{"group:choppy"}
 
 	minetest.register_node(name .."_fence", {
 		description = def.description or string.gsub(uname,"_"," ") .. " fence",
@@ -18,7 +18,6 @@ default.register_fence=function(def)
 		sounds = def.sounds,
 		drawtype = "nodebox",
 		paramtype = "light",
-		paramtype2 = "facedir",
 		connects_to=def.connects_to,
 		node_box = {
 			type = "connected",

@@ -87,7 +87,7 @@ default.register_tree=function(def)
 
 	def.tree = def.tree or					{}
 	def.tree.description = def.tree.description or			name .. " tree"
-	def.tree.tiles = def.tree.tiles or				{"default_tree.png","default_tree.png","default_tree.png"}
+	def.tree.tiles = def.tree.tiles or				{"default_wood.png","default_wood.png","default_tree.png"}
 	def.tree.paramtype2 = def.tree.paramtype2 or			"facedir"
 	def.tree.on_place = def.tree.on_place or 			minetest.rotate_node
 	def.tree.groups = def.tree.groups or				 {tree=1,choppy=2,flammable=1}
@@ -126,7 +126,15 @@ default.register_tree=function(def)
 
 -- sapling
 
+
 	def.sapling = def.sapling or					{}
+
+	if def.test then
+		def.sapling.after_place_node=function(pos)
+			minetest.get_node_timer(pos):start(1)
+		end
+	end
+
 	def.sapling.description = def.sapling.description or		name .. "tree sapling"
 	def.sapling.tiles = def.sapling.tiles or				{"default_stick.png"}
 	def.sapling.inventory_image = def.sapling.inventory_image or	def.sapling.tiles[1]
@@ -282,6 +290,42 @@ default.register_tree=function(def)
 				rotation = "random",
 			})
 		end
+	end
+
+
+
+
+	if def.door then
+		default.register_door({
+			name=def.name .. "_wood_door",
+			description = name .. " wood door",
+			texture=def.wood.tiles[1],
+			burnable = true,
+			craft={
+				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
+				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
+				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
+			}
+		})
+	end
+	if def.chair then
+		default.register_chair({
+			name = def.name .. "_wood",
+			description = def.name .. " wood chair",
+			burnable = true,
+			texture =def.wood.tiles[1],
+			craft={{"group:stick","",""},{mod .. def.name .. "_tree","",""},{"group:stick","",""}}
+		})
+	end
+	if def.fence then
+		default.register_fence({
+			name = def.name .. "_wood",
+			texture =def.wood.tiles[1],
+			craft={
+				{"group:stick","group:stick","group:stick"},
+				{"group:stick",mod .. def.name .. "_tree","group:stick"}
+			}
+		})
 	end
 end
 
