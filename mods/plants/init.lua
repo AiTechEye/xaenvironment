@@ -77,7 +77,15 @@ default.register_tree({
 			offset=0.001,
 			scale=0.0004,
 		}
-	}
+	},
+	fruit={
+		hp=1,
+		gaps=0,
+		description = "Cone",
+		tiles={"plants_cone.png"},
+		inventory_image="plants_cone.png",
+		visual_scale=0.5,
+	},
 })
 
 default.register_tree({
