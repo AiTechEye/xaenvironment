@@ -438,6 +438,24 @@ default.register_plant({
 	visual_scale=1.1,
 })
 
+default.register_plant({
+	name="jungle_grass",
+	biomes={"swamp","jungle"},
+	drawtype="firelike",
+	tiles={"plants_junglegrass.png"},
+	visual_scale=2,
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+	decoration={
+		place_on={"default:dirt_with_jungle_grass"},
+		noise_params={
+			offset=0.5,
+			scale=0.03,
+			spread={x=3,y=3,z=3},
+			seed=0,
+		},
+	},
+})
+
 for i=1,5 do
 default.register_plant({
 	name="grass" .. i,
@@ -446,7 +464,6 @@ default.register_plant({
 	tiles={"plants_grass"..i..".png"},
 	drop="plants:grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
-
 	decoration={
 		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
 		noise_params={
