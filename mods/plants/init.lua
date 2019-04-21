@@ -225,22 +225,36 @@ minetest.register_node("plants:coconut", {
 	description = "Coconut",
 	drawtype = "plantlike",
 	tiles={"plants_coconut.png"},
-	groups = {choppy = 3, dig_immediate = 3},
+	groups = {choppy = 3, dig_immediate = 3,flammable=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
 	sounds = default.node_sound_wood_defaults(),
 })
 
-minetest.register_node("plants:coconut_broken", {
+default.register_eatable("node","plants:coconut_broken",1,4,{
 	description = "Broken coconut",
 	drawtype = "plantlike",
 	tiles={"plants_coconut2.png"},
-	groups = {choppy = 3, dig_immediate = 3},
+
+			
+	drawtype="plantlike",
+	visual_scale=0.5,
+
+
+
+	inventory_image = "plants_coconut2.png",
+
+	groups = {choppy = 3, dig_immediate = 3,flammable=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
 	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_craft({
+	output="plants:coconut_broken",
+	recipe={{"plants:coconut"}}
 })
 
 default.register_tree({
