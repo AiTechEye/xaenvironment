@@ -243,12 +243,8 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
 	def.groups.eatable=hp
 	def.groups.gaps=gaps
-
+	local on_eat = def.on_eat or function() end
 	if gaps > 1 then
-
-		local on_eat = def.on_eat or function()
-		end
-
 		def.on_use=function(itemstack, user, pointed_thing)
 			local eat = 65536/gaps
 			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
@@ -277,7 +273,12 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 		end
 
 	else
-		def.on_use=minetest.item_eat(hp)
+		def.on_use=function(itemstack, user, pointed_thing)
+			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
+			on_eat(itemstack, user, pointed_thing)
+			itemstack:take_item()
+			return itemstack
+		end
 	end
 
 	if kind == "node" then
