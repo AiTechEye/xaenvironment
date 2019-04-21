@@ -354,6 +354,8 @@ minetest.register_node("default:snow", {
 	wield_scale = {x=0.5,y=0.5,z=2},
 	groups = {snowy=1,crumbly=3,falling_node=1,cools_lava=1},
 	buildable_to=true,
+	sunlight_propagates=true,
+	paramtype="light",
 	sounds = default.node_sound_dirt_defaults(),
 	drawtype="nodebox",
 	walkable=false,
