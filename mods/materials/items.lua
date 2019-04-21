@@ -4,16 +4,29 @@ minetest.register_craftitem("materials:piece_of_cloth", {
 	groups = {cloth=1,flammable = 1},
 })
 
-minetest.register_craftitem("materials:plant_extracts", {
+
+minetest.register_node("materials:plant_extracts", {
 	description = "Plant extracts",
 	inventory_image = "materials_plant_extracts.png",
-	groups = {flammable = 1},
+	drawtype = "plantlike",
+	tiles={"materials_plant_extracts.png"},
+	groups = {dig_immediate = 3,flammable=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_glass_defaults(),
 })
 
-minetest.register_craftitem("materials:plant_extracts_gas", {
+minetest.register_node("materials:plant_extracts_gas", {
 	description = "Plant extracts gas",
 	inventory_image = "materials_plant_extracts_gas.png",
-	groups = {flammable = 1},
+	drawtype = "plantlike",
+	tiles={"materials_plant_extracts_gas.png"},
+	groups = {dig_immediate = 3,flammable=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_glass_defaults(),
 })
 
 minetest.register_craftitem("materials:piece_of_wood", {
