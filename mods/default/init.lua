@@ -7,6 +7,7 @@ default={
 	on_player_death = {},
 	registered_bios={},
 	registered_bios_list={},
+	bucket={},
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")

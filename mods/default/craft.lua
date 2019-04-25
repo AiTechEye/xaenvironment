@@ -10,6 +10,13 @@ minetest.register_craft({
 --||||||||||||||||
 -- ======================= Node-tools
 --||||||||||||||||
+minetest.register_craft({
+	output="default:bucket",
+	recipe={
+		{"default:steel_ingot","","default:steel_ingot"},
+		{"","default:steel_ingot",""},
+	},
+})
 
 minetest.register_craft({
 	output="default:craftguide",

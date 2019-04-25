@@ -56,7 +56,6 @@ minetest.register_tool("default:quantum_pick", {
 	},
 })
 
-
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if digger and digger:get_wielded_item():get_name() == "default:quantum_pick" then
 		local inv = digger:get_inventory()
@@ -79,7 +78,6 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	end
 end)
 
-
 minetest.register_tool("default:cudgel", {
 	description = "Wooden cudgel",
 	inventory_image = "default_stick.png",
@@ -96,6 +94,32 @@ minetest.register_tool("default:cudgel", {
 	},
 	groups = {flammable = 2,stick=1},
 	sound=default.tool_breaks_defaults()
+})
+
+default.registry_bycket("default:water_source")
+default.registry_bycket("default:lava_source")
+default.registry_bycket("default:salt_water_source")
+
+minetest.register_craftitem("default:bucket", {
+	description = "Bucket",
+	inventory_image = "default_bucket.png",
+	groups = {bucket=1},
+	liquids_pointable = true,
+	on_use = function(itemstack, user, pointed_thing)
+		local p = pointed_thing
+		local n = user:get_player_name()
+		local no = p.under and default.bucket[minetest.get_node(p.under).name]
+		if p.type == "node" and no and not minetest.is_protected(n,p.under) then
+			minetest.remove_node(p.under)
+			if itemstack:get_count() == 1 then
+				itemstack:replace(ItemStack(no))
+			else
+				user:get_inventory():add_item("main",ItemStack(no))
+				itemstack:take_item()
+			end
+			return itemstack
+		end
+	end
 })
 
 minetest.register_craftitem("default:stick", {

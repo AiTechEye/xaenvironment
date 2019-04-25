@@ -517,3 +517,36 @@ default.registry_mineral=function(def)
 		end
 	end
 end
+
+default.registry_bycket=function(node_name)
+	local mod = minetest.get_current_modname() ..":"
+	local def = minetest.registered_nodes[node_name]
+	if not def then
+		error("bucket: " .. node_name .." is not a valid node")
+		return
+	end
+	local buk = mod .. "bucket_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
+	local tex = (def.inventory_image ~="" and def.inventory_image) or (type(def.tiles[1]) == "string" and def.tiles[1]) or (type(def.tiles[1])=="table" and def.tiles[1].name) or "default_grass.png"
+	minetest.register_tool(buk, {
+		description = "Bucket with " .. def.description,
+		inventory_image = tex .. "^default_alpha_bucket.png^[makealpha:0,255,0",
+		groups = {bucket=1},
+		liquids_pointable = true,
+		on_place = function(itemstack, user, pointed_thing)
+			local p = pointed_thing
+			local n = user:get_player_name()
+			if p.type == "node" then
+				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(n,p.under) then
+					minetest.set_node(p.under,{name=node_name})
+				elseif default.defpos(p.above,"buildable_to") and not minetest.is_protected(n,p.above) then
+					minetest.set_node(p.above,{name=node_name})
+				else
+					return itemstack
+				end
+				itemstack:replace(ItemStack("default:bucket"))
+				return itemstack
+			end
+		end,
+	})
+	default.bucket[node_name] = buk
+end
