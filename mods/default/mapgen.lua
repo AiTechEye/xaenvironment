@@ -98,8 +98,8 @@ minetest.register_tool("default:biocheck", {
 
 --desert_rocky
 
-default.register_bio({"semi_desert",		100,20,grass="default:desert_sand",dirt="default:desert_sand"})
-default.register_bio({"desert",		100,0,grass="default:desert_sand",dirt="default:desert_sand"})
+default.register_bio({"semi_desert",		100,20,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
+default.register_bio({"desert",		100,0,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
 
 default.register_bio({"swamp",		80,100,grass="default:dirt_with_jungle_grass"})
 default.register_bio({"jungle",		80,80,grass="default:dirt_with_jungle_grass",beach=true})

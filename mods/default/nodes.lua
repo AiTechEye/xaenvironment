@@ -271,6 +271,21 @@ minetest.register_node("default:mossycobble", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("default:desert_stone", {
+	description = "Desert stone",
+	drop = "default:desertcobble",
+	tiles={"default_desertstone.png"},
+	groups = {stone=1,cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("default:desert_cobble", {
+	description = "Desert cobble",
+	tiles={"default_desertcobble.png"},
+	groups = {stone=1,cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:gravel", {
 	description = "Gravel",
 	tiles={"default_gravel.png"},
