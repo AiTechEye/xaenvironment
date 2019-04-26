@@ -334,7 +334,7 @@ minetest.register_node("default:sand", {
 	drop ={
 		max_items = 1,
 		items = {
-			{items = {"default:flint"}, rarity = 8},
+			{items = {"default:flint"}, rarity = 16},
 			{items = {"default:sand"}}
 		}
 	}

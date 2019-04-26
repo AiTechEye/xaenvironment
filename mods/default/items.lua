@@ -120,7 +120,7 @@ minetest.register_craftitem("default:bucket", {
 			local nn = minetest.get_node(p.under)
 			if minetest.get_item_group(nn.name,"tankstorage") == 2 and nn.param2 > 0  then
 				item = ItemStack(minetest.get_meta(p.under):get_string("bucket"))
-				if nn.param2-1 > 0 then
+				if nn.param2-8 > 0 then
 					minetest.swap_node(p.under,{name=nn.name,param2=nn.param2-7})
 				else
 					minetest.set_node(p.under,{name="default:tankstorage"})

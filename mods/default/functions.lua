@@ -567,6 +567,7 @@ default.registry_bycket=function(node_name)
 		sunlight_propagates = true,
 		paramtype = "light",
 		paramtype2 = "glasslikeliquidlevel",
+		light_source = def.light_source,
 		can_dig = function(pos, player)
 			return minetest.get_node(pos).param2 == 0
 		end
