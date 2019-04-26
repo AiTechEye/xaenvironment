@@ -306,14 +306,7 @@ minetest.register_node("default:desert_sand", {
 	tiles={"default_desert_sand.png"},
 	groups = {crumbly=3,sand=1,falling_node=1},
 	sounds = default.node_sound_dirt_defaults(),
-	drowning = 1,
-	drop ={
-		max_items = 1,
-		items = {
-			{items = {"default:flint"}, rarity = 8},
-			{items = {"default:sand"}}
-		}
-	}
+	drowning = 1
 })
 
 minetest.register_node("default:sandstone", {
@@ -499,7 +492,7 @@ minetest.register_node("default:salt_water_source", {
 		}
 	},
 	alpha =165,
-	groups = {saltwater=1, liquid=1, cools_lava=1},
+	groups = {water=1, liquid=1, cools_lava=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -541,7 +534,7 @@ minetest.register_node("default:salt_water_flowing", {
 		}
 	},
 	alpha =165,
-	groups = {saltwater=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",

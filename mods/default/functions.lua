@@ -527,10 +527,11 @@ default.registry_bycket=function(node_name)
 	end
 	local buk = mod .. "bucket_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
 	local tex = (def.inventory_image ~="" and def.inventory_image) or (type(def.tiles[1]) == "string" and def.tiles[1]) or (type(def.tiles[1])=="table" and def.tiles[1].name) or "default_grass.png"
+
 	minetest.register_tool(buk, {
 		description = "Bucket with " .. def.description,
 		inventory_image = tex .. "^default_alpha_bucket.png^[makealpha:0,255,0",
-		groups = {bucket=1},
+		groups = {bucket=1,bucket_water=minetest.get_item_group(node_name,"water") > 0 and 1 or nil},
 		liquids_pointable = true,
 		on_place = function(itemstack, user, pointed_thing)
 			local p = pointed_thing

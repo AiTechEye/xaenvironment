@@ -269,7 +269,6 @@ minetest.register_node("default:craftguide", {
 	after_place_node = function(pos, placer, itemstack)
 		local meta = minetest.get_meta(pos)
 		meta:set_int("page", 1)
-
 		meta:set_string("but_size", "1,1")
 		meta:set_string("x_start", -0.2)
 		meta:set_string("x_add", 0.8)
@@ -279,6 +278,87 @@ minetest.register_node("default:craftguide", {
 		meta:set_string("y_label", 5)
 		meta:set_int("craftguide", 1)
 		default.workbench.set_form(pos)
-		 minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
+		minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
 	end,
+})
+
+minetest.register_node("default:paper_compressor", {
+	description = "Paper compressor",
+	tiles={"default_wood.png"},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.3125, 0.5},
+			{-0.3125, 0.0625, 0.3125, 0.3125, 0.5, 0.5},
+			{-0.3125, 0.0625, -0.5, 0.3125, 0.5, -0.3125},
+			{-0.5, 0.0625, -0.5, -0.3125, 0.5, 0.5},
+			{0.3125, 0.0625, -0.5, 0.5, 0.5, 0.5},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}}
+	},
+	after_place_node = function(pos, placer, itemstack)
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
+		inv:set_size("input", 1)
+		inv:set_size("input_water", 1)
+		inv:set_size("output", 1)
+		meta:set_string("formspec",
+			"size[8,5]" ..
+		--	"background[2,0;1,1;materials_piece_of_wood.png]" ..
+			"list[context;input;2,0;1,1;]" ..
+			"list[current_player;main;0,1.3;8,4;]" ..
+			"list[context;input_water;3,0;1,1;]" ..
+			"list[context;output;5,0;1,1;]" ..
+			"listring[current_player;main]" ..
+			"listring[current_name;input_water]" .. 
+			"listring[current_player;main]" ..
+			"listring[current_name;output]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if listname=="input" and stack:get_name() == "materials:piece_of_wood" or listname=="input_water" and minetest.get_item_group(stack:get_name(),"bucket_water") > 0 then
+			local inv = minetest.get_meta(pos):get_inventory()
+			local p = inv:get_stack("input",1):get_count()
+			local b = minetest.get_item_group(stack:get_name(),"bucket_water")
+			if ((listname == "input" and p + stack:get_count() >= 4) or p >= 4) and (minetest.get_item_group(inv:get_stack("input_water",1):get_name(),"bucket_water") > 0 or b > 0) then
+				inv:set_stack("output",1,"default:paper")
+			end
+			return stack:get_count()
+		end
+		return 0
+	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local meta = minetest.get_meta(pos)
+		local name = player:get_player_name()
+		if name==meta:get_string("owner") or not minetest.is_protected(pos,name) then
+			local inv = minetest.get_meta(pos):get_inventory()
+			if listname == "output" then
+				local w = inv:get_stack("input",1)
+				w:take_item(4)
+				inv:set_stack("input",1,w)
+				inv:set_stack("input_water",1,"default:bucket")
+			elseif (listname == "input" and inv:get_stack("input",1):get_count()-stack:get_count() < 4) or listname == "input_water" then
+				inv:set_stack("output",1,nil)
+			end
+			return stack:get_count()
+		end
+		return 0
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		if to_list == "output" or to_list ~= from_list then
+			return 0
+		end
+		return count
+	end,
+	can_dig = function(pos, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		return inv:is_empty("input") and inv:is_empty("input_water")
+	end
 })

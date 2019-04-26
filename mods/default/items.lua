@@ -96,6 +96,12 @@ minetest.register_tool("default:cudgel", {
 	sound=default.tool_breaks_defaults()
 })
 
+minetest.register_craftitem("default:paper", {
+	description = "Paper",
+	inventory_image = "default_paper.png",
+	groups = {flammable = 1},
+})
+
 default.registry_bycket("default:water_source")
 default.registry_bycket("default:lava_source")
 default.registry_bycket("default:salt_water_source")

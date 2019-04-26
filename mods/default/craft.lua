@@ -7,14 +7,24 @@ minetest.register_craft({
 	recipe={{"default:stick","default:stick","default:stick"},},
 })
 
---||||||||||||||||
--- ======================= Node-tools
---||||||||||||||||
 minetest.register_craft({
 	output="default:bucket",
 	recipe={
 		{"default:steel_ingot","","default:steel_ingot"},
 		{"","default:steel_ingot",""},
+	},
+})
+
+--||||||||||||||||
+-- ======================= Node-tools
+--||||||||||||||||
+
+minetest.register_craft({
+	output="default:paper_compressor",
+	recipe={
+		{"group:wood","","group:wood"},
+		{"group:wood","group:stick","group:wood"},
+		{"group:wood","group:wood","group:wood"},
 	},
 })
 
