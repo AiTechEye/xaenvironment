@@ -530,7 +530,7 @@ default.registry_bycket=function(node_name)
 	local tex = (def.inventory_image ~="" and def.inventory_image) or (type(def.tiles[1]) == "string" and def.tiles[1]) or (type(def.tiles[1])=="table" and def.tiles[1].name) or "default_grass.png"
 
 	minetest.register_tool(buk, {
-		description = "Bucket with " .. def.description,
+		description = "Bucket of " .. def.description,
 		inventory_image = tex .. "^default_alpha_bucket.png^[makealpha:0,255,0",
 		groups = {bucket=1,bucket_water=minetest.get_item_group(node_name,"water") > 0 and 1 or nil},
 		liquids_pointable = true,
@@ -557,7 +557,7 @@ default.registry_bycket=function(node_name)
 	default.bucket[node_name] = buk
 
 	minetest.register_node(tan, {
-		description = "Tankstorage with ".. def.description,
+		description = "Tankstorage of ".. def.description,
 		drop = "default:tankstorage",
 		tiles={"default_glass_with_frame.png","default_glass.png"},
 		special_tiles={tex},

@@ -319,7 +319,9 @@ minetest.register_node("default:paper_compressor", {
 			"listring[current_player;main]" ..
 			"listring[current_name;input_water]" .. 
 			"listring[current_player;main]" ..
-			"listring[current_name;output]"
+			"listring[current_name;output]" ..
+			"tooltip[2,0;1,1;Piece of wood]"..
+			"tooltip[3,0;1,1;Bucket of water]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
