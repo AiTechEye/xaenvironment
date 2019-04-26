@@ -143,6 +143,16 @@ minetest.register_node("default:torch_lean", {
 	end
 })
 
+minetest.register_node("default:tankstorage", {
+	description = "Tankstorage",
+	tiles={"default_glass_with_frame.png"},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed",
+	sunlight_propagates = true,
+	paramtype = "light",
+})
+
 minetest.register_node("default:glass_tabletop", {
 	description = "Glass tabletop",
 	tiles={"default_glass_with_frame.png"}, --,"default_glass.png"
@@ -169,7 +179,6 @@ minetest.register_node("default:glass", {
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
 	paramtype = "light",
-	paramtype2 = "glasslikeliquidelevel",
 })
 
 --||||||||||||||||

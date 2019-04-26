@@ -115,17 +115,39 @@ minetest.register_craftitem("default:bucket", {
 		local p = pointed_thing
 		local n = user:get_player_name()
 		local no = p.under and default.bucket[minetest.get_node(p.under).name]
-		if p.type == "node" and no and not minetest.is_protected(n,p.under) then
-			minetest.remove_node(p.under)
-			if itemstack:get_count() == 1 then
-				itemstack:replace(ItemStack(no))
-			else
-				user:get_inventory():add_item("main",ItemStack(no))
+		if p.type == "node" and not minetest.is_protected(n,p.under) then
+			local item
+			local nn = minetest.get_node(p.under)
+			if minetest.get_item_group(nn.name,"tankstorage") == 2 and nn.param2 > 0  then
+				item = ItemStack(minetest.get_meta(p.under):get_string("bucket"))
+				if nn.param2-1 > 0 then
+					minetest.swap_node(p.under,{name=nn.name,param2=nn.param2-7})
+				else
+					minetest.set_node(p.under,{name="default:tankstorage"})
+				end
+			elseif no then
+				item = ItemStack(no)
+				minetest.remove_node(p.under)
+			end
+			if item and itemstack:get_count() == 1 then
+				itemstack:replace(item)
+			elseif item then
+				user:get_inventory():add_item("main",item)
 				itemstack:take_item()
 			end
 			return itemstack
 		end
 	end
+})
+
+minetest.register_node("default:tankstorage", {
+	description = "Tankstorage",
+	tiles={"default_glass_with_frame.png"},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed",
+	sunlight_propagates = true,
+	paramtype = "light",
 })
 
 minetest.register_craftitem("default:stick", {

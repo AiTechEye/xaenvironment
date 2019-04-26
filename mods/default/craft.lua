@@ -20,6 +20,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:tankstorage",
+	recipe={
+		{"default:glass","default:glass","default:glass"},
+		{"default:glass","","default:glass"},
+		{"default:glass","default:glass","default:glass"},
+	},
+})
+
+minetest.register_craft({
 	output="default:paper_compressor",
 	recipe={
 		{"group:wood","","group:wood"},

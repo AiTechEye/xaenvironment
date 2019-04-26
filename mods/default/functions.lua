@@ -525,6 +525,7 @@ default.registry_bycket=function(node_name)
 		error("bucket: " .. node_name .." is not a valid node")
 		return
 	end
+	local tan = mod .. "tankstorage_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
 	local buk = mod .. "bucket_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
 	local tex = (def.inventory_image ~="" and def.inventory_image) or (type(def.tiles[1]) == "string" and def.tiles[1]) or (type(def.tiles[1])=="table" and def.tiles[1].name) or "default_grass.png"
 
@@ -537,8 +538,12 @@ default.registry_bycket=function(node_name)
 			local p = pointed_thing
 			local n = user:get_player_name()
 			if p.type == "node" then
+				local no = minetest.get_node(p.under)
 				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(n,p.under) then
 					minetest.set_node(p.under,{name=node_name})
+				elseif (no.name == "default:tankstorage" or no.name == tan) and no.param2 < 56 then
+					minetest.set_node(p.under,{name=tan,param2=no.param2+7})
+					minetest.get_meta(p.under):set_string("bucket",buk)
 				elseif default.defpos(p.above,"buildable_to") and not minetest.is_protected(n,p.above) then
 					minetest.set_node(p.above,{name=node_name})
 				else
@@ -550,4 +555,21 @@ default.registry_bycket=function(node_name)
 		end,
 	})
 	default.bucket[node_name] = buk
+
+	minetest.register_node(tan, {
+		description = "Tankstorage with ".. def.description,
+		drop = "default:tankstorage",
+		tiles={"default_glass_with_frame.png","default_glass.png"},
+		special_tiles={tex},
+		groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=2,not_in_creative_inventory=1},
+		sounds = default.node_sound_glass_defaults(),
+		drawtype = "glasslike_framed",
+		sunlight_propagates = true,
+		paramtype = "light",
+		paramtype2 = "glasslikeliquidlevel",
+		can_dig = function(pos, player)
+			return minetest.get_node(pos).param2 == 0
+		end
+	})
+
 end
