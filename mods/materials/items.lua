@@ -1,9 +1,28 @@
+minetest.register_node("materials:metal_beam", {
+	description = "Metal beam",
+	tiles={"materials_metal_beam.png"},
+	groups = {cracky = 1,level=3},
+	sunlight_propagates = true,
+	sounds = default.node_sound_metal_defaults(),
+	paramtype2 = "facedir",
+	on_place=minetest.rotate_node,
+})
+
+minetest.register_node("materials:metal_beam_rusty", {
+	description = "Rusty Metal beam",
+	tiles={"materials_metal_beam_rusty.png"},
+	groups = {cracky = 1,level=3},
+	sunlight_propagates = true,
+	sounds = default.node_sound_metal_defaults(),
+	paramtype2 = "facedir",
+	on_place=minetest.rotate_node,
+})
+
 minetest.register_craftitem("materials:piece_of_cloth", {
 	description = "Piece of cloth",
 	inventory_image = "materials_piece_of_cloth.png",
 	groups = {cloth=1,flammable = 1},
 })
-
 
 minetest.register_node("materials:plant_extracts", {
 	description = "Plant extracts",

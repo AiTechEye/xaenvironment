@@ -1,4 +1,18 @@
 minetest.register_craft({
+	output="materials:metal_beam 8",
+	recipe={
+		{"default:ironblock","default:ironblock"},
+	},
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "materials:metal_beam_rusty",
+	recipe = "materials:metal_beam",
+	cooktime = 20,
+})
+
+minetest.register_craft({
 	output="materials:piece_of_cloth",
 	recipe={
 		{"plants:cotton","plants:cotton","plants:cotton"},
