@@ -333,3 +333,73 @@ default.register_chest=function(def)
 		})
 	end
 end
+
+minetest.register_node("default:itemframe", {
+	description = "Item frame",
+	wield_image="default_frame.png",
+	inventory_image="default_frame.png",
+	tiles = {"default_frame.png"},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3,itemframe=1},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, 0.45, 0.5, 0.5, 0.5},
+		}
+	},
+	after_place_node = function(pos, placer)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
+	on_punch=function(pos, node, player, pointed_thing)
+		local meta=minetest.get_meta(pos)
+		if meta:get_string("owner") ~= player:get_player_name() then
+			return
+		end
+		local item = meta:get_string("item")
+		player:get_inventory():add_item("main",item)
+		meta:set_string("item","")
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:item" then
+				ob:remove()
+			end
+		end
+	end,
+	on_rightclick=function(pos, node, player, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		if meta:get_string("owner") ~= player:get_player_name() then
+			return
+		end
+		if meta:get_string("item") ~= "" then
+			return itemstack
+		end
+		local p = node.param2
+		local c = {
+			[1]={x=0.45,z=0},
+			[3]={x=-0.45,z=0},
+			[2]={x=0,z=-0.45},
+			[0]={x=0,z=0.45}
+		}
+		c = c[p]
+		meta:set_string("item",itemstack:get_name())
+		local en = minetest.add_entity(pos, "default:item"):get_luaentity()
+		itemstack:take_item()
+		en.new_itemframe(en)
+		return itemstack
+	end,
+	on_destruct=function(pos)
+		local meta=minetest.get_meta(pos)
+		local item = meta:get_string("item")
+		if item ~= "" then
+			minetest.add_item(pos,item):set_yaw(math.random(0,6.28))
+		end
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:item" then
+				ob:remove()
+			end
+		end
+	end,
+})

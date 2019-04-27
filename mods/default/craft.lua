@@ -20,6 +20,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:itemframe",
+	recipe={
+		{"default:stick","default:stick","default:stick"},
+		{"default:stick","materials:piece_of_cloth","default:stick"},
+		{"default:stick","default:stick","default:stick"},
+	},
+})
+
+minetest.register_craft({
 	output="default:tankstorage",
 	recipe={
 		{"default:glass","default:glass","default:glass"},

@@ -91,3 +91,50 @@ local item = {
 
 setmetatable(item,builtin_item)
 minetest.register_entity(":__builtin:item",item)
+
+minetest.register_entity("default:item",{
+	physical = false,
+	collisionbox = {0,0,0,0,0,0},
+	visual = "wielditem",
+	visual_size = {x=0.3,y=0.3},
+	textures = {"default:stick"},
+	new_itemframe=function(self)
+		local pos = self.object:get_pos()
+		local node = minetest.get_node(pos)
+		local p = node.param2
+		local c = {
+			[1]={x=0.45,z=0},
+			[3]={x=-0.45,z=0},
+			[2]={x=0,z=-0.45},
+			[0]={x=0,z=0.45}
+		}
+
+		c = c[p]
+
+		self.storage.itemframe = minetest.get_meta(pos):get_string("item")
+		self.object:set_yaw(p*(6.28*-0.25))
+		self.object:set_pos({x=pos.x+c.x,y=pos.y,z=pos.z+c.z})
+		self.itemframe(self)
+	end,
+	itemframe=function(self)
+		if minetest.get_item_group(minetest.get_node(self.object:get_pos()).name,"itemframe") == 0 then
+			self.object:remove()
+		else
+			self.object:set_properties({
+				textures={self.storage.itemframe},
+				visual_size = {x=0.4,y=0.4,z=0.01},
+			})
+		end
+	end,
+	on_activate=function(self, staticdata)
+		self.storage = minetest.deserialize(staticdata) or {}
+		if self.storage.itemframe then
+			self.itemframe(self)
+		end
+	end,
+	get_staticdata = function(self)
+		return minetest.serialize(self.storage)
+	end,
+	on_step=function(self, dtime)
+	end,
+})

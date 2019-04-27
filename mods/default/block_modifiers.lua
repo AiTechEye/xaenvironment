@@ -96,3 +96,23 @@ minetest.register_abm({
 		end
 	end
 })
+
+minetest.register_lbm({
+	name="default:itemframe",
+	nodenames={"default:itemframe"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:item" then
+				return
+			end
+		end
+		local meta=minetest.get_meta(pos)
+		local item = meta:get_string("item")
+		if item ~= "" then
+			local en = minetest.add_entity(pos, "default:item"):get_luaentity()
+			en.new_itemframe(en)
+		end
+	end
+})
