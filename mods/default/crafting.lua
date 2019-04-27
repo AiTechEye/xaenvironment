@@ -311,7 +311,9 @@ minetest.register_node("default:paper_compressor", {
 		inv:set_size("output", 1)
 		meta:set_string("formspec",
 			"size[8,5]" ..
-		--	"background[2,0;1,1;materials_piece_of_wood.png]" ..
+			"listcolors[#77777777;#777777aa;#000000ff]"..
+			"item_image[2,0;1,1;materials:piece_of_wood]" ..
+			"item_image[3,0;1,1;default:bucket_with_water_source]" ..
 			"list[context;input;2,0;1,1;]" ..
 			"list[current_player;main;0,1.3;8,4;]" ..
 			"list[context;input_water;3,0;1,1;]" ..
@@ -319,9 +321,7 @@ minetest.register_node("default:paper_compressor", {
 			"listring[current_player;main]" ..
 			"listring[current_name;input_water]" .. 
 			"listring[current_player;main]" ..
-			"listring[current_name;output]" ..
-			"tooltip[2,0;1,1;Piece of wood]"..
-			"tooltip[3,0;1,1;Bucket of water]"
+			"listring[current_name;output]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)

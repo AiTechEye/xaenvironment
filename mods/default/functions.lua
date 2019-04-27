@@ -223,8 +223,12 @@ default.defpos=function(pos,n)
 	return no and no[n] or nil
 end
 
+default.def=function(name)
+	return minetest.registered_items[name]
+end
+
 default.defname=function(name,n)
-	local no = minetest.registered_nodes[name]
+	local no = minetest.registered_items[name]
 	return no and no[n] or nil
 end
 
