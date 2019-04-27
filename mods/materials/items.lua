@@ -1,8 +1,17 @@
+
+minetest.register_node("materials:pallet_box", {
+	description = "Pallet box",
+	tiles={"materials_pallet_box.png"},
+	groups = {dig_immediate = 3,flammable=3},
+	sunlight_propagates = true,
+	drawtype = "glasslike",
+	paramtype = "light",
+	sounds = default.node_sound_wood_defaults(),
+})
 minetest.register_node("materials:metal_beam", {
 	description = "Metal beam",
 	tiles={"materials_metal_beam.png"},
 	groups = {cracky = 1,level=3},
-	sunlight_propagates = true,
 	sounds = default.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	on_place=minetest.rotate_node,
@@ -12,7 +21,6 @@ minetest.register_node("materials:metal_beam_rusty", {
 	description = "Rusty Metal beam",
 	tiles={"materials_metal_beam_rusty.png"},
 	groups = {cracky = 1,level=3},
-	sunlight_propagates = true,
 	sounds = default.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	on_place=minetest.rotate_node,

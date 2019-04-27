@@ -1,4 +1,13 @@
 minetest.register_craft({
+	output="materials:pallet_box",
+	recipe={
+		{"group:stick","","group:stick"},
+		{"","group:stick",""},
+		{"group:stick","","group:stick"},
+	},
+})
+
+minetest.register_craft({
 	output="materials:metal_beam 8",
 	recipe={
 		{"default:ironblock","default:ironblock"},
