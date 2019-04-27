@@ -1,3 +1,18 @@
+default.register_pebble({
+	name="stone",
+	decoration={seed=543}
+})
+
+default.register_pebble({
+	name="desert_stone",
+	tiles={"default_desertstone.png"},
+	decoration={
+		seed=532,
+		place_on={"default:desert_stone","default:desert_sand"},
+	}
+	
+})
+
 minetest.register_tool(":", {
 	type = "none",
 	wield_image = "wieldhand.png",

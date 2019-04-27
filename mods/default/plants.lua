@@ -1,3 +1,52 @@
+default.register_pebble=function(def)
+	local mod = minetest.get_current_modname() ..":"
+	local Name = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local ddef = table.copy(def.decoration or {})
+	local name = def.name
+
+	def.decoration =			nil
+	def.name =			nil
+	def.groups =			def.groups or			{}
+	def.groups.dig_immediate =		def.groups.dig_immediate or		3
+	def.description =			def.description or			string.gsub(name,"_"," ")
+	def.tiles =			def.tiles or			{"default_stone.png"}
+	def.sounds =			def.sounds or			default.node_sound_stone_defaults()
+	def.drawtype =			"mesh"
+	def.mesh =			"default_pebble.obj"
+	def.visual_scale =			0.3
+	def.paramtype =			"light"
+	def.paramtype2 =			"facedir"
+	def.sunlight_propagates =		def.sunlight_propagates or		true
+	def.collision_box = {
+		type = "fixed",
+		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
+	}
+	def.selection_box = {
+		type = "fixed",
+		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
+	}
+	minetest.register_node("default:pebble_" ..name, def)
+
+	minetest.register_decoration({
+		deco_type = "simple",
+		place_on = ddef.place_on or {"group:soil","default:stone"},
+		sidelen = 16,
+		noise_params = {
+			offset = 0.002,
+			scale = 0.004,
+			spread = {x = 100, y = 100, z = 100},
+			seed = ddef.seed,
+			octaves = 3,
+			persist = 0.6
+		},
+		y_min = ddef.y_min or -31000,
+		y_max = ddef.y_max or 31000,
+		decoration = "default:pebble_" ..name,
+		spawn_by = ddef.spawn_by,
+	--	num_spawn_by = 1,
+	})
+end
+
 default.register_plant=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local name = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
@@ -21,7 +70,7 @@ default.register_plant=function(def)
 	def.groups.flammable = def.groups.flammable or		1
 
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
-	def.sunlight_propagetes = def.sunlight_propagates or	true
+	def.sunlight_propagates = def.sunlight_propagates or	true
 	def.buildable_to = def.buildable_to or			true
 	def.floodable = def.floodable or 			true
 	def.paramtype = def.paramtype or			"light"

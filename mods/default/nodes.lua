@@ -301,7 +301,7 @@ minetest.register_node("default:mossycobble", {
 
 minetest.register_node("default:desert_stone", {
 	description = "Desert stone",
-	drop = "default:desertcobble",
+	drop = "default:desert_cobble",
 	tiles={"default_desertstone.png"},
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
