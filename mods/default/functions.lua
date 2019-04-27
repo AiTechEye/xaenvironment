@@ -574,3 +574,18 @@ default.registry_bycket=function(node_name)
 	})
 
 end
+
+default.wieldlight=function(name,i,item)
+	local user = minetest.get_player_by_name(name)
+	if user then
+		local pos = user:get_pos()
+		pos.y = pos.y + 1.5
+		local n = minetest.get_node(pos)
+		if (n.name == "air" or n.name == "default:lightsource") and user:get_wield_index() == i and user:get_wielded_item():get_name() == item and (minetest.get_node_light(pos) or 0) < 11 then
+			minetest.set_node(pos,{name="default:lightsource"})
+			minetest.after(0.3, function(name,i,item)
+				default.wieldlight(name,i,item)
+			end,name,i,item)
+		end
+	end
+end

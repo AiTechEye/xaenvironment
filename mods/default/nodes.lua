@@ -82,8 +82,11 @@ minetest.register_node("default:torch", {
 		itemstack:take_item()
 		return itemstack
 	end,
-})
+	on_use=function(itemstack, user, pointed_thing)
+		default.wieldlight(user:get_player_name(),user:get_wield_index(),"default:torch")
+	end
 
+})
 
 minetest.register_node("default:torch_floor", {
 	description = "Torch",
@@ -140,6 +143,22 @@ minetest.register_node("default:torch_lean", {
 			return false
 		end
 		return true
+	end
+})
+
+minetest.register_node("default:lightsource", {
+	drawtype = "airlike",
+	floodable = true,
+	pointable=false,
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+	light_source = 10,
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5)
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.remove_node(pos)
 	end
 })
 
