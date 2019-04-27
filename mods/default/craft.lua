@@ -102,14 +102,21 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
-	output="default:furnace",
+	output="default:cobble",
 	recipe={
-		{"group:stone","group:stone","group:stone"},
-		{"group:stone","","group:stone"},
-		{"group:stone","group:stone","group:stone"},
+		{"default:pebble_stone","default:pebble_stone","default:pebble_stone"},
+		{"default:pebble_stone","default:pebble_stone","default:pebble_stone"},
+		{"default:pebble_stone","default:pebble_stone","default:pebble_stone"},
 	},
 })
-
+minetest.register_craft({
+	output="default:desert_cobble",
+	recipe={
+		{"default:pebble_desert_stone","default:pebble_desert_stone","default:pebble_desert_stone"},
+		{"default:pebble_desert_stone","default:pebble_desert_stone","default:pebble_desert_stone"},
+		{"default:pebble_desert_stone","default:pebble_desert_stone","default:pebble_desert_stone"},
+	},
+})
 
 
 minetest.register_craft({
@@ -152,6 +159,13 @@ minetest.register_craft({
 	output = "default:stone",
 	recipe = "default:cobble",
 })
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:desert_stone",
+	recipe = "default:desert_cobble",
+})
+
 
 --||||||||||||||||
 -- ======================= FUEL
