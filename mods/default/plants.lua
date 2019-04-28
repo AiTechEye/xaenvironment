@@ -65,13 +65,11 @@ default.register_plant=function(def)
 	def.groups.attached_node = def.groups.attached_node or	1
 	def.groups.snappy = def.groups.snappy or		3
 
-
-
 	def.groups.flammable = def.groups.flammable or		1
 
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
 	def.sunlight_propagates = def.sunlight_propagates or	true
-	def.buildable_to = def.buildable_to or			true
+	def.buildable_to = type(def.buildable_to) == "nil"
 	def.floodable = def.floodable or 			true
 	def.paramtype = def.paramtype or			"light"
 	def.walkable = def.walkable or			false
