@@ -53,7 +53,6 @@ default.register_tree({
 	chair = true,
 	door = true,
 	fence = true,
-	mapgen={biomes={"all"}}, --"deciduous"
 	tree={tiles={"plants_pine_tree_top.png","plants_pine_tree_top.png","plants_pine_tree.png"}},
 	sapling={tiles={"plants_pine_treesapling.png"}},
 	wood={tiles={"plants_pine_wood.png"}},
@@ -485,7 +484,6 @@ default.register_plant({
 	tiles={"plants_dry_grass"..i..".png"},
 	drop="plants:dry_grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
-
 	decoration={
 		place_on={"default:dirt_with_dry_grass"},
 		noise_params={
@@ -559,4 +557,43 @@ minetest.register_craftitem("plants:cotton", {
 	description = "Cotton",
 	inventory_image = "plants_cotton.png",
 	groups = {flammable = 1},
+})
+
+default.register_plant({
+	name="cactus",
+	biomes={"desert","semi_desert"},
+	tiles={"plants_cactus.png"},
+	damage_per_second=5,
+	walkable = true,
+	groups={choppy=1,snappy=0,attached_node=0},
+	sounds = default.node_sound_wood_defaults(),
+	buildable_to=false,
+	drawtype = "nodebox",
+	paramtype = "light",
+	waving=0,
+	floodable=false,
+	drawtype = "nodebox",
+	paramtype = "light",
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.19, -0.19, -0.19, 0.19, 0.19, 0.19},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		}
+	},
+	decoration={
+		place_on={"default:desert_sand"},
+		noise_params={
+			offset=-0.00015,
+			scale=0.0005,
+			seed=3454365,
+		},
+		height = 4,
+		height_max = 8,
+	},
 })
