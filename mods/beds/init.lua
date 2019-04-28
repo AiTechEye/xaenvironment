@@ -42,7 +42,9 @@ beds.sleeping=function(pos,player)
 			end
 		end
 		for _, p in pairs(minetest.get_connected_players()) do
-			p:get_meta():set_string("beds_position",minetest.pos_to_string(p:get_pos()))
+			if minetest.get_item_group(p:get_pos(),"tent") == 0 then
+				p:get_meta():set_string("beds_position",minetest.pos_to_string(p:get_pos()))
+			end
 		end
 		minetest.set_timeofday(0.21)
 	end
@@ -84,7 +86,10 @@ minetest.register_node("beds:bed", {
 		return false
 	end,
 	on_place=function(itemstack, placer, pointed_thing)
-		local p = pointed_thing.above
+		local p = pointed_thing.under
+		if not default.defpos(p,"buildable_to") then
+			p = pointed_thing.above
+		end
 		local f=minetest.dir_to_facedir(placer:get_look_dir())
 		if (f==2 and default.defpos({x=p.x,y=p.y,z=p.z-1},"buildable_to")) or
 		(f==0 and default.defpos({x=p.x,y=p.y,z=p.z+1},"buildable_to")) or
@@ -97,6 +102,95 @@ minetest.register_node("beds:bed", {
 	end
 })
 
+minetest.register_node("beds:blocking", {
+	drawtype="airlike",
+	paramtype="light",
+	sunlight_propagetes = true,
+	pointable = false,
+	walkable = false,
+})
+
+minetest.register_node("beds:tent", {
+	description = "Tent",
+	stack_max=1,
+	tiles = {"beds_tent.png"},
+	groups = {dig_immediate = 3, flammable = 1,bed=1,tent=1},
+	drawtype="mesh",
+	paramtype="light",
+	paramtype2 = "facedir",
+	mesh = "tent.obj",
+	selection_box = {
+		type = "fixed",
+		fixed = { 
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 1.5},
+		}
+	},
+	collision_box = {
+		type = "fixed",
+		fixed = { 
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 1.5},
+		}
+	},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local p1 = player:get_player_name()
+		if not default.player_attached[p1] then
+			for _, p2 in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+				if p2:is_player() and p2:get_player_name() ~=p1 then
+					return
+				end
+			end
+		end
+		beds.lay_and_stand(pos,player)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_timer =  function (pos, elapsed)
+		for _, player in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+			if player:is_player() then
+				beds.sleeping(pos,player)
+				return true
+			end
+		end
+		return false
+	end,
+	on_place=function(itemstack, placer, pointed_thing)
+		local p = pointed_thing.under
+		if not default.defpos(p,"buildable_to") then
+			p = pointed_thing.above
+		end
+		local name = placer:get_player_name()
+		for y = 0,1 do
+		for x = -1,1 do
+		for z = -1,1 do
+			local np = {x=p.x+x,y=p.y+y,z=p.z+z}
+			if not default.defpos(np,"buildable_to") or minetest.is_protected(np,name) then
+				return
+			end
+		end
+		end
+		end
+		for y = 0,1 do
+		for x = -1,1 do
+		for z = -1,1 do
+			minetest.set_node({x=p.x+x,y=p.y+y,z=p.z+z},{name="beds:blocking"})
+		end
+		end
+		end
+		local f=minetest.dir_to_facedir(placer:get_look_dir())
+		minetest.set_node(p,{name="beds:tent",param2=f})
+		itemstack:take_item()
+		return itemstack
+	end,
+	after_destruct=function(pos)
+		for y = 0,1 do
+		for x = -1,1 do
+		for z = -1,1 do
+			minetest.remove_node({x=pos.x+x,y=pos.y+y,z=pos.z+z})
+		end
+		end
+		end
+	end
+})
+
 minetest.register_craft({
 	output="beds:bed",
 	recipe={
@@ -105,3 +199,10 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="beds:tent",
+	recipe={
+		{"group:stick","materials:piece_of_cloth","group:stick"},
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+	},
+})
