@@ -42,7 +42,7 @@ beds.sleeping=function(pos,player)
 			end
 		end
 		for _, p in pairs(minetest.get_connected_players()) do
-			if minetest.get_item_group(p:get_pos(),"tent") == 0 then
+			if minetest.get_item_group(minetest.get_node(p:get_pos()).name,"tent") == 0 then
 				p:get_meta():set_string("beds_position",minetest.pos_to_string(p:get_pos()))
 			end
 		end
