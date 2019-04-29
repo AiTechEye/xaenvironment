@@ -1,3 +1,17 @@
+default.register_pebble({
+	name="stone",
+	decoration={seed=543}
+})
+
+default.register_pebble({
+	name="desert_stone",
+	tiles={"default_desertstone.png"},
+	decoration={
+		seed=532,
+		place_on={"default:desert_stone","default:desert_sand"},
+	}	
+})
+
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},
@@ -353,10 +367,29 @@ minetest.register_node("default:sand", {
 	drop ={
 		max_items = 1,
 		items = {
-			{items = {"default:flint"}, rarity = 16},
+			{items = {"default:flint"}, rarity = 30},
+			{items = {"default:pebble_stone"}, rarity = 30},
 			{items = {"default:sand"}}
 		}
-	}
+	},
+	after_place_node = function(pos, placer,itemstack)
+		minetest.set_node(pos,{name="default:sand"})
+	end,
+	after_destruct=function(pos)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z}).name,"water") > 0 then
+			local items ={
+				["default:pebble_stone"]=20,
+				["default:gold_flake"]=50,
+				["default:micro_gold_flake"]=30,
+				["default:amber_lump"]=40,
+			}
+			for i,r in pairs(items) do
+				if math.random(1,r) == 1 then
+					minetest.add_item(pos,i)
+				end
+			end
+		end
+	end,
 })
 
 --||||||||||||||||

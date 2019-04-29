@@ -1,17 +1,42 @@
-default.register_pebble({
-	name="stone",
-	decoration={seed=543}
+minetest.register_craftitem("default:gold_flake", {
+	description = "Gold flake",
+	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
+	wield_scale={x=0.3,y=0.3,z=0.3},
 })
 
-default.register_pebble({
-	name="desert_stone",
-	tiles={"default_desertstone.png"},
-	decoration={
-		seed=532,
-		place_on={"default:desert_stone","default:desert_sand"},
-	}
-	
+minetest.register_craftitem("default:micro_gold_flake", {
+	description = "Micro gold flake",
+	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
+	wield_scale={x=0.1,y=0.1,z=0.1},
 })
+
+default.registry_mineral({
+	name="amber",
+	texture="default_amberblock.png",
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_ore=true,
+	not_ingot=true,
+	not_vineyardknife=true,
+	block={
+		groups={cracky=3},
+		sounds=default.node_sound_stone_defaults(),
+	},
+	regular_additional_craft={
+		{output="default:amberblock",recipe={
+			{"default:amber_lump","default:amber_lump","default:amber_lump"},
+			{"default:amber_lump","default:amber_lump","default:amber_lump"},
+			{"default:amber_lump","default:amber_lump","default:amber_lump"},
+		}},
+		{output="default:amber_lump 9",recipe={
+			{"default:amberblock"},
+		}}
+	}
+})
+
+
 
 minetest.register_tool(":", {
 	type = "none",

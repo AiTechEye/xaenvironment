@@ -86,6 +86,25 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:gold_lump",
+	recipe={
+		{"default:gold_flake","default:gold_flake","default:gold_flake"},
+		{"default:gold_flake","default:gold_flake","default:gold_flake"},
+		{"default:gold_flake","default:gold_flake","default:gold_flake"},
+	},
+})
+
+minetest.register_craft({
+	output="default:gold_flake",
+	recipe={
+		{"default:micro_gold_flake","default:micro_gold_flake","default:micro_gold_flake"},
+		{"default:micro_gold_flake","default:micro_gold_flake","default:micro_gold_flake"},
+		{"default:micro_gold_flake","default:micro_gold_flake","default:micro_gold_flake"},
+	},
+})
+
+
+minetest.register_craft({
 	output="default:stick 4",
 	recipe={{"group:wood"}},
 })
