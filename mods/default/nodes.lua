@@ -382,6 +382,8 @@ minetest.register_node("default:sand", {
 				["default:gold_flake"]=50,
 				["default:micro_gold_flake"]=30,
 				["default:amber_lump"]=40,
+				["default:iron_lump"]=70,
+				["default:copper_lump"]=70,
 			}
 			for i,r in pairs(items) do
 				if math.random(1,r) == 1 then
