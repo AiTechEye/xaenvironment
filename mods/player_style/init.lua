@@ -127,7 +127,11 @@ minetest.register_globalstep(function(dtime)
 						local d=player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
 						local v = player:get_player_velocity()
-						if run.wallrun == 1 and walkable and v.y == 0 and math.abs(v.x+v.z) > 1.5 then
+
+						if key.jump then
+							run.wallrun = nil
+							player:set_physics_override({jump=1.25})
+						elseif run.wallrun == 1 and walkable and v.y == 0 and math.abs(v.x+v.z) > 1.5 then
 							player:set_physics_override({jump=1.8})
 
 							run.wallrun = 2
@@ -135,9 +139,7 @@ minetest.register_globalstep(function(dtime)
 							player:set_physics_override({jump=1.25})
 							run.wallrun = 1
 
-						end
-						if key.jump then
-							run.wallrun = nil
+
 						end
 					end
 				end
