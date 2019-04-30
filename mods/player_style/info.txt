@@ -1,0 +1,6 @@
+crawl	sneak
+run	special/aux1
+wallrun	run + jump into a wall (requires a few of attempts to success)
+
+crawl to a edge to come higher
+
