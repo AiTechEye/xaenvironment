@@ -15,8 +15,11 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	default.on_player_death[player:get_player_name()]()
-	default.on_player_death[name] = nil
+	local name = player:get_player_name()
+	if default.on_player_death[name] then
+		default.on_player_death[name]()
+		default.on_player_death[name] = nil
+	end
 end)
 
 default.get_on_player_death=function(name,event)
