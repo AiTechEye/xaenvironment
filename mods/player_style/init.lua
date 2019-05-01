@@ -120,7 +120,7 @@ minetest.register_globalstep(function(dtime)
 					player_style.player_diveing(name,player,true,key.sneak)
 				elseif key.aux1 then
 					a="run"
-					player_style.player_run(name,player,true,pos)
+					player_style.player_run(name,player,true)
 					local run = player_style.player_running[name]
 
 					if run and run.wallrun then
