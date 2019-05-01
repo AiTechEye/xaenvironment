@@ -92,6 +92,45 @@ local item = {
 setmetatable(item,builtin_item)
 minetest.register_entity(":__builtin:item",item)
 
+local builtin_falling_node = minetest.registered_entities["__builtin:falling_node"]
+node = {
+	set_node=function(self,node,meta)
+		builtin_falling_node.set_node(self,node,meta)
+		self.itemstring = node.name
+		local def = default.def(self.itemstring)
+		local s = def.sounds
+		self.damage = def.damage_per_second
+		self.damage = self.damage > 0 and self.damage or nil
+		self.sound = (s.dug and s.dug.name) or (s.dig and s.dig.name) or (s.footstep and s.footstep.name) or (s.place and s.place.name)
+	end,
+	on_activate=function(self,staticdata)
+		builtin_falling_node.on_activate(self,staticdata)
+	end,
+	on_step=function(self,dtime)
+		builtin_falling_node.on_step(self,dtime)
+		if self.damage then
+			local pos = self.object:get_pos()
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+				local en = ob:get_luaentity()
+				if not (en and en.itemstring) then
+					ob:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=self.damage}})
+					if ob:get_hp() > 0 then
+						self.object:remove()
+						if self.sound then
+							minetest.sound_play(self.sound, {pos=pos, gain = 1})
+						end
+						minetest.add_item(pos,self.itemstring)
+						return self
+					end
+				end
+			end
+		end
+	end
+}
+
+setmetatable(node,builtin_falling_node)
+minetest.register_entity(":__builtin:falling_node",node)
+
 minetest.register_entity("default:item",{
 	physical = false,
 	collisionbox = {0,0,0,0,0,0},

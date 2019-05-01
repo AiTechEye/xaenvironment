@@ -306,6 +306,21 @@ minetest.register_node("default:cobble", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("default:cobble_porous", {
+	description = "Porous cobble",
+	tiles={"default_cobble.png"},
+	groups = {stone=1,cracky=3,falling_node=1},
+	sounds = default.node_sound_stone_defaults(),
+	damage_per_second = 10,
+})
+
+minetest.register_node("default:bedrock", {
+	description = "Bedrock",
+	tiles={"default_cooledlava.png"},
+	groups = {cracky=1,level=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:mossycobble", {
 	description = "Mossy cobble",
 	tiles={"default_cobble.png^default_stonemoss.png"},
