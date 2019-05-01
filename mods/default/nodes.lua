@@ -740,7 +740,7 @@ minetest.register_node("default:lava_flowing", {
 minetest.register_node("default:oil_source", {
 	description = "Oil source",
 	tiles={"default_oil.png"},
-	groups = {oil=1, liquid=1,disable_jump=1},
+	groups = {oil=1, liquid=1,disable_jump=1,flammable=3,},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -753,8 +753,19 @@ minetest.register_node("default:oil_source", {
 	liquid_renewable = false,
 	liquid_alternative_flowing = "default:oil_flowing",
 	liquid_alternative_source = "default:oil_source",
-	liquid_viscosity = 30,
+	liquid_viscosity = 25,
 	post_effect_color = {a = 255, r = 0, g = 0, b = 0},
+	on_burn=function(pos)
+		default.def(minetest.get_node(pos).name).on_ignite(pos)
+	end,
+	on_ignite=function(pos)
+		minetest.set_node(pos,{name="fire:basic_flame"})
+		minetest.after(0,function(pos)
+			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:oil"})) do
+				default.def(minetest.get_node(p).name).on_ignite(p)
+			end
+		end,pos)
+	end
 })
 
 minetest.register_node("default:oil_flowing", {
@@ -771,7 +782,7 @@ minetest.register_node("default:oil_flowing", {
 	},
 
 	liquid_renewable = false,
-	groups = {oil=1,liquid=1,not_in_creative_inventory=1,disable_jump=1},
+	groups = {oil=1,liquid=1,not_in_creative_inventory=1,disable_jump=1,flammable=3,},
 	drawtype = "flowingliquid",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
@@ -784,9 +795,19 @@ minetest.register_node("default:oil_flowing", {
 	liquidtype = "flowing",
 	liquid_alternative_flowing = "default:oil_flowing",
 	liquid_alternative_source = "default:oil_source",
-	liquid_viscosity = 20,
 	post_effect_color = {a = 255, r = 0, g = 0, b = 0},
-	liquid_viscosity = 30,
+	liquid_viscosity = 25,
+	on_burn=function(pos)
+		default.def(minetest.get_node(pos).name).on_ignite(pos)
+	end,
+	on_ignite=function(pos)
+		minetest.set_node(pos,{name="fire:basic_flame"})
+		minetest.after(0,function(pos)
+			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:oil"})) do
+				default.def(minetest.get_node(p).name).on_ignite(p)
+			end
+		end,pos)
+	end
 })
 
 

@@ -73,10 +73,6 @@ minetest.register_abm({
 	action=function(pos,node,active_object_count,active_object_count_wider)
 		for x=-1,1,1 do
 		for z=-1,1,1 do
-
-
-
-
 			if math.random(1,4) == 1 and minetest.get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "air" and minetest.get_item_group(minetest.get_node({x=pos.x+x,y=pos.y-1,z=pos.z+z}).name,"dirt") > 0 and minetest.get_meta(pos):get_int("placed") == 0 then
 				minetest.set_node({x=pos.x+x,y=pos.y,z=pos.z+z},{name="default:stick_on_ground"})
 			end

@@ -145,6 +145,7 @@ minetest.register_craftitem("default:paper", {
 default.registry_bycket("default:water_source")
 default.registry_bycket("default:lava_source")
 default.registry_bycket("default:salt_water_source")
+default.registry_bycket("default:oil_source")
 
 minetest.register_craftitem("default:bucket", {
 	description = "Bucket",
