@@ -13,7 +13,7 @@ minetest.register_ore({
 	clust_scarcity = 10 * 10 * 10,
 	clust_size = 5,
 	y_min= -31000,
-	y_max= -20,
+	y_max= 31000,
 })
 
 minetest.register_ore({
@@ -23,7 +23,7 @@ minetest.register_ore({
 	clust_scarcity = 10 * 10 * 10,
 	clust_size = 5,
 	y_min= -31000,
-	y_max= -20,
+	y_max= 31000,
 })
 
 minetest.register_ore({
@@ -53,7 +53,7 @@ minetest.register_ore({
 	clust_scarcity = 10 * 10 * 10,
 	clust_size = 5,
 	y_min= -31000,
-	y_max= 31000,
+	y_max= -20,
 })
 
 minetest.register_ore({
