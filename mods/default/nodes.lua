@@ -306,6 +306,18 @@ minetest.register_node("default:cobble", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("default:stone_hot", {
+	description = "Hot stone",
+	drop = "default:cobble",
+	tiles={"default_stone.png"},
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+	light_source=2,
+	after_destruct=function(pos)
+		minetest.set_node(pos,{name="default:lava_source"})
+	end
+})
+
 minetest.register_node("default:cobble_porous", {
 	description = "Porous cobble",
 	tiles={"default_cobble.png"},

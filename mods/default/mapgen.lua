@@ -46,6 +46,16 @@ minetest.register_ore({
 	y_max= 31000,
 })
 
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:stone_hot",
+	wherein= "default:stone",
+	clust_scarcity = 10 * 10 * 10,
+	clust_size = 5,
+	y_min= -31000,
+	y_max= 31000,
+})
+
 --||||||||||||||||
 -- ======================= biomes
 --||||||||||||||||
