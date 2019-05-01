@@ -129,7 +129,7 @@ lakes.registry_lake("lava",{
 	spawn_in = "default:stone",
 	chance = 10,
 	min_y = -31000,
-	max_y = -50,
+	max_y = -30,
 	radius = {5,30},
 	source = "default:lava_source",
 	underground = true,
