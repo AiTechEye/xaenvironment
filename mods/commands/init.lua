@@ -26,9 +26,12 @@ minetest.register_chatcommand("home", {
 		local player=minetest.get_player_by_name(name)
 		if player then
 			local meta = player:get_meta()
-			local pos = minetest.string_to_pos(meta:get_string("home"))
-			player:set_pos(pos)
-			minetest.chat_send_player(name, "Teleported to home")
+			local s = meta:get_string("home")
+			if s ~="" then
+				local pos = minetest.string_to_pos(s)
+				player:set_pos(pos)
+				minetest.chat_send_player(name, "Teleported to home")
+			end
 		end
 	end
 })
