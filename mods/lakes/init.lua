@@ -127,7 +127,7 @@ lakes.registry_lake("frech water lakes",{
 
 lakes.registry_lake("lava",{
 	spawn_in = "default:stone",
-	chance = 10,
+	chance = 5,
 	min_y = -31000,
 	max_y = -30,
 	radius = {5,30},
