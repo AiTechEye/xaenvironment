@@ -60,7 +60,7 @@ minetest.register_ore({
 	ore_type = "blob",
 	ore= "default:oil_source",
 	wherein= "default:stone",
-	clust_scarcity = 10 * 10 * 10,
+	clust_scarcity = 30 * 30 * 30,
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -10,
@@ -70,14 +70,11 @@ minetest.register_ore({
 	ore_type = "blob",
 	ore= "default:gas",
 	wherein= "default:stone",
-	clust_scarcity = 6 * 6 * 6,
+	clust_scarcity = 30 * 30 * 30,
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -10,
 })
-
-
-
 
 --||||||||||||||||
 -- ======================= biomes
