@@ -685,6 +685,7 @@ minetest.register_node("default:lava_source", {
 	liquid_alternative_flowing = "default:lava_flowing",
 	liquid_alternative_source = "default:lava_source",
 	liquid_viscosity = 20,
+	liquid_renewable = false,
 	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
 })
 
@@ -728,9 +729,65 @@ minetest.register_node("default:lava_flowing", {
 	liquid_alternative_flowing = "default:lava_flowing",
 	liquid_alternative_source = "default:lava_source",
 	liquid_viscosity = 20,
+	liquid_renewable = false,
 	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
 })
 
+--||||||||||||||||
+-- ======================= oil
+--||||||||||||||||
+
+minetest.register_node("default:oil_source", {
+	description = "Oil source",
+	tiles={"default_oil.png"},
+	groups = {oil=1, liquid=1,disable_jump=1},
+	drawtype = "liquid",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_renewable = false,
+	liquid_alternative_flowing = "default:oil_flowing",
+	liquid_alternative_source = "default:oil_source",
+	liquid_viscosity = 30,
+	post_effect_color = {a = 255, r = 0, g = 0, b = 0},
+})
+
+minetest.register_node("default:oil_flowing", {
+	description = "Oil flowing",
+	special_tiles={
+		{
+			name = "default_oil.png",
+			backface_culling = false,
+		},
+		{
+			name = "default_oil.png",
+			backface_culling = true,
+		}
+	},
+
+	liquid_renewable = false,
+	groups = {oil=1,liquid=1,not_in_creative_inventory=1,disable_jump=1},
+	drawtype = "flowingliquid",
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "default:oil_flowing",
+	liquid_alternative_source = "default:oil_source",
+	liquid_viscosity = 20,
+	post_effect_color = {a = 255, r = 0, g = 0, b = 0},
+	liquid_viscosity = 30,
+})
 
 
 --||||||||||||||||
