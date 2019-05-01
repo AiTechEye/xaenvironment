@@ -5,7 +5,7 @@ minetest.register_node("default:gas", {
 	drawtype="glasslike",
 	paramtype = "light",
 	pointable=false,
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	walkable=false,
 	post_effect_color = {a = 20, r = 213, g = 255, b = 0},
 	drowning = 1,
@@ -28,6 +28,7 @@ minetest.register_node("default:gas", {
 	on_ignite=function(pos)
 		minetest.set_node(pos,{name="fire:not_igniter"})
 		minetest.after(0.1,function(pos)
+			default.punch_pos(pos,10)
 			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"default:gas"})) do
 				default.def(minetest.get_node(p).name).on_ignite(p)
 			end
@@ -87,7 +88,7 @@ minetest.register_node("default:torch", {
 	mesh="default_torch.obj",
 	paramtype = "light",
 	paramtype2 = "facedir",
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	on_place=function(itemstack, placer, pointed_thing)
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"attached_node")>0 then
 			return itemstack
@@ -122,7 +123,7 @@ minetest.register_node("default:torch_floor", {
 	mesh="default_torch.obj",
 	paramtype = "light",
 	paramtype2 = "facedir",
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	walkable = false,
 	light_source = 10,
 	damage_per_second = 2,
@@ -148,7 +149,7 @@ minetest.register_node("default:torch_lean", {
 	mesh="default_torch_lean.obj",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	walkable = false,
 	light_source = 10,
 	damage_per_second = 2,
@@ -174,7 +175,7 @@ minetest.register_node("default:lightsource", {
 	floodable = true,
 	pointable=false,
 	paramtype = "light",
-	sunlight_propagetes = true,
+	sunlight_propagates = true,
 	walkable = false,
 	light_source = 10,
 	on_construct = function(pos)
@@ -801,6 +802,7 @@ minetest.register_node("default:oil_source", {
 	end,
 	on_ignite=function(pos)
 		minetest.set_node(pos,{name="fire:basic_flame"})
+		default.punch_pos(pos,10)
 		minetest.after(0,function(pos)
 			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:oil"})) do
 				default.def(minetest.get_node(p).name).on_ignite(p)
@@ -843,6 +845,7 @@ minetest.register_node("default:oil_flowing", {
 	end,
 	on_ignite=function(pos)
 		minetest.set_node(pos,{name="fire:basic_flame"})
+		default.punch_pos(pos,10)
 		minetest.after(0,function(pos)
 			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"group:oil"})) do
 				default.def(minetest.get_node(p).name).on_ignite(p)

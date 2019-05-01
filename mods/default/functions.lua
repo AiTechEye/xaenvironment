@@ -596,3 +596,16 @@ default.wieldlight=function(name,i,item)
 		end
 	end
 end
+
+default.punch_pos=function(pos,damage,even_items)
+	for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+		local en = ob:get_luaentity()
+		if even_items or not (en and en.itemstring) then
+			default.punch(ob,ob,damage)
+		end
+	end
+end
+
+default.punch=function(target,puncher,damage)
+	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
+end

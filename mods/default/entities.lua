@@ -123,7 +123,7 @@ node = {
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
 				local en = ob:get_luaentity()
 				if not (en and en.itemstring) then
-					ob:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=self.damage}})
+					default.punch(ob,self.object,self.damage)
 					if ob:get_hp() > 0 then
 						self.object:remove()
 						if self.sound then
