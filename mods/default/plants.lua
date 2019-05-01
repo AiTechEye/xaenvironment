@@ -349,9 +349,9 @@ default.register_tree=function(def)
 			texture=def.wood.tiles[1],
 			burnable = true,
 			craft={
-				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
-				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
-				{mod .. def.name .. "_tree",mod .. def.name .. "_tree",""},
+				{mod .. def.name .. "_wood",mod .. def.name .. "_wood",""},
+				{mod .. def.name .. "_wood",mod .. def.name .. "_wood",""},
+				{mod .. def.name .. "_wood",mod .. def.name .. "_wood",""},
 			}
 		})
 	end
@@ -361,7 +361,7 @@ default.register_tree=function(def)
 			description = def.name .. " wood chair",
 			burnable = true,
 			texture =def.wood.tiles[1],
-			craft={{"group:stick","",""},{mod .. def.name .. "_tree","",""},{"group:stick","",""}}
+			craft={{"group:stick","",""},{mod .. def.name .. "_wood","",""},{"group:stick","",""}}
 		})
 	end
 	if def.fence then
@@ -370,7 +370,7 @@ default.register_tree=function(def)
 			texture =def.wood.tiles[1],
 			craft={
 				{"group:stick","group:stick","group:stick"},
-				{"group:stick",mod .. def.name .. "_tree","group:stick"}
+				{"group:stick",mod .. def.name .. "_wood","group:stick"}
 			}
 		})
 	end
