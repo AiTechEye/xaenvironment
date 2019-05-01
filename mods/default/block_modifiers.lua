@@ -1,3 +1,33 @@
+minetest.register_on_dignode(function(pos, oldnode, digger)
+	if digger and digger:get_wielded_item():get_name() == "default:quantum_pick" then
+		local inv = digger:get_inventory()
+		if inv:room_for_item("main",oldnode.name) then
+			local name = digger:get_player_name()
+			local n = 0
+			local r = math.random(1,10)
+			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 10),vector.add(pos,10),{oldnode.name})) do
+				if not minetest.is_protected(p,name) then
+					inv:add_item("main",minetest.get_node_drops(minetest.get_node(p).name)[1])
+					minetest.remove_node(p)
+					minetest.check_for_falling(p)
+					n = n + 1
+					if n > 9+r then
+						break
+					end
+				end
+			end
+		end
+	end
+	if minetest.find_node_near(pos,1,"group:on_update") then
+		for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"group:on_update"})) do
+			local def=default.def(minetest.get_node(p).name)
+			if def.on_update then
+				def.on_update(p)
+			end
+		end
+	end
+end)
+
 minetest.register_abm({
 	nodenames={"group:igniter"},
 	neighbors={"group:cools_lava"},

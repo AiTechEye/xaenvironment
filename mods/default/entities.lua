@@ -102,6 +102,16 @@ node = {
 		self.damage = def.damage_per_second
 		self.damage = self.damage > 0 and self.damage or nil
 		self.sound = (s.dug and s.dug.name) or (s.dig and s.dig.name) or (s.footstep and s.footstep.name) or (s.place and s.place.name)
+
+		local pos = self.object:get_pos()
+		if minetest.find_node_near(pos,1,"group:on_update") then
+			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"group:on_update"})) do
+				local def=default.def(minetest.get_node(p).name)
+				if def.on_update then
+					def.on_update(p)
+				end
+			end
+		end
 	end,
 	on_activate=function(self,staticdata)
 		builtin_falling_node.on_activate(self,staticdata)

@@ -1,29 +1,38 @@
-default.register_pebble({
-	name="stone",
-	decoration={seed=543}
-})
-
-default.register_pebble({
-	name="desert_stone",
-	tiles={"default_desertstone.png"},
-	decoration={
-		seed=532,
-		place_on={"default:desert_stone","default:desert_sand"},
-	}	
-})
-
-minetest.register_node("default:obsidian", {
-	description = "Obsidian",
-	tiles={"default_obsidian.png"},
-	groups = {cracky=1,level=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("default:cooledlava", {
-	description = "Cooled lava",
-	tiles={"default_cooledlava.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_stone_defaults(),
+minetest.register_node("default:gas", {
+	description = "Gas",
+	tiles={"default_gas.png"},
+	groups = {stick=gas,flammable=2,on_update=1},
+	drawtype="glasslike",
+	paramtype = "light",
+	pointable=false,
+	sunlight_propagetes = true,
+	walkable=false,
+	post_effect_color = {a = 20, r = 213, g = 255, b = 0},
+	drowning = 1,
+	buildable_to = true,
+	alpha=10,
+	drop = "",
+	on_update = function(pos)
+		minetest.after(0.1,function(pos)
+			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"air"})) do
+				if p.y <= 0 then
+					minetest.set_node(p,{name="default:gas"})
+					default.def("default:gas").on_update(p)
+				end
+			end
+		end,pos)
+	end,
+	on_burn=function(pos)
+		default.def(minetest.get_node(pos).name).on_ignite(pos)
+	end,
+	on_ignite=function(pos)
+		minetest.set_node(pos,{name="fire:not_igniter"})
+		minetest.after(0.1,function(pos)
+			for _,p in pairs(minetest.find_nodes_in_area(vector.add(pos,1),vector.subtract(pos,1),{"default:gas"})) do
+				default.def(minetest.get_node(p).name).on_ignite(p)
+			end
+		end,pos)
+	end
 })
 
 minetest.register_node("default:ladder", {
@@ -175,6 +184,9 @@ minetest.register_node("default:lightsource", {
 		minetest.remove_node(pos)
 	end
 })
+--||||||||||||||||
+-- ======================= glass
+--||||||||||||||||
 
 minetest.register_node("default:tankstorage", {
 	description = "Tankstorage",
@@ -217,6 +229,7 @@ minetest.register_node("default:glass", {
 --||||||||||||||||
 -- ======================= grass
 --||||||||||||||||
+
 minetest.register_node("default:dirt_with_red_permafrost_grass", {
 	description = "Dirt with red permafrost  grass",
 	drop="default:permafrost_dirt",
@@ -290,6 +303,34 @@ minetest.register_node("default:dirt", {
 --||||||||||||||||
 -- ======================= Stone
 --||||||||||||||||
+
+default.register_pebble({
+	name="stone",
+	decoration={seed=543}
+})
+
+default.register_pebble({
+	name="desert_stone",
+	tiles={"default_desertstone.png"},
+	decoration={
+		seed=532,
+		place_on={"default:desert_stone","default:desert_sand"},
+	}	
+})
+
+minetest.register_node("default:obsidian", {
+	description = "Obsidian",
+	tiles={"default_obsidian.png"},
+	groups = {cracky=1,level=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("default:cooledlava", {
+	description = "Cooled lava",
+	tiles={"default_cooledlava.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+})
 
 minetest.register_node("default:stone", {
 	description = "Stone",
