@@ -56,24 +56,3 @@ minetest.override_item("default:coalblock",{
 		nitroglycerin.explode(pos,{radius=2,set="air"})
 	end
 })
-
-minetest.override_item("default:oil_source",{
-	on_burn=function(pos)
-		minetest.remove_node(pos)
-		nitroglycerin.explode(pos,{radius=4,set="air"})
-	end,
-	on_ignite=function(pos)
-		minetest.remove_node(pos)
-		nitroglycerin.explode(pos,{radius=4,set="air"})
-	end
-})
-minetest.override_item("default:oil_flowing",{
-	on_burn=function(pos)
-		minetest.remove_node(pos)
-		nitroglycerin.explode(pos,{radius=4,set="air"})
-	end,
-	on_ignite=function(pos)
-		minetest.remove_node(pos)
-		nitroglycerin.explode(pos,{radius=4,set="air"})
-	end
-})
