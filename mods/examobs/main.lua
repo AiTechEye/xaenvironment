@@ -1,12 +1,17 @@
 examobs={}
 
 examobs.main=function(self, dtime)
-	self.timer = self.timer + dtime
-	if self.timer < self.time then return end
-	self.timer = 0
+	self.timer1 = self.timer1 + dtime
+	self.timer2 = self.timer2 + dtime
+	if self.timer1 > 0.1 then
+		self.environment_timer = self.environment_timer + self.timer1
+		self.timer1 = 0
+		if self.environment_timer > 0.2 and examobs.environment(self) or self.step(self,dtime) then return end
+	end
+	if self.timer2 < 1 then return end
+	self.timer2 = 0
 
-	if self.step(self,dtime) then return end
-	if examobs.environment(self) then return end
+	if examobs.following(self) then return end
 	if examobs.fighting(self) then return end
 	if examobs.exploring(self) then return end
 end
@@ -32,13 +37,13 @@ examobs.register_mob=function(def)
 	def.reach =			def.reach or			4
 	def.dmg =			def.dmg or			1
 	def.bottom =			def.bottom or			0
-	def.breathing =			def.breathing or			""
+	def.breathing =			def.breathing or			1
 	def.resist_node =			def.resist_node
 	def.swiming =			def.swiming or			1
 
-
-	def.timer = 0
-	def.time = 0.5
+	def.timer1 = 0
+	def.timer2 = 0
+	def.environment_timer = 0
 	def.examob = 0
 
 	def.animation =			def.animation or			{
@@ -72,8 +77,11 @@ examobs.register_mob=function(def)
 		self.object:set_acceleration({x=0,y=-10,z =0})
 	end
 	def.on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		self.fight = puncher
-		examobs.lookat(self,self.fight)
+		local en = puncher:get_luaentity()
+		if not (en and en.examobs == self.examobs) then
+			self.fight = puncher
+			examobs.lookat(self,self.fight)
+		end
 	end
 	def.get_staticdata = function(self)
 		return minetest.serialize(self.storage)

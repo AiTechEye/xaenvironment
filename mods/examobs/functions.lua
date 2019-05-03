@@ -15,10 +15,13 @@ examobs.jump=function(self)
 end
 
 examobs.environment=function(self)
+	self.environment_timer = 0
 	local pos = self:pos()
 	pos = apos(pos,nil,self.bottom)
+	local def = examobs.defpos(pos)
+
 --jumping
-	if walkable(pos) then
+	if def.walkable then
 		if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
 			examobs.punch(self.object,self.object,1)
 		else
@@ -28,7 +31,21 @@ examobs.environment=function(self)
 		examobs.jump(self)
 	end
 --liquid
-	local def = examobs.defpos(apos(pos,0,0))
+
+	if self.breathing then
+		if (def.drowning or 0) > 0 then
+			self.breath = (self.breath or 20) -0.2
+			if self.breath <= 0 then
+				self.breath = 0
+				examobs.punch(self.object,self.object,1)
+			end
+		else
+			self.breath = 20
+		end	
+	end
+	if (def.damage_per_second or 0) > 0 and def.name ~= self.resist_node then
+		examobs.punch(self.object,self.object,def.damage_per_second)
+	end
 
 	if def.liquid_viscosity > 0 then
 		self.in_liquid = true
@@ -75,23 +92,6 @@ examobs.environment=function(self)
 		self.in_liquid = nil
 		self.object:set_acceleration({x =0, y = -10, z =0})
 	end
-
-	if type(self.breathing) == "number" then
-		if (def.drowning or 0) > 0 then
-			self.breathing = self.breathing -0.5
-			if self.breathing <= 0 then
-				self.breathing = 0
-				examobs.punch(self.object,self.object,1)
-			end
-		else
-			self.breathing = 20
-		end	
-	end
-	if (def.damage_per_second or 0) > 0 and def.name ~= self.resist_node then
-		examobs.punch(self.object,self.object,def.damage_per_second)
-	end
-
-
 end
 
 examobs.defpos=function(pos)
@@ -102,8 +102,22 @@ examobs.def=function(name)
 	return minetest.registered_items[name] or {}
 end
 
+examobs.following=function(self)
+	if self.folow and examobs.visiable(self,self.folow) then
+		local d = examobs.distance(self,self.folow)
+		if d > self.reach then
+			examobs.lookat(self,self.fight)
+			examobs.walk(self)
+		elseif d > self.range/2 then
+			examobs.lookat(self,self.fight)
+			examobs.walk(self,2,true)
+		end
+	end
+end
+
 examobs.exploring=function(self)
 	if examobs.find_objects(self) then return end
+
 	local r = math.random(1,10)
 	if r <= 5 and self.walking then		-- keep walk
 		examobs.walk(self)
@@ -221,9 +235,17 @@ examobs.find_objects=function(self)
 	if self.fight then return end
 	local obs = {}
 	for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), self.range)) do
-		local team = examobs.team(ob)
-		if team ~= "" and team ~= self.team and examobs.viewfield(self,ob) then
-			table.insert(obs,ob)
+		if examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
+			local team = examobs.team(ob)
+			if examobs.known(self,ob,"fight",true) then
+				self.fight = ob
+				return
+			elseif examobs.known(self,ob,"folow",true) then
+				self.folow = ob
+				return
+			elseif team ~= "" and team ~= self.team  then
+				table.insert(obs,ob)
+			end
 		end
 	end
 	if #obs > 0 then
