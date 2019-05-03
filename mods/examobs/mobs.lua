@@ -22,6 +22,7 @@ examobs.register_mob({
 	type = "animal",
 	team = "stone",
 	dmg = 4,
+	swiming = 0,
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},

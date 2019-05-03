@@ -6,6 +6,7 @@ examobs.main=function(self, dtime)
 	self.timer = 0
 
 	if self.step(self,dtime) then return end
+	if examobs.environment(self) then return end
 	if examobs.fighting(self) then return end
 	if examobs.exploring(self) then return end
 end
@@ -30,10 +31,15 @@ examobs.register_mob=function(def)
 	def.range =			def.range or			10
 	def.reach =			def.reach or			4
 	def.dmg =			def.dmg or			1
+	def.bottom =			def.bottom or			0
+	def.breathing =			def.breathing or			""
+	def.resist_node =			def.resist_node
+	def.swiming =			def.swiming or			1
+
 
 	def.timer = 0
 	def.time = 0.5
-
+	def.examob = 0
 
 	def.animation =			def.animation or			{
 										stand={x=1,y=39,speed=30},
@@ -45,8 +51,13 @@ examobs.register_mob=function(def)
 	if def.animation.walk then
 		def.animation.run = def.animation.run or {x=def.animation.walk.x,y=def.animation.walk.y,speed = 60}
 	end
+
 	for i, a in pairs(def.animation) do
 		def.animation[i].speed = def.animation[i].speed or 30
+	end
+
+	def.pos=function(self)
+		return self.object:get_pos()
 	end
 
 	def.on_rightclick=function(self, clicker,name)
@@ -56,8 +67,7 @@ examobs.register_mob=function(def)
 	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
-		self.exploring = {}
-		self.move={x=0,y=0,z=0,jump=0,speed=1}
+		self.examob = math.random(1,9999)
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})
 	end

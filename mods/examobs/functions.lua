@@ -1,50 +1,161 @@
-examobs.exploring=function(self)
-	if self.exploring then
-		if examobs.find_objects(self) then return end
-		local r = math.random(1,10)
-		if r <= 5 and self.exploring.walking then		-- keep walk
-			examobs.walk(self)
-		elseif r <= 2 then					-- rnd walk
-			self.object:set_yaw(math.random(0,6.28))
-			self.exploring.walking = true
-			examobs.walk(self)
-		elseif r == 3 then					-- rnd look
-			self.exploring.walking = nil
-			examobs.stand(self)
-			self.object:set_yaw(math.random(0,6.28))
-		else						-- stand
-			self.exploring.walking = nil
-			examobs.stand(self)
+apos=function(pos,x,y,z)
+	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
+end
+
+walkable=function(pos)
+	local n = minetest.get_node(pos).name
+	return (n ~= "air" and false) or examobs.def(n).walkable
+end
+
+examobs.jump=function(self)
+	local v = self.object:get_velocity()
+	if v.y == 0 then
+		self.object:set_velocity({x=v.x, y=5.5, z=v.z})
+	end
+end
+
+examobs.environment=function(self)
+	local pos = self:pos()
+	pos = apos(pos,nil,self.bottom)
+--jumping
+	if walkable(pos) then
+		if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
+			examobs.punch(self.object,self.object,1)
+		else
+			examobs.jump(self)
 		end
+	elseif walkable(examobs.pointat(self)) then
+		examobs.jump(self)
+	end
+--liquid
+	local def = examobs.defpos(apos(pos,0,0))
+
+	if def.liquid_viscosity > 0 then
+		self.in_liquid = true
+		local s=1
+		local v=self.object:get_velocity()
+		if self.dying or self.dead then s=-1 end
+
+		if self.swiming < 1 and s == 1 then
+			s = -1
+			examobs.stand(self)
+			examobs.punch(self.object,self.object,1)
+			examobs.anim(self,"run")
+			if math.random(1,2) == 1 then
+				self.object:set_yaw(math.random(0,6.28))
+			end
+
+			if v.y < 0 then
+				self.object:set_acceleration({x =0, y=20, z =0})
+				self.object:set_velocity({x =0, y=v.y/2, z =0})
+			elseif v.y > 0 then
+				self.object:set_velocity({x =0, y=0, z =0})
+				self.object:set_acceleration({x =0, y=0, z =0})
+			end
+			return true
+		end
+
+		self.object:set_acceleration({x =0, y =0.1*s, z =0})
+		
+		if v.y<-0.1 then
+			self.object:set_velocity({x = v.x, y =v.y/2, z =v.z})
+			return self
+		end
+		self.object:set_velocity({x = v.x, y =1*s - (def.liquid_viscosity*0.1), z = v.z})
+		return self
+	elseif self.in_liquid and (examobs.defpos(apos(pos,0,-1)).liquid_viscosity or 0) > 0 then
+		local v=self.object:get_velocity()
+		self.object:set_acceleration({x=0, y=0, z=0})
+		self.object:set_velocity({x=v.x, y=0, z=v.z})
+		if walkable(apos(examobs.pointat(self),0,-1)) then
+			examobs.jump(self)
+			self.object:set_acceleration({x=0, y=-10, z=0})
+		end
+	elseif self.in_liquid then
+		self.in_liquid = nil
+		self.object:set_acceleration({x =0, y = -10, z =0})
+	end
+
+	if type(self.breathing) == "number" then
+		if (def.drowning or 0) > 0 then
+			self.breathing = self.breathing -0.5
+			if self.breathing <= 0 then
+				self.breathing = 0
+				examobs.punch(self.object,self.object,1)
+			end
+		else
+			self.breathing = 20
+		end	
+	end
+	if (def.damage_per_second or 0) > 0 and def.name ~= self.resist_node then
+		examobs.punch(self.object,self.object,def.damage_per_second)
+	end
+
+
+end
+
+examobs.defpos=function(pos)
+	return minetest.registered_items[minetest.get_node(pos).name] or {}
+end
+
+examobs.def=function(name)
+	return minetest.registered_items[name] or {}
+end
+
+examobs.exploring=function(self)
+	if examobs.find_objects(self) then return end
+	local r = math.random(1,10)
+	if r <= 5 and self.walking then		-- keep walk
+		examobs.walk(self)
+	elseif r <= 2 then					-- rnd walk
+		self.object:set_yaw(math.random(0,6.28))
+		self.walking = true
+		examobs.walk(self)
+	elseif r == 3 then					-- rnd look
+		self.walking = nil
+		examobs.stand(self)
+		self.object:set_yaw(math.random(0,6.28))
+	else						-- stand
+		self.walking = nil
+		examobs.stand(self)
 	end
 end
 
 examobs.fighting=function(self)
-	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self,self.fight) then
+	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self,self.fight) and examobs.viewfield(self,self.fight) then
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
 			if math.random(1,2) == 1 then
-				examobs.punch(self.fight,self.object,self.dmg)
+				if self.fight:get_pos().y > self:pos().y then
+					examobs.jump(self)
+				end
+				examobs.punch(self.object,self.fight,self.dmg)
 				examobs.anim(self,"attack")
 				if examobs.gethp(self.fight) < 1 then
 					self.fight = nil
 				end
 			end
-			return true
 		else
 			examobs.lookat(self,self.fight)
 			examobs.walk(self,2,true)
-			return true
 		end
-	elseif self.fight then
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
+			local en = ob:get_luaentity()
+			if en and en.examob and not en.fight and en.team == self.team and en.examob ~= self.examob and examobs.visiable(self,ob) then
+				en.fight = self.fight
+				examobs.lookat(en,en.fight)
+			end
+		end
+		return true
+	else
 		self.fight = nil
+		examobs.stand(self)
 	end
 end
 
 examobs.stand=function(self)
-	self.move.x=0
-	self.move.z=0
 	self.object:set_velocity({
 		x = 0,
 		y = self.object:get_velocity().y,
@@ -61,14 +172,11 @@ examobs.walk=function(self,run)
 	local x =math.sin(yaw) * -1
 	local z =math.cos(yaw) * 1
 	local y=self.object:get_velocity().y
-	local s=(self.move.speed+1)*run
-	self.move.x=x*run
-	self.move.z=z*run
 
 	self.object:set_velocity({
-		x = x*s,
+		x = x*run,
 		y = y,
-		z = z*s
+		z = z*run
 	})
 
 	if run == 1 then
@@ -140,9 +248,9 @@ examobs.known=function(self,ob,type,get)
 end
 
 examobs.visiable=function(pos1,pos2)
-	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
 	pos1 = type(pos1) == "userdata" and pos1:get_pos() or pos1.object and pos1.object:get_pos() or pos1
-		
+	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2	
+
 	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
 	v.y=v.y-1
 	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5
@@ -151,7 +259,7 @@ examobs.visiable=function(pos1,pos2)
 	v.y = (v.y  / amount)*-1
 	v.z = (v.z  / amount)*-1
 	for i=1,d,1 do
-		local node=minetest.registered_nodes[minetest.get_node({x=pos1.x+(v.x*i),y=pos1.y+(v.y*i),z=pos1.z+(v.z*i)}).name]
+		local node = minetest.registered_nodes[minetest.get_node({x=pos1.x+(v.x*i),y=pos1.y+(v.y*i),z=pos1.z+(v.z*i)}).name]
 		if node and node.walkable then
 			return false
 		end
@@ -160,11 +268,11 @@ examobs.visiable=function(pos1,pos2)
 end
 
 examobs.gethp=function(ob,even_dead)
-	if not ob then
+	if not (ob and ob:get_pos()) then
 		return 0
 	end
 	local en = ob:get_luaentity()
-	return en and (even_dead and en.dead and 0 or en.hp or en.health) or ob:get_hp() or 0
+	return en and ((even_dead and en.dead and 0) or en.hp or en.health) or ob:get_hp() or 0
 end
 
 examobs.viewfield=function(self,ob)
@@ -189,6 +297,6 @@ examobs.distance=function(pos1,pos2)
 	return vector.distance(pos1,pos2)
 end
 
-examobs.punch=function(target,puncher,damage)
+examobs.punch=function(puncher,target,damage)
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
 end
