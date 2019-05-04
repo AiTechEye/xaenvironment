@@ -45,7 +45,7 @@ minetest.register_node("fire:basic_flame", {
 minetest.register_node("fire:not_igniter", {
 	description = "Fire (not igniter)",
 	tiles={"fire_basic_flame.png"},
-	groups = {fire=1,dig_immediate=3,igniter=1,not_in_craftguide=},
+	groups = {fire=1,dig_immediate=3,igniter=1,not_in_craftguide=1},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
@@ -72,7 +72,7 @@ minetest.register_node("fire:not_igniter", {
 minetest.register_node("fire:permanent_flame", {
 	description = "Permanent fire",
 	tiles={"fire_basic_flame.png"},
-	groups = {dig_immediate=3,igniter=2,not_in_craftguide=},
+	groups = {dig_immediate=3,igniter=2,not_in_craftguide=1},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
