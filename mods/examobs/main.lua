@@ -3,13 +3,14 @@ examobs={}
 examobs.main=function(self, dtime)
 	self.timer1 = self.timer1 + dtime
 	self.timer2 = self.timer2 + dtime
+	self.lifetimer = self.lifetimer - dtime
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
 		self.environment_timer2 = self.environment_timer2 + self.timer1
 		self.timer1 = 0
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
-	if self.timer2 < 1 then return end
+	if self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 
 	if (self.dying or self.dead) and examobs.dying(self) then return end
@@ -50,6 +51,14 @@ examobs.register_mob=function(def)
 	def.inv = 				def.inv or				{}
 	def.aggressivity =			def.aggressivity or			2
 	def.floating =			def.floating or			{}
+	def.updatetime =			def.updatetime or			1
+	def.spawn_chance =		def.spawn_chance or		50
+	def.spawn_on =			def.spawn_on or			{"group:spreading_dirt_type","group:sand","default:snow"}
+	def.spawn_in =			def.spawn_in or			"air"
+	def.light_min =			def.light_min or			9
+	def.light_max =			def.light_max or			13
+	def.lifetime =			def.lifetime or			120
+
 
 	def.animation =			def.animation or			{
 		stand={x=1,y=39,speed=30},
@@ -76,8 +85,16 @@ examobs.register_mob=function(def)
 	def.timer2 = 0
 	def.environment_timer = 0
 	def.environment_timer2 = 0
+	def.lifetimer = def.lifetime
 	def.examob = 0
-
+	def.heal=function(self,hp,gaps,num)
+		num = num or 1
+		gaps = gaps or 1
+		self.hp = self.hp + ((hp * gaps) * num )
+		self.hp = (self.hp < self.hp_max and self.hp) or self.hp_max
+		self.object:set_hp(self.hp)
+		examobs.showtext(self,self.hp .. "/" .. self.hp_max,"00ff00")
+	end
 	def.pos=function(self)
 		return self.object:get_pos()
 	end
@@ -89,15 +106,21 @@ examobs.register_mob=function(def)
 		self.on_click(self)
 	end
 	def.get_staticdata = function(self)
-		self.storage.health = {dead=self.dead, dying=self.dying, hp=self.hp}
+		self.storage.dead=self.dead
+		self.storage.dying=self.dying
+		self.storage.hp=self.hp
+		self.storage.lifetimer=self.lifetimer
 		return minetest.serialize(self.storage)
 	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
 		self.examob = math.random(1,9999)
-		self.dead = self.storage.health and self.storage.health.dead or nil
-		self.dying = self.storage.health and self.storage.health.dying or nil
-		self.hp = self.storage.health and self.storage.health.hp or def.hp
+
+		self.dead = self.storage.dead or nil
+		self.dying = self.storage.dying or nil
+		self.hp = self.storage.hp or def.hp
+		self.lifetimer = self.storage.lifetimer or def.lifetimer
+
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})
 
@@ -140,12 +163,13 @@ examobs.register_mob=function(def)
 	end
 	def.on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local en = puncher:get_luaentity()
-		local punched_by
 		local dmg = 0
-		if not (en and en.examobs == self.examobs) then
+		if not (en and en.examob == self.examob) then
 			self.fight = puncher
 			examobs.lookat(self,self.fight)
-			punched_by = puncher
+			if not examobs.known(self,puncher,"flee",true) then
+				examobs.known(self,puncher,"fight")
+			end
 			self.on_punched(self,pos,puncher)
 		end
 
@@ -164,6 +188,7 @@ examobs.register_mob=function(def)
 				self.object:set_velocity({x = 0,y = self.object:get_velocity().y,z = 0})
 			end
 		end, self,v,r)
+
 		self:hurt(dmg)
 		return self
 	end
@@ -173,7 +198,7 @@ examobs.register_mob=function(def)
 	if def.visual == "mesh" then
 		minetest.register_node(name .."_spawner", {
 			description = def.name .." spawner",
-			wield_scale={x=0.2,y=0.2,z=0.2},
+			wield_scale={x=0.1,y=0.1,z=0.1},
 			tiles = def.textures,
 			drawtype="mesh",
 			mesh=def.mesh,
@@ -202,30 +227,23 @@ examobs.register_mob=function(def)
 			end
 		})
 	end
---[[
-minetest.register_abm({
-	nodenames = def.spawn_on or {"group:spreading_dirt_type","group:sand","default:snow"},
-	interval = def.spawn_interval or 30,
-	chance = def.spawn_chance,
-	action = function(pos)
-		if aliveai.systemfreeze==1 then
-			return
-		end
-		local pos1={x=pos.x,y=pos.y+1,z=pos.z}
-		local pos2={x=pos.x,y=pos.y+2,z=pos.z}
-		local l=minetest.get_node_light(pos1)
-		if l==nil then return true end
-		if aliveai.random(1,def.spawn_chance)==1
-		and (def.light==0 
-		or (def.light>0 and l>=def.lowest_light) 
-		or (def.light<0 and l<=def.lowest_light)) then
-			if aliveai.check_spawn_space==false or def.check_spawn_space==0 or ((minetest.get_node(pos1).name==def.spawn_in and minetest.get_node(pos2).name==def.spawn_in) or minetest.get_item_group(minetest.get_node(pos1).name,def.spawn_in)>0) then
-				aliveai.newbot=true
-				pos1.y=pos1.y+def.spawn_y
-				minetest.add_entity(pos1, def.mod_name ..":" .. def.name):set_yaw(math.random(0,6.28))
+
+	minetest.register_abm({
+		nodenames = def.spawn_on,
+		interval = def.spawn_interval or 30,
+		chance = def.spawn_chance,
+		action = function(pos)
+			local pos1 = apos(pos,0,1)
+			local pos2 = apos(pos,0,2)
+			local l=minetest.get_node_light(pos1)
+			if l==nil then return true end
+			local n1 = minetest.get_node(pos1).name
+			local n2 = minetest.get_node(pos2).name
+			if math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
+				if n1==def.spawn_in and n2==def.spawn_in or minetest.get_item_group(n1,def.spawn_in) > 0 then
+					minetest.add_entity(apos(pos1,0,def.spawn_y), name):set_yaw(math.random(0,6.28))
+				end
 			end
 		end
-	end,
-})
---]]
+	})
 end

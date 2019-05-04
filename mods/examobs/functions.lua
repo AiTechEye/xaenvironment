@@ -16,6 +16,14 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
+
+	if self.flee or self.fight or self.folow then
+		self.lifetimer = self.lifetime
+	elseif self.lifetimer < 0 then
+		self.object:remove()
+		return self
+	end
+
 	local pos = self:pos()
 	local posf = examobs.pointat(self)
 	pos = apos(pos,nil,self.bottom)
@@ -25,14 +33,13 @@ examobs.environment=function(self)
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
-
 		if def.walkable and v.x+v.z > 0 then
 			if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
 				self:hurt(1)
 			else
 				examobs.jump(self)
 			end
-		elseif v.x+v.z > 0 and deff.walkable or (self.fight and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
+		elseif v.x+v.z > 0 and deff.walkable or (self.fight and examobs.gethp(self.fight) > 0 and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
 			examobs.jump(self)
 		elseif (deff.damage_per_second or 0) > 0 then
 			examobs.stand(self)
@@ -231,6 +238,15 @@ examobs.fighting=function(self)
 				if self.fight:get_pos().y > self:pos().y then
 					examobs.jump(self)
 				end
+
+				local en = self.fight:get_luaentity()
+				if en and en.itemstring then
+					local s = string.split(en.itemstring," ")
+					if minetest.get_item_group(s[1],"eatable") then
+						self:heal(minetest.get_item_group(s[1],"eatable"),minetest.get_item_group(s[1],"gaps"),tonumber(s[2]))
+						examobs.stand(self)
+					end
+				end
 				examobs.punch(self.object,self.fight,self.dmg)
 				examobs.anim(self,"attack")
 				if examobs.gethp(self.fight) < 1 then
@@ -287,6 +303,7 @@ examobs.walk=function(self,run)
 	if self.is_floating and examobs.fly(self,run) then return end
 	local pos=self:pos()
 	local yaw=examobs.num(self.object:get_yaw())
+	local runing = run
 	run = run and self.run_speed or self.walk_speed
 	local x = math.sin(yaw) * -1
 	local z = math.cos(yaw) * 1
@@ -297,10 +314,10 @@ examobs.walk=function(self,run)
 		z = z*run
 	})
 
-	if run == 1 then
-		examobs.anim(self,"walk")
-	else
+	if runing then
 		examobs.anim(self,"run")
+	else
+		examobs.anim(self,"walk")
 	end
 	return self
 end
@@ -340,12 +357,14 @@ examobs.find_objects=function(self)
 	local flee = self.aggressivity == -2
 	local fight = self.aggressivity == 2
 	local obs = {}
+	local hungry = self.hp < self.hp_max
 	for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), self.range)) do
 		local en = ob:get_luaentity()
-		if not (en and en.examobs == self.examobs) and examobs.visiable(self.object,ob) then
-			local infield = examobs.viewfield(self,ob) 
+		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
+			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
-			if infield and ((self.aggressivity > 0 and self.hp < self.hp_max) or examobs.known(self,ob,"fight",true)) then
+
+			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and (en and en.type == "animal")) or examobs.known(self,ob,"fight",true)) then
 				self.fight = ob
 				return
 			elseif flee or examobs.known(self,ob,"flee",true) then
@@ -354,8 +373,13 @@ examobs.find_objects=function(self)
 			elseif examobs.known(self,ob,"folow",true) then
 				self.folow = ob
 				return
-			elseif infield and fight and team ~= "" and team ~= self.team  then
+			elseif infield and (fight or (en and en.type == "monster")) and team ~= self.team then
 				table.insert(obs,ob)
+			end
+		elseif hungry and en and en.itemstring and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
+			if minetest.get_item_group(string.split(en.itemstring," ")[1],"eatable") > 0 then
+				self.fight = ob
+				return
 			end
 		end
 	end
@@ -369,7 +393,6 @@ end
 examobs.known=function(self,ob,type,get)
 	if not ob then return end
 	self.storage.known = self.storage.known or {}
-
 	local en = ob:get_luaentity()
 	local name = (en and (en.examobs or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
 
@@ -403,9 +426,11 @@ end
 examobs.gethp=function(ob,even_dead)
 	if not (ob and ob:get_pos()) then
 		return 0
+	elseif ob:is_player() then
+		return ob:get_hp()
 	end
 	local en = ob:get_luaentity()
-	return en and ((even_dead and en.dead and 0) or en.hp or en.health) or ob:get_hp() or 0
+	return en and ((even_dead and en.examob and en.dead and en.hp) or (en.examob and en.dead and 0) or en.hp or en.health) or ob:get_hp() or 0
 end
 
 examobs.viewfield=function(self,ob)
