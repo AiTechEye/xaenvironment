@@ -198,6 +198,7 @@ examobs.register_mob=function(def)
 	if def.visual == "mesh" then
 		minetest.register_node(name .."_spawner", {
 			description = def.name .." spawner",
+			groups={not_in_craftguide=1},
 			wield_scale={x=0.1,y=0.1,z=0.1},
 			tiles = def.textures,
 			drawtype="mesh",
@@ -216,6 +217,7 @@ examobs.register_mob=function(def)
 	else
 		minetest.register_craftitem(name .."_spawner", {
 			description = def.name .." spawner",
+			groups={not_in_craftguide=1},
 			inventory_image = def.textures[1] .. "^examobs_alpha_egg.png^[makealpha:0,255,0",
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
