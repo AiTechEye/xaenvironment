@@ -7,7 +7,6 @@ examobs.register_mob({
 	type = "animal",
 	dmg = 2,
 	aggressivity = 2,
-	walk_speed = 6,
 	run_speed = 10,
 	animation = {
 		stand = {x=0,y=9},
@@ -27,7 +26,6 @@ examobs.register_mob({
 	dmg = 4,
 	aggressivity = 2,
 	swiming = 0,
-	walk_speed = 6,
 	run_speed = 10,
 	animation = {
 		stand = {x=0,y=9},

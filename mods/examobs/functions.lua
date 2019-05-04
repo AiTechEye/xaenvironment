@@ -17,21 +17,25 @@ end
 examobs.environment=function(self)
 	self.environment_timer = 0
 	local pos = self:pos()
+	local posf = examobs.pointat(self)
 	pos = apos(pos,nil,self.bottom)
 	local def = examobs.defpos(pos)
-
+	local deff = examobs.defpos(posf)
+	local v = self.object:get_velocity()
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
-		local v = self.object:get_velocity()
+
 		if def.walkable and v.x+v.z > 0 then
 			if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
 				self:hurt(1)
 			else
 				examobs.jump(self)
 			end
-		elseif walkable(examobs.pointat(self)) and v.x+v.z > 0 then
+		elseif v.x+v.z > 0 and deff.walkable or (self.fight and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
 			examobs.jump(self)
+		elseif (deff.damage_per_second or 0) > 0 then
+			examobs.stand(self)
 		end
 	end
 
@@ -101,6 +105,17 @@ examobs.environment=function(self)
 		self.is_floating = nil
 		local v = self.object:get_velocity()
 		self.object:set_acceleration({x =0, y=-10, z =0})
+	elseif not self.is_floating then
+		if v.y < 0 and not self.falling then
+			self.falling = pos.y
+		end
+		if self.falling and v.y >= 0 and walkable(apos(pos,0,-1)) then
+			local d = math.floor(self.falling+0.5) - math.floor(pos.y+0.5)
+			if d >= 10 then
+				self:hurt(d)
+			end
+			self.falling = nil
+		end
 	end
 
 --liquid and viscosity
@@ -143,7 +158,7 @@ examobs.environment=function(self)
 		local v=self.object:get_velocity()
 		self.object:set_acceleration({x=0, y=0, z=0})
 		self.object:set_velocity({x=v.x, y=0, z=v.z})
-		if walkable(apos(examobs.pointat(self),0,-1)) then
+		if walkable(apos(posf,0,-1)) then
 			examobs.jump(self)
 			self.object:set_acceleration({x=0, y=-10, z=0})
 		end
@@ -330,7 +345,7 @@ examobs.find_objects=function(self)
 		if not (en and en.examobs == self.examobs) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob) 
 			local team = examobs.team(ob)
-			if infield and examobs.known(self,ob,"fight",true) then
+			if infield and ((self.aggressivity > 0 and self.hp < self.hp_max) or examobs.known(self,ob,"fight",true)) then
 				self.fight = ob
 				return
 			elseif flee or examobs.known(self,ob,"flee",true) then
