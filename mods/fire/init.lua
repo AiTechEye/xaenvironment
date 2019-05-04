@@ -2,7 +2,6 @@ minetest.register_craft({
 	output="fire:flint_and_steel",
 	recipe={{"default:flint","default:steel_ingot"},},
 })
-
 minetest.register_tool("fire:flint_and_steel", {
 	description = "Flint and steel",
 	inventory_image = "fire_flint_and_steel.png",
@@ -14,13 +13,12 @@ minetest.register_tool("fire:flint_and_steel", {
 		end
 		return itemstack
 	end,
-
 })
 
 minetest.register_node("fire:basic_flame", {
 	description = "Fire",
 	tiles={"fire_basic_flame.png"},
-	groups = {dig_immediate=3,fire=1,igniter=2,not_in_creative_inventory=1},
+	groups = {dig_immediate=3,fire=1,igniter=2,not_in_craftguide=1},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
@@ -47,7 +45,7 @@ minetest.register_node("fire:basic_flame", {
 minetest.register_node("fire:not_igniter", {
 	description = "Fire (not igniter)",
 	tiles={"fire_basic_flame.png"},
-	groups = {fire=1,dig_immediate=3,igniter=1,not_in_creative_inventory=1},
+	groups = {fire=1,dig_immediate=3,igniter=1,not_in_craftguide=},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
@@ -74,7 +72,7 @@ minetest.register_node("fire:not_igniter", {
 minetest.register_node("fire:permanent_flame", {
 	description = "Permanent fire",
 	tiles={"fire_basic_flame.png"},
-	groups = {dig_immediate=3,igniter=2,not_in_creative_inventory=1},
+	groups = {dig_immediate=3,igniter=2,not_in_craftguide=},
 	sounds = default.node_sound_defaults(),
 	drawtype = "firelike",
 	paramtype = "light",
