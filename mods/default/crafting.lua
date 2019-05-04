@@ -2,7 +2,7 @@ minetest.register_on_mods_loaded(function()
 	default.workbench.items_list = {}
 	default.workbench.groups_list = {}
 	for i,it in pairs(minetest.registered_items) do
-		if not (it.groups and it.groups.not_in_creative_inventory) then
+		if not (it.groups and (it.groups.not_in_creative_inventory or it.groups.not_in_craftguide)) then
 			table.insert(default.workbench.items_list,it.name)
 		end
 	end

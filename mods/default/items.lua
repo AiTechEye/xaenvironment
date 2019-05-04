@@ -80,6 +80,7 @@ minetest.register_tool("default:admin_pickaxe", {
 
 minetest.register_tool("default:quantum_pick", {
 	description ="Quantum tool",
+	groups={not_in_craftguide=1},
 	inventory_image = "default_quantumblock.png^default_alpha_pick.png^[makealpha:0,255,0",
 	tool_capabilities = {
 		full_punch_interval = 0.20,

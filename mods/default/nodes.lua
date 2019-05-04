@@ -1,7 +1,7 @@
 minetest.register_node("default:gas", {
 	description = "Gas",
 	tiles={"default_gas.png"},
-	groups = {stick=gas,flammable=2,on_update=1},
+	groups = {stick=gas,flammable=2,on_update=1,not_in_craftguide=1},
 	drawtype="glasslike",
 	paramtype = "light",
 	pointable=false,
@@ -67,7 +67,7 @@ minetest.register_node("default:stick_on_ground", {
 	description = "Stick",
 	drop="default:stick",
 	tiles={"default_tree.png"},
-	groups = {stick=1,dig_immediate=3,flammable=2},
+	groups = {stick=1,dig_immediate=3,flammable=2,not_in_craftguide=1},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.05,-0.5,-0.5,0.05,-0.45,0.5}},
@@ -539,7 +539,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1},
+	groups = {water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -624,7 +624,7 @@ minetest.register_node("default:salt_water_source", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1},
+	groups = {water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -712,7 +712,7 @@ minetest.register_node("default:lava_source", {
 			}
 		}
 	},
-	groups = {lava=1, liquid=1,igniter=3},
+	groups = {lava=1, liquid=1,igniter=3,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -782,7 +782,7 @@ minetest.register_node("default:lava_flowing", {
 minetest.register_node("default:oil_source", {
 	description = "Oil source",
 	tiles={"default_oil.png"},
-	groups = {oil=1, liquid=1,disable_jump=1,flammable=3,},
+	groups = {oil=1, liquid=1,disable_jump=1,flammable=3,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
