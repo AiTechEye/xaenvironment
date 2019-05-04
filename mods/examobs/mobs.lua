@@ -6,6 +6,9 @@ examobs.register_mob({
 	mesh = "examobs_wolf.b3d",
 	type = "animal",
 	dmg = 2,
+	aggressivity = 2,
+	walk_speed = 6,
+	run_speed = 10,
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -22,7 +25,10 @@ examobs.register_mob({
 	type = "animal",
 	team = "stone",
 	dmg = 4,
+	aggressivity = 2,
 	swiming = 0,
+	walk_speed = 6,
+	run_speed = 10,
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},

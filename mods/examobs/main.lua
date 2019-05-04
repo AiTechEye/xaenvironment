@@ -5,14 +5,18 @@ examobs.main=function(self, dtime)
 	self.timer2 = self.timer2 + dtime
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
+		self.environment_timer2 = self.environment_timer2 + self.timer1
 		self.timer1 = 0
-		if self.environment_timer > 0.2 and examobs.environment(self) or self.step(self,dtime) then return end
+		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
 	if self.timer2 < 1 then return end
 	self.timer2 = 0
 
+	if (self.dying or self.dead) and examobs.dying(self) then return end
+	if self.step(self) then return end
 	if examobs.following(self) then return end
 	if examobs.fighting(self) then return end
+	if examobs.fleeing(self) then return end
 	if examobs.exploring(self) then return end
 end
 
@@ -20,7 +24,8 @@ examobs.register_mob=function(def)
 
 	local name = minetest.get_current_modname() ..":" .. def.name
 
-	def.hp_max = 			def.hp or				20
+	def.hp =				def.hp or				20
+	def.hp_max = 			def.hp
 	def.physical =			def.physical or			true
 	def.collisionbox =			def.collisionbox or			{-0.35,-1.0,-0.35,0.35,0.8,0.35}
 	def.visual =			def.visual or			"mesh"
@@ -28,65 +33,140 @@ examobs.register_mob=function(def)
 	def.mesh =			def.mesh or			"character.b3d"
 	def.makes_footstep_sound =		def.makes_footstep_sound or		true
 
-
+	def.walk_speed =			def.walk_speed or			2
+	def.walk_run =			def.walk_run or			4
+	def.lay_on_death =			def.lay_on_death or		1
 	def.textures =			def.textures or			{"characrter.png"}
 	def.type =			def.type or			"npc"
 	def.team =			def.team or			"default"
 	def.step =			def.step or			function() end
-	def.range =			def.range or			10
+	def.range =			def.range or			15
 	def.reach =			def.reach or			4
 	def.dmg =			def.dmg or			1
 	def.bottom =			def.bottom or			0
 	def.breathing =			def.breathing or			1
-	def.resist_node =			def.resist_node
+	def.resist_nodes =			def.resist_nodes or			{}
 	def.swiming =			def.swiming or			1
-
-	def.timer1 = 0
-	def.timer2 = 0
-	def.environment_timer = 0
-	def.examob = 0
+	def.inv = 				def.inv or				{}
+	def.aggressivity =			def.aggressivity or			2
+	def.floating =			def.floating or			{}
 
 	def.animation =			def.animation or			{
-										stand={x=1,y=39,speed=30},
-										walk={x=41,y=61,speed=30},
-										run={x=41,y=61,speed=60},
-										attack={x=65,y=75,speed=30},
-										lay={x=113,y=123,speed=0},
-									}
+		stand={x=1,y=39,speed=30},
+		walk={x=41,y=61,speed=30},
+		run={x=41,y=61,speed=60},
+		attack={x=65,y=75,speed=30},
+		lay={x=113,y=123,speed=0},
+	}
 	if def.animation.walk then
 		def.animation.run = def.animation.run or {x=def.animation.walk.x,y=def.animation.walk.y,speed = 60}
 	end
-
 	for i, a in pairs(def.animation) do
 		def.animation[i].speed = def.animation[i].speed or 30
 	end
 
+	def.on_dying =			def.on_dying or			function() end
+	def.death =			def.death or			function() end
+	def.on_punched =			def.on_punched or			function() end
+	def.on_click =			def.on_click or			function() end
+	def.on_spawn =			def.on_spawn or			function() end
+	def.on_load =			def.on_load or			function() end
+
+	def.timer1 = 0
+	def.timer2 = 0
+	def.environment_timer = 0
+	def.environment_timer2 = 0
+	def.examob = 0
+
 	def.pos=function(self)
 		return self.object:get_pos()
 	end
-
+	def.on_step=examobs.main
 	def.on_rightclick=function(self, clicker,name)
 		if not self.fight then
 			examobs.lookat(self,clicker)
 		end
+		self.on_click(self)
+	end
+	def.get_staticdata = function(self)
+		self.storage.health = {dead=self.dead, dying=self.dying, hp=self.hp}
+		return minetest.serialize(self.storage)
 	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
 		self.examob = math.random(1,9999)
+		self.dead = self.storage.health and self.storage.health.dead or nil
+		self.dying = self.storage.health and self.storage.health.dying or nil
+		self.hp = self.storage.health and self.storage.health.hp or def.hp
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})
+
+		if self.dead or self.dying then
+			examobs.anim(self,"lay")
+		end
+
+		if staticdata ~= "" then
+			self.on_load(self)
+		else
+			self.on_spawn(self)
+		end
+	end
+	def.hurt=function(self,dmg)
+		self.hp = self.hp - dmg
+		self.object:set_hp(self.hp)
+		if self.dead then
+			if self.dead <= 0 or self.hp <= 0 then
+				self.object:remove()
+			end
+			return self
+		elseif self.dying then
+			if self.hp <= 0 then
+				examobs.dying(self,2)
+				return self
+			end
+		elseif self.hp <= 0 then
+			local pos=self.object:get_pos()
+			if self.lay_on_death == 1 then
+				examobs.stand(self)
+				examobs.dying(self,1)
+				return self
+			else
+				self.death(self,pos,punched_by)
+				examobs.dropall(self)
+				return self
+			end
+		end
+		examobs.showtext(self,self.hp .. "/" .. self.hp_max)
 	end
 	def.on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local en = puncher:get_luaentity()
+		local punched_by
+		local dmg = 0
 		if not (en and en.examobs == self.examobs) then
 			self.fight = puncher
 			examobs.lookat(self,self.fight)
+			punched_by = puncher
+			self.on_punched(self,pos,puncher)
 		end
+
+		tool_capabilities.damage_groups.fleshy=tool_capabilities.damage_groups.fleshy or 1
+
+		if tool_capabilities and tool_capabilities.damage_groups and tool_capabilities.damage_groups.fleshy then
+			dmg = tool_capabilities.damage_groups.fleshy
+		end
+
+		local v={x = dir.x*3,y = self.object:get_velocity().y,z = dir.z*3}
+		self.object:set_velocity(v)
+		local r=math.random(1,99)
+		self.onpunch_r=r
+		minetest.after(1, function(self,v,r)
+			if examobs.gethp(self.object) > 0 and self.onpunch_r==r then
+				self.object:set_velocity({x = 0,y = self.object:get_velocity().y,z = 0})
+			end
+		end, self,v,r)
+		self:hurt(dmg)
+		return self
 	end
-	def.get_staticdata = function(self)
-		return minetest.serialize(self.storage)
-	end
-	def.on_step=examobs.main,
 
 	minetest.register_entity(name,def)
 

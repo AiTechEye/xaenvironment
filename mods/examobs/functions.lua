@@ -21,31 +21,89 @@ examobs.environment=function(self)
 	local def = examobs.defpos(pos)
 
 --jumping
-	if def.walkable then
-		if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
-			examobs.punch(self.object,self.object,1)
-		else
+
+	if not (self.dying or self.dead or self.is_floating) then
+		local v = self.object:get_velocity()
+		if def.walkable and v.x+v.z > 0 then
+			if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
+				self:hurt(1)
+			else
+				examobs.jump(self)
+			end
+		elseif walkable(examobs.pointat(self)) and v.x+v.z > 0 then
 			examobs.jump(self)
 		end
-	elseif walkable(examobs.pointat(self)) then
-		examobs.jump(self)
 	end
---liquid
 
-	if self.breathing then
+--drowning & breath
+
+	if self.breathing > 0 and not self.dead and self.environment_timer2 > 1 then
 		if (def.drowning or 0) > 0 then
-			self.breath = (self.breath or 20) -0.2
+			self.breath = (self.breath or 20) -1
 			if self.breath <= 0 then
 				self.breath = 0
-				examobs.punch(self.object,self.object,1)
+				self:hurt(1)
+			else
+				examobs.showtext(self,self.breath .."/20","0000ff")
 			end
 		else
 			self.breath = 20
 		end	
 	end
-	if (def.damage_per_second or 0) > 0 and def.name ~= self.resist_node then
-		examobs.punch(self.object,self.object,def.damage_per_second)
+
+--damage
+
+	if self.environment_timer2 > 1 and (def.damage_per_second or 0) > 0 and not self.resist_nodes[def.name] then
+		self:hurt(def.damage_per_second)
+		if not (self.dying or self.dead) then
+			self.object:set_yaw(math.random(0,6.28))
+			examobs.jump(self)
+			examobs.walk(self,true)
+		end
+
+		if minetest.get_item_group(def.name, "igniter") > 0 then
+			minetest.add_particlespawner({
+				amount = 5,
+				time =0.2,
+				minpos = {x=pos.x-0.5, y=pos.y, z=pos.z-0.5},
+				maxpos = {x=pos.x+0.5, y=pos.y, z=pos.z+0.5},
+				minvel = {x=0, y=0, z=0},
+				maxvel = {x=0, y=math.random(3,6), z=0},
+				minacc = {x=0, y=2, z=0},
+				maxacc = {x=0, y=0, z=0},
+				minexptime = 1,
+				maxexptime = 3,
+				minsize = 3,
+				maxsize = 8,
+				texture = "default_item_smoke.png",
+				collisiondetection = true,
+			})
+		end
 	end
+
+-- timer = 0
+
+	if self.environment_timer2 > 1 then
+		self.environment_timer2 = 0
+	end
+
+--floating
+
+	if self.floating[def.name] then
+		if not self.is_floating then
+			self.is_floating = true
+			local v = self.object:get_velocity()
+			self.object:set_acceleration({x =0, y=0, z =0})
+			self.object:set_velocity({x=v.x, y=0, z =v.y})
+		end
+		return
+	elseif self.is_floating then
+		self.is_floating = nil
+		local v = self.object:get_velocity()
+		self.object:set_acceleration({x =0, y=-10, z =0})
+	end
+
+--liquid and viscosity
 
 	if def.liquid_viscosity > 0 then
 		self.in_liquid = true
@@ -55,13 +113,14 @@ examobs.environment=function(self)
 
 		if self.swiming < 1 and s == 1 then
 			s = -1
-			examobs.stand(self)
-			examobs.punch(self.object,self.object,1)
-			examobs.anim(self,"run")
-			if math.random(1,2) == 1 then
-				self.object:set_yaw(math.random(0,6.28))
+			self:hurt(1)
+			if not (self.dying or self.dead) then
+				examobs.stand(self)
+				examobs.anim(self,"run")
+				if math.random(1,2) == 1 then
+					self.object:set_yaw(math.random(0,6.28))
+				end
 			end
-
 			if v.y < 0 then
 				self.object:set_acceleration({x =0, y=20, z =0})
 				self.object:set_velocity({x =0, y=v.y/2, z =0})
@@ -110,7 +169,7 @@ examobs.following=function(self)
 			examobs.walk(self)
 		elseif d > self.range/2 then
 			examobs.lookat(self,self.fight)
-			examobs.walk(self,2,true)
+			examobs.walk(self,true)
 		end
 	end
 end
@@ -135,11 +194,24 @@ examobs.exploring=function(self)
 	end
 end
 
+examobs.fleeing=function(self)
+	if self.flee and examobs.gethp(self.flee) > 0 and examobs.visiable(self,self.flee) and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
+		examobs.lookat(self,self.flee)
+		local yaw=examobs.num(self.object:get_yaw())
+		self.object:set_yaw(yaw+math.pi)
+		examobs.walk(self,true)
+		return self
+	elseif self.flee then
+		self.flee = nil
+	end
+end
+
 examobs.fighting=function(self)
 	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self,self.fight) and examobs.viewfield(self,self.fight) then
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
+			examobs.walk(self,true)
 			if math.random(1,2) == 1 then
 				if self.fight:get_pos().y > self:pos().y then
 					examobs.jump(self)
@@ -152,7 +224,7 @@ examobs.fighting=function(self)
 			end
 		else
 			examobs.lookat(self,self.fight)
-			examobs.walk(self,2,true)
+			examobs.walk(self,true)
 		end
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
@@ -178,15 +250,32 @@ examobs.stand=function(self)
 	return self
 end
 
+examobs.fly=function(self,run)
+	if self.fight or self.folow or self.flee then
+		local pos1 = self:pos()
+		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos())
+		run = run and self.walk_run or self.walk_speed
+		if not self.flee then
+			run = run *-1
+		end
+		local d = examobs.distance(pos1,pos2)
+		self.object:set_velocity({
+			x=((pos1.x-pos2.x)*run)/d,
+			y=((pos1.y-pos2.y)*run)/d,
+			z=((pos1.z-pos2.z)*run)/d
+		})
+		return true
+	end
+end
+
 examobs.walk=function(self,run)
-	local pos=self.object:get_pos()
+	if self.is_floating and examobs.fly(self,run) then return end
+	local pos=self:pos()
 	local yaw=examobs.num(self.object:get_yaw())
-
-	run=run or 1
-	local x =math.sin(yaw) * -1
-	local z =math.cos(yaw) * 1
-	local y=self.object:get_velocity().y
-
+	run = run and self.run_speed or self.walk_speed
+	local x = math.sin(yaw) * -1
+	local z = math.cos(yaw) * 1
+	local y = self.object:get_velocity().y
 	self.object:set_velocity({
 		x = x*run,
 		y = y,
@@ -232,18 +321,25 @@ examobs.team=function(target)
 end
 
 examobs.find_objects=function(self)
-	if self.fight then return end
+	if self.aggressivity == 0 or self.fight or self.flee then return end
+	local flee = self.aggressivity == -2
+	local fight = self.aggressivity == 2
 	local obs = {}
 	for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), self.range)) do
-		if examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
+		local en = ob:get_luaentity()
+		if not (en and en.examobs == self.examobs) and examobs.visiable(self.object,ob) then
+			local infield = examobs.viewfield(self,ob) 
 			local team = examobs.team(ob)
-			if examobs.known(self,ob,"fight",true) then
+			if infield and examobs.known(self,ob,"fight",true) then
 				self.fight = ob
+				return
+			elseif flee or examobs.known(self,ob,"flee",true) then
+				self.flee = ob
 				return
 			elseif examobs.known(self,ob,"folow",true) then
 				self.folow = ob
 				return
-			elseif team ~= "" and team ~= self.team  then
+			elseif infield and fight and team ~= "" and team ~= self.team  then
 				table.insert(obs,ob)
 			end
 		end
@@ -321,4 +417,95 @@ end
 
 examobs.punch=function(puncher,target,damage)
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
+end
+
+examobs.showtext=function(self,text,color)
+	self.delstatus=math.random(0,1000) 
+	local del=self.delstatus
+	color=color or "ff0000"
+	self.object:set_properties({nametag=text,nametag_color="#" ..  color})
+	minetest.after(1.5, function(self,del)
+		if self and self.object and self.delstatus==del then
+			self.delstatus = nil
+			self.object:set_properties({nametag="",nametag_color=""})
+		end
+	end, self,del)
+	return self
+end
+
+examobs.dropall=function(self)
+	for i,v in pairs(self.inv) do
+		minetest.add_item(pos,i .. " " .. v):set_velocity({
+			x=math.random(-1.5,1.5),
+			y=math.random(0.5,1),
+			z=math.random(-1.5,1.5)
+		})
+	end
+end
+
+examobs.dying=function(self,set)
+	if self.lay_on_death ~= 1 then return end
+	if set and set==1 then
+		examobs.anim(self,"lay")
+		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.object:set_velocity({x=0,y=-3,z =0})
+		if self.hp<=self.hp_max*-1 then
+			examobs.dying(self,2)
+			return self
+		end
+
+		self.dying={step=self.hp_max+self.hp,try=self.hp+self.hp_max/2}
+		self.hp=self.hp_max/2
+		self.object:set_hp(self.hp)
+	elseif set and set==2 then
+		minetest.after(0.1, function(self)
+			if self.object:get_luaentity() then
+				examobs.anim(self,"lay")
+			end
+		end, self)
+		self.object:set_properties({nametag=""})
+		self.type=""
+		self.hp=self.hp_max
+		self.object:set_hp(self.hp)
+		self.dying=nil
+		self.dead=20
+		self.death(self)
+		examobs.dropall(self)
+	elseif set and set==3 and (self.dying or self.dead) then
+		self.dying={step=0,try=self.hp_max*2}
+		self.dead=nil
+	end
+
+	if self.dying then
+		self.object:set_velocity({x=0,y=self.object:get_velocity().y,z=0})
+		if self.hp<=self.hp_max*-1 then
+			examobs.dying(self,2)
+			return self
+		end
+		self.dying.try=self.dying.try+math.random(-1,1)
+		self.dying.step=self.dying.step-1
+		examobs.showtext(self,(self.dying.try+self.hp) .."/".. self.hp_max,"ff5500")
+		self.on_dying(self)
+
+		if self.dying.step<1 and self.dying.try+self.hp>=self.hp_max then
+			local h=math.random(1,5)
+			self.dying=nil
+			self.hp=h
+			self.object:set_hp(h)
+			examobs.stand(self)
+			examobs.showtext(self,"")
+			return self
+		elseif self.dying.step<1 and self.dying.try+self.hp<self.hp_max then
+			examobs.dying(self,2)
+			return self
+		end
+		return self
+	elseif self.dead then
+		self.dead=self.dead-1
+		if self.dead<0 then
+			examobs.dropall(self)
+			self.object:remove()
+		end
+		return self
+	end
 end
