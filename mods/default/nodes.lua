@@ -1,7 +1,7 @@
 minetest.register_node("default:gas", {
 	description = "Gas",
 	tiles={"default_gas.png"},
-	groups = {stick=gas,flammable=2,on_update=1,not_in_craftguide=1},
+	groups = {gas=1,flammable=2,on_update=1,not_in_craftguide=1},
 	drawtype="glasslike",
 	paramtype = "light",
 	pointable=false,
