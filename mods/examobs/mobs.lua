@@ -1,4 +1,4 @@
--- npc monster animal predator
+-- npc monster animal
 
 examobs.register_mob({
 	name = "wolf",
@@ -7,7 +7,8 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
-	updatetime=0.5,
+	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
+
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -17,6 +18,19 @@ examobs.register_mob({
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
 	spawn_on={"default:dirt_with_snow","default:dirt_with_coniferous_grass"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				item:take_item()
+				clicker:get_inventory():set_stack("main",i,item)
+				self.flolow = clicker
+			end
+		end
+	end
 })
 
 examobs.register_mob({
@@ -26,8 +40,8 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
-	updatetime=0.5,
 	team = "arctic_wolf",
+	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -37,6 +51,19 @@ examobs.register_mob({
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
 	spawn_on={"group:snowy"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				item:take_item()
+				clicker:get_inventory():set_stack("main",i,item)
+				self.flolow = clicker
+			end
+		end
+	end
 })
 
 examobs.register_mob({
@@ -46,8 +73,8 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
-	updatetime=0.5,
 	team = "golden_wolf",
+	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -57,6 +84,19 @@ examobs.register_mob({
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
 	spawn_on={"default:dirt_with_dry_grass"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				item:take_item()
+				clicker:get_inventory():set_stack("main",i,item)
+				self.flolow = clicker
+			end
+		end
+	end
 })
 
 examobs.register_mob({
@@ -69,7 +109,7 @@ examobs.register_mob({
 	aggressivity = 2,
 	swiming = 0,
 	run_speed = 10,
-	updatetime=0.5,
+	inv={["default:carbon_ingot"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},

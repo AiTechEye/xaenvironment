@@ -87,6 +87,24 @@ examobs.register_mob=function(def)
 	def.environment_timer2 = 0
 	def.lifetimer = def.lifetime
 	def.examob = 0
+
+	def.eat_item=function(self,item)
+		local s
+		if type(item) == "string" then
+			s = string.split(item," ")
+			s[2] = s[2] or 1
+		elseif type(item) == "userdata" then
+			s = {[1] = s:get_name(),[2] = s:get_count()}
+		else
+			return
+		end
+
+		if minetest.get_item_group(s[1],"eatable") then
+			self:heal(minetest.get_item_group(s[1],"eatable"),minetest.get_item_group(s[1],"gaps"),tonumber(s[2]))
+			examobs.stand(self)
+			return true
+		end
+	end
 	def.heal=function(self,hp,gaps,num)
 		num = num or 1
 		gaps = gaps or 1
@@ -99,11 +117,11 @@ examobs.register_mob=function(def)
 		return self.object:get_pos()
 	end
 	def.on_step=examobs.main
-	def.on_rightclick=function(self, clicker,name)
+	def.on_rightclick=function(self, clicker)
 		if not self.fight then
 			examobs.lookat(self,clicker)
 		end
-		self.on_click(self)
+		self.on_click(self,clicker)
 	end
 	def.get_staticdata = function(self)
 		self.storage.dead=self.dead
@@ -170,7 +188,7 @@ examobs.register_mob=function(def)
 			if not examobs.known(self,puncher,"flee",true) then
 				examobs.known(self,puncher,"fight")
 			end
-			self.on_punched(self,pos,puncher)
+			self.on_punched(self,puncher)
 		end
 
 		tool_capabilities.damage_groups.fleshy=tool_capabilities.damage_groups.fleshy or 1

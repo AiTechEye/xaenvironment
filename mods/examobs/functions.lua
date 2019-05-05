@@ -16,9 +16,16 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-
 	if self.flee or self.fight or self.folow then
 		self.lifetimer = self.lifetime
+
+		if not self.updatetime_reset then
+			self.updatetime_reset = self.updatetime
+			self.updatetime = self.updatetime*0.1
+		end
+	elseif self.updatetime_reset then
+		self.updatetime = self.updatetime_reset
+		self.updatetime_reset = nil
 	elseif self.lifetimer < 0 then
 		self.object:remove()
 		return self
@@ -197,7 +204,7 @@ examobs.following=function(self)
 end
 
 examobs.exploring=function(self)
-	if examobs.find_objects(self) then return end
+	if math.random(1,2) == 1 and examobs.find_objects(self) then return end
 
 	local r = math.random(1,10)
 	if r <= 5 and self.walking then		-- keep walk
@@ -241,11 +248,7 @@ examobs.fighting=function(self)
 
 				local en = self.fight:get_luaentity()
 				if en and en.itemstring then
-					local s = string.split(en.itemstring," ")
-					if minetest.get_item_group(s[1],"eatable") then
-						self:heal(minetest.get_item_group(s[1],"eatable"),minetest.get_item_group(s[1],"gaps"),tonumber(s[2]))
-						examobs.stand(self)
-					end
+					self:eat_item(en.itemstring)
 				end
 				examobs.punch(self.object,self.fight,self.dmg)
 				examobs.anim(self,"attack")
@@ -323,8 +326,10 @@ examobs.walk=function(self,run)
 end
 
 examobs.lookat=function(self,pos2)
-	if type(pos2) ~= "table" then
+	if type(pos2) == "userdata" then
 		pos2=pos2:get_pos()
+	elseif not pos2 then
+		return
 	end
 	local pos1=self.object:get_pos()
 	local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
@@ -363,8 +368,7 @@ examobs.find_objects=function(self)
 		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
-
-			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and (en and en.type == "animal")) or examobs.known(self,ob,"fight",true)) then
+			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or examobs.known(self,ob,"fight",true)) then
 				self.fight = ob
 				return
 			elseif flee or examobs.known(self,ob,"flee",true) then
@@ -394,8 +398,7 @@ examobs.known=function(self,ob,type,get)
 	if not ob then return end
 	self.storage.known = self.storage.known or {}
 	local en = ob:get_luaentity()
-	local name = (en and (en.examobs or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
-
+	local name = (en and (en.examob or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
 	if get then
 		return self.storage.known[name] == type
 	else
@@ -474,6 +477,10 @@ examobs.showtext=function(self,text,color)
 end
 
 examobs.dropall=function(self)
+	local pos = self:pos()
+	if not pos then
+		return
+	end
 	for i,v in pairs(self.inv) do
 		minetest.add_item(pos,i .. " " .. v):set_velocity({
 			x=math.random(-1.5,1.5),
