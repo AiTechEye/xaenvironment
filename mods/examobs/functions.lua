@@ -228,7 +228,7 @@ examobs.exploring=function(self)
 end
 
 examobs.fleeing=function(self)
-	if self.flee and examobs.gethp(self.flee) > 0 and examobs.visiable(self,self.flee) and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
+	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
 		examobs.lookat(self,self.flee)
 		local yaw=examobs.num(self.object:get_yaw())
 		self.object:set_yaw(yaw+math.pi)
@@ -240,7 +240,7 @@ examobs.fleeing=function(self)
 end
 
 examobs.fighting=function(self)
-	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self,self.fight) and examobs.viewfield(self,self.fight) then
+	if self.fight and examobs.gethp(self.fight) > 0 and examobs.viewfield(self,self.fight) then
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
@@ -490,6 +490,7 @@ examobs.dropall=function(self)
 			y=math.random(0.5,1),
 			z=math.random(-1.5,1.5)
 		})
+		self.inv[i] = nil
 	end
 end
 
