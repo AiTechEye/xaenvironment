@@ -1,5 +1,3 @@
-examobs={}
-
 examobs.main=function(self, dtime)
 	self.timer1 = self.timer1 + dtime
 	self.timer2 = self.timer2 + dtime

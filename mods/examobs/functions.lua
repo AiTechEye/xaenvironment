@@ -16,9 +16,8 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-	if self.flee or self.fight or self.folow then
+	if self.flee or self.fight then
 		self.lifetimer = self.lifetime
-
 		if not self.updatetime_reset then
 			self.updatetime_reset = self.updatetime
 			self.updatetime = self.updatetime*0.1
@@ -191,15 +190,19 @@ examobs.def=function(name)
 end
 
 examobs.following=function(self)
-	if self.folow and examobs.visiable(self,self.folow) then
-		local d = examobs.distance(self,self.folow)
-		if d > self.reach then
-			examobs.lookat(self,self.fight)
-			examobs.walk(self)
-		elseif d > self.range/2 then
-			examobs.lookat(self,self.fight)
+	if self.folow and examobs.visiable(self.object,self.folow) then
+		local d = examobs.distance(self.object,self.folow)
+		if d > self.range/2 then
+			examobs.lookat(self,self.folow)
 			examobs.walk(self,true)
+			return true
+		elseif d > self.reach then
+			examobs.lookat(self,self.folow)
+			examobs.walk(self)
+			return true
 		end
+	elseif self.folow then
+		self.folow = nil
 	end
 end
 

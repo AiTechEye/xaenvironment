@@ -8,7 +8,6 @@ examobs.register_mob({
 	aggressivity = 1,
 	run_speed = 8,
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
-
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -28,6 +27,7 @@ examobs.register_mob({
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
 				self.flolow = clicker
+				examobs.known(self,clicker,"folow")
 			end
 		end
 	end
@@ -40,7 +40,6 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
-	team = "arctic_wolf",
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
@@ -61,6 +60,7 @@ examobs.register_mob({
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
 				self.flolow = clicker
+				examobs.known(self,clicker,"folow")
 			end
 		end
 	end
@@ -73,7 +73,6 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
-	team = "golden_wolf",
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
@@ -94,6 +93,7 @@ examobs.register_mob({
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
 				self.flolow = clicker
+				examobs.known(self,clicker,"folow")
 			end
 		end
 	end
@@ -106,6 +106,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "stone",
 	dmg = 4,
+	hp = 30,
 	aggressivity = 2,
 	swiming = 0,
 	run_speed = 10,
@@ -119,4 +120,18 @@ examobs.register_mob({
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
 	spawn_on={"default:stone","default:cobble"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				item:take_item()
+				clicker:get_inventory():set_stack("main",i,item)
+				self.fight = clicker
+				examobs.known(self,clicker,"fight")
+			end
+		end
+	end
 })
