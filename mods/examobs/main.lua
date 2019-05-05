@@ -42,6 +42,7 @@ examobs.register_mob=function(def)
 	def.range =			def.range or			15
 	def.reach =			def.reach or			4
 	def.dmg =			def.dmg or			1
+	def.punch_chance =		def.punch_chance or		5
 	def.bottom =			def.bottom or			0
 	def.breathing =			def.breathing or			1
 	def.resist_nodes =			def.resist_nodes or			{}
@@ -199,8 +200,8 @@ examobs.register_mob=function(def)
 		self.object:set_velocity(v)
 		local r=math.random(1,99)
 		self.onpunch_r=r
-		minetest.after(1, function(self,v,r)
-			if examobs.gethp(self.object) > 0 and self.onpunch_r==r then
+		minetest.after(0.5, function(self,v,r)
+			if self and self.onpunch_r == r and self.object and self.object:get_pos() then
 				self.object:set_velocity({x = 0,y = self.object:get_velocity().y,z = 0})
 			end
 		end, self,v,r)

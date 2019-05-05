@@ -16,7 +16,7 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-	if self.flee or self.fight then
+	if self.flee or self.fight and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
 		if not self.updatetime_reset then
 			self.updatetime_reset = self.updatetime
@@ -32,20 +32,21 @@ examobs.environment=function(self)
 
 	local pos = self:pos()
 	local posf = examobs.pointat(self)
-	pos = apos(pos,nil,self.bottom)
+	pos = apos(pos,0,self.bottom)
+	posf = apos(posf,0,self.bottom)
 	local def = examobs.defpos(pos)
 	local deff = examobs.defpos(posf)
 	local v = self.object:get_velocity()
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
-		if def.walkable and v.x+v.z > 0 then
-			if walkable(apos(pos,nil,1)) and walkable(apos(pos,nil,2)) then
+		if def.walkable and v.x+v.z ~= 0 then
+			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) then
 				self:hurt(1)
 			else
 				examobs.jump(self)
 			end
-		elseif v.x+v.z > 0 and deff.walkable or (self.fight and examobs.gethp(self.fight) > 0 and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
+		elseif v.x+v.z ~= 0 and deff.walkable or (self.fight and examobs.gethp(self.fight) > 0 and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
 			examobs.jump(self)
 		elseif (deff.damage_per_second or 0) > 0 then
 			examobs.stand(self)
@@ -244,11 +245,10 @@ examobs.fighting=function(self)
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
 			examobs.walk(self,true)
-			if math.random(1,2) == 1 then
+			if math.random(1,self.punch_chance) == 1 then
 				if self.fight:get_pos().y > self:pos().y then
 					examobs.jump(self)
 				end
-
 				local en = self.fight:get_luaentity()
 				if en and en.itemstring then
 					self:eat_item(en.itemstring)
@@ -349,7 +349,7 @@ examobs.anim=function(self,type)
 	if self.visual ~= "mesh" or type == self.anim then return end
 	local a=self.animation[type]
 	if not a then return end
-	self.object:set_animation({x=a.x, y=a.y,},a.speed)
+	self.object:set_animation({x=a.x, y=a.y,},a.speed,false,a.loop)
 	self.anim=type
 	return self
 end

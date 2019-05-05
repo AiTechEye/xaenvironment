@@ -8,6 +8,7 @@ examobs.register_mob({
 	aggressivity = 1,
 	run_speed = 8,
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
+	punch_chance=3,
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -40,6 +41,7 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
+	punch_chance=3,
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
@@ -73,6 +75,7 @@ examobs.register_mob({
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
+	punch_chance=3,
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
@@ -134,4 +137,24 @@ examobs.register_mob({
 			end
 		end
 	end
+})
+
+examobs.register_mob({
+	name = "stonemonster",
+	textures = {"examobs_stonemonster.png"},
+	mesh = "examobs_stonemonster.b3d",
+	dmg = 5,
+	aggressivity = 2,
+	run_speed = 6,
+	inv={["default:stone"]=2,["default:iron_lump"]=1},
+	bottom=-1,
+	animation = {
+		stand = {x=1,y=10,speed=0},
+		walk = {x=11,y=31,speed=15},
+		run = {x=31,y=51,speed=60},
+		lay = {x=69,y=70,speed=0},
+		attack = {x=53,y=66},
+	},
+	collisionbox={-0.6,-1.2,-0.6,0.6,1.1,0.6,},
+	spawn_on={"default:stone","default:cobble"},
 })
