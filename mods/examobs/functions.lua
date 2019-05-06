@@ -16,9 +16,9 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-	if self.flee or self.fight and not (self.dead or self.dying) then
+	if self.flee or self.fight or self.folow and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
-		if not self.updatetime_reset then
+		if not (self.updatetime_reset or self.folow) then
 			self.updatetime_reset = self.updatetime
 			self.updatetime = self.updatetime*0.1
 		end
@@ -240,7 +240,7 @@ examobs.fleeing=function(self)
 end
 
 examobs.fighting=function(self)
-	if self.fight and examobs.gethp(self.fight) > 0 and examobs.viewfield(self,self.fight) then
+	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self.object,self.fight) then
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
