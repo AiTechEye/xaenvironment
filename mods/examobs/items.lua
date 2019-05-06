@@ -1,5 +1,3 @@
-
-
 default.register_eatable("craftitem","examobs:flesh",1,4,{
 	description = "Flesh",
 	groups={meat=1},
@@ -27,4 +25,13 @@ minetest.register_craft({
 	type = "cooking",
 	output = "examobs:meat",
 	recipe = "examobs:flesh",
+})
+
+-- ================ mud ================
+
+minetest.register_node("examobs:mud", {
+	description = "Mud",
+	tiles={"default_dirt.png^default_stonemoss.png"},
+	groups = {dirt=1,soil=1,crumbly=3},
+	sounds = default.node_sound_dirt_defaults(),
 })

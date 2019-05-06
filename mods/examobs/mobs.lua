@@ -168,12 +168,14 @@ examobs.register_mob({
 	textures = {"examobs_mudmonster.png"},
 	mesh = "examobs_mudmonster.b3d",
 	type = "monster",
-	team = "stone",
+	team = "dirt",
 	dmg = 5,
 	hp = 30,
 	swiming = 0,
 	aggressivity = 2,
-	inv={["default:dirt"]=2},
+	inv={["default:dirt"]=2,["examobs:mud"]=5},
+	light_min = 1,
+	light_max = 9,
 	bottom=-1,
 	animation = {
 		stand = {x=0,y=10,speed=0},
@@ -183,5 +185,5 @@ examobs.register_mob({
 		attack = {x=80,y=100},
 	},
 	collisionbox={-0.5,-1.2,-0.5,0.5,0.9,0.5,},
-	spawn_on={"default:dirt","group:spreading_dirt_type"},
+	spawn_on={"default:dirt","","group:spreading_dirt_type"},
 })
