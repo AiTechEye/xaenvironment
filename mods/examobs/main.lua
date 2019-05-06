@@ -79,6 +79,8 @@ examobs.register_mob=function(def)
 	def.on_click =			def.on_click or			function() end
 	def.on_spawn =			def.on_spawn or			function() end
 	def.on_load =			def.on_load or			function() end
+	def.is_food =			def.is_food or			function() return true end
+
 
 	def.timer1 = 0
 	def.timer2 = 0

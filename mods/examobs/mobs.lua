@@ -31,6 +31,9 @@ examobs.register_mob({
 				examobs.known(self,clicker,"folow")
 			end
 		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
 	end
 })
 
@@ -65,6 +68,9 @@ examobs.register_mob({
 				examobs.known(self,clicker,"folow")
 			end
 		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
 	end
 })
 
@@ -99,6 +105,9 @@ examobs.register_mob({
 				examobs.known(self,clicker,"folow")
 			end
 		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
 	end
 })
 
@@ -136,6 +145,9 @@ examobs.register_mob({
 				examobs.known(self,clicker,"fight")
 			end
 		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
 	end
 })
 
@@ -186,4 +198,33 @@ examobs.register_mob({
 	},
 	collisionbox={-0.5,-1.2,-0.5,0.5,0.9,0.5,},
 	spawn_on={"default:dirt","","group:spreading_dirt_type"},
+})
+examobs.register_mob({
+	name = "chicken",
+	textures = {"examobs_chicken1.png"},
+	mesh = "examobs_chicken.b3d",
+	type = "animal",
+	team = "chicken",
+	dmg = 1,
+	hp = 5,
+	aggressivity = -1,
+--	inv={},
+	walk_speed=2,
+	run_speed=4,
+	animation = {
+		stand = {x=0,y=10,speed=0},
+		walk = {x=20,y=30},
+		run = {x=20,y=30,speed=60},
+		lay = {x=41,y=45,speed=0},
+		attack = {x=20,y=30},
+	},
+	collisionbox={-0.3,-0.4,-0.3,0.3,0.4,0.3},
+	spawn_on={"group:spreading_dirt_type"},
+	on_spawn=function(self)
+		self.storage.skin="examobs_chicken" .. math.random(1,3) ..".png"
+		self.object:set_properties({textures={self.storage.skin}})
+	end,
+	on_load=function(self)
+		self.object:set_properties({textures={self.storage.skin or "examobs_chicken1.png"}})
+	end,
 })

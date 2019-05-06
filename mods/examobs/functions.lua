@@ -384,7 +384,7 @@ examobs.find_objects=function(self)
 				table.insert(obs,ob)
 			end
 		elseif hungry and en and en.itemstring and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
-			if minetest.get_item_group(string.split(en.itemstring," ")[1],"eatable") > 0 then
+			if minetest.get_item_group(string.split(en.itemstring," ")[1],"eatable") > 0 and self.is_food(self,string.split(en.itemstring," ")[1]) then
 				self.fight = ob
 				return
 			end
