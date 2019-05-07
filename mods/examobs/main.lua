@@ -140,7 +140,7 @@ examobs.register_mob=function(def)
 		self.dying = self.storage.dying or nil
 		self.hp = self.storage.hp or def.hp
 		self.lifetimer = self.storage.lifetimer or def.lifetimer
-		self.inv = self.storage.inv or def.inv
+		self.inv = self.storage.inv or table.copy(def.inv)
 
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})

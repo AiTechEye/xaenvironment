@@ -16,7 +16,7 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-	if self.flee or self.fight or self.folow and not (self.dead or self.dying) then
+	if (self.flee or self.fight or self.folow) and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
 		if not (self.updatetime_reset or self.folow) then
 			self.updatetime_reset = self.updatetime
@@ -29,7 +29,6 @@ examobs.environment=function(self)
 		self.object:remove()
 		return self
 	end
-
 	local pos = self:pos()
 	local posf = examobs.pointat(self)
 	pos = apos(pos,0,self.bottom)
@@ -232,14 +231,16 @@ examobs.fleeing=function(self)
 	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
 		local p = examobs.pointat(self)
 		if walkable(p) and walkable(apos(p,0,1)) then
-			if  self.aggressivity > -2 then
+			if  self.aggressivity > -2 and examobs.distance(self.object,self.flee) <= self.reach then
 				examobs.lookat(self,self.flee)
+				flee = self.flee
 				self.fight = self.flee
-				minetest.after(2, function(self)
-					if self and self.object and self.flee then
+				minetest.after(2, function(self,flee)
+					if self and self.object and flee then
 						self.fight = nil
+						self.flee = flee
 					end
-				end, self)
+				end, self,flee)
 			else
 				self.object:set_yaw(math.random(0,6.28))
 				examobs.jump(self)
@@ -529,7 +530,6 @@ examobs.dying=function(self,set)
 			examobs.dying(self,2)
 			return self
 		end
-
 		self.dying={step=self.hp_max+self.hp,try=self.hp+self.hp_max/2}
 		self.hp=self.hp_max/2
 		self.object:set_hp(self.hp)

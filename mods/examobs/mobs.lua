@@ -232,14 +232,12 @@ examobs.register_mob({
 	step=function(self)
 		self.egg_timer = self.egg_timer -1
 		if self.egg_timer < 1 then
-			if minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
+			if self.flee or self.fight then
+				self.egg_timer = math.random(60,600)
+			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
 				minetest.add_node(self:pos(),{name="examobs:egg"})
 				self.egg_timer = math.random(60,600)
 			end
 		end
 	end
-
-
-
-
 })
