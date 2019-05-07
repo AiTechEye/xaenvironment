@@ -40,13 +40,14 @@ examobs.environment=function(self)
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
+		local target = self.fight or self.flee or self.come
 		if def.walkable and v.x+v.z ~= 0 then
-			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) then
+			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
 				self:hurt(1)
 			else
 				examobs.jump(self)
 			end
-		elseif v.x+v.z ~= 0 and deff.walkable or (self.fight and examobs.gethp(self.fight) > 0 and not walkable(apos(posf,0,-1)) and self.fight:get_pos().y <= pos.y) then
+		elseif v.x+v.z ~= 0 and deff.walkable or (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y <= pos.y) then
 			examobs.jump(self)
 		elseif (deff.damage_per_second or 0) > 0 then
 			examobs.stand(self)
@@ -229,6 +230,25 @@ end
 
 examobs.fleeing=function(self)
 	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
+		local p = examobs.pointat(self)
+		if walkable(p) and walkable(apos(p,0,1)) then
+			if  self.aggressivity > -2 then
+				examobs.lookat(self,self.flee)
+				self.fight = self.flee
+				minetest.after(2, function(self)
+					if self and self.object and self.flee then
+						self.fight = nil
+					end
+				end, self)
+			else
+				self.object:set_yaw(math.random(0,6.28))
+				examobs.jump(self)
+				examobs.walk(self,true)
+				
+			end
+			return self
+		end
+
 		examobs.lookat(self,self.flee)
 		local yaw=examobs.num(self.object:get_yaw())
 		self.object:set_yaw(yaw+math.pi)
@@ -371,13 +391,14 @@ examobs.find_objects=function(self)
 		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
-			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or examobs.known(self,ob,"fight",true)) then
+			local known = examobs.known(self,ob)
+			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
-			elseif flee or examobs.known(self,ob,"flee",true) then
+			elseif flee or known ==  "flee" then
 				self.flee = ob
 				return
-			elseif examobs.known(self,ob,"folow",true) then
+			elseif known == "folow" then
 				self.folow = ob
 				return
 			elseif infield and (fight or (en and en.type == "monster")) and team ~= self.team then
@@ -402,7 +423,9 @@ examobs.known=function(self,ob,type,get)
 	self.storage.known = self.storage.known or {}
 	local en = ob:get_luaentity()
 	local name = (en and (en.examob or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
-	if get then
+	if not type then
+		return self.storage.known[name]
+	elseif get then
 		return self.storage.known[name] == type
 	else
 		self.storage.known[name] = type
@@ -485,11 +508,13 @@ examobs.dropall=function(self)
 		return
 	end
 	for i,v in pairs(self.inv) do
-		minetest.add_item(pos,i .. " " .. v):set_velocity({
-			x=math.random(-1.5,1.5),
-			y=math.random(0.5,1),
-			z=math.random(-1.5,1.5)
-		})
+		if minetest.registered_items[i] then
+			minetest.add_item(pos,i .. " " .. v):set_velocity({
+				x=math.random(-1.5,1.5),
+				y=math.random(0.5,1),
+				z=math.random(-1.5,1.5)
+			})
+		end
 		self.inv[i] = nil
 	end
 end

@@ -125,10 +125,11 @@ examobs.register_mob=function(def)
 		self.on_click(self,clicker)
 	end
 	def.get_staticdata = function(self)
-		self.storage.dead=self.dead
-		self.storage.dying=self.dying
-		self.storage.hp=self.hp
-		self.storage.lifetimer=self.lifetimer
+		self.storage.dead = self.dead
+		self.storage.dying = self.dying
+		self.storage.hp = self.hp
+		self.storage.lifetimer = self.lifetimer
+		self.storage.inv = self.inv
 		return minetest.serialize(self.storage)
 	end
 	def.on_activate=function(self, staticdata)
@@ -139,6 +140,7 @@ examobs.register_mob=function(def)
 		self.dying = self.storage.dying or nil
 		self.hp = self.storage.hp or def.hp
 		self.lifetimer = self.storage.lifetimer or def.lifetimer
+		self.inv = self.storage.inv or def.inv
 
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})
@@ -184,11 +186,17 @@ examobs.register_mob=function(def)
 		local en = puncher:get_luaentity()
 		local dmg = 0
 		if not (en and en.examob == self.examob) then
-			self.fight = puncher
-			examobs.lookat(self,self.fight)
-			if not examobs.known(self,puncher,"flee",true) then
-				examobs.known(self,puncher,"fight")
+			if self.aggressivity > 0 then
+				self.fight = puncher
+				if not examobs.known(self,puncher,"flee",true) then
+					examobs.known(self,puncher,"fight")
+				end
+			elseif self.aggressivity < 0 then
+				self.flee = puncher
+				examobs.known(self,puncher,"flee")
 			end
+			examobs.lookat(self,self.fight)
+
 			self.on_punched(self,puncher)
 		end
 
@@ -211,7 +219,9 @@ examobs.register_mob=function(def)
 		self:hurt(dmg)
 		return self
 	end
-
+	def.on_death=function(self,killer)
+		examobs.dropall(self)
+	end
 	minetest.register_entity(name,def)
 
 	if def.visual == "mesh" then

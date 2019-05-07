@@ -208,7 +208,7 @@ examobs.register_mob({
 	dmg = 1,
 	hp = 5,
 	aggressivity = -1,
---	inv={},
+	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
 	animation = {
@@ -218,13 +218,28 @@ examobs.register_mob({
 		lay = {x=41,y=45,speed=0},
 		attack = {x=20,y=30},
 	},
-	collisionbox={-0.3,-0.4,-0.3,0.3,0.4,0.3},
+	collisionbox={-0.3,-0.35,-0.3,0.3,0.4,0.3},
 	spawn_on={"group:spreading_dirt_type"},
+	egg_timer = math.random(60,600),
 	on_spawn=function(self)
+		self.inv["examobs:feather"]=math.random(1,3)
 		self.storage.skin="examobs_chicken" .. math.random(1,3) ..".png"
 		self.object:set_properties({textures={self.storage.skin}})
 	end,
 	on_load=function(self)
 		self.object:set_properties({textures={self.storage.skin or "examobs_chicken1.png"}})
 	end,
+	step=function(self)
+		self.egg_timer = self.egg_timer -1
+		if self.egg_timer < 1 then
+			if minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
+				minetest.add_node(self:pos(),{name="examobs:egg"})
+				self.egg_timer = math.random(60,600)
+			end
+		end
+	end
+
+
+
+
 })
