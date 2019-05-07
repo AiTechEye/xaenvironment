@@ -239,5 +239,18 @@ examobs.register_mob({
 				self.egg_timer = math.random(60,600)
 			end
 		end
-	end
+	end,
+	is_food=function(self,item)
+		return false
+	end,
+	on_click=function(self,clicker)
+		if math.random(1,5) == 1 and not self.fight then
+			clicker:get_inventory():add_item("main","examobs:chicken_spawner")
+			self.flolow = clicker
+			self.object:remove()
+		else
+			self.flee = clicker
+			examobs.known(self,clicker,"flee")
+		end
+	end,
 })

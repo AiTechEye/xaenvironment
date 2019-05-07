@@ -234,11 +234,16 @@ examobs.register_mob=function(def)
 			mesh=def.mesh,
 			paramtype="light",
 			visual_scale=0.1,
+			walkable = true,
+			pointable = false,
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
 					local p = pointed_thing.above
 					minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, name):set_yaw(math.random(0,6.28))
 					itemstack:take_item()
+				minetest.after(0.5, function(p)
+					minetest.add_node(p,{name="air"})
+				end, p)
 				end
 				return itemstack
 			end,

@@ -39,14 +39,14 @@ examobs.environment=function(self)
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
-		local target = self.fight or self.flee or self.come
+		local target = self.fight or self.flee or self.folow
 		if def.walkable and v.x+v.z ~= 0 then
 			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
 				self:hurt(1)
 			else
 				examobs.jump(self)
 			end
-		elseif v.x+v.z ~= 0 and deff.walkable or (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y <= pos.y) then
+		elseif v.x+v.z ~= 0 and deff.walkable or (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y >= pos.y) then
 			examobs.jump(self)
 		elseif (deff.damage_per_second or 0) > 0 then
 			examobs.stand(self)
@@ -396,13 +396,13 @@ examobs.find_objects=function(self)
 			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
-			elseif flee or known ==  "flee" then
+			elseif known == "flee" or (flee and team ~= self.team) or (self.aggressivity == -1 and en and en.type == "monster") then
 				self.flee = ob
 				return
 			elseif known == "folow" then
 				self.folow = ob
 				return
-			elseif infield and (fight or (en and en.type == "monster")) and team ~= self.team then
+			elseif infield and ((self.aggressivity == 1 and en and en.type == "monster") or self.aggressivity == 2) and team ~= self.team then
 				table.insert(obs,ob)
 			end
 		elseif hungry and en and en.itemstring and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
