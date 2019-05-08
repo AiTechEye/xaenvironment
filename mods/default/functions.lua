@@ -227,7 +227,7 @@ default.defpos=function(pos,n)
 end
 
 default.def=function(name)
-	return minetest.registered_items[name]
+	return minetest.registered_items[name] or {}
 end
 
 default.defname=function(name,n)
