@@ -475,6 +475,10 @@ default.register_plant({
 	groups={grass=1,spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
 		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
+	end,
+	on_plant_spreading=function(pos)
+		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
+		return true
 	end
 })
 default.register_plant({
@@ -496,6 +500,10 @@ default.register_plant({
 	groups={spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
 		minetest.set_node(pos,{name="plants:dry_grass"..math.random(1,5)})
+	end,
+	on_plant_spreading=function(pos)
+		minetest.set_node(pos,{name="plants:dry_grass"..math.random(1,5)})
+		return true
 	end
 })
 
@@ -510,7 +518,14 @@ minetest.register_lbm({
 			local p = minetest.find_nodes_in_area_under_air(vector.add(pos, 1),vector.subtract(pos, 1),{"group:spreading_dirt_type"})
 			if #p > 0 then
 				local p2 = p[1]
-				minetest.set_node({x=p2.x,y=p2.y+1,z=p2.z},node)
+				local def = default.def(minetest.get_node(pos).name)
+				local up = {x=p2.x,y=p2.y+1,z=p2.z}
+				if def.on_plant_spreading and def.on_plant_spreading(up) then
+					return
+				else
+					minetest.set_node(up,node)
+				end
+				
 			end
 		end
 	end
