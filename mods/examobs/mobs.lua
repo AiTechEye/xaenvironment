@@ -292,7 +292,6 @@ examobs.register_mob({
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"grass") > 0
 	end,
-
 	on_spawn=function(self)
 		self.storage.wool = "examobs_wool.png"
 		self.storage.woolen = 1
@@ -316,7 +315,7 @@ examobs.register_mob({
 				minetest.add_item(pos,"examobs:wool")
 				self.storage.woolen = nil
 				self.object:set_properties({textures={"examobs_sheep.png"}})
-				self.storage.wool_timer = math.random(3,9)
+				self.storage.wool_timer = math.random(300,900)
 			elseif minetest.get_item_group(item,"grass")> 0 then
 				self:eat_item(item,2)
 				self.flolow = clicker
