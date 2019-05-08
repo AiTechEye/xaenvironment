@@ -90,9 +90,13 @@ minetest.register_craft({
 		{"","",""}
 	}
 })
+
+--[[
+i have a better plan for this, but in another mod
 minetest.register_node("examobs:wool", {
 	description = "Wool",
 	groups = {oddly_breakable_by_hand=2,choppy=3,wool=1},
 	tiles={"examobs_wool.png"},
 	sounds = default.node_sound_wood_defaults(),
 })
+--]]

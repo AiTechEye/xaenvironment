@@ -11,8 +11,11 @@ examobs.main=function(self, dtime)
 	if self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 
-	if (self.dying or self.dead) and examobs.dying(self) then return end
-	if self.step(self) then return end
+	if (self.dying or self.dead) and examobs.dying(self) then
+		return
+	elseif self.step(self) then
+		return
+	end
 	if examobs.following(self) then return end
 	if examobs.fighting(self) then return end
 	if examobs.fleeing(self) then return end
@@ -56,7 +59,7 @@ examobs.register_mob=function(def)
 	def.spawn_in =			def.spawn_in or			"air"
 	def.light_min =			def.light_min or			9
 	def.light_max =			def.light_max or			13
-	def.lifetime =			def.lifetime or			120
+	def.lifetime =			def.lifetime or			300
 
 
 	def.animation =			def.animation or			{
@@ -80,7 +83,7 @@ examobs.register_mob=function(def)
 	def.on_spawn =			def.on_spawn or			function() end
 	def.on_load =			def.on_load or			function() end
 	def.is_food =			def.is_food or			function() return true end
-
+	def.on_lifedeadline =		def.on_lifedeadline or		function() end
 
 	def.timer1 = 0
 	def.timer2 = 0
@@ -124,7 +127,7 @@ examobs.register_mob=function(def)
 	end
 	def.on_step=examobs.main
 	def.on_rightclick=function(self, clicker)
-		if not self.fight then
+		if not (self.fight or self.dead or self.dying) then
 			examobs.lookat(self,clicker)
 		end
 		self.on_click(self,clicker)

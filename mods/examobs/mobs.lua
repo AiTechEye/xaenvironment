@@ -27,7 +27,7 @@ examobs.register_mob({
 				local item = clicker:get_inventory():get_stack("main",i)
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
-				self.flolow = clicker
+				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
 		end
@@ -64,7 +64,7 @@ examobs.register_mob({
 				local item = clicker:get_inventory():get_stack("main",i)
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
-				self.flolow = clicker
+				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
 		end
@@ -101,7 +101,7 @@ examobs.register_mob({
 				local item = clicker:get_inventory():get_stack("main",i)
 				item:take_item()
 				clicker:get_inventory():set_stack("main",i,item)
-				self.flolow = clicker
+				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
 		end
@@ -246,7 +246,7 @@ examobs.register_mob({
 	on_click=function(self,clicker)
 		if math.random(1,5) == 1 and not self.fight then
 			clicker:get_inventory():add_item("main","examobs:chicken_spawner")
-			self.flolow = clicker
+			self.folow = clicker
 			self.object:remove()
 		else
 			self.flee = clicker
@@ -265,7 +265,7 @@ examobs.register_mob({
 	dmg = 1,
 	hp = 15,
 	aggressivity = -1,
---	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
+	inv={["examobs:flesh"]=1},
 	walk_speed=2,
 	run_speed=4,
 	animation = {
@@ -278,16 +278,9 @@ examobs.register_mob({
 	collisionbox={-0.5,-0.7,-0.5,0.5,0.5,0.5},
 	spawn_on={"group:spreading_dirt_type"},
 	egg_timer = math.random(60,600),
-	step=function(self)
-		--self.egg_timer = self.egg_timer -1
-		if self.egg_timer < 1 then
-			if self.flee or self.fight then
-				self.egg_timer = math.random(60,600)
-			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
-				minetest.add_node(self:pos(),{name="examobs:egg"})
-				self.egg_timer = math.random(60,600)
-			end
-		end
+	on_lifedeadline=function(self)
+		examobs.dying(self,2)
+		return true
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"grass") > 0
@@ -312,25 +305,56 @@ examobs.register_mob({
 				local pos = self:pos()
 				item:add_wear(600)
 				clicker:get_inventory():set_stack("main",i,item)
-				minetest.add_item(pos,"examobs:wool")
+				minetest.add_item(pos,"plants:cotton 4")
 				self.storage.woolen = nil
 				self.object:set_properties({textures={"examobs_sheep.png"}})
-				self.storage.wool_timer = math.random(300,900)
+				self.storage.wool_grow = 0
+				examobs.showtext(self,self.storage.wool_grow .."/10","ffffff")
 			elseif minetest.get_item_group(item,"grass")> 0 then
 				self:eat_item(item,2)
-				self.flolow = clicker
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				item:take_item()
+				clicker:get_inventory():set_stack("main",i,item)
+				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
 		end
 	end,
 	step=function(self)
-		if self.storage.wool_timer then
-			self.storage.wool_timer = self.storage.wool_timer -1
-			if self.storage.wool_timer < 1 then
-				self.storage.wool_timer = nil
-				self.storage.woolen = 1
-				self:on_load()
+		if not self.grass and (math.random(1,10) == 1 or self.lifetimer < self.lifetime/2) then
+			local p = self:pos()
+			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass"})
+			for i,v in pairs(np) do
+				if examobs.visiable(self.object,v) then
+					self.grass = v
+					examobs.stand(self)
+					return true
+				end
+			end
+		elseif self.grass then
+			examobs.lookat(self,self.grass)
+			examobs.walk(self)
+			if not examobs.visiable(self.object,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
+				self.grass = nil
+			elseif examobs.distance(self.object,self.grass) <= 2 then
+				minetest.remove_node(self.grass)
+				self.grass = nil
+				self.lifetimer = self.lifetime
+				examobs.stand(self)
+				examobs.anim(self,"attack")
+				self:heal(1)
+				if self.storage.wool_grow then
+					self.storage.wool_grow = self.storage.wool_grow + 1
+					examobs.showtext(self,self.storage.wool_grow .."/10","ffffff")
+					if self.storage.wool_grow > 10 then
+						self.storage.wool_grow = nil
+						self.storage.woolen = 1
+						self:on_load()
+					end
+				end
+				return true
 			end
 		end
-	end,
+	end
 })

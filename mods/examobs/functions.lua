@@ -26,7 +26,11 @@ examobs.environment=function(self)
 		self.updatetime = self.updatetime_reset
 		self.updatetime_reset = nil
 	elseif self.lifetimer < 0 then
-		self.object:remove()
+		if self:on_lifedeadline() then
+			self.lifetimer = self.lifetime
+		else
+			self.object:remove()
+		end
 		return self
 	end
 	local pos = self:pos()
