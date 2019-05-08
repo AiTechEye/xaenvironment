@@ -77,3 +77,22 @@ minetest.register_craftitem("examobs:feather",{
 	inventory_image = "examobs_feather.png",
 	wield_scale={x=0.5,y=0.5,z=0.2},
 })
+-- ================ sheep ================
+minetest.register_tool("examobs:shears",{
+	description = "Shears",
+	inventory_image = "examobs_shears.png",
+})
+minetest.register_craft({
+	output = "examobs:shears",
+	recipe = {
+		{"","default:iron_ingot",""},
+		{"","default:iron_ingot","default:iron_ingot"},
+		{"","",""}
+	}
+})
+minetest.register_node("examobs:wool", {
+	description = "Wool",
+	groups = {oddly_breakable_by_hand=2,choppy=3,wool=1},
+	tiles={"examobs_wool.png"},
+	sounds = default.node_sound_wood_defaults(),
+})

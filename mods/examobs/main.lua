@@ -89,7 +89,10 @@ examobs.register_mob=function(def)
 	def.lifetimer = def.lifetime
 	def.examob = 0
 
-	def.eat_item=function(self,item)
+	local egg = def.spawner_egg
+	def.spawner_egg = nil
+
+	def.eat_item=function(self,item,add)
 		local s
 		if type(item) == "string" then
 			s = string.split(item," ")
@@ -99,20 +102,22 @@ examobs.register_mob=function(def)
 		else
 			return
 		end
-
-		if minetest.get_item_group(s[1],"eatable") then
-			self:heal(minetest.get_item_group(s[1],"eatable"),minetest.get_item_group(s[1],"gaps"),tonumber(s[2]))
-			examobs.stand(self)
-			return true
-		end
+		local eatable = minetest.get_item_group(s[1],"eatable")
+		local gaps = minetest.get_item_group(s[1],"gaps")
+		self:heal((eatable > 0 and eatable) or add or 1,(gaps > 0 and gaps) or 1,tonumber(s[2]))
+		examobs.stand(self)
+		return true
 	end
 	def.heal=function(self,hp,gaps,num)
 		num = num or 1
 		gaps = gaps or 1
+		local ohp = self.hp
 		self.hp = self.hp + ((hp * gaps) * num )
 		self.hp = (self.hp < self.hp_max and self.hp) or self.hp_max
-		self.object:set_hp(self.hp)
-		examobs.showtext(self,self.hp .. "/" .. self.hp_max,"00ff00")
+		if ohp < self.hp_max then
+			self.object:set_hp(self.hp)
+			examobs.showtext(self,self.hp .. "/" .. self.hp_max,"00ff00")
+		end
 	end
 	def.pos=function(self)
 		return self.object:get_pos()
@@ -224,7 +229,7 @@ examobs.register_mob=function(def)
 	end
 	minetest.register_entity(name,def)
 
-	if def.visual == "mesh" then
+	if not egg and def.visual == "mesh" then
 		minetest.register_node(name .."_spawner", {
 			description = def.name .." spawner",
 			groups={not_in_craftguide=1},

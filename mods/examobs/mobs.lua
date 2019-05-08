@@ -254,3 +254,84 @@ examobs.register_mob({
 		end
 	end,
 })
+
+examobs.register_mob({
+	name = "sheep",
+	spawner_egg = true,
+	textures = {"examobs_wool.png^examobs_sheep.png"},
+	mesh = "examobs_sheep.b3d",
+	type = "animal",
+	team = "sheep",
+	dmg = 1,
+	hp = 15,
+	aggressivity = -1,
+--	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
+	walk_speed=2,
+	run_speed=4,
+	animation = {
+		stand = {x=0,y=10,speed=0},
+		walk = {x=20,y=40,speed=40},
+		run = {x=20,y=40,speed=80},
+		lay = {x=101,y=105,speed=0},
+		attack = {x=50,y=90},
+	},
+	collisionbox={-0.5,-0.7,-0.5,0.5,0.5,0.5},
+	spawn_on={"group:spreading_dirt_type"},
+	egg_timer = math.random(60,600),
+	step=function(self)
+		--self.egg_timer = self.egg_timer -1
+		if self.egg_timer < 1 then
+			if self.flee or self.fight then
+				self.egg_timer = math.random(60,600)
+			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
+				minetest.add_node(self:pos(),{name="examobs:egg"})
+				self.egg_timer = math.random(60,600)
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"grass") > 0
+	end,
+
+	on_spawn=function(self)
+		self.storage.wool = "examobs_wool.png"
+		self.storage.woolen = 1
+		self:on_load()
+	end,
+	on_load=function(self)
+		self.storage.wool = self.storage.wool or "examobs_wool.png"
+		self.object:set_properties({textures={
+			(self.storage.woolen and (self.storage.wool .. "^") or "") .. "examobs_sheep.png"
+		}})
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if item == "examobs:shears" and self.storage.woolen and examobs.known(self,clicker,"folow",true) then
+				local i = clicker:get_wield_index()
+				local item = clicker:get_inventory():get_stack("main",i)
+				local pos = self:pos()
+				item:add_wear(600)
+				clicker:get_inventory():set_stack("main",i,item)
+				minetest.add_item(pos,"examobs:wool")
+				self.storage.woolen = nil
+				self.object:set_properties({textures={"examobs_sheep.png"}})
+				self.storage.wool_timer = math.random(3,9)
+			elseif minetest.get_item_group(item,"grass")> 0 then
+				self:eat_item(item,2)
+				self.flolow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
+	end,
+	step=function(self)
+		if self.storage.wool_timer then
+			self.storage.wool_timer = self.storage.wool_timer -1
+			if self.storage.wool_timer < 1 then
+				self.storage.wool_timer = nil
+				self.storage.woolen = 1
+				self:on_load()
+			end
+		end
+	end,
+})
