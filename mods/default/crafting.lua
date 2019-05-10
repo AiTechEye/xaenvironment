@@ -63,8 +63,6 @@ default.workbench.set_form=function(pos,add)
 		"listring[current_name;stock]" .. 
 		"listring[current_name;craft]".. 
 		"listring[current_player;main]" ..
-		"listring[current_name;output]" ..
-		"listring[current_player;main]" ..
 		craftguide_items ..
 		"image_button[-0.2,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
 		"image_button[0.3,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
@@ -191,7 +189,6 @@ minetest.register_node("default:workbench", {
 		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Workbench")
 		meta:set_int("page", 1)
-
 		meta:set_string("but_size", "0.7,0.7")
 		meta:set_string("x_start", -0.2)
 		meta:set_string("x_add", 0.5)
@@ -225,6 +222,8 @@ minetest.register_node("default:workbench", {
 			end
 			if listname == "craft" then
 				minetest.get_node_timer(pos):start(0.1)
+				local inv = minetest.get_meta(pos):get_inventory()
+				inv:set_stack("output",1,default.workbench.get_craft_result(inv:get_list("craft")))
 			end
 			return stack:get_count()
 		end
@@ -316,9 +315,7 @@ minetest.register_node("default:paper_compressor", {
 			"list[context;input_water;3,0;1,1;]" ..
 			"list[context;output;5,0;1,1;]" ..
 			"listring[current_player;main]" ..
-			"listring[current_name;input_water]" .. 
-			"listring[current_player;main]" ..
-			"listring[current_name;output]"
+			"listring[current_name;input_water]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -403,9 +400,7 @@ minetest.register_node("default:dye_workbench", {
 			"list[context;input_water;3,0;1,1;]" ..
 			"list[context;output;5,0;1,1;]" ..
 			"listring[current_player;main]" ..
-			"listring[current_name;input_water]" .. 
-			"listring[current_player;main]" ..
-			"listring[current_name;output]"
+			"listring[current_name;input_water]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
