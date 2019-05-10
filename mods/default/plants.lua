@@ -74,6 +74,8 @@ default.register_plant=function(def)
 	def.paramtype = def.paramtype or			"light"
 	def.walkable = def.walkable or			false
 	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
+	def.dye_colors = def.dye_colors or			{palette=90,hex="#0f2802",name="dark green"}
+
 
 	minetest.register_node(mod .. def.name, def)
 
@@ -151,6 +153,9 @@ default.register_tree=function(def)
 	def.wood.tiles = def.wood.tiles or				{"default_wood.png"}
 	def.wood.groups = def.wood.groups or				{wood=1,choppy=3,flammable=2}
 	def.wood.sounds = def.wood.sounds or 				default.node_sound_wood_defaults()
+	def.wood.palette = "default_palette.png"
+	def.wood.paramtype2 = "color"
+	def.wood.on_punch=default.dye_coloring
 	minetest.register_node(mod .. def.name .. "_wood", def.wood)
 	minetest.register_craft({
 		output=mod .. def.name .. "_wood 4",
@@ -255,6 +260,7 @@ default.register_tree=function(def)
 				description = def.fruit.description or 			fruit_name,
 				inventory_image = def.fruit.inventory_image or 		"default_apple.png",
 				tiles = def.fruit.tiles or				{"default_apple.png"},
+				dye_colors =  def.fruit.dye_colors,
 				groups = def.fruit.groups or				{dig_immediate=3,leafdecay=5,snappy=3,flammable=3,attached_node=1},
 				sounds = def.fruit.sounds or				default.node_sound_leaves_defaults(),
 				drawtype = def.fruit.drawtype or			"plantlike",

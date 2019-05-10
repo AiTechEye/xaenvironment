@@ -381,7 +381,7 @@ minetest.register_node("default:dye_workbench", {
 				n = 7
 			end
 			meta:set_int("color",p+n)
-			node.param2 = p
+			node.param2 = p+n
 			minetest.swap_node(pos,node)
 			minetest.chat_send_player(player:get_player_name(),node.param2)
 		end
@@ -423,6 +423,7 @@ minetest.register_node("default:dye_workbench", {
 						name=color.name or "dye",
 						description= (color.name and color.name.upper(string.sub(color.name,1,1)) .. string.sub(color.name,2,string.len(color.name))) or ""
 					}
+					item.count = 4
 					inv:set_stack("output",1,item)
 					minetest.swap_node(pos,{name="default:dye_workbench",param2=color.palette})
 				end

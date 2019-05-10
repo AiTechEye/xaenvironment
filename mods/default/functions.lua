@@ -616,3 +616,14 @@ default.take_item=function(clicker)
 	item:take_item()
 	clicker:get_inventory():set_stack("main",i,item)
 end
+
+default.dye_coloring=function(pos, node, player, pointed_thing)
+	if player:get_wielded_item():get_name() == "default:dye" then
+		local color = player:get_wielded_item():to_table()
+		default.take_item(player)
+		if not color.meta.palette_index then
+			return
+		end
+		minetest.swap_node(pos,{name=node.name,param2=color.meta.palette_index or 1})
+	end
+end
