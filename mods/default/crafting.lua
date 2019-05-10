@@ -459,9 +459,6 @@ minetest.register_node("default:dye_workbench", {
 		return inv:is_empty("input") and inv:is_empty("input_water")
 	end,
 	drop="default:dye_workbench 1",
-	on_construct = function(pos, placer)
-		minetest.swap_node(pos,{name="default:dye_workbench",param2=141})
-	end,
 	drawtype = "nodebox",
 	paramtype = "light",
 	node_box = {
