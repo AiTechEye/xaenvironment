@@ -127,9 +127,10 @@ examobs.register_mob=function(def)
 	end
 	def.on_step=examobs.main
 	def.on_rightclick=function(self, clicker)
-		if not (self.fight or self.dead or self.dying) then
-			examobs.lookat(self,clicker)
+		if self.fight or self.dead or self.dying then
+			return
 		end
+		examobs.lookat(self,clicker)
 		self.on_click(self,clicker)
 	end
 	def.get_staticdata = function(self)
