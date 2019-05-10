@@ -121,6 +121,21 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:wool",
+	recipe={
+		{"plants:cotton","plants:cotton"},
+		{"plants:cotton","plants:cotton"},
+	},
+})
+
+minetest.register_craft({
+	output="plants:cotton 4",
+	recipe={
+		{"default:wool"},
+	},
+})
+
+minetest.register_craft({
 	output="default:cobble",
 	recipe={
 		{"default:pebble_stone","default:pebble_stone","default:pebble_stone"},
