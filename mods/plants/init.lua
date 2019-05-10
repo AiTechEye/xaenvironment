@@ -387,7 +387,7 @@ default.register_plant({
 	groups={spreading_plant=20},
 	visual_scale=2.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,2,0.25}},
-	dye_colors = {palette=100,hex="#bbffbb",name="dark green"},
+	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 default.register_plant({
 	name="cow_parsnip_big",
@@ -408,7 +408,7 @@ default.register_plant({
 	groups={spreading_plant=16},
 	visual_scale=3.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,3,0.25}},
-	dye_colors = {palette=100,hex="#bbffbb",name="dark green"},
+	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 
@@ -424,7 +424,7 @@ default.register_plant({
 	groups={spreading_plant=15},
 	visual_scale=1.3,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}},
-	dye_colors = {palette=100,hex="#bbffbb",name="dark green"},
+	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 default.register_plant({
@@ -438,7 +438,7 @@ default.register_plant({
 	}},
 	groups={spreading_plant=10},
 	visual_scale=1.1,
-	dye_colors = {palette=100,hex="#bbffbb",name="dark green"},
+	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 default.register_plant({
