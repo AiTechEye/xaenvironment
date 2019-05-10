@@ -376,7 +376,11 @@ minetest.register_node("default:dye_workbench", {
 		local meta = minetest.get_meta(pos)
 		if meta:get_int("colortest") == 1 then
 			local p = meta:get_int("color")
-			meta:set_int("color",p+1)
+			local n = 1
+			if player:get_wielded_item():get_name() == "default:dye_workbench" then
+				n = 7
+			end
+			meta:set_int("color",p+n)
 			node.param2 = p
 			minetest.swap_node(pos,node)
 			minetest.chat_send_player(player:get_player_name(),node.param2)
