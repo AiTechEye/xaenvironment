@@ -14,6 +14,7 @@ default.register_tree({
 		description = "Apple",
 		tiles={"plants_apple.png"},
 		inventory_image="plants_apple.png",
+		dye_colors = {palette=1,hex="#ff1900"}
 	},
 	tree={tiles={"plants_apple_tree_top.png","plants_apple_tree_top.png","plants_apple_tree.png"}},
 	sapling={tiles={"plants_apple_treesapling.png"}},
@@ -22,7 +23,7 @@ default.register_tree({
 	schematic=minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts",
 	sapling_place_schematic=function(pos)
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts", "random", nil, false)
-	end
+	end,
 })
 
 default.register_tree({
@@ -37,6 +38,7 @@ default.register_tree({
 		description = "Pear",
 		tiles={"plants_pear.png"},
 		inventory_image="plants_pear.png",
+		dye_colors = {palette=94,hex="#a2d400"}
 	},
 	tree={tiles={"plants_pear_tree_top.png","plants_pear_tree_top.png","plants_pear_tree.png"}},
 	sapling={tiles={"plants_pear_tree_sapling.png"}},
@@ -285,21 +287,43 @@ default.register_tree({
 --||||||||||||||||
 -- ======================= plants
 --||||||||||||||||
-
-for i,c in pairs({"d8e41d","b21db5","601db5","bb91f0","e4d9f3","fd0084","6f86ff","ff3030","ff4d00","ffb047","ffb0c5","a6421f"}) do
+local flowers = {
+	["d7c82e"]=132,
+	["8d0087"]=25,
+	["430168"]=32,
+	["ab00ff"]=21,
+	["d6d6d6"]=118,
+	["ff0092"]=14,
+	["017aff"]=49,
+	["ff0031"]=7,
+	["f67601"]=105,
+	["ae8136"]=131,
+	["f690ff"]=124,
+	["431c00"]=111,
+	["00ffc2"]=63,
+	["01ff01"]=77,
+	["ffdb01"]=98,
+	["ff1900"]=1,
+}
+local flowers_i = 0
+for i,v in pairs(flowers) do
+	flowers_i = flowers_i + 1
 	default.register_plant({
-		name="daisybush" .. i,
+		name="daisybush" .. flowers_i,
 		description = "Daisy bush",
-		tiles={"plants_pear_tree_top.png^[colorize:#"..c.."ff^plants_daisybushflower.png^[makealpha:0,255,0"},
+		tiles={"plants_pear_tree_top.png^[colorize:#"..i.."ff^plants_daisybushflower.png^[makealpha:0,255,0"},
 		decoration={noise_params={
 			offset=-0.001,
 			scale=0.003,
-			seed=80*i,
+			seed=80*flowers_i,
 		}},
+		dye_colors = {palette=v,hex="#"..i},
 	})
 end
+flowers_i = nil
+flowers = nil
 
-default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff"})
+default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff",dye_colors = {palette=136,hex="#ff2f00"}})
 default.register_plant({
 	name="lonicera_tatarica",
 	biomes={"deciduous"},
@@ -311,7 +335,8 @@ default.register_plant({
 	drop={max_items = 1,items = {
 		{items = {"plants:lonicera_tatarica_berries"}, rarity = 3},
 		{items = {"plants:lonicera_tatarica"}}
-	}}
+	}},
+	dye_colors = {palette=136,hex="#ff2f00"},
 })
 
 default.register_plant({
@@ -322,7 +347,8 @@ default.register_plant({
 		offset=-0.0015,
 		scale=0.003,
 		seed=545,
-	}}
+	}},
+	dye_colors = {palette=28,hex="#ab00ff"},
 })
 
 default.register_plant({
@@ -333,7 +359,8 @@ default.register_plant({
 		offset=-0.0015,
 		scale=0.003,
 		seed=8745,
-	}}
+	}},
+	dye_colors = {palette=98,hex="#ff7a01"},
 })
 
 default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
@@ -350,7 +377,8 @@ default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
 				end
 			end,name,user,s)
 		end
-	end
+	end,
+	dye_colors = {palette=15,hex="#f7018c"}
 })
 
 default.register_plant({
@@ -365,7 +393,8 @@ default.register_plant({
 	drop={max_items = 1,items = {
 		{items = {"plants:dolls_eyes_berries 3"}, rarity = 2},
 		{items = {"plants:dolls_eyes"}}
-	}}
+	}},
+	dye_colors = {palette=15,hex="#f7018c"},
 })
 
 default.register_plant({
@@ -387,7 +416,6 @@ default.register_plant({
 	groups={spreading_plant=20},
 	visual_scale=2.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,2,0.25}},
-	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 default.register_plant({
 	name="cow_parsnip_big",
@@ -408,7 +436,6 @@ default.register_plant({
 	groups={spreading_plant=16},
 	visual_scale=3.5,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,3,0.25}},
-	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 
@@ -424,7 +451,6 @@ default.register_plant({
 	groups={spreading_plant=15},
 	visual_scale=1.3,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}},
-	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 default.register_plant({
@@ -438,7 +464,6 @@ default.register_plant({
 	}},
 	groups={spreading_plant=10},
 	visual_scale=1.1,
-	dye_colors = {palette=90,hex="#0f2802",name="dark green"},
 })
 
 default.register_plant({
@@ -457,6 +482,7 @@ default.register_plant({
 			seed=0,
 		},
 	},
+	dye_colors = {palette=93,hex="#a2d400"},
 })
 
 for i=1,5 do
@@ -483,7 +509,8 @@ default.register_plant({
 	on_plant_spreading=function(pos)
 		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
 		return true
-	end
+	end,
+	dye_colors = {palette=87,hex="#236801"},
 })
 default.register_plant({
 	name="dry_grass" .. i,
@@ -508,9 +535,9 @@ default.register_plant({
 	on_plant_spreading=function(pos)
 		minetest.set_node(pos,{name="plants:dry_grass"..math.random(1,5)})
 		return true
-	end
+	end,
+	dye_colors = {palette=132,hex="#D7C82E"},
 })
-
 end
 
 minetest.register_lbm({
