@@ -377,7 +377,10 @@ minetest.register_node("default:dye_workbench", {
 		if meta:get_int("colortest") == 1 then
 			local p = meta:get_int("color")
 			local n = 1
-			if player:get_wielded_item():get_name() == "default:dye_workbench" then
+			if p+1 > 255 then
+				n = 0
+				p = 0
+			elseif player:get_wielded_item():get_name() == "default:dye_workbench" then
 				n = 7
 			end
 			meta:set_int("color",p+n)
