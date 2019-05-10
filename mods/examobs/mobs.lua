@@ -23,10 +23,7 @@ examobs.register_mob({
 			local item = clicker:get_wielded_item():get_name()
 			if minetest.get_item_group(item,"meat")> 0 then
 				self:eat_item(item)
-				local i = clicker:get_wield_index()
-				local item = clicker:get_inventory():get_stack("main",i)
-				item:take_item()
-				clicker:get_inventory():set_stack("main",i,item)
+				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
@@ -60,10 +57,7 @@ examobs.register_mob({
 			local item = clicker:get_wielded_item():get_name()
 			if minetest.get_item_group(item,"meat")> 0 then
 				self:eat_item(item)
-				local i = clicker:get_wield_index()
-				local item = clicker:get_inventory():get_stack("main",i)
-				item:take_item()
-				clicker:get_inventory():set_stack("main",i,item)
+				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
@@ -97,10 +91,7 @@ examobs.register_mob({
 			local item = clicker:get_wielded_item():get_name()
 			if minetest.get_item_group(item,"meat")> 0 then
 				self:eat_item(item)
-				local i = clicker:get_wield_index()
-				local item = clicker:get_inventory():get_stack("main",i)
-				item:take_item()
-				clicker:get_inventory():set_stack("main",i,item)
+				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 			end
@@ -137,10 +128,7 @@ examobs.register_mob({
 			local item = clicker:get_wielded_item():get_name()
 			if minetest.get_item_group(item,"meat")> 0 then
 				self:eat_item(item)
-				local i = clicker:get_wield_index()
-				local item = clicker:get_inventory():get_stack("main",i)
-				item:take_item()
-				clicker:get_inventory():set_stack("main",i,item)
+				default.take_item(clicker)
 				self.fight = clicker
 				examobs.known(self,clicker,"fight")
 			end
@@ -291,7 +279,8 @@ examobs.register_mob({
 		self:on_load()
 	end,
 	on_load=function(self)
-		self.storage.wool = self.storage.wool or "examobs_wool.png"
+		local color = self.storage.color and self.storage.color.hex and ("^[colorize:" .. self.storage.color.hex .."cc") or ""
+		self.storage.wool = (self.storage.wool or "examobs_wool.png") .. color
 		self.object:set_properties({textures={
 			(self.storage.woolen and (self.storage.wool .. "^") or "") .. "examobs_sheep.png"
 		}})
@@ -305,19 +294,23 @@ examobs.register_mob({
 				local pos = self:pos()
 				item:add_wear(600)
 				clicker:get_inventory():set_stack("main",i,item)
-				minetest.add_item(pos,"plants:cotton 4")
+				local drop = ItemStack("default:wool"):to_table()
+				drop.meta = self.storage.color
+				minetest.add_item(pos,drop)
 				self.storage.woolen = nil
 				self.object:set_properties({textures={"examobs_sheep.png"}})
 				self.storage.wool_grow = 0
 				examobs.showtext(self,self.storage.wool_grow .."/10","ffffff")
 			elseif minetest.get_item_group(item,"grass")> 0 then
 				self:eat_item(item,2)
-				local i = clicker:get_wield_index()
-				local item = clicker:get_inventory():get_stack("main",i)
-				item:take_item()
-				clicker:get_inventory():set_stack("main",i,item)
+				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
+			elseif item == "default:dye" then
+				local color = clicker:get_wielded_item():to_table()
+				self.storage.color = color.meta
+				default.take_item(clicker)
+				self:on_load()
 			end
 		end
 	end,
