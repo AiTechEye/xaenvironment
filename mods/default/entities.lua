@@ -22,12 +22,10 @@ local item = {
 	end,
 	on_step = function(self,dtime)
 		builtin_item.on_step(self,dtime)
-
 		local pos = self.object:get_pos()
 		local n = minetest.get_node(pos).name
 		local igniter = minetest.get_item_group(n,"igniter")
 		local def = minetest.registered_items[n]
-
 		if not self.flammable then
 			local count = string.find(self.itemstring," ")
 			local item = self.itemstring

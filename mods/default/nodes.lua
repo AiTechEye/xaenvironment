@@ -1,3 +1,37 @@
+minetest.register_node("default:dye", {
+	tiles={"default_wool.png"},
+	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1},
+	palette="default_palette.png",
+	paramtype2="color",
+	drawtype = "mesh",
+	mesh = "default_dye.obj",
+	walkable= false,
+	paramtype = "light",
+	sunlight_propagates = true,
+	selection_box = {
+		type = "fixed",
+		fixed = {{-0.2, -0.5, -0.1, 0.2, -0.3, 0.1}}
+	},
+	on_place=function()
+	end
+})
+
+minetest.register_node("default:wool", {
+	description = "Wool",
+	tiles={"default_wool.png"},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=3},
+	palette="default_palette.png",
+	sounds = default.node_sound_wood_defaults(),
+	paramtype2="color",
+	on_punch = function(pos, node, player, pointed_thing)
+		if player:get_wielded_item():get_name() == "default:dye" then
+			local color = player:get_wielded_item():to_table()
+			minetest.swap_node(pos,{name="default:wool",param2=color.meta.palette_index or 1})
+			default.take_item(player)
+		end
+	end
+})
+
 minetest.register_node("default:gas", {
 	description = "Gas",
 	tiles={"default_gas.png"},

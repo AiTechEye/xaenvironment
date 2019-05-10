@@ -609,3 +609,10 @@ end
 default.punch=function(target,puncher,damage)
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
 end
+
+default.take_item=function(clicker)
+	local i = clicker:get_wield_index()
+	local item = clicker:get_inventory():get_stack("main",i)
+	item:take_item()
+	clicker:get_inventory():set_stack("main",i,item)
+end
