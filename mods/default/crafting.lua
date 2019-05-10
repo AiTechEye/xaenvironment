@@ -113,10 +113,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 				local itlist = ""
 
 				if craft.items and (craft.type == "normal" or craft.type == "workbench") then
-					local craftgl = 9 -- #craft.items
-					--if craftgl < 9 then
-					--	 craftgl = 9
-					--end
+					local craftgl = 9
 					for i1=1, craftgl,1 do
 						local it2s = (i1 and craft.items[i1] or "")
 						local label = ""
@@ -424,7 +421,7 @@ minetest.register_node("default:dye_workbench", {
 						palette_index = color.palette or 1,
 						hex=color.hex or "777777",
 						name=color.name or "dye",
-						description= (color.name and color.name.upper(string.sub(color.name,1,1)) .. string.sub(color.name,2,string.len(color.name)) .. " dye") or "Dye"
+						description= (color.name and color.name.upper(string.sub(color.name,1,1)) .. string.sub(color.name,2,string.len(color.name))) or ""
 					}
 					inv:set_stack("output",1,item)
 					minetest.swap_node(pos,{name="default:dye_workbench",param2=color.palette})
