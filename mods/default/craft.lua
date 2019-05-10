@@ -20,6 +20,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:dye_workbench",
+	recipe={
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","group:wood","group:wood"},
+		{"default:stick","","default:stick"},
+	},
+})
+
+minetest.register_craft({
 	output="default:itemframe",
 	recipe={
 		{"default:stick","default:stick","default:stick"},
