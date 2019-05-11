@@ -113,6 +113,8 @@ examobs.register_mob({
 	aggressivity = 2,
 	swiming = 0,
 	run_speed = 10,
+	light_min = 1,
+	light_max = 9,
 	inv={["default:carbon_ingot"]=1,["examobs:tooth"]=1},
 	animation = {
 		stand = {x=0,y=9},
@@ -150,6 +152,8 @@ examobs.register_mob({
 	swiming = 0,
 	aggressivity = 2,
 	run_speed = 6,
+	light_min = 1,
+	light_max = 9,
 	inv={["default:stone"]=2,["default:iron_lump"]=1},
 	bottom=-1,
 	animation = {
@@ -267,8 +271,10 @@ examobs.register_mob({
 	spawn_on={"group:spreading_dirt_type"},
 	egg_timer = math.random(60,600),
 	on_lifedeadline=function(self)
-		examobs.dying(self,2)
-		return true
+		if self.storage.tamed then
+			examobs.dying(self,2)
+			return true
+		end
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"grass") > 0
@@ -306,6 +312,7 @@ examobs.register_mob({
 				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
+				self.storage.tamed = 1
 			elseif item == "default:dye" then
 				local color = clicker:get_wielded_item():to_table()
 				self.storage.color = color.meta
@@ -333,7 +340,9 @@ examobs.register_mob({
 			elseif examobs.distance(self.object,self.grass) <= 2 then
 				minetest.remove_node(self.grass)
 				self.grass = nil
-				self.lifetimer = self.lifetime
+				if self.storage.tamed then
+					self.lifetimer = self.lifetime
+				end
 				examobs.stand(self)
 				examobs.anim(self,"attack")
 				self:heal(1)

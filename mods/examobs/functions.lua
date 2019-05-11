@@ -237,7 +237,7 @@ examobs.fleeing=function(self)
 		if walkable(p) and walkable(apos(p,0,1)) then
 			if  self.aggressivity > -2 and examobs.distance(self.object,self.flee) <= self.reach then
 				examobs.lookat(self,self.flee)
-				flee = self.flee
+				local flee = self.flee
 				self.fight = self.flee
 				minetest.after(2, function(self,flee)
 					if self and self.object and flee then

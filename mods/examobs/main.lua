@@ -54,11 +54,11 @@ examobs.register_mob=function(def)
 	def.aggressivity =			def.aggressivity or			2
 	def.floating =			def.floating or			{}
 	def.updatetime =			def.updatetime or			1
-	def.spawn_chance =		def.spawn_chance or		50
+	def.spawn_chance =		def.spawn_chance or		100
 	def.spawn_on =			def.spawn_on or			{"group:spreading_dirt_type","group:sand","default:snow"}
-	def.spawn_in =			def.spawn_in or			"air"
+	def.spawn_in =			def.spawn_in
 	def.light_min =			def.light_min or			9
-	def.light_max =			def.light_max or			13
+	def.light_max =			def.light_max or			15
 	def.lifetime =			def.lifetime or			300
 
 
@@ -281,11 +281,9 @@ examobs.register_mob=function(def)
 			local pos1 = apos(pos,0,1)
 			local pos2 = apos(pos,0,2)
 			local l=minetest.get_node_light(pos1)
-			if l==nil then return true end
-			local n1 = minetest.get_node(pos1).name
-			local n2 = minetest.get_node(pos2).name
-			if math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
-				if n1==def.spawn_in and n2==def.spawn_in or minetest.get_item_group(n1,def.spawn_in) > 0 then
+			if l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
+				local n1 = minetest.get_node(pos1).name
+				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
 					minetest.add_entity(apos(pos1,0,def.spawn_y), name):set_yaw(math.random(0,6.28))
 				end
 			end
