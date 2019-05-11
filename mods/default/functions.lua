@@ -618,7 +618,7 @@ default.take_item=function(clicker)
 end
 
 default.dye_coloring=function(pos, node, player, pointed_thing)
-	if player:get_wielded_item():get_name() == "default:dye" then
+	if not minetest.is_protected(pos,player:get_player_name()) and player:get_wielded_item():get_name() == "default:dye" then
 		local color = player:get_wielded_item():to_table()
 		default.take_item(player)
 		if not color.meta.palette_index then

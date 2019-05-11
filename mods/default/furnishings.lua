@@ -26,7 +26,10 @@ default.register_fence=function(def)
 			connect_right={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{0.0625, 0.25, -0.0625, 0.5, 0.375, 0.0625},{0.0625, -0.25, -0.0625, 0.5, -0.125, 0.0625}},
 			connect_left={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.5, 0.25, -0.0625, -0.0625, 0.375, 0.0625},{-0.5, -0.25, -0.0625, -0.0625, -0.125, 0.0625}},
 			fixed = {-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},
-		}
+		},
+		palette="default_palette.png",
+		paramtype2="color",
+		on_punch=default.dye_coloring
 	})
 
 	if def.craft then
@@ -129,7 +132,7 @@ default.register_door=function(def)
 			action_off = function (pos, node)
 				minetest.get_meta(pos):set_int("locked",0)
 			end,
-		}}
+		}},
 	})
 
 	minetest.register_craft({
@@ -239,7 +242,7 @@ default.register_chair=function(def)
 		end,
 		after_place_node = function(pos, placer)
 			minetest.get_meta(pos):set_int("placed",1)
-		end
+		end,
 	})
 
 	minetest.register_craft({
@@ -279,8 +282,6 @@ default.register_chest=function(def)
 	minetest.register_node(name,{
 		description = def.description or uname .. " chest",
 		groups = groups,
-	--	drawtype="nodebox",
-	--	paramtype="light",
 		paramtype2 = "facedir",
 		tiles = tiles or def.tiles,
 		paramtype = "light",
