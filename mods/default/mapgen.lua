@@ -112,6 +112,10 @@ default.register_bio=function(def)
 		y_max =		def.y_max or		31000,
 		heat_point =				def[2],
 		humidity_point =				def[3],
+
+	--	max_pos={x=30000,z=30000},
+	--	min_pos={x=-30000,z=-30000},
+
 	})
 	if def.beach then
 		minetest.register_biome({
@@ -126,6 +130,9 @@ default.register_bio=function(def)
 		y_max = 3,
 		heat_point = def[2],
 		humidity_point = def[3],
+
+	--	max_pos={x=30000,z=30000},
+	--	min_pos={x=-30000,z=-30000},
 		})
 	end
 end
@@ -173,21 +180,146 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 -- =======================Decorations
 --||||||||||||||||
 
---[[
-minetest.register_biome({
-	name = "underground",
-	node_top = "default:dirt_with_grass",
-	depth_top = 1,
-	node_filler = "default:dirt",
-	depth_filler = 5,
-	node_stone = "default:stone",
-	node_water_top = "",
-	depth_water_top =0 ,
-	node_water = "",
-	node_river_water = "",
-	y_min = -31000,
-	y_max = 0,
-	heat_point = 50,
-	humidity_point = 50,
+minetest.register_on_generated(function(minp, maxp, seed)
+	if (minp.x >= 30000 or minp.x <= -30000 or minp.z >= 30000 or minp.z <= -30000) and (maxp.x >= 30000 or maxp.x <= -30000 or maxp.z >= 30000 or maxp.z <= -30000) then
+		local air = minetest.get_content_id("default:end_of_world_air")
+		local airblocking = minetest.get_content_id("default:end_of_world_air2")
+		local sand = minetest.get_content_id("default:end_of_world_sand")
+		local stone = minetest.get_content_id("default:end_of_world_stone")
+		local water = minetest.get_content_id("default:end_of_world_water")
+		local waterblocking = minetest.get_content_id("default:end_of_world_water2")
+		local vox = minetest.get_voxel_manip()
+		local min, max = vox:read_from_map(minp, maxp)
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vox:get_data()
+		for x=min.x,max.x do
+		for y=min.y,max.y do
+		for z=min.z,max.z do
+			if y == -20 then
+				data[area:index(x,y,z)] = sand
+			elseif y < -20 then
+				data[area:index(x,y,z)] = stone
+
+			elseif y > -20 and (x >= 30500 or x <= -30500 or z >= 30500 or z <= -30500) then
+				if y > -20 and y <= 1 then
+					data[area:index(x,y,z)] = waterblocking
+				elseif y > 1 then
+					data[area:index(x,y,z)] = airblocking
+				end
+			elseif y > -20 and y <= 1 then
+				data[area:index(x,y,z)] = water
+			else
+				data[area:index(x,y,z)] = air
+			end
+		end
+		end
+		end
+		vox:set_data(data)
+		vox:write_to_map()
+	end
+end)
+
+minetest.register_node("default:end_of_world_sand", {
+	tiles={"default_sand.png"},
+	drop = "",
+	drowning = 1,
 })
---]]
+minetest.register_node("default:end_of_world_stone", {
+	tiles={"default_stone.png"},
+	drop = "",
+	drowning = 1,
+})
+minetest.register_node("default:end_of_world_air", {
+	drawtype = "airlike",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	drowning = 1,
+	drop = "",
+	paramtype = "light",
+	sunlight_propagates = true,
+})
+minetest.register_node("default:end_of_world_air2", {
+	drawtype = "airlike",
+	pointable = false,
+	diggable = false,
+	drowning = 1,
+	drop = "",
+	paramtype = "light",
+	sunlight_propagates = true,
+})
+
+minetest.register_node("default:end_of_world_water", {
+	tiles={
+		{
+			name = "default_salt_water_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
+		},
+		{
+			name = "default_salt_water_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
+		}
+	},
+	alpha =165,
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	drop = "",
+	drowning = 1,
+	drawtype = "liquid",
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:salt_water_flowing",
+	liquid_alternative_source = "default:end_of_world_water",
+	liquid_viscosity = 1,
+	liquid_renewable = false,
+	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
+	sounds = default.node_sound_water_defaults(),
+})
+
+minetest.register_node("default:end_of_world_water2", {
+	tiles={
+		{
+			name = "default_salt_water_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
+		},
+		{
+			name = "default_salt_water_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2,
+			}
+		}
+	},
+	alpha =165,
+	paramtype = "light",
+	pointable = false,
+	drop = "",
+	drowning = 1,
+	liquid_range = 0,
+	drawtype = "liquid",
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:end_of_world_water2",
+	liquid_alternative_source = "default:end_of_world_water2",
+})
