@@ -181,13 +181,16 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 
 minetest.register_on_generated(function(minp, maxp, seed)
-	if (minp.x >= 30000 or minp.x <= -30000 or minp.z >= 30000 or minp.z <= -30000) and (maxp.x >= 30000 or maxp.x <= -30000 or maxp.z >= 30000 or maxp.z <= -30000) then
+	if (minp.y <= -30000 or maxp.y <= -30000 ) or ((minp.x >= 30000 or minp.x <= -30000 or minp.z >= 30000 or minp.z <= -30000) and (maxp.x >= 30000 or maxp.x <= -30000 or maxp.z >= 30000 or maxp.z <= -30000)) then
+
 		local air = minetest.get_content_id("default:end_of_world_air")
 		local airblocking = minetest.get_content_id("default:end_of_world_air2")
 		local sand = minetest.get_content_id("default:end_of_world_sand")
 		local stone = minetest.get_content_id("default:end_of_world_stone")
 		local water = minetest.get_content_id("default:end_of_world_water")
 		local waterblocking = minetest.get_content_id("default:end_of_world_water2")
+		local lava = minetest.get_content_id("default:end_of_world_lava")
+		local lavablocking = minetest.get_content_id("default:end_of_world_lava2")
 		local vox = minetest.get_voxel_manip()
 		local min, max = vox:read_from_map(minp, maxp)
 		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
@@ -197,9 +200,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for z=min.z,max.z do
 			if y == -20 then
 				data[area:index(x,y,z)] = sand
-			elseif y < -20 then
+			elseif y < -29920 and y > -30000 then
+				data[area:index(x,y,z)] = air
+			elseif y < -20 and y > -30000 then
 				data[area:index(x,y,z)] = stone
-
 			elseif y > -20 and (x >= 30500 or x <= -30500 or z >= 30500 or z <= -30500) then
 				if y > -20 and y <= 1 then
 					data[area:index(x,y,z)] = waterblocking
@@ -208,6 +212,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 			elseif y > -20 and y <= 1 then
 				data[area:index(x,y,z)] = water
+			elseif y <= -30500 then
+				data[area:index(x,y,z)] = lavablocking
+			elseif y <= -30000 then
+				data[area:index(x,y,z)] = lava
 			else
 				data[area:index(x,y,z)] = air
 			end
@@ -223,11 +231,13 @@ minetest.register_node("default:end_of_world_sand", {
 	tiles={"default_sand.png"},
 	drop = "",
 	drowning = 1,
+	groups={not_in_creative_inventory = 1},
 })
 minetest.register_node("default:end_of_world_stone", {
 	tiles={"default_stone.png"},
 	drop = "",
 	drowning = 1,
+	groups={not_in_creative_inventory = 1},
 })
 minetest.register_node("default:end_of_world_air", {
 	drawtype = "airlike",
@@ -238,6 +248,8 @@ minetest.register_node("default:end_of_world_air", {
 	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
+	floodable = false,
+	groups={not_in_creative_inventory = 1},
 })
 minetest.register_node("default:end_of_world_air2", {
 	drawtype = "airlike",
@@ -247,6 +259,8 @@ minetest.register_node("default:end_of_world_air2", {
 	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
+	floodable = false,
+	groups={not_in_creative_inventory = 1},
 })
 
 minetest.register_node("default:end_of_world_water", {
@@ -287,6 +301,7 @@ minetest.register_node("default:end_of_world_water", {
 	liquid_renewable = false,
 	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
 	sounds = default.node_sound_water_defaults(),
+	groups={not_in_creative_inventory = 1},
 })
 
 minetest.register_node("default:end_of_world_water2", {
@@ -322,4 +337,89 @@ minetest.register_node("default:end_of_world_water2", {
 	liquidtype = "source",
 	liquid_alternative_flowing = "default:end_of_world_water2",
 	liquid_alternative_source = "default:end_of_world_water2",
+	groups={not_in_creative_inventory = 1},
+})
+
+minetest.register_node("default:end_of_world_lava", {
+	description = "Lava source",
+	tiles={
+		{
+			name = "default_lava_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		},
+		{
+			name = "default_lava_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		}
+	},
+	drawtype = "liquid",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	light_source=13,
+	drop = "",
+	liquid_range = 0,
+	drowning = 1,
+	damage_per_second = 1000,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:end_of_world_lava",
+	liquid_alternative_source = "default:end_of_world_lava",
+	liquid_viscosity = 20,
+	liquid_renewable = false,
+	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
+	groups={not_in_creative_inventory = 1,igniter=1000},
+})
+minetest.register_node("default:end_of_world_lava2", {
+	description = "Lava source",
+	tiles={
+		{
+			name = "default_lava_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		},
+		{
+			name = "default_lava_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 2,
+			}
+		}
+	},
+	drawtype = "liquid",
+	paramtype = "light",
+	pointable = false,
+	diggable = false,
+	light_source=13,
+	drop = "",
+	drowning = 1,
+	liquid_range = 0,
+	damage_per_second = 1000,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:end_of_world_lava2",
+	liquid_alternative_source = "default:end_of_world_lava2",
+	liquid_viscosity = 20,
+	liquid_renewable = false,
+	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
+	groups={not_in_creative_inventory = 1,igniter=1000},
 })
