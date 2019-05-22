@@ -332,7 +332,6 @@ end
 
 examobs.walk=function(self,run)
 	if self.is_floating and examobs.fly(self,run) then return end
-	local pos=self:pos()
 	local yaw=examobs.num(self.object:get_yaw())
 	local runing = run
 	run = run and self.run_speed or self.walk_speed
@@ -397,7 +396,9 @@ examobs.find_objects=function(self)
 			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
 			local known = examobs.known(self,ob)
-			if infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
+
+			if ob:is_player() and examobs.hiding[ob:get_player_name()] then
+			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
 			elseif known == "flee" or (flee and team ~= self.team) or (self.aggressivity == -1 and en and en.type == "monster") then

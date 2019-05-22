@@ -9,6 +9,23 @@ default.register_eatable("craftitem","examobs:meat",3,4,{
 	inventory_image = "examobs_meat.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
+minetest.register_tool("examobs:hiding_poison", {
+	description = "Hiding poison",
+	inventory_image = "materials_plant_extracts.png",
+	sound=default.tool_breaks_defaults(),
+	on_use=function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		if examobs.hiding[name] then
+			examobs.hiding[name] = nil
+			minetest.chat_send_player(name,"off")
+		else
+			examobs.hiding[name] = true
+			minetest.chat_send_player(name,"on")
+		end
+	end,
+})
+
+
 -- ================ Wolf ================
 
 minetest.register_craftitem("examobs:pelt",{
@@ -90,13 +107,3 @@ minetest.register_craft({
 		{"","",""}
 	}
 })
-
---[[
-i have a better plan for this, but in another mod
-minetest.register_node("examobs:wool", {
-	description = "Wool",
-	groups = {oddly_breakable_by_hand=2,choppy=3,wool=1},
-	tiles={"examobs_wool.png"},
-	sounds = default.node_sound_wood_defaults(),
-})
---]]

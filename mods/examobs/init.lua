@@ -1,4 +1,4 @@
-examobs={}
+examobs={hiding={}}
 
 dofile(minetest.get_modpath("examobs") .. "/main.lua")
 dofile(minetest.get_modpath("examobs") .. "/functions.lua")

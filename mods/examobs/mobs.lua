@@ -199,7 +199,7 @@ examobs.register_mob({
 	team = "chicken",
 	dmg = 1,
 	hp = 5,
-	aggressivity = -1,
+	aggressivity = -2,
 	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
@@ -329,6 +329,7 @@ examobs.register_mob({
 				if examobs.visiable(self.object,v) then
 					self.grass = v
 					examobs.stand(self)
+					minetest.sound_play("examobs_sheep", {object=self.object, gain = 1, max_hear_distance = 10})
 					return true
 				end
 			end
@@ -369,7 +370,7 @@ examobs.register_mob({
 	team = "duck",
 	dmg = 1,
 	hp = 5,
-	aggressivity = -2,
+	aggressivity = -1,
 	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
@@ -420,6 +421,7 @@ examobs.register_mob({
 				if examobs.visiable(self.object,v) then
 					self.grass = v
 					examobs.stand(self)
+					minetest.sound_play("examobs_duck", {object=self.object, gain = 1, max_hear_distance = 10})
 					return true
 				end
 			end
