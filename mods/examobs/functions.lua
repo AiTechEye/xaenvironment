@@ -396,8 +396,11 @@ examobs.find_objects=function(self)
 			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
 			local known = examobs.known(self,ob)
-
-			if ob:is_player() and examobs.hiding[ob:get_player_name()] then
+			local player = ob:is_player()
+			if player then
+				self.lifetimer = self.lifetime
+			end
+			if player and examobs.hiding[ob:get_player_name()] then
 			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return

@@ -1,7 +1,22 @@
-examobs.main=function(self, dtime)
+minetest.register_globalstep(function(dtime)
+	if examobs.global_timer <= os.clock() then
+		examobs.global_lifetime = (math.floor(examobs.global_time*100) / 100) + 1
+		examobs.global_lifetime = examobs.global_lifetime <= 1.1 and examobs.global_lifetime or examobs.global_lifetime * 10
+		examobs.global_timer = os.clock() + 1
+		examobs.global_time = 0
+	end
+end)
+
+examobs.on_step=function(self, dtime)
+	local time = os.clock()
 	self.timer1 = self.timer1 + dtime
 	self.timer2 = self.timer2 + dtime
-	self.lifetimer = self.lifetimer - dtime
+	self.lifetimer = self.lifetimer - (dtime*examobs.global_lifetime)
+	examobs.main(self, dtime)
+	examobs.global_time = examobs.global_time + os.clock() - time
+end
+
+examobs.main=function(self, dtime)
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
 		self.environment_timer2 = self.environment_timer2 + self.timer1
@@ -126,7 +141,7 @@ examobs.register_mob=function(def)
 	def.pos=function(self)
 		return self.object:get_pos()
 	end
-	def.on_step=examobs.main
+	def.on_step=examobs.on_step
 	def.on_rightclick=function(self, clicker)
 		if self.fight or self.dead or self.dying then
 			return
@@ -282,7 +297,7 @@ examobs.register_mob=function(def)
 			local pos1 = apos(pos,0,1)
 			local pos2 = apos(pos,0,2)
 			local l=minetest.get_node_light(pos1)
-			if l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
+			if examobs.global_lifetime <= 10 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
 					minetest.add_entity(apos(pos1,0,bottom), name):set_yaw(math.random(0,6.28))
