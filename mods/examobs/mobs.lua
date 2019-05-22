@@ -360,3 +360,85 @@ examobs.register_mob({
 		end
 	end
 })
+
+examobs.register_mob({
+	name = "duck",
+	textures = {"examobs_duck1.png"},
+	mesh = "examobs_duck.b3d",
+	type = "animal",
+	team = "duck",
+	dmg = 1,
+	hp = 5,
+	aggressivity = -2,
+	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
+	walk_speed=2,
+	run_speed=4,
+	animation = {
+		stand = {x=0,y=6,speed=0},
+		walk = {x=10,y=20,speed=20},
+		run = {x=10,y=20,speed=40},
+		lay = {x=59,y=60,speed=0},
+		attack = {x=35,y=44},
+		eat = {x=45,y=55},
+	},
+	collisionbox={-0.4,-0.42,-0.4,0.4,0.25,0.4},
+	spawn_on={"group:spreading_dirt_type"},
+	on_spawn=function(self)
+		self.inv["examobs:feather"]=math.random(1,3)
+		self.storage.skin="examobs_duck" .. math.random(1,4) ..".png"
+		self.object:set_properties({textures={self.storage.skin}})
+	end,
+	on_load=function(self)
+		self.object:set_properties({textures={self.storage.skin or "examobs_duck1.png"}})
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"grass") > 0
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if not self.fight and minetest.get_item_group(item,"grass")> 0 then
+				self:eat_item(item,2)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			elseif math.random(1,5) == 1 and not self.fight then
+				clicker:get_inventory():add_item("main","examobs:duck_spawner")
+				self.folow = clicker
+				self.object:remove()
+			else
+				self.flee = clicker
+				examobs.known(self,clicker,"flee")
+			end
+		end
+	end,
+	step=function(self)
+		if not self.grass and (math.random(1,10) == 1 or self.lifetimer < self.lifetime/2) then
+			local p = self:pos()
+			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass"})
+			for i,v in pairs(np) do
+				if examobs.visiable(self.object,v) then
+					self.grass = v
+					examobs.stand(self)
+					return true
+				end
+			end
+		elseif self.grass then
+			examobs.lookat(self,self.grass)
+			examobs.walk(self)
+			if not examobs.visiable(self.object,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
+				self.grass = nil
+			elseif examobs.distance(self.object,self.grass) <= 2 then
+				minetest.remove_node(self.grass)
+				self.grass = nil
+				if self.storage.tamed then
+					self.lifetimer = self.lifetime
+				end
+				examobs.stand(self)
+				examobs.anim(self,"eat")
+				self:heal(1)
+				return true
+			end
+		end
+	end
+})
