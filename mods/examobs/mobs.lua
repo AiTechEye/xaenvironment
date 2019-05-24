@@ -486,19 +486,12 @@ examobs.register_mob({
 		end
 	end,
 	is_food=function(self,item)
-		return minetest.get_item_group(item,"grass") > 0
+		return false
 	end,
 	on_click=function(self,clicker)
 		if clicker:is_player() then
-			local item = clicker:get_wielded_item():get_name()
-			if not self.fight and minetest.get_item_group(item,"grass")> 0 then
-				self:eat_item(item,2)
-				default.take_item(clicker)
-				self.folow = clicker
-				examobs.known(self,clicker,"folow")
-			elseif math.random(1,5) == 1 and not self.fight then
-				clicker:get_inventory():add_item("main","examobs:duck_spawner")
-				self.folow = clicker
+			if math.random(1,10) == 1 and not (self.fight or self.flee) then
+				clicker:get_inventory():add_item("main","examobs:magpie_spawner")
 				self.object:remove()
 			else
 				self.flee = clicker
