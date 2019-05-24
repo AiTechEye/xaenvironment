@@ -308,7 +308,9 @@ examobs.stand=function(self)
 		x = 0,
 		y = self.object:get_velocity().y,
 		z = 0})
-	examobs.anim(self,"stand")
+	if not self.on_stand(self) then
+		examobs.anim(self,"stand")
+	end
 	return self
 end
 
@@ -326,6 +328,7 @@ examobs.fly=function(self,run)
 			y=((pos1.y-pos2.y)*run)/d,
 			z=((pos1.z-pos2.z)*run)/d
 		})
+		self.on_fly(self)
 		return true
 	end
 end
@@ -333,18 +336,18 @@ end
 examobs.walk=function(self,run)
 	if self.is_floating and examobs.fly(self,run) then return end
 	local yaw=examobs.num(self.object:get_yaw())
-	local runing = run
-	run = run and self.run_speed or self.walk_speed
+	local running = run
+	self.movingspeed = run and self.run_speed or self.walk_speed
 	local x = math.sin(yaw) * -1
 	local z = math.cos(yaw) * 1
 	local y = self.object:get_velocity().y
 	self.object:set_velocity({
-		x = x*run,
+		x = x*self.movingspeed,
 		y = y,
-		z = z*run
+		z = z*self.movingspeed
 	})
-
-	if runing then
+	if self.on_walk(self) then return end
+	if running then
 		examobs.anim(self,"run")
 	else
 		examobs.anim(self,"walk")

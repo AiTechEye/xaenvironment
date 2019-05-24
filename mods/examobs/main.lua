@@ -99,6 +99,9 @@ examobs.register_mob=function(def)
 	def.on_load =			def.on_load or			function() end
 	def.is_food =			def.is_food or			function() return true end
 	def.on_lifedeadline =		def.on_lifedeadline or		function() end
+	def.on_walk =			def.on_walk or			function() end
+	def.on_fly =			def.on_fly or			function() end
+	def.on_stand =			def.on_stand or			function() end
 
 	def.timer1 = 0
 	def.timer2 = 0
