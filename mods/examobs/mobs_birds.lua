@@ -21,9 +21,8 @@ examobs.register_bird=function(def)
 		fly = {x=5,y=15},
 		float = {x=0,y=0,speed=0},
 	}
-	def2.collisionbox={-0.3,-0.22,-0.3,0.3,0.15,0.4}
+	def2.collisionbox = def.collisionbox or {-0.3,-0.22,-0.3,0.3,0.15,0.3}
 	def2.spawn_on = def.spawn_on or {"group:spreading_dirt_type"}
-	
 	def.on_spawn = def.on_spawn or function() end
 	def.on_load = def.on_load or function() end
 	def.is_food = def.is_food or function() end
@@ -52,10 +51,10 @@ examobs.register_bird=function(def)
 		return def.is_food(self)
 	end
 	def2.on_click=function(self,clicker)
-		def.on_click(self)
+		if def.on_click(self) then return end
 		if clicker:is_player() then
 			if math.random(1,10) == 1 and not (self.fight or self.flee) then
-				clicker:get_inventory():add_item("main",self.name "_spawner")
+				clicker:get_inventory():add_item("main",self.name .. "_spawner")
 				self.object:remove()
 			else
 				self.flee = clicker
@@ -76,7 +75,11 @@ examobs.register_bird=function(def)
 		if self.storage.fly then
 			examobs.anim(self,"fly")
 			local v = self.object:get_velocity()
-			if self.movingspeed > self.walk_speed then
+			if self.fight and self:pos().y-0.4 > self.fight:get_pos().y then
+				self.object:set_velocity({x=v.x,y=self.run_speed*-1,z=v.z})
+			elseif self.fight and self:pos().y+0.4 < self.fight:get_pos().y then
+				self.object:set_velocity({x=v.x,y=self.run_speed,z=v.z})
+			elseif self.movingspeed > self.walk_speed then
 				self.object:set_velocity({x=v.x,y=3,z=v.z})
 			else
 				self.object:set_velocity({x=v.x,y=0.5,z=v.z})
@@ -95,7 +98,9 @@ examobs.register_bird=function(def)
 		end
 	end
 	def2.step=function(self)
-		if not self.storage.fly and (self.flee or self.object:get_velocity().y < 0 or math.random(1,10) == 1) then
+		if def.step(self) then
+			return self
+		elseif not self.storage.fly and (self.flee or self.fight or self.object:get_velocity().y < 0 or math.random(1,10) == 1) then
 			self.object:set_velocity({x=0,y=1,z=0})
 			self.storage.fly = 1
 			self.floating = {["air"]=1}
@@ -107,7 +112,6 @@ examobs.register_bird=function(def)
 			examobs.stand(self)
 			examobs.anim(self,"stand")
 		end
-		return def.step(self)
 	end
 	for i,v in pairs(def) do
 		if not def2[i] then

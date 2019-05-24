@@ -107,7 +107,7 @@ examobs.register_mob({
 	textures = {"uexamobs_underground_wolf.png"},
 	mesh = "examobs_wolf.b3d",
 	type = "monster",
-	team = "carbon",
+	team = "coal",
 	dmg = 4,
 	hp = 30,
 	aggressivity = 2,
@@ -445,10 +445,91 @@ examobs.register_mob({
 	end
 })
 
-
 examobs.register_bird({
 	name = "magpie",
+	textures={"examobs_magpie.png"},
+	on_click=function(self)
+		return self
+	end,
 	step=function(self)
+		if not self.item and math.random(1,2) == 1 then
+			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
+				local en = ob:get_luaentity()
+				if en and en.itemstring and examobs.visiable(self.object,ob) then
+					self.item = ob
+					self.fight = ob
+					return
+				end
+			end
+		elseif self.item then
+			if not self.item:get_pos() or not examobs.visiable(self.object,self.item) then
+				self.item = nil
+				return
+			elseif examobs.distance(self.object,self.item) <= 1 then
+				local item = string.split(self.item:get_luaentity().itemstring," ")
+				if minetest.get_item_group(item[1],"eatable") > 0 then
+					self:eat_item(item[1])
+				elseif item[1] then
+					self.inv[item[1]] = (self.inv[item[1]] or 0) + (item[2] and tonumber(item[2]) or 1)
+				end
+				self.lifetimer = self.lifetime
+				self.item:remove()
+				self.item = nil
+			else
+				examobs.lookat(self,self.item)
+				examobs.walk(self)
+			end
+			return self
+		end
+	end
+})
 
+examobs.register_bird({
+	name = "crow",
+	aggressivity = 1,
+	textures={"examobs_crow.png"},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"eatable") > 0
+	end
+})
+
+examobs.register_bird({
+	name = "gull",
+	textures={"examobs_gull.png"},
+	visual_size={x=1.5,y=1.5},
+	collisionbox={-0.4,-0.33,-0.4,0.4,0.3,0.4},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"eatable") > 0
+	end
+})
+
+examobs.register_bird({
+	name = "coalcrow",
+	aggressivity = 2,
+	is_food=function(self,item)
+		return true
+	end,
+	hp = 10,
+	dmg = 4,
+	team = "coal",
+	type = "monster",
+	run_speed = 4,
+	walk_speed = 2,
+	inv = {["default:coal_lump"]=1},
+	spawn_on = {"group:stone","group:spreading_dirt_type"},
+	light_min = 1,
+	light_max = 10,
+	textures={"examobs_coalcrow.png"},
+	on_spawn=function(self)
+		self.storage.size = math.random(1,2)
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.size == 2 then
+			self.object:set_properties({
+				visual_size={x=1.5,y=1.5},
+				collisionbox={-0.4,-0.33,-0.4,0.4,0.3,0.4}
+			})
+		end
 	end
 })

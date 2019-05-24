@@ -358,7 +358,8 @@ end
 examobs.lookat=function(self,pos2)
 	if type(pos2) == "userdata" then
 		pos2=pos2:get_pos()
-	elseif not pos2 then
+	end
+	if not (pos2 and pos2.z) then
 		return
 	end
 	local pos1=self.object:get_pos()
@@ -493,7 +494,7 @@ end
 examobs.distance=function(pos1,pos2)
 	pos1 = type(pos1) == "userdata" and pos1:get_pos() or pos1
 	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
-	return vector.distance(pos1,pos2)
+	return pos1.z and pos2.z and vector.distance(pos1,pos2) or 0
 end
 
 examobs.punch=function(puncher,target,damage)
