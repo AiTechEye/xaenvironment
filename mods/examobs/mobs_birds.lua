@@ -109,8 +109,10 @@ examobs.register_bird=function(def)
 		end
 		return def.step(self)
 	end
-
-
-print(dump(def2))
+	for i,v in pairs(def) do
+		if not def2[i] then
+			def2[i]=v
+		end
+	end
 	examobs.register_mob(def2)
 end
