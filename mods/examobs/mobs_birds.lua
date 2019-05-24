@@ -1,4 +1,5 @@
 examobs.register_bird=function(def)
+	def = def or {}
 	local def2 = {}
 	def2.name = def.name or "bird"
 	def2.textures = def.textures or {"examobs_bird.png"}

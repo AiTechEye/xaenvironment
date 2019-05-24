@@ -445,6 +445,8 @@ examobs.register_mob({
 	end
 })
 
+examobs.register_bird()
+
 examobs.register_bird({
 	name = "magpie",
 	textures={"examobs_magpie.png"},
