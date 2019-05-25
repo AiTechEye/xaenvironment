@@ -65,26 +65,33 @@ examobs.register_bird=function(def)
 	end
 	def2.on_fly=function(self)
 		def.on_fly(self)
+--print(self.name,22)
 		examobs.anim(self,"fly")
 		if self.flee then
 			local v = self.object:get_velocity()
 			self.object:set_velocity({x=v.x,y=3,z=v.z})
 		end
 	end
-	def2.on_walk=function(self)
+	def2.on_walk=function(self,x,y,z)
 		def.on_walk(self)
 		if self.storage.fly then
 			examobs.anim(self,"fly")
-			local v = self.object:get_velocity()
-			if self.fight and self:pos().y-0.4 > self.fight:get_pos().y then
-				self.object:set_velocity({x=v.x,y=self.run_speed*-1,z=v.z})
-			elseif self.fight and self:pos().y+0.4 < self.fight:get_pos().y then
-				self.object:set_velocity({x=v.x,y=self.run_speed,z=v.z})
+			local target = self.target or self.fight
+			target = target and target:get_pos()
+			if target and self:pos().y-0.4 > target.y then
+				y = self.run_speed*-1
+			elseif target and self:pos().y+0.4 < target.y then
+				y = self.run_speed
 			elseif self.movingspeed > self.walk_speed then
-				self.object:set_velocity({x=v.x,y=3,z=v.z})
+				y = 3
 			else
-				self.object:set_velocity({x=v.x,y=0.5,z=v.z})
+				y = 0.5
 			end
+			if target then
+				x = x * self.run_speed
+				z = z * self.run_speed
+			end
+			self.object:set_velocity({x=x,y=y,z=z})
 			return 1
 		end
 	end
@@ -101,6 +108,10 @@ examobs.register_bird=function(def)
 	def2.step=function(self)
 		if def.step(self) then
 			return self
+
+		elseif self.fight and self.storage.fly then
+			local v = self.object:get_velocity()
+			self.object:set_velocity({x=v.x*self.run_speed,y=v.y*self.run_speed,z=v.z*self.run_speed})
 		elseif not self.storage.fly and (self.flee or self.fight or self.object:get_velocity().y < 0 or math.random(1,10) == 1) then
 			self.object:set_velocity({x=0,y=1,z=0})
 			self.storage.fly = 1

@@ -486,13 +486,14 @@ examobs.register_bird({
 				local en = ob:get_luaentity()
 				if en and en.itemstring and examobs.visiable(self.object,ob) then
 					self.item = ob
-					self.fight = ob
+					self.target = ob
 					return
 				end
 			end
 		elseif self.item then
 			if not self.item:get_pos() or not examobs.visiable(self.object,self.item) then
 				self.item = nil
+				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.item) <= 1 then
 				local item = string.split(self.item:get_luaentity().itemstring," ")
@@ -504,6 +505,7 @@ examobs.register_bird({
 				self.lifetimer = self.lifetime
 				self.item:remove()
 				self.item = nil
+				self.target = nil
 			else
 				examobs.lookat(self,self.item)
 				examobs.walk(self)

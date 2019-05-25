@@ -16,7 +16,7 @@ end
 
 examobs.environment=function(self)
 	self.environment_timer = 0
-	if (self.flee or self.fight or self.folow) and not (self.dead or self.dying) then
+	if (self.flee or self.fight or self.folow or self.target) and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
 		if not (self.updatetime_reset or self.folow) then
 			self.updatetime_reset = self.updatetime
@@ -318,17 +318,16 @@ examobs.fly=function(self,run)
 	if self.fight or self.folow or self.flee then
 		local pos1 = self:pos()
 		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos())
-		run = run and self.walk_run or self.walk_speed
+		run = run and self.walk_run*5 or self.walk_speed
 		if not self.flee then
 			run = run *-1
 		end
 		local d = examobs.distance(pos1,pos2)
-		self.object:set_velocity({
-			x=((pos1.x-pos2.x)*run)/d,
-			y=((pos1.y-pos2.y)*run)/d,
-			z=((pos1.z-pos2.z)*run)/d
-		})
-		self.on_fly(self)
+		local x = ((pos1.x-pos2.x)/d)*run
+		local y = ((pos1.y-pos2.y)/d)*run
+		local z = ((pos1.z-pos2.z)/d)*run
+		self.object:set_velocity({x=x,y=y,z=z})
+		self.on_fly(self,x,y,z)
 		return true
 	end
 end
@@ -338,20 +337,24 @@ examobs.walk=function(self,run)
 	local yaw=examobs.num(self.object:get_yaw())
 	local running = run
 	self.movingspeed = run and self.run_speed or self.walk_speed
-	local x = math.sin(yaw) * -1
-	local z = math.cos(yaw) * 1
+	local x = (math.sin(yaw) * -1) * self.movingspeed
+	local z = (math.cos(yaw) * 1) * self.movingspeed
 	local y = self.object:get_velocity().y
+
 	self.object:set_velocity({
-		x = x*self.movingspeed,
+		x = x,
 		y = y,
-		z = z*self.movingspeed
+		z = z
 	})
-	if self.on_walk(self) then return end
+
+	if self.on_walk(self,x,y,z) then return end
+
 	if running then
 		examobs.anim(self,"run")
 	else
 		examobs.anim(self,"walk")
 	end
+
 	return self
 end
 
@@ -494,7 +497,7 @@ end
 examobs.distance=function(pos1,pos2)
 	pos1 = type(pos1) == "userdata" and pos1:get_pos() or pos1
 	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
-	return pos1.z and pos2.z and vector.distance(pos1,pos2) or 0
+	return pos2 and pos1.z and pos2.z and vector.distance(pos1,pos2) or 0
 end
 
 examobs.punch=function(puncher,target,damage)
