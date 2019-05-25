@@ -271,10 +271,9 @@ examobs.register_mob({
 	spawn_on={"group:spreading_dirt_type"},
 	egg_timer = math.random(60,600),
 	on_lifedeadline=function(self)
-		if self.storage.tamed then
-			return true
-		else
+		if self.lifetimer < 0 and self.storage.tamed then
 			examobs.dying(self,2)
+			return true
 		end
 	end,
 	is_food=function(self,item)
