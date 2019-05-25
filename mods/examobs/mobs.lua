@@ -416,14 +416,30 @@ examobs.register_mob({
 	step=function(self)
 		if not self.grass and (math.random(1,10) == 1 or self.lifetimer < self.lifetime/2) then
 			local p = self:pos()
-			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass"})
+			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass","group:water"})
 			for i,v in pairs(np) do
 				if examobs.visiable(self.object,v) then
-					self.grass = v
+					if minetest.get_item_group(minetest.get_node(v).name,"grass") > 0 then
+						self.grass = v
+					elseif self.lifetimer > self.lifetime/2 then
+						self.water = v
+					end
 					examobs.stand(self)
 					minetest.sound_play("examobs_duck", {object=self.object, gain = 1, max_hear_distance = 10})
 					return true
 				end
+			end
+		elseif self.water then
+			examobs.lookat(self,self.water)
+			examobs.walk(self)
+			if not examobs.visiable(self.object,self.water) or minetest.get_item_group(minetest.get_node(self.water).name,"water") == 0 then
+				self.water = nil
+			elseif examobs.distance(self.object,self.water) <= 2 then
+				minetest.remove_node(self.grass)
+				self.water = nil
+				examobs.stand(self)
+				examobs.anim(self,"eat")
+				return true
 			end
 		elseif self.grass then
 			examobs.lookat(self,self.grass)
@@ -445,7 +461,18 @@ examobs.register_mob({
 	end
 })
 
-examobs.register_bird()
+examobs.register_bird({
+	visual_size= {x=0.5,y=0.5,z=0.5},
+	collisionbox={-0.2,-0.13,-0.2,0.2,0.2,0.2},
+	step=function(self)
+		if self.storage.fly and not (self.fight or self.flee) and math.random(1,30) == 1 then
+			minetest.sound_play("examobs_bird1", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	is_food=function(self,item)
+		return false
+	end
+})
 
 examobs.register_bird({
 	name = "magpie",
@@ -454,7 +481,7 @@ examobs.register_bird({
 		return self
 	end,
 	step=function(self)
-		if not self.item and math.random(1,2) == 1 then
+		if not self.item and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
 				if en and en.itemstring and examobs.visiable(self.object,ob) then
@@ -483,6 +510,9 @@ examobs.register_bird({
 			end
 			return self
 		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"eatable") > 0
 	end
 })
 
@@ -498,8 +528,13 @@ examobs.register_bird({
 examobs.register_bird({
 	name = "gull",
 	textures={"examobs_gull.png"},
-	visual_size={x=1.5,y=1.5},
+	visual_size={x=1.5,y=1.5,z=1.5},
 	collisionbox={-0.4,-0.33,-0.4,0.4,0.3,0.4},
+	step=function(self)
+		if self.storage.fly and not self.flee and math.random(1,10) == 1 then
+			minetest.sound_play("examobs_gull", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"eatable") > 0
 	end
@@ -533,5 +568,8 @@ examobs.register_bird({
 				collisionbox={-0.4,-0.33,-0.4,0.4,0.3,0.4}
 			})
 		end
+	end,
+	is_food=function(self,item)
+		return true
 	end
 })
