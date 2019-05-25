@@ -322,6 +322,7 @@ examobs.fly=function(self,run)
 		if not self.flee then
 			run = run *-1
 		end
+		if not pos2 then return end
 		local d = examobs.distance(pos1,pos2)
 		local x = ((pos1.x-pos2.x)/d)*run
 		local y = ((pos1.y-pos2.y)/d)*run

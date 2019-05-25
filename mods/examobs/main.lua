@@ -26,6 +26,15 @@ examobs.main=function(self, dtime)
 	if self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 
+	if not self.static_save and examobs.global_lifetime > 1 and not self:on_lifedeadline() then
+		self.object:set_properties({static_save = false})
+		self.static_save = true
+
+	elseif self.static_save and examobs.global_lifetime <= 1 then
+		self.object:set_properties({static_save = true})
+		self.static_save = nil
+	end	
+
 	if (self.dying or self.dead) and examobs.dying(self) then
 		return
 	elseif self.step(self) then
@@ -300,7 +309,7 @@ examobs.register_mob=function(def)
 			local pos1 = apos(pos,0,1)
 			local pos2 = apos(pos,0,2)
 			local l=minetest.get_node_light(pos1)
-			if examobs.global_lifetime <= 10 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
+			if examobs.global_lifetime <= 1 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
 					minetest.add_entity(apos(pos1,0,bottom), name):set_yaw(math.random(0,6.28))

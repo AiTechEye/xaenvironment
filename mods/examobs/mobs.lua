@@ -435,10 +435,8 @@ examobs.register_mob({
 			if not examobs.visiable(self.object,self.water) or minetest.get_item_group(minetest.get_node(self.water).name,"water") == 0 then
 				self.water = nil
 			elseif examobs.distance(self.object,self.water) <= 2 then
-				minetest.remove_node(self.grass)
 				self.water = nil
 				examobs.stand(self)
-				examobs.anim(self,"eat")
 				return true
 			end
 		elseif self.grass then
