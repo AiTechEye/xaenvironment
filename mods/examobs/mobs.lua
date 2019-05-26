@@ -628,6 +628,7 @@ examobs.register_fish({
 	dmg = 5,
 	aggressivity = 2,
 	run_speed = 6,
+	spawn_chance = 500,
 	textures = {"examobs_pike.png"},
 	on_spawn=function(self)
 		self.storage.size = math.random(1.5,2)
@@ -644,6 +645,7 @@ examobs.register_fish({
 	type = "monster",
 	hp = 10,
 	dmg = 2,
+	spawn_chance = 1000,
 	aggressivity = 2,
 	run_speed = 10,
 	textures = {"examobs_piranha.png"},
@@ -656,6 +658,17 @@ examobs.register_fish({
 				examobs.punch(self.object,self.fight,2)
 			end
 		end
-	end
+	end,
+	on_spawn=function(self)
+		local p = self:pos()
+		minetest.after(0.1,function(p)
+			if not self.clone then
+				for i=0,math.random(1,5) do
+					local en = minetest.add_entity(p,"examobs:piranha")
+					en:get_luaentity().clone = true
+				end
+			end
+		end,p)
+	end,
 })
 
