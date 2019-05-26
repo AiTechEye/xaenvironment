@@ -620,3 +620,21 @@ examobs.register_fish({
 		self.object:set_properties({visual_size= {x=s,y=s,z=s}})
 	end
 })
+examobs.register_fish({
+	name = "pike",
+	team = "pike",
+	type = "monster",
+	hp = 10,
+	dmg = 5,
+	aggressivity = 2,
+	run_speed = 6,
+	textures = {"examobs_pike.png"},
+	on_spawn=function(self)
+		self.storage.size = math.random(1.5,2)
+		self:on_load()
+	end,
+	on_load=function(self)
+		local s = self.storage.size or 1
+		self.object:set_properties({visual_size= {x=s,y=s,z=s*2}})
+	end
+})
