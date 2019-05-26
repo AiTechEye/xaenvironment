@@ -573,3 +573,13 @@ examobs.register_bird({
 		return true
 	end
 })
+
+
+
+examobs.register_fish({
+	name = "perch",
+	textures = {"examobs_perch.png"},
+	step=function(self)
+		--return minetest.get_item_group(item,"eatable") > 0
+	end
+})

@@ -111,7 +111,7 @@ examobs.environment=function(self)
 
 --floating
 
-	if self.floating[def.name] then
+	if self.floating_in_group and minetest.get_item_group(def.name,self.floating_in_group) > 0 or self.floating[def.name] then
 		if not self.is_floating then
 			self.is_floating = true
 			local v = self.object:get_velocity()
@@ -315,10 +315,10 @@ examobs.stand=function(self)
 end
 
 examobs.fly=function(self,run)
-	if self.fight or self.folow or self.flee then
+	if self.fight or self.folow or self.flee or self.target then
 		local pos1 = self:pos()
-		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos())
-		run = run and self.walk_run*5 or self.walk_speed
+		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos()) or (self.target and self.target:get_pos())
+		run = run and self.walk_run*2 or self.walk_speed
 		if not self.flee then
 			run = run *-1
 		end
@@ -378,7 +378,7 @@ examobs.num=function(a)
 end
 
 examobs.anim=function(self,type)
-	if self.visual ~= "mesh" or type == self.anim then return end
+	if self.visual ~= "mesh" or type == self.anim or not self.animation then return end
 	local a=self.animation[type]
 	if not a then return end
 	self.object:set_animation({x=a.x, y=a.y,},a.speed,false,a.loop)

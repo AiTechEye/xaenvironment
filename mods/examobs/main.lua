@@ -37,7 +37,7 @@ examobs.main=function(self, dtime)
 
 	if (self.dying or self.dead) and examobs.dying(self) then
 		return
-	elseif self.step(self) then
+	elseif self.step(self) or self.target then
 		return
 	end
 	if examobs.following(self) then return end
@@ -77,6 +77,7 @@ examobs.register_mob=function(def)
 	def.inv = 				def.inv or				{}
 	def.aggressivity =			def.aggressivity or			2
 	def.floating =			def.floating or			{}
+	def.floating_in_group =		def.floating_in_group
 	def.updatetime =			def.updatetime or			1
 	def.spawn_chance =		def.spawn_chance or		100
 	def.spawn_on =			def.spawn_on or			{"group:spreading_dirt_type","group:sand","default:snow"}
@@ -85,20 +86,22 @@ examobs.register_mob=function(def)
 	def.light_max =			def.light_max or			15
 	def.lifetime =			def.lifetime or			300
 
+	def.animation =			def.animation
+	--	stand={x=1,y=39,speed=30},
+	--	walk={x=41,y=61,speed=30},
+	--	run={x=41,y=61,speed=60},
+	--	attack={x=65,y=75,speed=30},
+	--	lay={x=113,y=123,speed=0},
+	--}
+	if def.animation then
+		if def.animation.walk then
+			def.animation.run = def.animation.run or {x=def.animation.walk.x,y=def.animation.walk.y,speed = 60}
+		end
+		for i, a in pairs(def.animation) do
+			def.animation[i].speed = def.animation[i].speed or 30
+		end
+	end
 
-	def.animation =			def.animation or			{
-		stand={x=1,y=39,speed=30},
-		walk={x=41,y=61,speed=30},
-		run={x=41,y=61,speed=60},
-		attack={x=65,y=75,speed=30},
-		lay={x=113,y=123,speed=0},
-	}
-	if def.animation.walk then
-		def.animation.run = def.animation.run or {x=def.animation.walk.x,y=def.animation.walk.y,speed = 60}
-	end
-	for i, a in pairs(def.animation) do
-		def.animation[i].speed = def.animation[i].speed or 30
-	end
 
 	def.on_dying =			def.on_dying or			function() end
 	def.death =			def.death or			function() end
@@ -212,8 +215,9 @@ examobs.register_mob=function(def)
 				examobs.dying(self,1)
 				return self
 			else
-				self.death(self,pos,punched_by)
+				self.death(self,pos)
 				examobs.dropall(self)
+				self.object:remove()
 				return self
 			end
 		end
