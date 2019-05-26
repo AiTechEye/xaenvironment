@@ -138,7 +138,7 @@ examobs.register_fish=function(def)
 
 	local mobname = minetest.get_current_modname() ..":" .. def2.name
 
-	def2.textures = def.textures or {"examobs_perch.png"}
+	def2.textures = def.textures or {"examobs_fish.png"}
 	def2.mesh = def.mesh or "examobs_fish.obj"
 	def2.type = def.type or "animal"
 	def2.team = def.team or "fish"
@@ -156,7 +156,7 @@ examobs.register_fish=function(def)
 	def2.floating_in_group = def.floating_in_group or "water"
 	def2.light_min = def.light_min or 5
 	def2.breathing = 0
-	--def2.backface_culling = true
+
 	def2.lay_on_death = def.lay_on_death or 0
 	def2.inv = def.inv or {[mobname]=1}
 	def.is_food = def.is_food or function() end
@@ -231,8 +231,8 @@ examobs.register_fish=function(def)
 		mesh = "examobs_fish.obj",
 		tiles=def2.textures,
 		paramtype ="light",
-		paramtype2 ="facedir",
 		groups = {dig_immediate = 3,eatable=1,meat=1,fish=1},
 		sounds = default.node_sound_defaults(),
+		walkable = false,
 	})
 end

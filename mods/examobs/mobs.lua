@@ -574,12 +574,50 @@ examobs.register_bird({
 	end
 })
 
-
+examobs.register_fish({
+	name = "fish",
+	color = true,
+	on_spawn=function(self)
+		local n
+		local c = ""
+		local t="0123456789ABCDEF"
+		if math.random(1,2) == 1 then
+  			for i=1,3,1 do
+        				n=math.random(1,16)
+       				c=c .. string.sub(t,n,n) .. string.sub(t,n,n)
+			end
+		else
+  			for i=1,6,1 do
+        				n=math.random(1,16)
+       				c=c ..string.sub(t,n,n)
+			end
+		end
+		 for i=1,2,1 do
+        			n=math.random(8,16)
+       			c=c ..string.sub(t,n,n)
+		end
+		self.storage.size = math.random(0.5,2)
+		self.storage.color = c
+		self:on_load()
+	end,
+	on_load=function(self)
+		local s = self.storage.size or 1
+		self.object:set_properties({
+			textures={"examobs_fish.png^[colorize:#" .. self.storage.color or "ffffff"},
+			visual_size= {x=s,y=s,z=s},
+		})
+	end
+})
 
 examobs.register_fish({
 	name = "perch",
 	textures = {"examobs_perch.png"},
-	step=function(self)
-		--return minetest.get_item_group(item,"eatable") > 0
+	on_spawn=function(self)
+		self.storage.size = math.random(0.5,2)
+		self:on_load()
+	end,
+	on_load=function(self)
+		local s = self.storage.size or 1
+		self.object:set_properties({visual_size= {x=s,y=s,z=s}})
 	end
 })
