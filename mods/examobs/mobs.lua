@@ -575,7 +575,6 @@ examobs.register_bird({
 })
 
 examobs.register_fish({
-	name = "fish",
 	color = true,
 	on_spawn=function(self)
 		local n
