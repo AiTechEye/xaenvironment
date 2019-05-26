@@ -638,3 +638,24 @@ examobs.register_fish({
 		self.object:set_properties({visual_size= {x=s,y=s,z=s*2}})
 	end
 })
+examobs.register_fish({
+	name = "piranha",
+	team = "piranha",
+	type = "monster",
+	hp = 10,
+	dmg = 2,
+	aggressivity = 2,
+	run_speed = 10,
+	textures = {"examobs_piranha.png"},
+	step=function(self)
+		if self.fight and examobs.distance(self.object,self.fight) <= 3 and self.fight:get_pos() then
+			local p = apos(self:pos(),math.random(-1,1),math.random(-1,1),math.random(-1,1))
+			if minetest.get_item_group(minetest.get_node(p).name,"water") > 0 then
+				self.object:set_pos(p)
+				examobs.lookat(self,self.fight)
+				examobs.punch(self.object,self.fight,2)
+			end
+		end
+	end
+})
+
