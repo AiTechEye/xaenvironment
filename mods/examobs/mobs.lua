@@ -482,7 +482,7 @@ examobs.register_bird({
 		if not self.item and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
-				if en and en.itemstring and examobs.visiable(self.object,ob) then
+				if en and en.name == "__builtin:item" and examobs.visiable(self.object,ob) then
 					self.item = ob
 					self.target = ob
 					return

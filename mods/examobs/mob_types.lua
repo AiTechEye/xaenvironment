@@ -187,7 +187,7 @@ examobs.register_fish=function(def)
 		elseif not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
-				if en and en.itemstring and examobs.viewfield(self,ob) and examobs.visiable(self.object,ob) then
+				if en and (en.name == "__builtin:item" or en.examobs_fishing_target) and examobs.viewfield(self,ob) and examobs.visiable(self.object,ob) then
 					self.target =  ob
 					return
 				elseif not examobs.team(ob) and examobs.visiable(self.object,ob) and not (ob:is_player() and examobs.hiding[ob:get_player_name()]) then
@@ -200,7 +200,13 @@ examobs.register_fish=function(def)
 				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.target) <= 1 then
-				local item = string.split(self.target:get_luaentity().itemstring," ")
+				local en = self.target:get_luaentity()
+				if en.examobs_fishing_target then
+					en:on_trigger(self.object)
+					self.target = nil
+					return
+				end
+				local item = string.split(en.itemstring," ")
 				if minetest.get_item_group(item[1],"eatable") > 0 then
 					self:eat_item(item[1])
 				elseif item[1] then

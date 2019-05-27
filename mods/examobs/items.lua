@@ -113,8 +113,6 @@ minetest.register_entity("examobs:fishing_string",{
 	physical = false,
 	visual = "cube",
 	pointable = false,
-	--mesh = "examobs_cube.obj",
-	--visual_size={x=1,y=1,z=1},
 	textures={"examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png"},
 	on_activate=function(self, staticdata)
 		for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), 1)) do
@@ -138,22 +136,41 @@ minetest.register_entity("examobs:fishing_string",{
 })
 
 minetest.register_entity("examobs:fishing_float",{
-	physical = true,
+	physical = false,
 	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1,},
 	visual = "cube",
 	visual_size={x=0.1,y=0.1,z=0.1},
+	pointable = false,
 	textures={"default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png"},
+	examobs_fishing_target = true,
 	on_activate=function(self, staticdata)
 		self.object:set_acceleration({x=0,y=-5,z=0})
 		self.string = minetest.add_entity(self.object:get_pos(), "examobs:fishing_string")
 		self.string:get_luaentity().float = self.object
 	end,
-	on_step=function(self,dtime)
-		if not (self.user and self.string and self.user:get_wielded_item():get_name() == "examobs:fishing_rod") or examobs.distance(self.object,self.user) > 30 or not (examobs.visiable(self.object,self.user)) then
-			if self.string then
-				self.string:remove()
+	on_trigger=function(self,catch)
+		self.object:set_acceleration({x=0,y=0,z=0})
+		self.catch = catch
+	end,
+	delete=function(self,catched)
+		if self.string then
+			self.string:remove()
+		end
+		self.object:remove()
+		if catched then
+			local item = self.user:get_wielded_item()
+			local i = self.user:get_wield_index()
+			if item:get_wear() < 60000 then
+				item:add_wear(3000)
+			else
+				item = ItemStack("examobs:fishing_rod")
 			end
-			self.object:remove()
+			self.user:get_inventory():set_stack("main",i,item)
+		end
+	end,
+	on_step=function(self,dtime)
+		if not (self.user and self.string and self.user:get_wielded_item():get_name() == "examobs:fishing_rod_with_string") or examobs.distance(self.object,self.user) > 30 or not (examobs.visiable(self.object,self.user)) then
+			self:delete()
 			return
 		end
 		local pos1 = self.object:get_pos()
@@ -169,7 +186,29 @@ minetest.register_entity("examobs:fishing_float",{
 		self.string:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
 		self.string:set_properties({visual_size={x=examobs.distance(pos1,pos2),y=0.01,z=0.01}})
 
-		if not self.water and minetest.get_item_group(minetest.get_node(pos1).name,"water") > 0 then
+		if examobs.distance(pos1,pos2) > 25 then
+			self.object:set_velocity({x=vec.x*-1,y=self.object:get_velocity().y,z=vec.z*-1})
+		elseif self.catch then
+			if examobs.distance(pos1,pos2) < 1 then
+				local pos3 = self.catch:get_pos()
+				examobs.punch(self.user,self.catch,examobs.gethp(self.catch))
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos3, 2)) do
+					local en = ob:get_luaentity()
+					if en and en.name == "__builtin:item" then
+						examobs.punch(self.user,ob,1)
+					end
+				end
+				self:delete(true)
+				return
+			end
+			pos2 = self.catch:get_pos()
+			if not pos2 then
+				self:delete()
+			end
+			self.object:set_velocity({x=vec.x*-2,y=vec.y*-2,z=vec.z*-2})
+			self.catch:set_velocity({x=(pos2.x-pos1.x)*-2, y=(pos2.y-pos1.y)*-2, z=(pos2.z-pos1.z)*-2})
+			return
+		elseif not self.water and minetest.get_item_group(minetest.get_node(pos1).name,"water") > 0 then
 			self.object:set_acceleration({x=0,y=1,z=0})
 			self.object:set_velocity({x=0,y=0,z=0})
 			self.water = true
@@ -182,28 +221,56 @@ minetest.register_entity("examobs:fishing_float",{
 			end
 		else
 			self.object:set_acceleration({x=0,y=-5,z=0})
+			if walkable(pos1) then
+				self:delete()
+			end
 		end
 	end
 })
 
-minetest.register_tool("examobs:fishing_rod", {
-	description = "Fishing rod (WIP)",
+minetest.register_craftitem("examobs:fishing_rod", {
+	description = "Fishing rod",
 	inventory_image = "examobs_fishing_rod.png",
+})
+
+minetest.register_tool("examobs:fishing_rod_with_string", {
+	description = "Fishing rod with string",
+	inventory_image = "examobs_fishing_rod_with_string.png",
 	sound=default.tool_breaks_defaults(),
 	on_use=function(itemstack, user, pointed_thing)
-		local f = minetest.add_entity(user:get_pos(), "examobs:fishing_float")
+		local pos = user:get_pos()
+		local name = user:get_player_name()
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 30)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "examobs:fishing_float" and en.user_name == name then
+				en:delete()
+				return itemstack
+			end
+		end
+		local f = minetest.add_entity(apos(pos,0,1.5), "examobs:fishing_float")
 		f:set_rotation({x=90.,y=0,z=0})
 		f:get_luaentity().user = user
+		f:get_luaentity().user_name = name
 		local d=user:get_look_dir()
 		f:set_velocity({x=d.x*10,y=d.y*10,z=d.z*10})
+		return itemstack
 	end
+})
+
+minetest.register_craft({
+	output = "examobs:fishing_rod_with_string",
+	recipe = {
+		{"","materials:string",""},
+		{"","materials:string","examobs:fishing_rod"},
+		{"","materials:string",""}
+	}
 })
 
 minetest.register_craft({
 	output = "examobs:fishing_rod",
 	recipe = {
 		{"","materials:string","default:stick"},
-		{"materials:piece_of_wood","materials:string","default:stick"},
-		{"default:iron_ingot","materials:string","default:stick"}
+		{"","materials:piece_of_wood","default:stick"},
+		{"","default:iron_ingot","default:stick"}
 	}
 })

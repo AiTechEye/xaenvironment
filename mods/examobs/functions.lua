@@ -275,7 +275,7 @@ examobs.fighting=function(self)
 					examobs.jump(self)
 				end
 				local en = self.fight:get_luaentity()
-				if en and en.itemstring then
+				if en and en.name == "__builtin:item" then
 					self:eat_item(en.itemstring)
 				end
 				examobs.punch(self.object,self.fight,self.dmg)
@@ -421,7 +421,7 @@ examobs.find_objects=function(self)
 			elseif infield and ((self.aggressivity == 1 and en and en.type == "monster") or self.aggressivity == 2) and team ~= self.team then
 				table.insert(obs,ob)
 			end
-		elseif hungry and en and en.itemstring and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
+		elseif hungry and en and en.name == "__builtin:item" and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
 			if minetest.get_item_group(string.split(en.itemstring," ")[1],"eatable") > 0 and self.is_food(self,string.split(en.itemstring," ")[1]) then
 				self.fight = ob
 				return
