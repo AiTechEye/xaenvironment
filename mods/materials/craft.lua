@@ -60,5 +60,10 @@ minetest.register_craft({
 		{"group:stick","group:stick","group:stick"},
 		{"group:stick","group:stick","group:stick"},
 		{"group:stick","group:stick","group:stick"},
-	},
+	}
 })
+minetest.register_craft({
+	output="materials:string",
+	recipe={{"plants:cotton"}}
+})
+

@@ -68,3 +68,8 @@ minetest.register_node("materials:mixed_wood", {
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
 	sounds = default.node_sound_wood_defaults(),
 })
+minetest.register_craftitem("materials:string", {
+	description = "String",
+	inventory_image = "materials_string.png",
+	groups = {flammable = 1},
+})
