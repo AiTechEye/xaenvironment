@@ -151,10 +151,13 @@ minetest.register_entity("examobs:fishing_float",{
 	on_trigger=function(self,catch)
 		self.object:set_acceleration({x=0,y=0,z=0})
 		self.catch = catch
+		self:wear()
+	end,
+	wear=function(self)
 		local item = self.user:get_wielded_item()
 		local i = self.user:get_wield_index()
 		if item:get_wear() < 60000 then
-			item:add_wear(3000)
+			item:add_wear(1500)
 		else
 			item = ItemStack("examobs:fishing_rod")
 		end
@@ -196,6 +199,7 @@ minetest.register_entity("examobs:fishing_float",{
 						examobs.punch(self.user,ob,1)
 					end
 				end
+				self:wear()
 				self:delete()
 				return
 			end
@@ -220,12 +224,13 @@ minetest.register_entity("examobs:fishing_float",{
 minetest.register_craftitem("examobs:fishing_rod", {
 	description = "Fishing rod",
 	inventory_image = "examobs_fishing_rod.png",
+	groups={flammable=3},
 })
 
 minetest.register_tool("examobs:fishing_rod_with_string", {
 	description = "Fishing rod with string",
 	inventory_image = "examobs_fishing_rod_with_string.png",
-	sound=default.tool_breaks_defaults(),
+	groups={flammable=3},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		local name = user:get_player_name()
