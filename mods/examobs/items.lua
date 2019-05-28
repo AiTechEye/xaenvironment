@@ -151,22 +151,20 @@ minetest.register_entity("examobs:fishing_float",{
 	on_trigger=function(self,catch)
 		self.object:set_acceleration({x=0,y=0,z=0})
 		self.catch = catch
+		local item = self.user:get_wielded_item()
+		local i = self.user:get_wield_index()
+		if item:get_wear() < 60000 then
+			item:add_wear(3000)
+		else
+			item = ItemStack("examobs:fishing_rod")
+		end
+		self.user:get_inventory():set_stack("main",i,item)
 	end,
-	delete=function(self,catched)
+	delete=function(self)
 		if self.string then
 			self.string:remove()
 		end
 		self.object:remove()
-		if catched then
-			local item = self.user:get_wielded_item()
-			local i = self.user:get_wield_index()
-			if item:get_wear() < 60000 then
-				item:add_wear(3000)
-			else
-				item = ItemStack("examobs:fishing_rod")
-			end
-			self.user:get_inventory():set_stack("main",i,item)
-		end
 	end,
 	on_step=function(self,dtime)
 		if not (self.user and self.string and self.user:get_wielded_item():get_name() == "examobs:fishing_rod_with_string") or examobs.distance(self.object,self.user) > 30 or not (examobs.visiable(self.object,self.user)) then
@@ -198,7 +196,7 @@ minetest.register_entity("examobs:fishing_float",{
 						examobs.punch(self.user,ob,1)
 					end
 				end
-				self:delete(true)
+				self:delete()
 				return
 			end
 			pos2 = self.catch:get_pos()
@@ -208,17 +206,8 @@ minetest.register_entity("examobs:fishing_float",{
 			self.object:set_velocity({x=vec.x*-2,y=vec.y*-2,z=vec.z*-2})
 			self.catch:set_velocity({x=(pos2.x-pos1.x)*-2, y=(pos2.y-pos1.y)*-2, z=(pos2.z-pos1.z)*-2})
 			return
-		elseif not self.water and minetest.get_item_group(minetest.get_node(pos1).name,"water") > 0 then
-			self.object:set_acceleration({x=0,y=1,z=0})
-			self.object:set_velocity({x=0,y=0,z=0})
-			self.water = true
-		elseif self.water and minetest.get_item_group(minetest.get_node(apos(pos1,0,-1)).name,"water") then
-			self.object:set_acceleration({x=0,y=0,z=0})
-			self.object:set_velocity({x=0,y=0,z=0})
-			if not self.floating then
-				self.floating = true
-				self.object:set_pos({x=pos1.x,y=math.floor(pos1.y+0.5)+0.5,z=pos1.z})
-			end
+		elseif minetest.get_item_group(minetest.get_node(pos1).name,"water") > 0 then
+			self.object:set_velocity({x=0,y=1,z=0})
 		else
 			self.object:set_acceleration({x=0,y=-5,z=0})
 			if walkable(pos1) then
