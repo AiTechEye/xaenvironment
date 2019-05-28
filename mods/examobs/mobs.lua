@@ -193,6 +193,7 @@ examobs.register_mob({
 })
 examobs.register_mob({
 	name = "chicken",
+	swiming = 0,
 	textures = {"examobs_chicken1.png"},
 	mesh = "examobs_chicken.b3d",
 	type = "animal",

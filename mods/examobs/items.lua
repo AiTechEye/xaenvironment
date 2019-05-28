@@ -246,6 +246,39 @@ minetest.register_tool("examobs:fishing_rod_with_string", {
 	end
 })
 
+default.register_eatable("node","examobs:fried_fish",1,3, {
+	description = "Fried fish",
+	wield_scale = {x=0.3,y=0.3,z=0.3,},
+	visual_scale=0.1,
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.2,-0.2,-0.2,0.2,0.2,0.2}
+	},
+	drawtype = "mesh",
+	mesh = "examobs_fish.obj",
+	tiles={"examobs_fish.png^[colorize:#000a"},
+	paramtype ="light",
+	paramtype2 ="facedir",
+	groups = {dig_immediate = 3,eatable=1,meat=1,fish=1},
+	sounds = default.node_sound_defaults(),
+	walkable = false,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "examobs:fried_fish",
+	recipe = "group:fish",
+})
+
+minetest.register_craft({
+	output = "examobs:fishing_rod_with_string",
+	recipe = {
+		{"","materials:string",""},
+		{"","materials:string","examobs:fishing_rod"},
+		{"","materials:string",""}
+	}
+})
+
 minetest.register_craft({
 	output = "examobs:fishing_rod_with_string",
 	recipe = {

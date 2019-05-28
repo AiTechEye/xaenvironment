@@ -169,13 +169,8 @@ examobs.register_fish=function(def)
 	def2.on_click=function(self,clicker)
 		if def.on_click(self) then return end
 		if clicker:is_player() then
-			if self.dead or self.dying then
-				clicker:get_inventory():add_item("main",mobname)
-				self.object:remove()
-			else
-				self.flee = clicker
-				examobs.known(self,clicker,"flee")
-			end
+			self.flee = clicker
+			examobs.known(self,clicker,"flee")
 		end
 	end
 	def2.step=function(self)
@@ -184,10 +179,13 @@ examobs.register_fish=function(def)
 		elseif minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
 			self:hurt(1)
 			examobs.stand(self)
+		elseif self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then
+			self.fight = nil
 		elseif not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
-				if en and (en.name == "__builtin:item" or en.examobs_fishing_target) and examobs.viewfield(self,ob) and examobs.visiable(self.object,ob) then
+				local p = ob:get_pos()
+				if en and (en.name == "__builtin:item" or en.examobs_fishing_target) and (minetest.get_node(p).name ~= "air" or minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"water") > 0) and examobs.viewfield(self,ob) and examobs.visiable(self.object,ob) then
 					self.target =  ob
 					return
 				elseif not examobs.team(ob) and examobs.visiable(self.object,ob) and not (ob:is_player() and examobs.hiding[ob:get_player_name()]) then
@@ -233,10 +231,15 @@ examobs.register_fish=function(def)
 		description = "Dead " .. def2.name,
 		wield_scale = {x=0.3,y=0.3,z=0.3,},
 		visual_scale=0.1,
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.2,-0.2,-0.2,0.2,0.2,0.2}
+		},
 		drawtype = "mesh",
 		mesh = "examobs_fish.obj",
 		tiles=def2.textures,
 		paramtype ="light",
+		paramtype2 ="facedir",
 		groups = {dig_immediate = 3,eatable=1,meat=1,fish=1},
 		sounds = default.node_sound_defaults(),
 		walkable = false,
