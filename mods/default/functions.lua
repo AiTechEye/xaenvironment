@@ -617,6 +617,24 @@ default.take_item=function(clicker)
 	clicker:get_inventory():set_stack("main",i,item)
 end
 
+default.dye_texturing=function(i,o,w,h)
+	i = i or 1
+	o = o or 150
+	w = w or 16
+	h = h or 16
+	local x = 2
+	local y = 0
+	local gx = (default.palette_x)*-1
+	for ii=0,i do
+		x = x - 1
+		if x == gx then
+			x = 0
+			y = y -1
+		end
+	end
+	return "([combine:1x1:"..x..","..y.."=default_palette.png^[opacity:"..o.."^[resize:"..w.."x"..h..")"
+end
+
 default.dye_coloring=function(pos, node, player, pointed_thing)
 	if not minetest.is_protected(pos,player:get_player_name()) and player:get_wielded_item():get_name() == "default:dye" then
 		local color = player:get_wielded_item():to_table()
