@@ -1,3 +1,21 @@
+minetest.register_globalstep(function(dtime)
+	if examobs.global_timer <= os.clock() then
+		examobs.global_lifetime = (math.floor(examobs.global_time*100) / 100) + 1
+		examobs.global_lifetime = examobs.global_lifetime <= 1.1 and examobs.global_lifetime or examobs.global_lifetime * 10
+		examobs.global_timer = os.clock() + 1
+		examobs.global_time = 0
+	end
+end)
+
+examobs.on_step=function(self, dtime)
+	local time = os.clock()
+	self.timer1 = self.timer1 + dtime
+	self.timer2 = self.timer2 + dtime
+	self.lifetimer = self.lifetimer - (dtime*examobs.global_lifetime)
+	examobs.main(self, dtime)
+	examobs.global_time = examobs.global_time + os.clock() - time
+end
+
 apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
 end
@@ -33,6 +51,7 @@ examobs.environment=function(self)
 		end
 		return self
 	end
+
 	local pos = self:pos()
 	local posf = examobs.pointat(self)
 	pos = apos(pos,0,self.bottom)
@@ -44,9 +63,10 @@ examobs.environment=function(self)
 
 	if not (self.dying or self.dead or self.is_floating) then
 		local target = self.fight or self.flee or self.folow
-		if def.walkable and v.x+v.z ~= 0 then
+		if def.walkable and v.x+v.z == 0 then
 			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
 				self:hurt(1)
+
 			else
 				examobs.jump(self)
 			end
@@ -412,7 +432,7 @@ examobs.find_objects=function(self)
 			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
-			elseif known == "flee" or (flee and team ~= self.team) or (self.aggressivity == -1 and en and en.type == "monster") then
+			elseif known == "flee" or (flee and team ~= self.team and (self.flee_from_threats_only == 0 or player)) or (self.aggressivity == -1 and en and en.type == "monster") then
 				self.flee = ob
 				return
 			elseif known == "folow" then

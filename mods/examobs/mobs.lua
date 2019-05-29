@@ -201,6 +201,7 @@ examobs.register_mob({
 	dmg = 1,
 	hp = 5,
 	aggressivity = -2,
+	flee_from_threats_only = 1,
 	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
@@ -229,6 +230,9 @@ examobs.register_mob({
 				self.egg_timer = math.random(60,600)
 			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
 				minetest.add_node(self:pos(),{name="examobs:egg"})
+				meta:set_int("date",default.date("get"))
+				meta:set_int("hours",math.random(1,6))
+				minetest.get_node_timer(pointed_thing.above):start(10)
 				self.egg_timer = math.random(60,600)
 			end
 		end
@@ -258,6 +262,7 @@ examobs.register_mob({
 	dmg = 1,
 	hp = 15,
 	aggressivity = -1,
+	flee_from_threats_only = 1,
 	inv={["examobs:flesh"]=1},
 	walk_speed=2,
 	run_speed=4,
@@ -529,6 +534,8 @@ examobs.register_bird({
 examobs.register_bird({
 	name = "gull",
 	textures={"examobs_gull.png"},
+	aggressivity = -2,
+	flee_from_threats_only = 1,
 	visual_size={x=1.5,y=1.5,z=1.5},
 	collisionbox={-0.4,-0.33,-0.4,0.4,0.3,0.4},
 	step=function(self)
@@ -554,7 +561,7 @@ examobs.register_bird({
 	run_speed = 4,
 	walk_speed = 2,
 	inv = {["default:coal_lump"]=1},
-	spawn_on = {"group:stone","group:spreading_dirt_type"},
+	spawn_on = {"group:stone"},
 	light_min = 1,
 	light_max = 10,
 	textures={"examobs_coalcrow.png"},
@@ -649,6 +656,7 @@ examobs.register_fish({
 	spawn_chance = 1000,
 	aggressivity = 2,
 	run_speed = 10,
+	light_min = 1,
 	textures = {"examobs_piranha.png"},
 	step=function(self)
 		if self.fight and examobs.distance(self.object,self.fight) <= 3 and self.fight:get_pos() then
@@ -670,6 +678,6 @@ examobs.register_fish({
 				end
 			end
 		end,p)
-	end,
+	end
 })
 

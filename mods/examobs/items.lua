@@ -87,6 +87,14 @@ minetest.register_node("examobs:egg", {
 	},
 	tiles={"default_snowball.png^[colorize:#ffffff^examobs_alpha_egg.png^[makealpha:0,255,0"},
 	sounds = default.node_sound_dirt_defaults(),
+	on_timer = function (pos, elapsed)
+		local meta = minetest.get_meta(pos)
+		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+			minetest.remove_node(pos)
+			return false
+		end
+		return true
+	end
 })
 minetest.register_craftitem("examobs:feather",{
 	description = "Feather",

@@ -1,21 +1,3 @@
-minetest.register_globalstep(function(dtime)
-	if examobs.global_timer <= os.clock() then
-		examobs.global_lifetime = (math.floor(examobs.global_time*100) / 100) + 1
-		examobs.global_lifetime = examobs.global_lifetime <= 1.1 and examobs.global_lifetime or examobs.global_lifetime * 10
-		examobs.global_timer = os.clock() + 1
-		examobs.global_time = 0
-	end
-end)
-
-examobs.on_step=function(self, dtime)
-	local time = os.clock()
-	self.timer1 = self.timer1 + dtime
-	self.timer2 = self.timer2 + dtime
-	self.lifetimer = self.lifetimer - (dtime*examobs.global_lifetime)
-	examobs.main(self, dtime)
-	examobs.global_time = examobs.global_time + os.clock() - time
-end
-
 examobs.main=function(self, dtime)
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
@@ -75,7 +57,9 @@ examobs.register_mob=function(def)
 	def.resist_nodes =			def.resist_nodes or			{}
 	def.swiming =			def.swiming or			1
 	def.inv = 				def.inv or				{}
-	def.aggressivity =			def.aggressivity or			2
+	def.aggressivity =			def.aggressivity or			1
+	def.flee_from_threats_only =		def.flee_from_threats_only or		0
+
 	def.floating =			def.floating or			{}
 	def.floating_in_group =		def.floating_in_group
 	def.updatetime =			def.updatetime or			1
