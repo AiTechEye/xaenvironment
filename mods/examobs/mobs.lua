@@ -291,11 +291,11 @@ examobs.register_mob({
 		self:on_load()
 	end,
 	on_load=function(self)
-		if self.storage.color then
+		if self.storage.color and self.storage.color.palette_index then
 			self.storage.palette_index = self.storage.color.palette_index
 			self.storage.color = nil
 		end
-		local color = self.storage.palette_index and ("^"..default.dye_texturing(self.storage.palette_index,{opacity=255})) or ""
+		local color = self.storage.palette_index and ("^"..default.dye_texturing(self.storage.palette_index,{opacity=210})) or ""
 		self.object:set_properties({textures={
 			(self.storage.woolen and ("examobs_wool.png" .. color .."^") or "") .. "examobs_sheep.png"
 		}})
@@ -324,7 +324,7 @@ examobs.register_mob({
 				self.storage.tamed = 1
 			elseif item == "default:dye" then
 				local color = clicker:get_wielded_item():to_table()
-				self.storage.palette_index = color.meta.palette_index
+				self.storage.palette_index = color.meta and color.meta.palette_index
 				default.take_item(clicker)
 				self:on_load()
 			end
