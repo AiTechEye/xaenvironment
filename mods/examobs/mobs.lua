@@ -295,7 +295,7 @@ examobs.register_mob({
 			self.storage.palette_index = self.storage.color.palette_index
 			self.storage.color = nil
 		end
-		local color = self.storage.palette_index and ("^"..default.dye_texturing(self.storage.palette_index,{opacity=210})) or ""
+		local color = self.storage.palette_index and ("^"..default.dye_texturing(self.storage.palette_index,{opacity=180})) or ""
 		self.object:set_properties({textures={
 			(self.storage.woolen and ("examobs_wool.png" .. color .."^") or "") .. "examobs_sheep.png"
 		}})
