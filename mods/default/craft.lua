@@ -1,3 +1,7 @@
+minetest.register_craft({
+	type = "toolrepair",
+	additional_wear = -0.4
+})
 --||||||||||||||||
 -- ======================= Tools
 --||||||||||||||||
