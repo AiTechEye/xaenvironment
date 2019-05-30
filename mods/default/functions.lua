@@ -617,14 +617,18 @@ default.take_item=function(clicker)
 	clicker:get_inventory():set_stack("main",i,item)
 end
 
-default.dye_texturing=function(i,o,w,h)
+default.dye_texturing=function(i,def)
+	def = def or {}
+	def.opacity = def.opacity or 150
+	def.image_w = def.image_w or 16
+	def.image_h = def.image_h or 16
+	def.palette_w = def.palette_w or 7
+	def.palette_h = def.palette_h or 20
+	def.palette = def.palette or "default_palette.png"
 	i = i or 1
-	o = o or 150
-	w = w or 16
-	h = h or 16
 	local x = 2
 	local y = 0
-	local gx = (default.palette_x)*-1
+	local gx = def.palette_w*-1
 	for ii=0,i do
 		x = x - 1
 		if x == gx then
@@ -632,7 +636,7 @@ default.dye_texturing=function(i,o,w,h)
 			y = y -1
 		end
 	end
-	return "([combine:1x1:"..x..","..y.."=default_palette.png^[opacity:"..o.."^[resize:"..w.."x"..h..")"
+	return "([combine:1x1:"..x..","..y.."="..def.palette.."^[opacity:"..def.opacity.."^[resize:"..def.image_w.."x"..def.image_h..")"
 end
 
 default.dye_coloring=function(pos, node, player, pointed_thing)

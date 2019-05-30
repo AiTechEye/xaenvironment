@@ -8,8 +8,6 @@ default={
 	registered_bios={},
 	registered_bios_list={},
 	bucket={},
-	palette_x=7,
-	palette_y=20,
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")
