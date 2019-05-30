@@ -1,5 +1,6 @@
 -- npc monster animal
 
+
 examobs.register_mob({
 	name = "wolf",
 	textures = {"examobs_wolf.png"},
@@ -286,15 +287,17 @@ examobs.register_mob({
 		return minetest.get_item_group(item,"grass") > 0
 	end,
 	on_spawn=function(self)
-		self.storage.wool = "examobs_wool.png"
 		self.storage.woolen = 1
 		self:on_load()
 	end,
 	on_load=function(self)
-		local color = self.storage.color and self.storage.color.hex and ("^[colorize:" .. self.storage.color.hex .."cc") or ""
-		self.storage.wool = (self.storage.wool or "examobs_wool.png") .. color
+		if self.storage.color then
+			self.storage.palette_index = self.storage.color.palette_index
+			self.storage.color = nil
+		end
+		local color = self.storage.palette_index and ("^"..default.dye_texturing(self.storage.palette_index,{opacity=255})) or ""
 		self.object:set_properties({textures={
-			(self.storage.woolen and (self.storage.wool .. "^") or "") .. "examobs_sheep.png"
+			(self.storage.woolen and ("examobs_wool.png" .. color .."^") or "") .. "examobs_sheep.png"
 		}})
 	end,
 	on_click=function(self,clicker)
@@ -307,7 +310,7 @@ examobs.register_mob({
 				item:add_wear(600)
 				clicker:get_inventory():set_stack("main",i,item)
 				local drop = ItemStack("default:wool"):to_table()
-				drop.meta = self.storage.color
+				drop.meta = {palette_index=self.storage.palette_index}
 				minetest.add_item(pos,drop)
 				self.storage.woolen = nil
 				self.object:set_properties({textures={"examobs_sheep.png"}})
@@ -321,7 +324,7 @@ examobs.register_mob({
 				self.storage.tamed = 1
 			elseif item == "default:dye" then
 				local color = clicker:get_wielded_item():to_table()
-				self.storage.color = color.meta
+				self.storage.palette_index = color.meta.palette_index
 				default.take_item(clicker)
 				self:on_load()
 			end
