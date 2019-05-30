@@ -44,6 +44,18 @@ minetest.register_node("materials:plant_extracts", {
 	sounds = default.node_sound_glass_defaults(),
 })
 
+minetest.register_node("materials:glass_bottle", {
+	description = "Glass bottle",
+	inventory_image = "materials_plant_extracts.png",
+	drawtype = "plantlike",
+	tiles={"materials_plant_extracts.png"},
+	groups = {dig_immediate = 3,flammable=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_glass_defaults(),
+})
+
 minetest.register_node("materials:plant_extracts_gas", {
 	description = "Plant extracts gas",
 	inventory_image = "materials_plant_extracts_gas.png",

@@ -67,3 +67,12 @@ minetest.register_craft({
 	recipe={{"plants:cotton"}}
 })
 
+minetest.register_craft({
+	output="materials:glass_bottle 12",
+	recipe={
+		{"","default:glass",""},
+		{"default:glass","","default:glass"},
+		{"default:glass","default:glass","default:glass"},
+	}
+})
+
