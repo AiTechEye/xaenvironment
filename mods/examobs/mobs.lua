@@ -215,7 +215,7 @@ examobs.register_mob({
 	},
 	collisionbox={-0.3,-0.35,-0.3,0.3,0.4,0.3},
 	spawn_on={"group:spreading_dirt_type"},
-	egg_timer = math.random(60,600),
+	egg_timer = math.random(1,600),
 	on_spawn=function(self)
 		self.inv["examobs:feather"]=math.random(1,3)
 		self.storage.skin="examobs_chicken" .. math.random(1,3) ..".png"
@@ -228,14 +228,15 @@ examobs.register_mob({
 		self.egg_timer = self.egg_timer -1
 		if self.egg_timer < 1 then
 			if self.flee or self.fight then
-				self.egg_timer = math.random(60,600)
+				self.egg_timer = math.random(1,600)
 			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
-				minetest.add_node(self:pos(),{name="examobs:egg"})
-				local meta = minetest.get_meta(self:pos())
+				local pos = self:pos()
+				minetest.add_node(pos,{name="examobs:egg"})
+				local meta = minetest.get_meta(pos)
 				meta:set_int("date",default.date("get"))
 				meta:set_int("hours",math.random(1,6))
-				minetest.get_node_timer(pointed_thing.above):start(10)
-				self.egg_timer = math.random(60,600)
+				minetest.get_node_timer(pos):start(10)
+				self.egg_timer = math.random(1,600)
 			end
 		end
 	end,
