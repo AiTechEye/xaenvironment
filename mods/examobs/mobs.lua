@@ -231,6 +231,7 @@ examobs.register_mob({
 				self.egg_timer = math.random(60,600)
 			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
 				minetest.add_node(self:pos(),{name="examobs:egg"})
+				local meta = minetest.get_meta(self:pos())
 				meta:set_int("date",default.date("get"))
 				meta:set_int("hours",math.random(1,6))
 				minetest.get_node_timer(pointed_thing.above):start(10)

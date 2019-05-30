@@ -10,7 +10,7 @@ default.register_eatable("craftitem","examobs:meat",3,4,{
 })
 
 minetest.register_tool("examobs:hiding_poison", {
-	description = "Hiding poison",
+	description = "Hiding poison from mobs",
 	inventory_image = "materials_plant_extracts.png",
 	sound=default.tool_breaks_defaults(),
 	on_use=function(itemstack, user, pointed_thing)
@@ -19,12 +19,31 @@ minetest.register_tool("examobs:hiding_poison", {
 			examobs.hiding[name] = nil
 			minetest.chat_send_player(name,"off")
 		else
-			examobs.hiding[name] = true
+			examobs.hiding[name] = user:get_wield_index()
+			for _, ob in pairs(minetest.get_objects_inside_radius(user:get_pos(),30)) do
+				local en = ob:get_luaentity()
+				if en and en.examob then
+					local target = en.fight or en.flee or en.target
+					if target and target:is_player() and target:get_player_name() == name then
+						en.fight = nil
+						en.fight = nil
+						en.flee = nil
+					end
+				end
+			end
 			minetest.chat_send_player(name,"on")
 		end
-	end,
+	end
 })
 
+minetest.register_craft({
+	output = "examobs:hiding_poison",
+	recipe = {
+		{"plants:lonicera_tatarica_berries","materials:glass_bottle","plants:dolls_eyes_berries"},
+		{"plants:lonicera_tatarica_berries","group:bucket_water","plants:dolls_eyes_berries"},
+		{"plants:lonicera_tatarica_berries","","plants:dolls_eyes_berries"}
+	}
+})
 
 -- ================ Wolf ================
 

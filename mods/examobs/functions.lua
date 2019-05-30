@@ -425,10 +425,27 @@ examobs.find_objects=function(self)
 			local team = examobs.team(ob)
 			local known = examobs.known(self,ob)
 			local player = ob:is_player()
+			local hiding
 			if player then
 				self.lifetimer = self.lifetime
+				local invtool = examobs.hiding[ob:get_player_name()]
+				local inv = ob:get_inventory()
+				if invtool and inv:get_stack("main",invtool):get_name() == "examobs:hiding_poison" then
+					local item = inv:get_stack("main",invtool)
+					local w = item:get_wear()
+					if w >= 60000 then
+						inv:set_stack("main",invtool,nil)
+						examobs.hiding[ob:get_player_name()] = nil
+					else
+						item:add_wear(600)
+						inv:set_stack("main",invtool,item)
+						hiding = true
+					end
+				elseif invtool then
+					examobs.hiding[ob:get_player_name()] = nil
+				end
 			end
-			if player and examobs.hiding[ob:get_player_name()] then
+			if hiding then
 			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
