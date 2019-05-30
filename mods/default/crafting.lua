@@ -26,18 +26,21 @@ default.workbench.set_form=function(pos,add)
 	local x_add = tonumber(meta:get_string("x_add"))
 	local y_add = tonumber(meta:get_string("y_add"))
 
+	local but_am = meta:get_int("but_am")
+	local but_am_w = meta:get_int("but_am_w")
+
 	local craftguide_items = ""
 	add = add or ""
 	local x=-0.2
 	local y=0
-	for i=page,page+39,1 do
+	for i=page,page+but_am,1 do
 		local it = default.workbench.items_list[i]
 		if not it then
 			break
 		end
 		craftguide_items = craftguide_items .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. it ..";guide_item#" .. it .. ";]"
 		x = x + x_add
-		if x >= x_add*7 then
+		if x >= x_add*but_am_w then
 			x = -0.2
 			y = y + y_add
 		end
@@ -48,8 +51,8 @@ default.workbench.set_form=function(pos,add)
 			"size[8,12]" ..
 			craftguide_items ..
 			"list[current_player;main;0,8.3;8,4;]" ..
-			"image_button[3.1,7.1;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
-			"image_button[3.9,7.1;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
+			"image_button[3.1,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
+			"image_button[3.9,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
 			add
 		)
 	else
@@ -100,6 +103,9 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 		local y_start_crafring = tonumber(meta:get_string("y_start_crafring"))
 		local y_start_cooking = tonumber(meta:get_string("y_start_cooking"))
 		local y_label = tonumber(meta:get_string("y_label"))
+
+		local but_am_w = meta:get_int("but_am_w")
+
 
 		for i,it in pairs(pressed) do
 			if  string.sub(i,1,11) == "guide_item#" then
@@ -160,10 +166,11 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 				local x = x_start
 				local y = y_start_cooking
 				local itlist = "label[-0.2," .. y_label .. ";" .. groupname .."]"
+				local bs = tonumber(but_size.split(but_size,",")[1])
 				for _,nam in pairs(group) do
 					itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. nam ..";guide_item#" ..nam ..";]"
 					x = x + x_add
-					if x >= 3.8 then
+					if x >= bs*(but_am_w-2)  then
 						x = x_start
 						y = y + y_add
 					end
@@ -190,12 +197,14 @@ minetest.register_node("default:workbench", {
 		meta:set_string("infotext", "Workbench")
 		meta:set_int("page", 1)
 		meta:set_string("but_size", "0.7,0.7")
-		meta:set_string("x_start", -0.2)
-		meta:set_string("x_add", 0.5)
-		meta:set_string("y_add", 0.6)
-		meta:set_string("y_start_crafring", 4)
-		meta:set_string("y_start_cooking", 4.5)
+		meta:set_string("x_start", "-0.2")
+		meta:set_string("x_add", "0.5")
+		meta:set_string("y_add", "0.6")
+		meta:set_string("y_start_crafring", "4")
+		meta:set_string("y_start_cooking", "4.5")
 		meta:set_string("y_label", 4)
+		meta:set_int("but_am", 39)
+		meta:set_int("but_am_w", 7)
 
 		default.workbench.set_form(pos)
 	end,
@@ -267,12 +276,15 @@ minetest.register_node("default:craftguide", {
 		meta:set_int("page", 1)
 		meta:set_string("but_size", "1,1")
 		meta:set_string("x_start", -0.2)
-		meta:set_string("x_add", 0.8)
-		meta:set_string("y_add", 0.9)
-		meta:set_string("y_start_crafring", 5)
-		meta:set_string("y_start_cooking", 5.5)
-		meta:set_string("y_label", 5)
+		meta:set_string("x_add", "0.8")
+		meta:set_string("y_add", "0.9")
+		meta:set_string("y_start_crafring", "5")
+		meta:set_string("y_start_cooking", "5.5")
+		meta:set_string("y_label", "5")
 		meta:set_int("craftguide", 1)
+		meta:set_int("but_am", 49)
+		meta:set_int("but_am_w", 9)
+
 		default.workbench.set_form(pos)
 		minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
 	end,
