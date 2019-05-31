@@ -70,11 +70,11 @@ default.register_plant=function(def)
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
 	def.sunlight_propagates = def.sunlight_propagates or	true
 	def.buildable_to = type(def.buildable_to) == "nil"
-	def.floodable = def.floodable or 			true
+	def.floodable = def.floodable == true or def.floodable == nil
 	def.paramtype = def.paramtype or			"light"
 	def.walkable = def.walkable or			false
 	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
-	def.dye_colors = def.dye_colors or			{palette=90,hex="#0f2802",name="dark green"}
+	def.dye_colors = def.dye_colors or			{palette=90}
 
 
 	minetest.register_node(mod .. def.name, def)
@@ -103,10 +103,7 @@ default.register_plant=function(def)
 	if ddef.biomes and ddef.biomes[1] == "all" then
 		ddef.biomes = default.registered_bios_list
 	end
-
 	minetest.register_decoration(ddef)
-
-
 end
 
 default.register_tree=function(def)
