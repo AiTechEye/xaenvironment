@@ -1,3 +1,5 @@
+dofile(minetest.get_modpath("plants") .. "/water.lua")
+
 --||||||||||||||||
 -- ======================= trees
 --||||||||||||||||
@@ -299,10 +301,6 @@ default.register_plant({
 		seed=80*v,
 	}},
 	dye_colors = {palette=v},
-	on_use=function(s)
-		print(v)
-		print(default.dye_texturing(v))
-	end
 })
 end
 
