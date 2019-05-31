@@ -33,6 +33,7 @@ default.workbench.set_form=function(pos,add)
 	add = add or ""
 	local x=-0.2
 	local y=0
+
 	for i=page,page+but_am,1 do
 		local it = default.workbench.items_list[i]
 		if not it then
@@ -80,14 +81,14 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.guidefront then
 			local page = meta:get_int("page")
 			if page + 40 < #default.workbench.items_list then
-				meta:set_int("page",page + 40)
+				meta:set_int("page",page + meta:get_int("but_am")+1)
 				default.workbench.set_form(pos)
 			end
 			return
 		elseif pressed.guideback then
 			local page = meta:get_int("page")
 			if page - 40 >= 0 then
-				meta:set_int("page",page - 40)
+				meta:set_int("page",page - meta:get_int("but_am")-1)
 				default.workbench.set_form(pos)
 			end
 			return
