@@ -62,6 +62,7 @@ minetest.register_on_joinplayer(function(player)
 
 	player_style.players[name].hunger={
 		level = player:get_meta():get_int("hunger"),
+		step = 0,
 		back=player:hud_add({
 			hud_elem_type="statbar",
 			position={x=0.5,y=1},
@@ -100,6 +101,13 @@ player_style.hunger=function(player,add,reset)
 		return
 	elseif p.hunger.num == math.ceil(p.hunger.level+add) then
 		p.hunger.level = p.hunger.level + add
+		if p.hunger.level <= 5  then
+			local step = math.floor(p.hunger.level*100)/100
+			if p.hunger.step ~= step then
+				p.hunger.step = step
+				player:set_hp(player:get_hp()-1)
+			end
+		end
 		return
 	end
 
@@ -172,21 +180,19 @@ minetest.register_globalstep(function(dtime)
 		if not attached_players[name] then
 			local key=player:get_player_control()
 			local a="stand"
-			local hunger = -0.00001
+			local hunger = -0.0001
 			if key.up or key.down or key.left or key.right then
-				hunger = -0.0005
+				hunger = -0.0002
 				a="walk"
 				local p = player:get_pos()
 				if key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
-					hunger = -0.0001
+					hunger = -0.002
 					a="dive"
 					player_style.player_diveing(name,player,true,key.sneak)
 				elseif key.aux1 then
-					hunger = -0.001
 					a="run"
 					player_style.player_run(name,player,true)
 					local run = player_style.player_running[name]
-
 					if run and run.wallrun then
 						local d=player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
@@ -215,7 +221,7 @@ minetest.register_globalstep(function(dtime)
 
 			if player_style.player_dive[name] and not (a == "fly" or a == "dive") then
 				local p = player:get_pos()
-				hunger = -0.001
+				hunger = -0.01
 				 if default.defpos({x=p.x,y=p.y+1.5,z=p.z},"walkable") then
 					if key.up or key.down or key.left or key.right then
 						a="dive"
@@ -241,14 +247,15 @@ minetest.register_globalstep(function(dtime)
 end)
 
 player_style.player_run=function(name,player,a)
+	player_style.hunger(player,-0.001)
 	if player_style.player_dive[name] then
-	elseif a and not player_style.player_running[name] then
+	elseif a and not player_style.player_running[name] and player_style.players[name].hunger.level > 15 then
 		player_style.player_running[name] = {wallrun=1}
 		player:set_physics_override({
 			jump=1.25,
 			speed = 2,
 		})
-	elseif not a and player_style.player_running[name] then
+	elseif  (not a or player_style.players[name].hunger.level < 15) and player_style.player_running[name] then
 		player_style.player_running[name] = nil
 		player:set_physics_override({
 			jump=1,
