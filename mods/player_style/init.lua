@@ -6,6 +6,10 @@ player_style={
 	player_running = {},
 }
 
+minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,user,pointed_thing)
+	player_style.hunger(user,hp_change)
+end)
+
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and modifer.type == "fall" then
 		hp_change = hp_change*4
@@ -14,12 +18,105 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 end,true)
 
 minetest.register_on_respawnplayer(function(player)
-	player_style.player_attached[player:get_player_name()] = nil
+	local name = player:get_player_name()
+	player_style.player_attached[name] = nil
+	player_style.set_animation(name,"stand")
+	player_style.hunger(player,0,true)
+end)
+
+minetest.register_on_newplayer(function(player)
+	player_style.hunger(player,0,true)
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	player_style.player_attached[player:get_player_name()] = nil
+	local name=player:get_player_name()
+	player_style.player_attached[name] = nil
+	minetest.after(0, function(name)
+			player_style.players[name] = nil
+			player_style.player_dive[name] = nil
+	end, name)
 end)
+
+minetest.register_on_joinplayer(function(player)
+	local profile=player_style.registered_profiles["default"]
+	local name=player:get_player_name()
+
+	player_style.players[name] = {}
+	player_style.players[name].profile = "default"
+	player_style.players[name].player = player
+
+	player:set_properties({
+		textures =	profile.texture,
+		visual =		profile.visual,
+		visual_size =	profile.visual_size,
+		collisionbox =	profile.collisionbox,
+		mesh =		profile.mesh,
+		eye_height =	profile.eye_height,
+		stepheight =	profile.stepheight
+	})
+
+	player_style.set_animation(name,"stand")
+
+	player:hud_set_hotbar_image(profile.hotbar)
+	player:hud_set_hotbar_selected_image(profile.hotbar_selected)
+
+	player_style.players[name].hunger={
+		level = player:get_meta():get_int("hunger"),
+		back=player:hud_add({
+			hud_elem_type="statbar",
+			position={x=0.5,y=1},
+			text="player_style_hunger_bar_back.png",
+			number=20,
+			direction = 0,
+			size={x=24,y=24},
+			direction=0,
+			offset={x=25,y=-120},
+		}),
+		bar=player:hud_add({
+			hud_elem_type="statbar",
+			position={x=0.5,y=1},
+			text="player_style_hunger_bar.png",
+			number=player:get_meta():get_int("hunger"),
+			direction = 0,
+			size={x=24,y=24},
+			direction=0,
+			offset={x=25,y=-120},
+		})
+	}
+end)
+
+player_style.hunger=function(player,add,reset)
+
+	local name = player:get_player_name()
+	local p = player_style.players[name]
+
+	if reset then
+		player:get_meta():set_int("hunger",20)
+		if p and p.hunger then
+			p.hunger.level = 20
+		end
+	end
+	if not (p and p.hunger) then
+		return
+	elseif p.hunger.num == math.ceil(p.hunger.level+add) then
+		p.hunger.level = p.hunger.level + add
+		return
+	end
+
+	local a = p.hunger.level+add
+
+	if a < 0 then
+		a = 0
+		player:set_hp(0)
+	elseif a > 20 then
+		a = 20
+	end
+
+	p.hunger.num = math.ceil(a)
+	p.hunger.level = a
+	player:get_meta():set_int("hunger",p.hunger.num)
+	player:hud_change(p.hunger.bar, "number", p.hunger.num)
+end
 
 player_style.register_profile=function(def)
 	def=def or {}
@@ -67,43 +164,6 @@ player_style.set_animation=function(name,typ,n)
 	end
 end
 
-minetest.register_on_joinplayer(function(player)
-	local profile=player_style.registered_profiles["default"]
-	local name=player:get_player_name()
-
-	player_style.players[name] = {}
-	player_style.players[name].profile = "default"
-	player_style.players[name].player = player
-
-	player:set_properties({
-		textures =	profile.texture,
-		visual =		profile.visual,
-		visual_size =	profile.visual_size,
-		collisionbox =	profile.collisionbox,
-		mesh =		profile.mesh,
-		eye_height =	profile.eye_height,
-		stepheight =	profile.stepheight
-	})
-
-	player_style.set_animation(name,"stand")
-
-	player:hud_set_hotbar_image(profile.hotbar)
-	player:hud_set_hotbar_selected_image(profile.hotbar_selected)
-end)
-
-minetest.register_on_respawnplayer(function(player)
-	player_style.set_animation(player:get_player_name(),"stand")
-end)
-
-minetest.register_on_leaveplayer(function(player)
-	local name=player:get_player_name()
-
-	minetest.after(0, function(name)
-			player_style.players[name] = nil
-			player_style.player_dive[name] = nil
-	end, name)
-end)
-
 local attached_players = player_style.player_attached
 
 minetest.register_globalstep(function(dtime)
@@ -112,13 +172,17 @@ minetest.register_globalstep(function(dtime)
 		if not attached_players[name] then
 			local key=player:get_player_control()
 			local a="stand"
+			local hunger = -0.00001
 			if key.up or key.down or key.left or key.right then
+				hunger = -0.0005
 				a="walk"
 				local p = player:get_pos()
 				if key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
+					hunger = -0.0001
 					a="dive"
 					player_style.player_diveing(name,player,true,key.sneak)
 				elseif key.aux1 then
+					hunger = -0.001
 					a="run"
 					player_style.player_run(name,player,true)
 					local run = player_style.player_running[name]
@@ -127,19 +191,16 @@ minetest.register_globalstep(function(dtime)
 						local d=player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
 						local v = player:get_player_velocity()
-
+						hunger = -0.01
 						if key.jump then
 							run.wallrun = nil
 							player:set_physics_override({jump=1.25})
 						elseif run.wallrun == 1 and walkable and v.y == 0 and math.abs(v.x+v.z) > 1.5 then
 							player:set_physics_override({jump=1.8})
-
 							run.wallrun = 2
 						elseif run.wallrun == 2 and not walkable then
 							player:set_physics_override({jump=1.25})
 							run.wallrun = 1
-
-
 						end
 					end
 				end
@@ -154,6 +215,7 @@ minetest.register_globalstep(function(dtime)
 
 			if player_style.player_dive[name] and not (a == "fly" or a == "dive") then
 				local p = player:get_pos()
+				hunger = -0.001
 				 if default.defpos({x=p.x,y=p.y+1.5,z=p.z},"walkable") then
 					if key.up or key.down or key.left or key.right then
 						a="dive"
@@ -173,6 +235,7 @@ minetest.register_globalstep(function(dtime)
 
 			end
 			player_style.set_animation(name,a)
+			player_style.hunger(player,hunger)
 		end
 	end
 end)
