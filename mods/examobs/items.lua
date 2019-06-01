@@ -38,6 +38,7 @@ minetest.register_tool("examobs:hiding_poison", {
 
 minetest.register_craft({
 	output = "examobs:hiding_poison",
+	replacements={{"group:bucket_water","default:bucket"}},
 	recipe = {
 		{"plants:lonicera_tatarica_berries","materials:glass_bottle","plants:dolls_eyes_berries"},
 		{"plants:lonicera_tatarica_berries","group:bucket_water","plants:dolls_eyes_berries"},
