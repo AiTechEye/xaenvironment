@@ -1,6 +1,5 @@
 default.register_pebble=function(def)
 	local mod = minetest.get_current_modname() ..":"
-	local Name = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local ddef = table.copy(def.decoration or {})
 	local name = def.name
 
@@ -25,7 +24,8 @@ default.register_pebble=function(def)
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
 	}
-	minetest.register_node("default:pebble_" ..name, def)
+
+	minetest.register_node(mod.."pebble_" ..name, def)
 
 	minetest.register_decoration({
 		deco_type = "simple",
@@ -41,7 +41,7 @@ default.register_pebble=function(def)
 		},
 		y_min = ddef.y_min or -31000,
 		y_max = ddef.y_max or 31000,
-		decoration = "default:pebble_" ..name,
+		decoration = mod.."pebble_" ..name,
 		spawn_by = ddef.spawn_by,
 	--	num_spawn_by = 1,
 	})
