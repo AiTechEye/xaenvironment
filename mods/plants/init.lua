@@ -302,6 +302,18 @@ default.register_plant({
 	}},
 	dye_colors = {palette=v},
 })
+	default.register_pebble({
+		name = "glowing" .. i,
+		light_source = 7,
+		tiles={default.dye_texturing(v,{opacity=200})},
+		dye_colors = {palette=v},
+		alpha = 150,
+		decoration = {
+			place_on = "default:stone",
+			y_max = -100,
+			seed = 80*v,
+		}
+	})
 end
 
 default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff",dye_colors = {palette=136}})
