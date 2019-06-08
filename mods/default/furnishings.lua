@@ -152,7 +152,7 @@ default.register_chair=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
 	local name = mod .. def.name .. "_chair"
-	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chair=1}
+	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chair=1,used_by_npc=1}
 
 	groups.flammable = def.burnable and 1 or nil
 
@@ -262,7 +262,7 @@ default.register_chest=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
 	local name = mod .. def.name
-	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chest=1}
+	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chest=1,used_by_npc=1}
 	local tiles
 	local locked = def.locked
 	groups.flammable = def.burnable and 1 or nil
@@ -340,7 +340,7 @@ minetest.register_node("default:itemframe", {
 	wield_image="default_frame.png",
 	inventory_image="default_frame.png",
 	tiles = {"default_frame.png"},
-	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3,itemframe=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3,itemframe=1,used_by_npc=2},
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",
