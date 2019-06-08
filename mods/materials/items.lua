@@ -2,7 +2,7 @@
 minetest.register_node("materials:pallet_box", {
 	description = "Pallet box",
 	tiles={"materials_pallet_box.png"},
-	groups = {dig_immediate = 3,flammable=3},
+	groups = {dig_immediate = 3,flammable=3,used_by_npc=1},
 	sunlight_propagates = true,
 	drawtype = "glasslike",
 	paramtype = "light",
@@ -11,7 +11,7 @@ minetest.register_node("materials:pallet_box", {
 minetest.register_node("materials:metal_beam", {
 	description = "Metal beam",
 	tiles={"materials_metal_beam.png"},
-	groups = {cracky = 1,level=3},
+	groups = {cracky = 1,level=3,used_by_npc=1},
 	sounds = default.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	on_place=minetest.rotate_node,
@@ -20,7 +20,7 @@ minetest.register_node("materials:metal_beam", {
 minetest.register_node("materials:metal_beam_rusty", {
 	description = "Rusty Metal beam",
 	tiles={"materials_metal_beam_rusty.png"},
-	groups = {cracky = 1,level=3},
+	groups = {cracky = 1,level=3,used_by_npc=1},
 	sounds = default.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	on_place=minetest.rotate_node,
@@ -37,7 +37,7 @@ minetest.register_node("materials:plant_extracts", {
 	inventory_image = "materials_plant_extracts.png",
 	drawtype = "plantlike",
 	tiles={"materials_plant_extracts.png"},
-	groups = {dig_immediate = 3,flammable=1},
+	groups = {dig_immediate = 3,flammable=1,used_by_npc=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -49,7 +49,7 @@ minetest.register_node("materials:glass_bottle", {
 	inventory_image = "materials_plant_extracts.png",
 	drawtype = "plantlike",
 	tiles={"materials_plant_extracts.png"},
-	groups = {dig_immediate = 3,flammable=1},
+	groups = {dig_immediate = 3,flammable=1,used_by_npc=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -61,7 +61,7 @@ minetest.register_node("materials:plant_extracts_gas", {
 	inventory_image = "materials_plant_extracts_gas.png",
 	drawtype = "plantlike",
 	tiles={"materials_plant_extracts_gas.png"},
-	groups = {dig_immediate = 3,flammable=1},
+	groups = {dig_immediate = 3,flammable=1,used_by_npc=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -77,7 +77,7 @@ minetest.register_craftitem("materials:piece_of_wood", {
 minetest.register_node("materials:mixed_wood", {
 	description = "Mixed wood",
 	tiles = {"materials_mixed_wood.png"},
-	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 })
 minetest.register_craftitem("materials:string", {
