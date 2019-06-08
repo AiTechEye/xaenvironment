@@ -188,9 +188,22 @@ examobs.register_mob({
 		run = {x=50,y=70,speed=15},
 		lay = {x=106,y=110,speed=0},
 		attack = {x=80,y=100},
+		attack_freeze = {x=80,y=100,speed=0},
 	},
 	collisionbox={-0.5,-1.2,-0.5,0.5,0.9,0.5,},
 	spawn_on={"default:dirt","","group:spreading_dirt_type"},
+	step=function(self)
+		if (minetest.get_node_light(self:pos()) or 0) > 9 then
+			self:hurt(1)
+			if not self.muddry and self.dying then
+				examobs.stand(self)
+				if self.fight then
+					examobs.anim(self,"attack_freeze")
+				end
+				return self
+			end
+		end
+	end,
 })
 examobs.register_mob({
 	name = "chicken",
@@ -685,4 +698,3 @@ examobs.register_fish({
 		end,p)
 	end
 })
-
