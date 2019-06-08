@@ -14,6 +14,9 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and modifer.type == "fall" then
 		hp_change = hp_change*4
 	end
+	if hp_change < 0 then
+		player_style.hunger(player,-1)
+	end
 	return hp_change
 end,true)
 
