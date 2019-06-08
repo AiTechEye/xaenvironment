@@ -54,7 +54,7 @@ minetest.register_node("beds:bed", {
 	description = "Bed",
 	stack_max=1,
 	tiles = {"beds_bed.png","default_wood.png","default_wood.png^beds_bed_side.png"},
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 1,bed=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 1,bed=1,used_by_npc=1},
 	drawtype="nodebox",
 	paramtype="light",
 	paramtype2 = "facedir",
