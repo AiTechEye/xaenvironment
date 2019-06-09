@@ -806,6 +806,7 @@ minetest.register_lbm({
 	nodenames={"examobs:npc_house_spawner"},
 	run_at_every_load = true,
 	action=function(pos,node)
+		minetest.remove_node(pos)
 		examobs.generate_npc_house(pos)
 	end
 })
