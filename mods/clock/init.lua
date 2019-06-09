@@ -29,7 +29,7 @@ minetest.register_node("clock:clock" .. i, {
 	drop = "clock:clock1",
 	wield_image="clock_1.png",
 	inventory_image="clock_"..i ..".png",
-	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=2},
+	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=i == 1 and 2 or nil},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	node_box = {
@@ -52,6 +52,8 @@ minetest.register_node("clock:clock" .. i, {
 	sunlight_propagates = true,
 	after_place_node = function(pos, placer, itemstack)
 		minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
+	end,
+	on_construct=function(pos)
 		minetest.get_node_timer(pos):start(1)
 	end,
 	on_timer = function (pos, elapsed)
