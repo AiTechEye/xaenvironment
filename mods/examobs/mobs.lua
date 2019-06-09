@@ -1,7 +1,6 @@
 examobs.register_mob({
 	name = "npc",
 	type = "npc",
-	textures = {"character.png"},
 	dmg = 1,
 	aggressivity = 1,
 	walk_speed = 1,
@@ -512,9 +511,17 @@ examobs.register_mob({
 examobs.register_bird({
 	visual_size= {x=0.5,y=0.5,z=0.5},
 	collisionbox={-0.2,-0.13,-0.2,0.2,0.2,0.2},
+	on_spawn=function(self)
+		self:on_load()
+	end,
+	on_load=function(self)
+		self.storage.palette_index = self.storage.palette_index or math.random(1,15*7)
+		self.storage.kind = self.storage.kind or math.random(1,6)
+		self.object:set_properties({textures={"examobs_bird.png^"..default.dye_texturing(self.storage.palette_index,{opacity=140}) }})
+	end,
 	step=function(self)
 		if self.storage.fly and not (self.fight or self.flee) and math.random(1,30) == 1 then
-			minetest.sound_play("examobs_bird1", {object=self.object, gain = 1, max_hear_distance = 20})
+			minetest.sound_play("examobs_bird"..self.storage.kind, {object=self.object, gain = 1, max_hear_distance = 20})
 		end
 	end,
 	is_food=function(self,item)
