@@ -56,3 +56,46 @@ minetest.override_item("default:coalblock",{
 		nitroglycerin.explode(pos,{radius=2,set="air"})
 	end
 })
+
+minetest.register_craft({
+	output = "nitroglycerin:timed_bomb 3",
+	recipe = {
+		{"nitroglycerin:c4","nitroglycerin:c4","nitroglycerin:c4"},
+		{"nitroglycerin:c4","nitroglycerin:c4","nitroglycerin:c4"},
+		{"nitroglycerin:c4","nitroglycerin:c4","nitroglycerin:c4"},
+	}
+})
+
+minetest.register_craftitem("nitroglycerin:c4", {
+	description = "C4",
+	inventory_image = "nitroglycerin_c4.png"
+})
+
+if examobs then
+examobs.register_mob({
+	name = "gass_man",
+	type = "npc",
+	team = "gass",
+	textures = {"nitroglycerin_gassman.png"},
+	aggressivity = 2,
+	walk_speed = 1,
+	dmg = 0,
+	run_speed = 4,
+	animation = "default",
+	spawn_chance = 1000,
+	extimer = 20,
+	inv = {["nitroglycerin:c4"]=1},
+	step=function(self)
+		if self.fight and examobs.distance(self.object,self.fight) < 3 then
+			examobs.showtext(self,self.extimer,"ffff00")
+			self.extimer = self.extimer - 1
+			if self.extimer and self.extimer < 0 then
+				self.extimer = nil
+				local pos = self:pos()
+				self.object:remove()
+				nitroglycerin.explode(pos,{radius=4,set="air"})
+			end
+		end
+	end
+})
+end
