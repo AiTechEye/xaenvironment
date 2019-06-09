@@ -185,16 +185,18 @@ end
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2},
+	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
 	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+	end,
+	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("craft", 9)
 		inv:set_size("output", 1)
 		inv:set_size("stock", 16)
-		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", "Workbench")
 		meta:set_int("page", 1)
 		meta:set_string("but_size", "0.7,0.7")
@@ -206,7 +208,6 @@ minetest.register_node("default:workbench", {
 		meta:set_string("y_label", 4)
 		meta:set_int("but_am", 39)
 		meta:set_int("but_am_w", 7)
-
 		default.workbench.set_form(pos)
 	end,
 	on_timer = function (pos, elapsed)
@@ -264,7 +265,7 @@ minetest.register_node("default:craftguide", {
 	tiles={"default_craftgreed.png^default_unknown.png"},
 	wield_image="default_craftgreed.png^default_unknown.png",
 	inventory_image="default_craftgreed.png^default_unknown.png",
-	groups = {dig_immediate=3,flammable=2},
+	groups = {dig_immediate=3,flammable=2,used_by_npc=2},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
 	drawtype="nodebox",
@@ -272,7 +273,7 @@ minetest.register_node("default:craftguide", {
 	paramtype2="wallmounted",
 	paramtype = "light",
 	sunlight_propagates = true,
-	after_place_node = function(pos, placer, itemstack)
+	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_int("page", 1)
 		meta:set_string("but_size", "1,1")
@@ -285,8 +286,9 @@ minetest.register_node("default:craftguide", {
 		meta:set_int("craftguide", 1)
 		meta:set_int("but_am", 49)
 		meta:set_int("but_am_w", 9)
-
 		default.workbench.set_form(pos)
+	end,
+	after_place_node = function(pos, placer, itemstack)
 		minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
 	end,
 })
@@ -294,7 +296,7 @@ minetest.register_node("default:craftguide", {
 minetest.register_node("default:paper_compressor", {
 	description = "Paper compressor",
 	tiles={"default_wood.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	drawtype="nodebox",
@@ -312,7 +314,7 @@ minetest.register_node("default:paper_compressor", {
 		type = "fixed",
 		fixed = {{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}}
 	},
-	after_place_node = function(pos, placer, itemstack)
+	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("input", 1)
@@ -375,7 +377,7 @@ minetest.register_node("default:paper_compressor", {
 minetest.register_node("default:dye_workbench", {
 	description = "Dye workbench",
 	tiles={"default_birch_wood.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 	palette="default_palette.png",
 	paramtype2="color",
@@ -397,9 +399,11 @@ minetest.register_node("default:dye_workbench", {
 		end
 	end,
 	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
+	end,
+	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		meta:set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
 		inv:set_size("input", 1)
 		inv:set_size("input_water", 1)
 		inv:set_size("output", 1)
