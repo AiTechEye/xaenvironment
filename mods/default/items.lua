@@ -149,9 +149,11 @@ minetest.register_craftitem("default:bucket", {
 				item = ItemStack(no)
 				minetest.remove_node(p.under)
 			end
-			if item and itemstack:get_count() == 1 then
+
+			if item and item:get_name() ~= "" and itemstack:get_count() == 1 then
 				itemstack:replace(item)
-			elseif item then
+			elseif item and item:get_name() ~= "" then
+
 				user:get_inventory():add_item("main",item)
 				itemstack:take_item()
 			end
