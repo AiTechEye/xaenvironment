@@ -638,3 +638,138 @@ examobs.dying=function(self,set)
 		return self
 	end
 end
+
+minetest.register_tool("examobs:house_test", {
+	inventory_image = "materials_plant_extracts.png",
+	sound=default.tool_breaks_defaults(),
+	groups={not_in_creative_inventory=1},
+	on_use=function(itemstack, user, pointed_thing)
+		local pos = 
+		examobs.generate_npc_house(user:get_pos())
+	end
+})
+
+examobs.generate_npc_house=function(pos)
+	local s = math.random(2,7)
+	local h = math.random(2,4)
+	local sa = 0
+	local n=0
+	local wood
+
+	s = math.floor(s/2) ~= s/2 and s or s + 1
+
+-- if param2 ~=0 return
+--on_place param2 = 1
+
+	for x=-s,s do
+	for z=-s,s do
+	for y=-1,h do
+		sa = sa +1
+		local p = apos(pos,x,y,z)
+		if walkable(p) then
+			n=n+1
+		end
+	end
+	end
+	end
+
+	if n > sa/2 or n < sa/10 then
+		return
+	end
+
+	for i,v in pairs(minetest.find_nodes_in_area(apos(pos,-20,-1,-20),apos(pos,20,5,20),"group:tree")) do
+		local it = minetest.get_craft_result({method = "normal",width = 1, items = {minetest.get_node(v).name}})
+		if it.item:get_count() > 0 then
+			wood = it.item:get_name()
+			break
+		end
+	end
+
+	local door_item = minetest.get_craft_result({method = "normal",width = 3, items = {wood,wood,"",wood,wood,"",wood,wood,""}})
+	local door_wood = door_item.item:get_count() > 0 and door_item.item:get_name() or nil
+	local wall = "default:cobble"
+	local window = "default:glass"
+	local wint = math.random(0,3)
+	local door_rnd = math.random(1,2)
+	local door = {-s,s}
+	door = door[math.random(1,2)]
+
+	local furn_floor = {}
+	local furn_wall = {}
+	local mirror = {[0]=2,[1]=3,[2]=0,[3]=1}
+	local wallmounted=function(x,z,s)
+		if z==-s+1 then
+			return 5
+		elseif z==s-1 then
+			return 4
+		elseif x==-s+1 then
+			return 3
+		elseif x==s-1 then
+			return 2
+		else
+			return 0
+		end
+	end
+
+	for i,v in pairs(minetest.registered_nodes) do
+		if v.groups and v.groups.used_by_npc then
+			if v.groups.used_by_npc == 1 then
+				table.insert(furn_floor,i)
+			elseif v.groups.used_by_npc == 2 then
+				table.insert(furn_wall,i)
+			end
+		end
+	end
+
+	for x=-s,s do
+	for z=-s,s do
+	for y=-1,h do
+		local nset
+		local p
+		if y >-1 and y< h and ((x==-s+1 or x==s-1 or z==-s+1 or z==s-1)) and x ~= 0 and z ~= 0 and math.abs(x)~=s and math.abs(z)~=s and (y==0 and math.random(1,s) == 1 or math.random(1,s*h*2) == 1) then
+			if y==0 then
+				nset = furn_floor[math.random(1,#furn_floor)]
+			else
+					nset = furn_wall[math.random(1,#furn_wall)]
+			end
+
+			if default.def(nset).paramtype2 == "wallmounted" then
+				p = wallmounted(x,z,s)
+			elseif x == s-1 then
+				p = 1
+			elseif x == -s+1 then
+				p = 3
+			elseif z == s-1 then
+				p = 0
+			elseif x == -s+1 then
+				p = 2
+			end
+			p = minetest.get_item_group(nset,"bed") > 0 and mirror[p] or p
+
+		elseif (y==0 or y== 1) and ((wint == 2 and x == 0 and (z==door)) or (wint == 1 and z == 0 and x == door)
+		or ((wint == 0 or wint == 3) and ((door_rnd == 1 and z == 0 and x == door) or (door_rnd == 2 and x == 0 and z == door)))) then
+--door
+			if y == 0 then
+				if wint == 1 or wint ~= 2 and door_rnd == 1 then
+					p = {1,3}
+					p = p[math.random(1,2)]
+				elseif wint == 2 or wint ~= 1 and door_rnd == 2 then
+					p = {0,2}
+					p = p[math.random(1,2)]
+				end
+				nset = door_wood
+			end
+
+		elseif y > 0 and y < h/1.5 and (((wint == 0 or wint == 1) and (z == -s or z == s) and (x > -s/2 and x < s/2)) or ((wint == 0 or wint == 2) and (x == -s or x == s) and (z > -s/2 and z < s/2))) then
+-- window
+			nset = window 
+		elseif y ==- 1 or y == h or x == -s or x == s or z == -s or z == s then
+-- wall & floor & ceiling
+			nset = wood or wall
+		end
+			
+		minetest.set_node(apos(pos,x,y,z),{name=nset or "air",param2 = p or 0})
+	end
+	end
+	end
+end
