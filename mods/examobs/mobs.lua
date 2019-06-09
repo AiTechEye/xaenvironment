@@ -1,5 +1,31 @@
--- npc monster animal
-
+examobs.register_mob({
+	name = "npc",
+	type = "npc",
+	textures = {"character.png"},
+	dmg = 1,
+	aggressivity = 1,
+	walk_speed = 1,
+	run_speed = 8,
+	animation = "default",
+	spawn_chance = 1000,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_lifedeadline=function(self)
+		return self.storage.npc_generated
+	end,
+})
 
 examobs.register_mob({
 	name = "wolf",

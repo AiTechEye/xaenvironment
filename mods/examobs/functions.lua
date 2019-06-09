@@ -639,16 +639,6 @@ examobs.dying=function(self,set)
 	end
 end
 
-minetest.register_tool("examobs:house_test", {
-	inventory_image = "materials_plant_extracts.png",
-	sound=default.tool_breaks_defaults(),
-	groups={not_in_creative_inventory=1},
-	on_use=function(itemstack, user, pointed_thing)
-		local pos = 
-		examobs.generate_npc_house(user:get_pos())
-	end
-})
-
 examobs.generate_npc_house=function(pos)
 	local s = math.random(2,7)
 	local h = math.random(2,4)
@@ -696,6 +686,7 @@ examobs.generate_npc_house=function(pos)
 
 	local furn_floor = {}
 	local furn_wall = {}
+	local items = {}
 	local mirror = {[0]=2,[1]=3,[2]=0,[3]=1}
 	local wallmounted=function(x,z,s)
 		if z==-s+1 then
@@ -708,6 +699,12 @@ examobs.generate_npc_house=function(pos)
 			return 2
 		else
 			return 0
+		end
+	end
+
+	for i,v in pairs(minetest.registered_craftitems) do
+		if not (v.groups and (v.groups.not_in_creative_inventory or v.groups.not_in_craftguide)) then
+			table.insert(items,i)
 		end
 	end
 
@@ -726,6 +723,7 @@ examobs.generate_npc_house=function(pos)
 	for y=-1,h do
 		local nset
 		local p
+		local plpos = apos(pos,x,y,z)
 		if y >-1 and y< h and ((x==-s+1 or x==s-1 or z==-s+1 or z==s-1)) and x ~= 0 and z ~= 0 and math.abs(x)~=s and math.abs(z)~=s and (y==0 and math.random(1,s) == 1 or math.random(1,s*h*2) == 1) then
 			if y==0 then
 				nset = furn_floor[math.random(1,#furn_floor)]
@@ -767,9 +765,47 @@ examobs.generate_npc_house=function(pos)
 -- wall & floor & ceiling
 			nset = wood or wall
 		end
-			
-		minetest.set_node(apos(pos,x,y,z),{name=nset or "air",param2 = p or 0})
+
+		minetest.set_node(plpos,{name=nset or "air",param2 = p or 0})
+
+		if nset and nset ~= wood and nset ~= wall and minetest.get_meta(plpos):get_inventory():get_size("main") > 0 then
+--items
+			local m = minetest.get_meta(plpos):get_inventory()
+			local size = m:get_size("main")
+
+			for i=1,size do
+				if math.random(1,math.floor(size/2)) == 1 then
+					m:set_stack("main",i,items[math.random(1,size)].." ".. math.random(1,10))
+				end
+			end
+		end
 	end
 	end
 	end
+	minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity().storage.npc_generated = true
 end
+
+minetest.register_ore({
+	ore_type = "scatter",
+	ore = "examobs:npc_house_spawner",
+	wherein = "group:spreading_dirt_type",
+	clust_scarcity = 30 * 30 * 30,
+	clust_num_ores = 1,
+	clust_size	 = 1,
+	y_min= 1,
+	y_max = 200,
+})
+
+minetest.register_node("examobs:npc_house_spawner", {
+	drawtype = "airlike",
+	groups = {dig_immediate=3,not_in_creative_inventory=1,not_in_craftguide=1},
+})
+
+minetest.register_lbm({
+	name="examobs:npchouse_spawner",
+	nodenames={"examobs:npc_house_spawner"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		examobs.generate_npc_house(pos)
+	end
+})

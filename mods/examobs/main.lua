@@ -35,7 +35,7 @@ examobs.register_mob=function(def)
 	def.hp =				def.hp or				20
 	def.hp_max = 			def.hp
 	def.physical =			def.physical or			true
-	def.collisionbox =			def.collisionbox or			{-0.35,-1.0,-0.35,0.35,0.8,0.35}
+	def.collisionbox =			def.collisionbox or			{-0.35,0,-0.35,0.35,1.8,0.35}
 	def.visual =			def.visual or			"mesh"
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
@@ -44,7 +44,7 @@ examobs.register_mob=function(def)
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
 	def.lay_on_death =			def.lay_on_death or		1
-	def.textures =			def.textures or			{"characrter.png"}
+	def.textures =			def.textures or			{"character.png"}
 	def.type =			def.type or			"npc"
 	def.team =			def.team or			"default"
 	def.step =			def.step or			function() end
@@ -70,13 +70,15 @@ examobs.register_mob=function(def)
 	def.light_max =			def.light_max or			15
 	def.lifetime =			def.lifetime or			300
 
-	def.animation =			def.animation
-	--	stand={x=1,y=39,speed=30},
-	--	walk={x=41,y=61,speed=30},
-	--	run={x=41,y=61,speed=60},
-	--	attack={x=65,y=75,speed=30},
-	--	lay={x=113,y=123,speed=0},
-	--}
+	def.animation =			def.animation == "default" and 
+	{
+		stand={x=1,y=39,speed=30},
+		walk={x=41,y=61,speed=30},
+		run={x=41,y=61,speed=60},
+		attack={x=65,y=75,speed=30},
+		lay={x=113,y=123,speed=0},
+	} or def.animation
+
 	if def.animation then
 		if def.animation.walk then
 			def.animation.run = def.animation.run or {x=def.animation.walk.x,y=def.animation.walk.y,speed = 60}
