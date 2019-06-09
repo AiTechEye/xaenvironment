@@ -568,7 +568,7 @@ default.registry_bycket=function(node_name)
 		drop = "default:tankstorage",
 		tiles={"default_glass_with_frame.png","default_glass.png"},
 		special_tiles={tex},
-		groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=2,not_in_creative_inventory=1},
+		groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=2,not_in_creative_inventory=1,used_by_npc=1},
 		sounds = default.node_sound_glass_defaults(),
 		drawtype = "glasslike_framed",
 		sunlight_propagates = true,
