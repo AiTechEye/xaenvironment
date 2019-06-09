@@ -7,6 +7,24 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:quantum_pick",
+	recipe={
+		{"default:quantumblock","default:quantumblock","default:quantumblock"},
+		{"","group:stick",""},
+		{"","group:stick",""},
+	},
+})
+
+minetest.register_craft({
+	output="default:quantumblock",
+	recipe={
+		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
+		{"default:uraniumactive_ingot","default:electric_lump","default:uraniumactive_ingot"},
+		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
+	},
+})
+
+minetest.register_craft({
 	output="default:cudgel",
 	recipe={{"default:stick","default:stick","default:stick"},},
 })

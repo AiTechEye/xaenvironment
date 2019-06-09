@@ -26,6 +26,14 @@ minetest.register_node("default:wool", {
 	on_punch=default.dye_coloring
 })
 
+minetest.register_node("default:quantumblock", {
+	tiles={"default_quantumblock.png"},
+	groups = {cracky=1,level=2},
+	paramtype = "light",
+	sunlight_propagates = true,
+	light_source = 13
+})
+
 minetest.register_node("default:gas", {
 	description = "Gas",
 	tiles={"default_gas.png"},

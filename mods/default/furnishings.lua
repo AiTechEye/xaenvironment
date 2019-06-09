@@ -278,7 +278,6 @@ default.register_chest=function(def)
 		}
 	end
 
-
 	minetest.register_node(name,{
 		description = def.description or uname .. " chest",
 		groups = groups,
@@ -286,10 +285,12 @@ default.register_chest=function(def)
 		tiles = tiles or def.tiles,
 		paramtype = "light",
 		sounds = def.sounds or default.node_sound_wood_defaults(),
+		on_construct=function(pos)
+			minetest.get_meta(pos):get_inventory():set_size("main", 32)
+		end,
 		after_place_node = function(pos, placer, itemstack)
 			local meta = minetest.get_meta(pos)
 			local pname = placer:get_player_name()
-			meta:get_inventory():set_size("main", 32)
 			if locked then
 				meta:set_string("owner",pname)
 				meta:set_string("infotext","Locked chest (" .. pname .. ")")

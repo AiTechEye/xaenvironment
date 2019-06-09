@@ -164,19 +164,21 @@ end
 minetest.register_node("default:furnace", {
 	description = "Furnace",
 	tiles = {"default_cobble.png","default_air.png"},
-	groups = {stone=2,cracky=3},
+	groups = {stone=2,cracky=3,used_by_npc=1},
 	drawtype="mesh",
 	mesh="default_furnace.b3d",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+	end,
+	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("cook", 4)
 		inv:set_size("fuel", 16)
 		inv:set_size("fried", 4)
-		meta:set_string("owner", placer:get_player_name())
 		meta:set_string("infotext", " Furnace (inactive)")
 		meta:set_string("formspec",
 		"size[8,9]" ..
@@ -190,7 +192,7 @@ minetest.register_node("default:furnace", {
 		"listring[current_name;fried]" .. 
 		"listring[current_name;cook]"
 		)
-		end,
+	end,
 	allow_metadata_inventory_put = put,
 	allow_metadata_inventory_take = take,
 	allow_metadata_inventory_move = move,
