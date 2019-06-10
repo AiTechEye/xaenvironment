@@ -3,7 +3,7 @@ examobs.register_mob({
 	type = "npc",
 	dmg = 1,
 	aggressivity = 1,
-	walk_speed = 1,
+	walk_speed = 4,
 	run_speed = 8,
 	animation = "default",
 	spawn_chance = 1000,
