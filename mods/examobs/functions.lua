@@ -307,6 +307,10 @@ examobs.fighting=function(self)
 		else
 			examobs.lookat(self,self.fight)
 			examobs.walk(self,true)
+
+			if not self.is_floating and math.abs(self.fight:get_pos().y)-5 > math.abs(self:pos().y) then
+				self.fight = nil
+			end
 		end
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
