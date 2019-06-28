@@ -575,7 +575,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
+	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -617,7 +617,7 @@ minetest.register_node("default:water_flowing", {
 		}
 	},
 	alpha =165,
-	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
