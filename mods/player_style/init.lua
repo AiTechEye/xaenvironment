@@ -15,7 +15,7 @@ player_style.drinkable=function(pos,player)
 end
 
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
-	if player_style.survive_thirst and minetest.get_item_group(minetest.get_node(pointed_thing.above).name,"drinkable") > 0 and not minetest.is_protected(pointed_thing.above,puncher:get_player_name()) then
+	if player_style.survive_thirst and player_style.drinkable(pointed_thing.above,puncher) then
 		 player_style.thirst(puncher,1)
 		minetest.remove_node(pointed_thing.above)
 	else
@@ -27,7 +27,7 @@ minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,use
 	player_style.hunger(user,hp_change)
 	local wet = minetest.get_item_group(itemstack:get_name(),"wet") - minetest.get_item_group(itemstack:get_name(),"dry")
 	if wet ~= 0 then
-		 player_style.thirst(user,wet*0.1)
+		 player_style.thirst(user,wet)
 	end
 end)
 
