@@ -250,6 +250,9 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
 	def.groups.eatable=hp
 	def.groups.gaps=gaps
+	def.groups.wet=def.wet or 0
+	def.groups.dry=def.dry or 1
+
 	local on_eat = def.on_eat or function() end
 	if gaps > 1 then
 		def.on_use=function(itemstack, user, pointed_thing)
