@@ -175,17 +175,12 @@ player_style.hunger=function(player,add,reset)
 	elseif a > 20 then
 		a = 20
 	end
-	local cur_hunger = p.hunger.num
 
 	p.hunger.num = math.ceil(a)
 	p.hunger.level = a
 
 	player:get_meta():set_int("hunger",p.hunger.num)
 	player:hud_change(p.hunger.bar, "number", p.hunger.num)
-
-	if a > cur_hunger then
-		player_style.thirst(player,-0.1)
-	end
 end
 
 player_style.thirst=function(player,add,reset)
@@ -362,6 +357,7 @@ minetest.register_globalstep(function(dtime)
 			end
 			player_style.set_animation(name,a)
 			player_style.hunger(player,hunger)
+			player_style.thirst(player,hunger*2)
 		end
 	end
 end)
