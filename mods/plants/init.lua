@@ -13,6 +13,7 @@ default.register_tree({
 	fruit={
 		hp=1,
 		gaps=4,
+		wet=0,
 		description = "Apple",
 		tiles={"plants_apple.png"},
 		inventory_image="plants_apple.png",
@@ -37,6 +38,7 @@ default.register_tree({
 	fruit={
 		hp=1,
 		gaps=4,
+		wet=1,
 		description = "Pear",
 		tiles={"plants_pear.png"},
 		inventory_image="plants_pear.png",
@@ -84,6 +86,7 @@ default.register_tree({
 	fruit={
 		hp=1,
 		gaps=0,
+		wet=1,
 		description = "Cone",
 		tiles={"plants_cone.png"},
 		inventory_image="plants_cone.png",
@@ -247,6 +250,7 @@ default.register_eatable("node","plants:coconut_broken",1,4,{
 	walkable = false,
 	paramtype = "light",
 	sounds = default.node_sound_wood_defaults(),
+	wet=1,
 })
 
 minetest.register_craft({
