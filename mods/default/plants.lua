@@ -254,6 +254,7 @@ default.register_tree=function(def)
 
 		if fts > 1 then
 			default.register_eatable("node",fruit_name,(def.fruit.hp or 1),(def.fruit.gaps or 4),{
+				wet = 0,
 				description = def.fruit.description or 			fruit_name,
 				inventory_image = def.fruit.inventory_image or 		"default_apple.png",
 				tiles = def.fruit.tiles or				{"default_apple.png"},
