@@ -4,18 +4,27 @@ player_style={
 	player_attached={},
 	player_dive = {},
 	player_running = {},
+	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst"),
+	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger"),
+	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage"),
 }
 
 minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,user,pointed_thing)
 	player_style.hunger(user,hp_change)
+
+	local wet = minetest.get_item_group(itemstack:get_name(),"wet") - minetest.get_item_group(itemstack:get_name(),"dry")
+
+	if wet ~= 0 then
+		 player_style.thirst(user,wet)
+	end
 end)
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
-	if player and modifer.type == "fall" then
+	if player and modifer.type == "fall" and player_style.survive_fall_damage == true then
 		hp_change = hp_change*4
-	end
-	if hp_change < 0 then
-		player_style.hunger(player,-1)
+		if hp_change < 0 then
+			player_style.hunger(player,-1)
+		end
 	end
 	return hp_change
 end,true)
@@ -25,10 +34,11 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.player_attached[name] = nil
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
+	player_style.thirst(player,0,true)
 end)
 
 minetest.register_on_newplayer(function(player)
-	player_style.hunger(player,0,true)
+	player_style.thirst(player,0,true)
 end)
 
 minetest.register_on_leaveplayer(function(player)
@@ -63,30 +73,61 @@ minetest.register_on_joinplayer(function(player)
 	player:hud_set_hotbar_image(profile.hotbar)
 	player:hud_set_hotbar_selected_image(profile.hotbar_selected)
 
-	player_style.players[name].hunger={
-		level = player:get_meta():get_int("hunger"),
-		step = 0,
-		back=player:hud_add({
-			hud_elem_type="statbar",
-			position={x=0.5,y=1},
-			text="player_style_hunger_bar_back.png",
-			number=20,
-			direction = 0,
-			size={x=24,y=24},
-			direction=0,
-			offset={x=25,y=-120},
-		}),
-		bar=player:hud_add({
-			hud_elem_type="statbar",
-			position={x=0.5,y=1},
-			text="player_style_hunger_bar.png",
-			number=player:get_meta():get_int("hunger"),
-			direction = 0,
-			size={x=24,y=24},
-			direction=0,
-			offset={x=25,y=-120},
-		})
-	}
+	if player_style.survive_hunger == true then
+		player_style.players[name].hunger={
+			level = player:get_meta():get_int("hunger"),
+			step = 0,
+			num = 0,
+			back=player:hud_add({
+				hud_elem_type="statbar",
+				position={x=0.5,y=1},
+				text="player_style_hunger_bar_back.png",
+				number=20,
+				direction = 0,
+				size={x=24,y=24},
+				direction=0,
+				offset={x=25,y=-120},
+			}),
+			bar=player:hud_add({
+				hud_elem_type="statbar",
+				position={x=0.5,y=1},
+				text="player_style_hunger_bar.png",
+				number=player:get_meta():get_int("hunger"),
+				direction = 0,
+				size={x=24,y=24},
+				direction=0,
+				offset={x=25,y=-120},
+			})
+		}
+	end
+
+	if player_style.survive_thirst == true then
+		player_style.players[name].thirst = {
+			level = player:get_meta():get_int("thirst"),
+			step = 0,
+			num = 0,
+			back=player:hud_add({
+				hud_elem_type="statbar",
+				position={x=0.5,y=1},
+				text="player_style_thirst_bar_back.png",
+				number=20,
+				direction = 0,
+				size={x=24,y=24},
+				direction=0,
+				offset={x=25,y=-150},
+			}),
+			bar=player:hud_add({
+				hud_elem_type="statbar",
+				position={x=0.5,y=1},
+				text="player_style_thirst_bar.png",
+				number=player:get_meta():get_int("thirst"),
+				direction = 0,
+				size={x=24,y=24},
+				direction=0,
+				offset={x=25,y=-150},
+			})
+		}
+	end
 end)
 
 player_style.hunger=function(player,add,reset)
@@ -100,6 +141,7 @@ player_style.hunger=function(player,add,reset)
 			p.hunger.level = 20
 		end
 	end
+
 	if not (p and p.hunger) then
 		return
 	elseif p.hunger.num == math.ceil(p.hunger.level+add) then
@@ -115,18 +157,79 @@ player_style.hunger=function(player,add,reset)
 	end
 
 	local a = p.hunger.level+add
-
 	if a < 0 then
 		a = 0
 		player:set_hp(0)
 	elseif a > 20 then
 		a = 20
 	end
+	local cur_hunger = p.hunger.num
 
 	p.hunger.num = math.ceil(a)
 	p.hunger.level = a
+
 	player:get_meta():set_int("hunger",p.hunger.num)
 	player:hud_change(p.hunger.bar, "number", p.hunger.num)
+
+	if a < cur_hunger then
+		player_style.thirst(player,-1)
+	end
+end
+
+player_style.thirst=function(player,add,reset)
+
+	local name = player:get_player_name()
+	local p = player_style.players[name]
+
+
+	if not (p and p.thirst) then
+		return
+	elseif reset then
+		player:get_meta():set_int("thirst",20)
+		p.thirst.level = 20
+	end
+
+	local a = p.thirst.level+add
+
+	if a < 0 then
+		a = 0
+		minetest.after(0,function(player)
+			player:set_hp(0)
+		end,player)
+	elseif a > 20 then
+		a = 20
+	elseif a <= 10 then
+		minetest.after(0,function(player)
+			player:set_hp(player:get_hp()-1)
+		end,player)
+	end
+
+	p.thirst.num = a
+	p.thirst.level = a
+
+	player:get_meta():set_int("thirst",p.thirst.num)
+	player:hud_change(p.thirst.bar, "number", p.thirst.num)
+
+	if a <= 9 and not p.thirst.to_death then
+		p.thirst.to_death = true
+		player_style.thirst_to_death(player)
+	end
+end
+
+player_style.thirst_to_death=function(player)
+	local name = player:get_player_name()
+	local p = player_style.players[name]
+
+	if player:get_pos() and p and p.thirst then
+		if p.thirst.num <= 9 then
+			player_style.thirst(player,-1)
+			minetest.after(10,function(player)
+				player_style.thirst_to_death(player)
+			end,player)
+		elseif p.thirst.to_death then
+			p.thirst.to_death = nil
+		end
+	end
 end
 
 player_style.register_profile=function(def)
