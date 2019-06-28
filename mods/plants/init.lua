@@ -38,7 +38,7 @@ default.register_tree({
 	fruit={
 		hp=1,
 		gaps=4,
-		wet=1,
+		wet=0.5,
 		description = "Pear",
 		tiles={"plants_pear.png"},
 		inventory_image="plants_pear.png",
@@ -86,7 +86,7 @@ default.register_tree({
 	fruit={
 		hp=1,
 		gaps=0,
-		wet=1,
+		wet=-0.1,
 		description = "Cone",
 		tiles={"plants_cone.png"},
 		inventory_image="plants_cone.png",
