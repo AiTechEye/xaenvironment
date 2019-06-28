@@ -8,14 +8,26 @@ player_style={
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger"),
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage"),
 }
+dofile(minetest.get_modpath("player_style") .. "/stuff.lua")
+
+player_style.drinkable=function(pos,player)
+	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
+end
+
+minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
+	if player_style.survive_thirst and minetest.get_item_group(minetest.get_node(pointed_thing.above).name,"drinkable") > 0 and not minetest.is_protected(pointed_thing.above,puncher:get_player_name()) then
+		 player_style.thirst(puncher,1)
+		minetest.remove_node(pointed_thing.above)
+	else
+		player_style.hunger(puncher,-0.01)
+	end
+end)
 
 minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,user,pointed_thing)
 	player_style.hunger(user,hp_change)
-
 	local wet = minetest.get_item_group(itemstack:get_name(),"wet") - minetest.get_item_group(itemstack:get_name(),"dry")
-
 	if wet ~= 0 then
-		 player_style.thirst(user,wet)
+		 player_style.thirst(user,wet*0.1)
 	end
 end)
 
@@ -171,8 +183,8 @@ player_style.hunger=function(player,add,reset)
 	player:get_meta():set_int("hunger",p.hunger.num)
 	player:hud_change(p.hunger.bar, "number", p.hunger.num)
 
-	if a < cur_hunger then
-		player_style.thirst(player,-1)
+	if a > cur_hunger then
+		player_style.thirst(player,-0.1)
 	end
 end
 
@@ -181,12 +193,14 @@ player_style.thirst=function(player,add,reset)
 	local name = player:get_player_name()
 	local p = player_style.players[name]
 
-
 	if not (p and p.thirst) then
 		return
 	elseif reset then
 		player:get_meta():set_int("thirst",20)
 		p.thirst.level = 20
+	elseif p.thirst.num == math.ceil(p.thirst.level+add) then
+		p.thirst.level = p.thirst.level + add
+		return
 	end
 
 	local a = p.thirst.level+add
@@ -198,19 +212,19 @@ player_style.thirst=function(player,add,reset)
 		end,player)
 	elseif a > 20 then
 		a = 20
-	elseif a <= 10 then
+	elseif a <= 10 and add <= 0 then
 		minetest.after(0,function(player)
 			player:set_hp(player:get_hp()-1)
 		end,player)
 	end
 
-	p.thirst.num = a
+	p.thirst.num = math.ceil(a)
 	p.thirst.level = a
 
 	player:get_meta():set_int("thirst",p.thirst.num)
 	player:hud_change(p.thirst.bar, "number", p.thirst.num)
 
-	if a <= 9 and not p.thirst.to_death then
+	if p.thirst.num <= 9 and not p.thirst.to_death then
 		p.thirst.to_death = true
 		player_style.thirst_to_death(player)
 	end
