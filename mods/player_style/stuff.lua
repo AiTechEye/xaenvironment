@@ -6,11 +6,12 @@ minetest.register_tool("player_style:bottle", {
 		local wear = itemstack:get_wear()
 		local max = 65535
 		wear = wear ~= 0 and wear or max
-		if pointed_thing.under and player_style.drinkable(pointed_thing.under,user) then
+		if pointed_thing.under and player_style.drinkable(pointed_thing.under,user) and wear > 1 then
 			wear=math.floor(wear-(max/5))
+			minetest.remove_node(pointed_thing.under)
 		elseif wear < max then
 			wear=math.floor(wear+(max/5))
-			 player_style.thirst(user,1)
+			player_style.thirst(user,1)
 		end
 		if wear > max then
 			wear = max
