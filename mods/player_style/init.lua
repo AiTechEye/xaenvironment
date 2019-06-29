@@ -50,7 +50,12 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 minetest.register_on_newplayer(function(player)
-	player_style.thirst(player,0,true)
+	minetest.after(0,function(player)
+		if player and player:get_pos() then
+			player_style.thirst(player,0,true)
+			player_style.hunger(player,0,true)
+		end
+	end,player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
@@ -200,7 +205,7 @@ player_style.thirst=function(player,add,reset)
 
 	local a = p.thirst.level+add
 
-	if a < 0 then
+	if a <= 0 then
 		a = 0
 		minetest.after(0,function(player)
 			player:set_hp(0)
