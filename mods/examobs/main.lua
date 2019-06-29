@@ -69,6 +69,7 @@ examobs.register_mob=function(def)
 	def.light_min =			def.light_min or			9
 	def.light_max =			def.light_max or			15
 	def.lifetime =			def.lifetime or			300
+	def.add_wear =			def.add_wear or			10000
 
 	def.animation =			def.animation == "default" and 
 	{
@@ -227,10 +228,12 @@ examobs.register_mob=function(def)
 			self.on_punched(self,puncher)
 		end
 
-		tool_capabilities.damage_groups.fleshy=tool_capabilities.damage_groups.fleshy or 1
+		dmg = tool_capabilities.damage_groups.fleshy or 1
 
-		if tool_capabilities and tool_capabilities.damage_groups and tool_capabilities.damage_groups.fleshy then
-			dmg = tool_capabilities.damage_groups.fleshy
+		if puncher:is_player() then
+			local tool = puncher:get_wielded_item()
+			tool:add_wear(math.ceil(self.add_wear/(dmg*dmg)))
+			puncher:set_wielded_item(tool)
 		end
 
 		local v={x = dir.x*3,y = self.object:get_velocity().y,z = dir.z*3}
