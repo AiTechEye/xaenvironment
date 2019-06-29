@@ -76,6 +76,26 @@ minetest.register_ore({
 	y_max= -10,
 })
 
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:snowblock_thin",
+	wherein= "default:snowblock",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 15,
+	y_min= -10,
+	y_max= 1,
+})
+
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:snowblock_thin",
+	wherein= "default:ice",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 15,
+	y_min= -10,
+	y_max= 1,
+})
+
 --||||||||||||||||
 -- ======================= biomes
 --||||||||||||||||
