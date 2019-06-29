@@ -152,6 +152,22 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	type = "cooking",
+	output="default:water_source",
+	recipe="default:ice"
+})
+minetest.register_craft({
+	type = "cooking",
+	output="default:water_source",
+	recipe="default:snowblock_thin"
+})
+minetest.register_craft({
+	type = "cooking",
+	output="default:water_source",
+	recipe="default:snowblock"
+})
+
+minetest.register_craft({
 	output="default:wool",
 	recipe={
 		{"plants:cotton","plants:cotton"},
