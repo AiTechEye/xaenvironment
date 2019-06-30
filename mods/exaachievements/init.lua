@@ -2,9 +2,9 @@ exaachievements={
 	events={
 		dig={
 			["default:dirt"]={
-				count=10,
+				count=25,
 				label="Mud_dive",
-				text="Dig 10 dirt",
+				text="Dig 25 dirt",
 				skills=1,
 			},
 		},
