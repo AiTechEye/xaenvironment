@@ -5,6 +5,7 @@ exaachievements={
 				count=10,
 				label="Mud_dive",
 				text="Dig 10 dirt",
+				skills=1,
 			},
 		},
 		place={
@@ -12,6 +13,7 @@ exaachievements={
 				count=25,
 				label="Dirt_house",
 				text="Place 25 dirt",
+				skills=1,
 			},
 		},
 	},
@@ -22,6 +24,21 @@ minetest.register_chatcommand("a", {
 	description = "Achievements (pre alpha)",
 	func = function(name, param)
 		exaachievements.form(name,minetest.get_player_by_name(name))
+	end
+})
+
+minetest.register_chatcommand("aaa", {
+	params = "",
+	description = "Clear achievements",
+	privs = {ban=true},
+	func = function(name, param)
+		local m = minetest.get_player_by_name(name):get_meta()
+		m:set_int("exaskills",0)
+		for i1,v1 in pairs(exaachievements.events) do
+		for i2,v2 in pairs(v1) do
+			m:set_int("exaachievements_"..v2.label,0)
+		end
+		end
 	end
 })
 
@@ -45,10 +62,8 @@ exaachievements.form=function(name,user)
 			end
 
 			count = m:get_int("exaachievements_"..v2.label)
-			--done = count == v2.count
 
-print(v2.count)
-			gui = gui .. "label[0.6,"..y..";"..  string.gsub(v2.label,"_"," ").. "\b\b" .. (count >= v2.count and (minetest.colorize("#00FF00","Completed")) or count.. "/" .. v2.count) .."]"
+			gui = gui .. "label[0.6,"..y..";"..  string.gsub(v2.label,"_"," ").. "\b\b" .. (count >= v2.count and (minetest.colorize("#00FF00","Completed")) or count.. "/" .. v2.count) .. minetest.colorize("#FFFF00","\b\b+" .. v2.skills) .."]"
 
 			.. "label[0.8,"..y..".4;"..v2.text.."]"
 
@@ -88,6 +103,9 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 		local c = m:get_int(lab)+1
 		if c <= a.count then
 			m:set_int(lab,c)
+			if c == a.count then
+				m:set_int("exaskills",m:get_int("exaskills")+a.skills)
+			end
 		end
 	end
 end)
@@ -100,6 +118,9 @@ minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
 		local c = m:get_int(lab)+1
 		if c <= a.count then
 			m:set_int(lab,c)
+			if c == a.count then
+				m:set_int("exaskills",m:get_int("exaskills")+a.skills)
+			end
 		end
 	end
 end)
