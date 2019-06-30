@@ -1,6 +1,15 @@
 exaachievements={
 	events={
 		dig={
+			["default:sand"]={
+				count=25,
+				label="Sand_treasures",
+				text="Dig sand under water",
+				skills=1,
+				approve=function(node,pos,user)
+					return minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0
+				end
+			},
 			["default:dirt"]={
 				count=25,
 				label="Mud_dive",
@@ -18,6 +27,10 @@ exaachievements={
 		},
 	},
 }
+
+apos=function(pos,x,y,z)
+	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
+end
 
 minetest.register_chatcommand("a", {
 	params = "",
@@ -41,10 +54,6 @@ minetest.register_chatcommand("aaa", {
 		end
 	end
 })
-
-
-exaachievements.new_player=function(player)
-end
 
 exaachievements.form=function(name,user)
 	local gui = "size[6,8]"
@@ -81,24 +90,19 @@ minetest.register_on_player_receive_fields(function(user, form, pressed)
 	end
 end)
 
-
-
-
-minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
-end)
 minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,user,pointed_thing)
 end)
 
-
-minetest.register_on_newplayer(function(player)
-	exaachievements.new_player(player)
-end)
-
-
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	local a = exaachievements.events.dig[oldnode.name]
+
 	if a then
 		local lab = "exaachievements_"..a.label
+
+		if a.approve and not a.approve(oldnode,pos,digger) then
+			return true
+		end
+
 		local m = digger:get_meta()
 		local c = m:get_int(lab)+1
 		if c <= a.count then
@@ -114,6 +118,11 @@ minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
 	local a = exaachievements.events.place[node.name]
 	if a then
 		local lab = "exaachievements_"..a.label
+
+		if a.approve and not a.approve(oldnode,pos,placer) then
+			return true
+		end
+
 		local m = placer:get_meta()
 		local c = m:get_int(lab)+1
 		if c <= a.count then
