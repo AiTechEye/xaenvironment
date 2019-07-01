@@ -1,14 +1,16 @@
-exaachievements.register(eventtype,{
-	type="",				-- required, alternatives: "eat", "craft", "place", "dig", "customize"
+exaachievements.register({
+	type="eat",			-- required, alternatives: "eat", "craft", "place", "dig", "customize"
 	item="plants:apple",		-- required: item or group (not used by "customize")
 	name="Apples",			-- required
 	description="Eat 100 apples",		-- required
 	count=100,			-- optional, default: 10
 	skills=2,				-- optional, default: 1
 	image="plants_apple.png",		-- optional image or item
+	min=10,				-- optional, min achievements to begin
 	approve=function(player,item,pos)	-- optional, params depends by type
 		return true or false
 	end
+
 
 })
 used by "customize"

@@ -1,108 +1,42 @@
---min skills, requere to be done, function
+--requere to be done, function
 
 exaachievements={
-	events={
-		customize={
-			["hunter"]={
-				count=100,
-				name="Hunter",
-				description="Kill 100 animals",
-				skills=10,
-				approve=function(user)
-					--return minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0
-				end
-			},
-		},
-		dig={
-			["default:sand"]={
-				count=25,
-				name="Sand_treasures",
-				description="Dig sand under water",
-				skills=1,
-				approve=function(user,item,pos)
-					return minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0
-				end
-			},
-			["spreading_dirt_type"]={
-				image="default:dirt_with_grass",
-				count=25,
-				name="Mud_dive",
-				description="Dig 25 dirts",
-				skills=1,
-			},
-			["tree"]={
-				image="plants:apple_tree",
-				count=25,
-				name="tree_cutter",
-				description="Dig 25 tree",
-				skills=2,
-			},
-		},
-		place={
-			["default:dirt"]={
-				count=25,
-				name="Dirt_house",
-				description="Place 25 dirts",
-				skills=1,
-			},
-		},
-		craft={
-			["wood"]={
-				image="plants:apple_wood",
-				count=50,
-				name="House_builder",
-				description="Craft 50 wood",
-				skills=1,
-			},
-			["default:stick"]={
-				count=10,
-				name="Item_maker",
-				description="Craft 10 sticks",
-				skills=1,
-			},
-		},
-		eat={
-			["plants:apple"]={
-				count=1,
-				name="Apples",
-				description="Eat an apple",
-				skills=1,
-			},
-		}
-	},
+	events={customize={},dig={},place={},craft={},eat={}},
+	tmp={regnames={}}
 }
 
-exaachievements.register=function(event,def)
-	if not def.name then
-		error('exaachievements: "name" required')
-	elseif not def.item then
-		error('exaachievements: "item" required')
+exaachievements.register=function(def)
+	if not def.name or type(def.name) ~="string" then
+		error('exaachievements: "name" required, is '..type(def.name)..'')
+	elseif not def.item and def.type ~= "customize" then
+		error('exaachievements '..def.name..':\n "item" required')
 	elseif not def.description then
-		error('exaachievements: "description" required')
-	elseif not exaachievements.events[event] then
-		error('exaachievements: invalid event: "dig", "place", "craft", "eat", "functions"')
+		error('exaachievements '..def.name..':\n "description" required')
+	elseif not def.type or not exaachievements.events[def.type] then
+		local t = type(def.type)
+		error('exaachievements '..def.name..':\n invalid type "'..(t=="string" and def.type or t)..'", use: "dig", "place", "craft", "eat", "customize"')
 	end
 
-	if event == "functions" then
-		def.item=def.name
+	if exaachievements.tmp.regnames[def.name] then
+		error('exaachievements '..def.name..': Already exist')
+	else
+		exaachievements.tmp.regnames[def.name]=1
 	end
 
-	exaachievements.events[event][def.item]={
+	if def.type == "customize" then
+		def.item = def.name
+	end
+
+	exaachievements.events[def.type][def.item]={
 		count=		def.count or 10,
 		name=		def.name:gsub(" ","_"),
 		description=	def.description,
 		skills=		def.skills or 1,
 		image=		def.image,
 		approve=		def.approve,
+		min=		def.min,
 	}
 end
-
-
-exaachievements.register("eat",{
-	name="Pears g",
-	count=1,
-	description="Eat a pear",
-})
 
 exaachievements.customize=function(user,name)
 	local a = exaachievements.events.customize[name]
@@ -149,27 +83,33 @@ exaachievements.form=function(name,user,ach_num)
 	local c = ""
 	local ach
 	local num = 0
+	local skill = m:get_int("exaskills")
 
 	ach_num = ach_num or 1
 
 	for i1,v1 in pairs(exaachievements.events) do
 		for i2,v2 in pairs(v1) do
 			count = m:get_int("exaachievements_"..v2.name)
-			gui = gui .. c .. (count >= v2.count and "#00FF00" or "") .. string.gsub(v2.name,"_"," ") .. "\b\b" .. (count >= v2.count and "Completed" or count.. "/" .. v2.count .. "\b\b+" .. v2.skills)
+			gui = gui .. c ..(v2.min and v2.min > skill and ("#777777" ..  string.gsub(v2.name,"_"," ") .. " (" ..v2.min..")")	or	(count >= v2.count and "#00FF00" or "") .. string.gsub(v2.name,"_"," ") .. "\b\b" .. (count >= v2.count and "Completed" or count.. "/" .. v2.count .. "\b\b+" .. v2.skills)	)
 			c=","
 			num = num + 1
 			if num == ach_num then
 				ach = {value=v2,index=i2}
 			end
-
 		end
 	end
 
-	gui = gui .. ";"..ach_num.."]"
+	gui = gui .. ";"..ach_num.."]label[7,0;"..minetest.colorize("#FFFF00",skill).."]"
 
 	if ach then
+
+		local un = ach.value.min and ach.value.min > skill
 		local image
-		if ach.value.image and minetest.registered_items[ach.value.image] then
+
+		if un then
+			gui = gui .. "image"
+			image = "default_unknown.png"
+		elseif ach.value.image and minetest.registered_items[ach.value.image] then
 			gui = gui .."item_image"
 			image = ach.value.image
 		elseif ach.value.image and ach.value.image:sub(-4,-1) == ".png" then
@@ -179,16 +119,49 @@ exaachievements.form=function(name,user,ach_num)
 			gui = gui .."item_image"
 			image = ach.index
 		end
+
 		count = m:get_int("exaachievements_"..ach.value.name)
 		gui = gui .. (image and "[-0.2,-0.2;1,1;"..image.."]" or "")
-		.."label[0.6,0.2;"..ach.value.description.."]"
-		.."label[0.6,-0.2;".. minetest.colorize("#FFFF00","+"..ach.value.skills) .. "\b\b" .. count .. "/" .. ach.value.count.. (count >= ach.value.count and minetest.colorize("#00FF00","\b\bCompleted") or "") .. "]"
+
+		if not un then
+			gui = gui
+			.."label[0.6,0.2;"..ach.value.description.."]"
+			.."label[0.6,-0.2;".. minetest.colorize("#FFFF00","+"..ach.value.skills) .. "\b\b" .. count .. "/" .. ach.value.count.. (count >= ach.value.count and minetest.colorize("#00FF00","\b\bCompleted") or "") .. "]"
+		end
+
 	end
 
 	minetest.after(0.2, function(name,user)
 		return minetest.show_formspec(name, "exaachievements",gui)
 	end, name,user)
 end
+
+
+
+dofile(minetest.get_modpath("exaachievements") .. "/achievements.lua")
+
+
+
+exaachievements.skills=function(a,num,user,item,pos)
+	local lab = "exaachievements_"..a.name
+
+	if a.approve and not a.approve(user,item,pos) then
+		return
+	end
+	local m = user:get_meta()
+	local c = m:get_int(lab)
+
+	if c <= a.count and not (a.min and a.min > m:get_int("exaskills")) then
+		m:set_int(lab,c + num)
+		if c < a.count and c + num >= a.count then
+			m:set_int("exaskills",m:get_int("exaskills")+a.skills)
+		end
+	end
+end
+
+minetest.register_on_mods_loaded(function()
+	exaachievements.tmp.regnames=nil
+end)
 
 minetest.register_on_player_receive_fields(function(user, form, pressed)
 	if form=="exaachievements" then
@@ -213,25 +186,10 @@ minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,use
 	end
 end)
 
-exaachievements.skills=function(a,num,user,item,pos)
-	local lab = "exaachievements_"..a.name
-	if a.approve and not a.approve(user,item,pos) then
-		return true
-	end
-	local m = user:get_meta()
-	local c = m:get_int(lab) + num
-	if c <= a.count then
-		m:set_int(lab,c)
-		if c == a.count then
-			m:set_int("exaskills",m:get_int("exaskills")+a.skills)
-		end
-	end
-end
-
 minetest.register_on_craft(function(itemstack,player,old_craft_grid,craft_inv)
 	local name = itemstack:get_name()
 	local a = exaachievements.events.craft[name]
-	local def = minetest.registered_nodes[name]
+	local def = minetest.registered_items[name]
 	if a then 
 		exaachievements.skills(a,itemstack:get_count(),player,itemstack)
 	end
@@ -249,7 +207,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	if a then 
 		exaachievements.skills(a,1,digger,ItemStack(oldnode.name),pos)
 	end
-	for i,v in pairs(minetest.registered_nodes[oldnode.name].groups) do
+	for i,v in pairs(minetest.registered_items[oldnode.name].groups) do
 		if exaachievements.events.dig[i] then
 			exaachievements.skills(exaachievements.events.dig[i],1,digger,ItemStack(oldnode.name),pos)
 		end
@@ -261,7 +219,7 @@ minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
 	if a then 
 		exaachievements.skills(a,1,placer,ItemStack(node.name),pos)
 	end
-	for i,v in pairs(minetest.registered_nodes[node.name].groups) do
+	for i,v in pairs(minetest.registered_items[node.name].groups) do
 		if exaachievements.events.place[i] then
 			exaachievements.skills(exaachievements.events.place[i],1,placer,ItemStack(node.name),pos)
 		end
