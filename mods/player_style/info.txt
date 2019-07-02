@@ -6,7 +6,7 @@ crawl to a edge to come higher
 
 
 player_style.register_button({
-	type="image_button",	nil , "image_button", "item_button"
+	type="image_button",	nil , "image", "item_image"
 	exit=true,		nil , true
 	image="default_dirt.png",	nil, image, item
 	name="dirt",		button name/id
