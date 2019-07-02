@@ -13,7 +13,7 @@ minetest.register_chatcommand("sethome", {
 			local meta = player:get_meta()
 			local pos = player:get_pos()
 			meta:set_string("home",minetest.pos_to_string(pos))
-			minetest.chat_send_player(name, "Home set at " .. math.floor(pos.x) .." " .. math.floor(pos.y) .." " .. math.floor(pos.z))
+			minetest.chat_send_player(name, "Home set!")
 		end
 	end
 })
@@ -32,6 +32,37 @@ minetest.register_chatcommand("home", {
 				player:set_pos(pos)
 				minetest.chat_send_player(name, "Teleported to home")
 			end
+		end
+	end
+})
+
+player_style.register_button({
+	exit=true,
+	name="sethome",
+	label="Home",
+	info="Set home",
+	action=function(player)
+		local name = player:get_player_name()
+		local meta = player:get_meta()
+		local pos = player:get_pos()
+		meta:set_string("home",minetest.pos_to_string(pos))
+		minetest.chat_send_player(name, "Home set!")
+	end
+})
+
+player_style.register_button({
+	exit=true,
+	name="gohome",
+	label="Home",
+	info="Go home",
+	action=function(player)
+		local meta = player:get_meta()
+		local name = player:get_player_name()
+		local s = meta:get_string("home")
+		if s ~="" then
+			local pos = minetest.string_to_pos(s)
+			player:set_pos(pos)
+			minetest.chat_send_player(name, "Teleported to home")
 		end
 	end
 })
