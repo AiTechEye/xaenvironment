@@ -21,7 +21,7 @@ minetest.register_chatcommand("exaach_clear", {
 player_style.register_button({
 	exit=true,
 	name="achievements",
-	image="default_unknown.png",
+	image="achievements_icon.png",
 	type="image",
 	info="Achievements",
 	action=function(user)
@@ -32,7 +32,6 @@ player_style.register_button({
 exaachievements.get_skills=function(user)
 	return user:get_meta():get_int("exaskills")
 end
-
 
 exaachievements.register=function(def)
 	if not def.name or type(def.name) ~="string" then
@@ -171,7 +170,7 @@ exaachievements.skills=function(a,num,user,item,pos)
 	local c = m:get_int(lab)
 	local skills = m:get_int("exaskills")
 
-	if c <= a.count and not (a.min and a.min > skills) and not (a.hiden_until and a.hiden_until > skills) then
+	if c <= a.count and not ((a.min and a.min > skills) or (a.hide_until and a.hide_until > skills)) then
 		m:set_int(lab,c + num)
 		if c < a.count and c + num >= a.count then
 			m:set_int("exaskills",skills+a.skills)
