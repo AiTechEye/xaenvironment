@@ -38,8 +38,9 @@ minetest.register_chatcommand("home", {
 
 player_style.register_button({
 	exit=true,
+	type="image",
+	image="commands_sethome.png",
 	name="sethome",
-	label="Home",
 	info="Set home",
 	action=function(player)
 		local name = player:get_player_name()
@@ -52,8 +53,9 @@ player_style.register_button({
 
 player_style.register_button({
 	exit=true,
+	type="image",
+	image="commands_gohome.png",
 	name="gohome",
-	label="Home",
 	info="Go home",
 	action=function(player)
 		local meta = player:get_meta()
