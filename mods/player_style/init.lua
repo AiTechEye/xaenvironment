@@ -1,5 +1,6 @@
 player_style={
 	players={},
+	buttons={text="",num=0,action={}},
 	registered_profiles={},
 	player_attached={},
 	player_dive = {},
@@ -75,6 +76,17 @@ minetest.register_on_joinplayer(function(player)
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 
+	player:set_inventory_formspec(
+		"size[8,8]" 
+		.."listcolors[#77777777;#777777aa;#000000ff]"
+		.."list[current_player;main;0,3;8,4;]"
+		.."list[current_player;craft;4,0;3,3;]"
+		.."list[current_player;craftpreview;7,1;1,1;]"
+		.."listring[current_player;main]"
+		.."listring[current_player;craft]"
+		..player_style.buttons.text
+	)
+
 	player:set_properties({
 		textures =	profile.texture,
 		visual =		profile.visual,
@@ -128,7 +140,6 @@ minetest.register_on_joinplayer(function(player)
 				position={x=0.5,y=1},
 				text="player_style_thirst_bar_back.png",
 				number=20,
-				direction = 0,
 				size={x=24,y=24},
 				direction=0,
 				offset={x=25,y=-150},
@@ -140,10 +151,33 @@ minetest.register_on_joinplayer(function(player)
 				number=player:get_meta():get_int("thirst"),
 				direction = 0,
 				size={x=24,y=24},
-				direction=0,
 				offset={x=25,y=-150},
 			})
 		}
+	end
+end)
+
+player_style.register_button=function(def)
+	local b = (def.type and (def.type .. "_button") or "button")
+	.. (def.exit and "_exit" or "")
+	.. "["..player_style.buttons.num..",7.2;1,1;"
+	.. (((def.type == "image" or def.type == "item_image") and def.image and (def.image .. ";")) or "")
+	.. def.name ..";"
+	.. (def.label or "") .."]"
+	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
+	player_style.buttons.text = player_style.buttons.text .. b
+	player_style.buttons.num = player_style.buttons.num + 1
+	player_style.buttons.action[def.name]=def.action
+end
+
+minetest.register_on_player_receive_fields(function(user, form, pressed)
+	if form == "" then
+		for i,v in pairs(pressed) do
+			if player_style.buttons.action[i] then
+				player_style.buttons.action[i](user)
+				break
+			end
+		end
 	end
 end)
 
