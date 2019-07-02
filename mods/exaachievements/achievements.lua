@@ -13,7 +13,7 @@ exaachievements.register({
 exaachievements.register({
 	type="dig",
 	count=25,
-	name="Leave_hut",
+	name="Sukkah",
 	item="leaves",
 	image="plants:apple_leaves",
 	description="Dig 25 leaves and find sticks",

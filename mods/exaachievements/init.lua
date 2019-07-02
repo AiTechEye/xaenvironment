@@ -89,7 +89,7 @@ apos=function(pos,x,y,z)
 end
 
 exaachievements.form=function(name,user,ach_num)
-	local gui = "size[8,8]textlist[-0.2,0.7;8.2,7.6;list;"
+	local gui = "size[8,8] listcolors[#77777777;#777777aa;#000000ff] textlist[-0.2,0.7;8.2,7.6;list;"
 	local y = 0
 	local m = user:get_meta()
 	local done
@@ -188,6 +188,14 @@ exaachievements.completed=function(a,player)
 		offset={x=0,y=0},
 	})
 
+	local img = player:hud_add({
+		hud_elem_type="image",
+		scale = {x=2,y=2},
+		position={x=0.5,y=0.03},
+		text="achievements_icon.png",
+		offset={x=-125,y=0},
+	})
+
 	local ach = player:hud_add({
 		hud_elem_type="text",
 		scale = {x=1,y=1},
@@ -208,13 +216,14 @@ exaachievements.completed=function(a,player)
 		alignment=0,
 	})
 
-	minetest.after(5,function(player,back,ach,com)
+	minetest.after(5,function(player,back,ach,com,img)
 		if player and player:get_pos() then
+			player:hud_remove(img)
 			player:hud_remove(ach)
 			player:hud_remove(com)
 			player:hud_remove(back)
 		end
-	end,player,back,ach,com)
+	end,player,back,ach,com,img)
 end
 
 minetest.register_on_mods_loaded(function()
@@ -262,7 +271,7 @@ end)
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	local a = exaachievements.events.dig[oldnode.name]
-	if a then 
+	if a then
 		exaachievements.skills(a,1,digger,ItemStack(oldnode.name),pos)
 	end
 	for i,v in pairs(minetest.registered_items[oldnode.name].groups) do
