@@ -1,5 +1,3 @@
---requere to be done, function
-
 exaachievements={
 	events={customize={},dig={},place={},craft={},eat={}},
 	tmp={regnames={}}
@@ -15,6 +13,14 @@ exaachievements.register=function(def)
 	elseif not def.type or not exaachievements.events[def.type] then
 		local t = type(def.type)
 		error('exaachievements '..def.name..':\n invalid type "'..(t=="string" and def.type or t)..'", use: "dig", "place", "craft", "eat", "customize"')
+	elseif def.skills and type(def.skills) ~="number" then
+		error('exaachievements '..def.name..':\n '..type(v)..' "skills" number only')
+	elseif def.min and type(def.min) ~="number" then
+		error('exaachievements '..def.name..':\n '..type(v)..' "min" number only')
+	elseif def.hide_until and type(def.hide_until) ~="number" then
+		error('exaachievements '..def.name..':\n '..type(v)..' "hide_until" number only')
+	elseif def.approve and type(def.approve) ~="function" then
+		error('exaachievements '..def.name..':\n '..type(v)..' "approve" function only')
 	end
 
 	if exaachievements.tmp.regnames[def.name] then
@@ -35,6 +41,7 @@ exaachievements.register=function(def)
 		image=		def.image,
 		approve=		def.approve,
 		min=		def.min,
+		hide_until=	def.hide_until,
 	}
 end
 
@@ -89,12 +96,16 @@ exaachievements.form=function(name,user,ach_num)
 
 	for i1,v1 in pairs(exaachievements.events) do
 		for i2,v2 in pairs(v1) do
-			count = m:get_int("exaachievements_"..v2.name)
-			gui = gui .. c ..(v2.min and v2.min > skill and ("#777777" ..  string.gsub(v2.name,"_"," ") .. " (" ..v2.min..")")	or	(count >= v2.count and "#00FF00" or "") .. string.gsub(v2.name,"_"," ") .. "\b\b" .. (count >= v2.count and "Completed" or count.. "/" .. v2.count .. "\b\b+" .. v2.skills)	)
-			c=","
-			num = num + 1
-			if num == ach_num then
-				ach = {value=v2,index=i2}
+
+			if not (v2.hide_until and v2.hide_until > skill) then
+
+				count = m:get_int("exaachievements_"..v2.name)
+				gui = gui .. c ..(v2.min and v2.min > skill and ("#777777" ..  string.gsub(v2.name,"_"," ") .. " (" ..v2.min..")")	or	(count >= v2.count and "#00FF00" or "") .. string.gsub(v2.name,"_"," ") .. "\b\b" .. (count >= v2.count and "Completed" or count.. "/" .. v2.count .. "\b\b+" .. v2.skills)	)
+				c=","
+				num = num + 1
+				if num == ach_num then
+					ach = {value=v2,index=i2}
+				end
 			end
 		end
 	end
@@ -150,13 +161,53 @@ exaachievements.skills=function(a,num,user,item,pos)
 	end
 	local m = user:get_meta()
 	local c = m:get_int(lab)
+	local skills = m:get_int("exaskills")
 
-	if c <= a.count and not (a.min and a.min > m:get_int("exaskills")) then
+	if c <= a.count and not (a.min and a.min > skills) and not (a.hiden_until and a.hiden_until > skills) then
 		m:set_int(lab,c + num)
 		if c < a.count and c + num >= a.count then
-			m:set_int("exaskills",m:get_int("exaskills")+a.skills)
+			m:set_int("exaskills",skills+a.skills)
+			exaachievements.completed(a,user)
 		end
 	end
+end
+
+exaachievements.completed=function(a,player)
+	local back = player:hud_add({
+		hud_elem_type="image",
+		scale = {x=20,y=5},
+		position={x=0.5,y=0},
+		text="default_steelblock.png",
+		offset={x=0,y=0},
+	})
+
+	local ach = player:hud_add({
+		hud_elem_type="text",
+		scale = {x=1,y=1},
+		text=a.name:gsub("_"," "),
+		number=0x000000,
+		offset={x=0,y=10},
+		position={x=0.5,y=0},
+		alignment=0,
+	})
+
+	local com = player:hud_add({
+		hud_elem_type="text",
+		scale = {x=1,y=1},
+		text="Achievement Completed!",
+		number=0x000000,
+		offset={x=0,y=25},
+		position={x=0.5,y=0},
+		alignment=0,
+	})
+
+	minetest.after(5,function(player,back,ach,com)
+		if player and player:get_pos() then
+			player:hud_remove(ach)
+			player:hud_remove(com)
+			player:hud_remove(back)
+		end
+	end,player,back,ach,com)
 end
 
 minetest.register_on_mods_loaded(function()

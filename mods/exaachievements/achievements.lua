@@ -15,6 +15,7 @@ exaachievements.register({
 	item="plants:apple",
 	count=1,
 	description="Eat an apple",
+	hide_until=2,
 })
 --================ Customize ==================
 exaachievements.register({
@@ -41,7 +42,7 @@ exaachievements.register({
 	count=25,
 	name="Mud_dive",
 	item="spreading_dirt_type",
-	description="Dig 25 dirts",
+	description="Dig 25 grass",
 	skills=1,
 	image="default:dirt_with_grass",
 })

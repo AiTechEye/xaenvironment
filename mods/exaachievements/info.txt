@@ -6,13 +6,14 @@ exaachievements.register({
 	count=100,			-- optional, default: 10
 	skills=2,				-- optional, default: 1
 	image="plants_apple.png",		-- optional image or item
-	min=10,				-- optional, min achievements to begin
+	min=10,				-- optional, min achievements to be able
+	hide_until=2,			-- optional, min achievements to be able and visible
 	approve=function(player,item,pos)	-- optional, params depends by type
 		return true or false
 	end
-
-
 })
+
+
 used by "customize"
 
 exaachievements.customize(player,name)
