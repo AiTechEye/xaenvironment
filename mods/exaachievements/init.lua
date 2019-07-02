@@ -3,6 +3,37 @@ exaachievements={
 	tmp={regnames={}}
 }
 
+minetest.register_chatcommand("exaach_clear", {
+	params = "",
+	description = "Clear your achievements",
+	privs = {ban=true},
+	func = function(name, param)
+		local m = minetest.get_player_by_name(name):get_meta()
+		m:set_int("exaskills",0)
+		for i1,v1 in pairs(exaachievements.events) do
+		for i2,v2 in pairs(v1) do
+			m:set_int("exaachievements_"..v2.name,0)
+		end
+		end
+	end
+})
+
+player_style.register_button({
+	exit=true,
+	name="achievements",
+	image="default_unknown.png",
+	type="image",
+	info="Achievements",
+	action=function(user)
+		exaachievements.form(user:get_player_name(),user)
+	end
+})
+
+exaachievements.get_skills=function(user)
+	return user:get_meta():get_int("exaskills")
+end
+
+
 exaachievements.register=function(def)
 	if not def.name or type(def.name) ~="string" then
 		error('exaachievements: "name" required, is '..type(def.name)..'')
@@ -57,29 +88,6 @@ end
 apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
 end
-
-minetest.register_chatcommand("a", {
-	params = "",
-	description = "Achievements (pre alpha)",
-	func = function(name, param)
-		exaachievements.form(name,minetest.get_player_by_name(name))
-	end
-})
-
-minetest.register_chatcommand("aaa", {
-	params = "",
-	description = "Clear achievements",
-	privs = {ban=true},
-	func = function(name, param)
-		local m = minetest.get_player_by_name(name):get_meta()
-		m:set_int("exaskills",0)
-		for i1,v1 in pairs(exaachievements.events) do
-		for i2,v2 in pairs(v1) do
-			m:set_int("exaachievements_"..v2.name,0)
-		end
-		end
-	end
-})
 
 exaachievements.form=function(name,user,ach_num)
 	local gui = "size[8,8]textlist[-0.2,0.7;8.2,7.6;list;"

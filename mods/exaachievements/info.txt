@@ -13,7 +13,7 @@ exaachievements.register({
 	end
 })
 
-
-used by "customize"
-
-exaachievements.customize(player,name)
+exaachievements.customize(player,achievement_name)	Used by "customize"
+exaachievements.get_skills(user)			Get player skills
+/ach						Achievements
+/ach_clear					Clear your achievements (ban required)
