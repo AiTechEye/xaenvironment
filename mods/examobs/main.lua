@@ -168,6 +168,7 @@ examobs.register_mob=function(def)
 		self.hp = self.storage.hp or def.hp
 		self.lifetimer = self.storage.lifetimer or def.lifetimer
 		self.inv = self.storage.inv or table.copy(def.inv)
+		self.otype = self.type
 
 		self.object:set_velocity({x=0,y=-1,z=0})
 		self.object:set_acceleration({x=0,y=-10,z =0})
@@ -213,6 +214,7 @@ examobs.register_mob=function(def)
 	def.on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local en = puncher:get_luaentity()
 		local dmg = 0
+		self.last_punched_by = puncher or self.last_punched_by
 		if not (en and en.examob == self.examob) then
 			if self.aggressivity > 0 then
 				self.fight = puncher
@@ -247,8 +249,22 @@ examobs.register_mob=function(def)
 		end, self,v,r)
 
 		self:hurt(dmg)
+		self:achievements()
+
 		return self
 	end
+
+	def.achievements=function(self)
+		if not self.achievemed and (self.dead or self.object:get_hp()<=0) and self.last_punched_by and self.last_punched_by:is_player() then
+			self.achievemed = true
+			if self.otype == "monster" then
+				exaachievements.customize(self.last_punched_by,"Monsters_nightmare")
+			elseif self.otype == "animal" then
+				exaachievements.customize(self.last_punched_by,"Hunter")
+			end
+		end
+	end
+
 	def.on_death=function(self,killer)
 		examobs.dropall(self)
 	end

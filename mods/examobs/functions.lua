@@ -16,6 +16,24 @@ examobs.on_step=function(self, dtime)
 	examobs.global_time = examobs.global_time + os.clock() - time
 end
 
+exaachievements.register({
+	type="customize",
+	name="Hunter",
+	count=100,
+	description="Kill 100 animals",
+	skills=5,
+	hide_until=10,
+})
+
+exaachievements.register({
+	type="customize",
+	name="Monsters_nightmare",
+	count=100,
+	description="Kill 100 monsters",
+	skills=10,
+	hide_until=10,
+})
+
 apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
 end
@@ -635,6 +653,7 @@ examobs.dying=function(self,set)
 		return self
 	elseif self.dead then
 		self.dead=self.dead-1
+		self:achievements()
 		if self.dead<0 then
 			examobs.dropall(self)
 			self.object:remove()
