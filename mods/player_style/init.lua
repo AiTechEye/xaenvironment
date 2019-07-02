@@ -15,9 +15,14 @@ player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
 end
 
+minetest.register_on_craft(function(itemstack,player,old_craft_grid,craft_inv)
+	player_style.thirst(player,-0.05)
+	player_style.hunger(player,-0.05)
+end)
+
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
 	if player_style.survive_thirst and player_style.drinkable(pointed_thing.above,puncher) then
-		 player_style.thirst(puncher,1)
+		player_style.thirst(puncher,1)
 		minetest.remove_node(pointed_thing.above)
 	else
 		player_style.hunger(puncher,-0.01)
@@ -183,6 +188,10 @@ end)
 
 player_style.hunger=function(player,add,reset)
 
+	if player_style.survive_hunger == false then
+		return
+	end
+
 	local name = player:get_player_name()
 	local p = player_style.players[name]
 
@@ -223,6 +232,10 @@ player_style.hunger=function(player,add,reset)
 end
 
 player_style.thirst=function(player,add,reset)
+
+	if player_style.survive_thirst == false then
+		return
+	end
 
 	local name = player:get_player_name()
 	local p = player_style.players[name]
