@@ -40,6 +40,7 @@ default.register_plant({
 	floodable = false,
 	walkable = true,
 	decoration={
+		biomes={"hot_ocean"}, 
 		noise_params={
 			offset=0.6,
 			scale=0.04,
@@ -53,9 +54,6 @@ default.register_plant({
 		y_max = -5,
 		y_min = -30,
 		spawn_by = "default:salt_water_source",
-		biomes ={
-			"hot_ocean",
-		}, 
 	},
 	dye_colors = {palette=i*7+4},
 })

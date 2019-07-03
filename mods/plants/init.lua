@@ -323,12 +323,15 @@ end
 default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff",dye_colors = {palette=136}})
 default.register_plant({
 	name="lonicera_tatarica",
-	biomes={"deciduous"},
+
 	tiles={"plants_lonicera_tatarica.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.003,
-	}},
+	decoration={
+		biomes={"deciduous"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.003,
+		}
+	},
 	drop={max_items = 1,items = {
 		{items = {"plants:lonicera_tatarica_berries"}, rarity = 3},
 		{items = {"plants:lonicera_tatarica"}}
@@ -338,25 +341,29 @@ default.register_plant({
 
 default.register_plant({
 	name="verbena",
-	biomes={"deciduous"},
 	tiles={"plants_verbena.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.003,
-		seed=545,
-	}},
+	decoration={
+		biomes={"deciduous"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.003,
+			seed=545,
+		}
+	},
 	dye_colors = {palette=28},
 })
 
 default.register_plant({
 	name="lantana",
-	biomes={"deciduous","deciduous_grassland","coniferous"},
 	tiles={"plants_lantana.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.003,
-		seed=8745,
-	}},
+	decoration={
+		biomes={"deciduous","deciduous_grassland","coniferous"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.003,
+			seed=8745,
+		}
+	},
 	dye_colors = {palette=98},
 })
 
@@ -380,13 +387,15 @@ default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
 
 default.register_plant({
 	name="dolls_eyes",
-	biomes={"tropic","jungle"},
 	tiles={"plants_dolls_eyes.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.005,
-		seed=3454365,
-	}},
+	decoration={
+		biomes={"tropic","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.005,
+			seed=3454365,
+		}
+	},
 	drop={max_items = 1,items = {
 		{items = {"plants:dolls_eyes_berries 3"}, rarity = 2},
 		{items = {"plants:dolls_eyes"}}
@@ -396,13 +405,15 @@ default.register_plant({
 
 default.register_plant({
 	name="cow_parsnip",
-	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
-	decoration={noise_params={
-		offset=0.0015,
-		scale=0.015,
-		seed=3365,
-	}},
+	decoration={
+		biomes={"deciduous","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.015,
+			seed=3365,
+		}
+	},
 	damage_per_second=4,
 	groups={snappy=1},
 	on_punch=function(pos,node,player,pointed_thing)
@@ -416,13 +427,15 @@ default.register_plant({
 })
 default.register_plant({
 	name="cow_parsnip_big",
-	biomes={"deciduous"},
 	tiles={"plants_cow_parsnip.png"},
-	decoration={noise_params={
-		offset=0.0015,
-		scale=0.015,
-		seed=3365,
-	}},
+	decoration={
+		biomes={"deciduous","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.015,
+			seed=3365,
+		}
+	},
 	damage_per_second=4,
 	groups={snappy=3},
 	on_punch=function(pos,node,player,pointed_thing)
@@ -438,13 +451,15 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris_big",
-	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.015,
-		seed=3365,
-	}},
+	decoration={
+		biomes={"deciduous","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.015,
+			seed=3366,
+		}
+	},
 	groups={spreading_plant=15},
 	visual_scale=1.3,
 	selection_box ={type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.8,0.25}},
@@ -452,13 +467,15 @@ default.register_plant({
 
 default.register_plant({
 	name="anthriscus_sylvestris",
-	biomes={"deciduous","jungle"},
 	tiles={"plants_cow_parsnip.png"},
-	decoration={noise_params={
-		offset=-0.0015,
-		scale=0.015,
-		seed=3365,
-	}},
+	decoration={
+		biomes={"deciduous","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.015,
+			seed=3366,
+		}
+	},
 	groups={spreading_plant=10},
 	visual_scale=1.1,
 })
