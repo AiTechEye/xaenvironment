@@ -114,6 +114,20 @@ minetest.register_biome({
 	humidity_point = 50,
 })
 
+minetest.register_biome({
+	name = "hot_ocean",
+	node_top = "default:sand",
+	depth_top = 5,
+	depth_filler = 5,
+	node_stone = "default:stone",
+	node_water = "default:salt_water_source",
+	--node_river_water = "default:salt_water_source",
+	y_min = -31000,
+	y_max = 0,
+	heat_point = 90,
+	humidity_point = 40,
+})
+
 default.register_bio=function(def)
 	default.registered_bios[def[1]] = {heat=def[2],humidity=def[3],grass=def.grass}
 	table.insert(default.registered_bios_list,def[1])
