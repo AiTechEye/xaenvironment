@@ -8,7 +8,6 @@ minetest.register_tool("player_style:bottle", {
 		wear = wear ~= 0 and wear or max
 		if pointed_thing.under and player_style.drinkable(pointed_thing.under,user) and wear > 1 then
 			wear=math.floor(wear-(max/5))
-			minetest.remove_node(pointed_thing.under)
 		elseif wear < max then
 			wear=math.floor(wear+(max/5))
 			player_style.thirst(user,1)

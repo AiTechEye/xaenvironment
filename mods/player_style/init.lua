@@ -23,7 +23,6 @@ end)
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
 	if player_style.survive_thirst and player_style.drinkable(pointed_thing.above,puncher) then
 		player_style.thirst(puncher,1)
-		minetest.remove_node(pointed_thing.above)
 	else
 		player_style.hunger(puncher,-0.01)
 	end
