@@ -142,3 +142,15 @@ minetest.register_lbm({
 		end
 	end
 })
+
+minetest.register_lbm({
+	name="default:on_load",
+	nodenames={"group:on_load"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		local n = minetest.registered_items[node.name]
+		if n and n.on_load then
+			n.on_load(pos,node)
+		end
+	end
+})
