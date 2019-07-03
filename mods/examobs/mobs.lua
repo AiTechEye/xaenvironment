@@ -575,7 +575,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "crow",
-	aggressivity = 1,
+	aggressivity = -2,
 	textures={"examobs_crow.png"},
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"eatable") > 0
