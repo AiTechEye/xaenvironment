@@ -387,7 +387,6 @@ minetest.register_globalstep(function(dtime)
 
 			if player_style.player_dive[name] and not (a == "fly" or a == "dive") then
 				local p = player:get_pos()
-				hunger = -0.01
 				 if default.defpos({x=p.x,y=p.y+1.5,z=p.z},"walkable") then
 					if key.up or key.down or key.left or key.right then
 						a="dive"
