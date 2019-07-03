@@ -82,7 +82,7 @@ default.register_plant=function(def)
 
 	ddef.decoration = def.name
 	ddef.deco_type = ddef.deco_type or			"simple"
-	ddef.place_on = ddef.place_on or 			{"default:dirt_with_grass"}
+	ddef.place_on = ddef.place_on or 			{"group:spreading_dirt_type"}
 	ddef.sidelen = ddef.sidelen or				16
 	ddef.biomes = ddef.biomes or				{"grass_land"}
 	ddef.y_min = ddef.y_min or				1
