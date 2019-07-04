@@ -418,7 +418,6 @@ default.registry_mineral({
 default.registry_mineral({
 	name="bronze",
 	texture="default_bronzeblock.png",
-	--not_lump = true,
 	not_ore = true,
 	regular_additional_craft={{
 		output="default:bronze_lump 8",
@@ -640,7 +639,14 @@ default.registry_mineral({
 		clust_num_ores=1,
 		clust_size=9,
 		y_max=-100,
-	}
+	},
+	regular_additional_craft={
+	{output="default:electricblock",
+	recipe={
+		{"default:electric_lump","default:electric_lump","default:electric_lump"},
+		{"default:electric_lump","default:electric_lump","default:electric_lump"},
+		{"default:electric_lump","default:electric_lump","default:electric_lump"},
+	}}},
 })
 
 default.registry_mineral({
@@ -658,6 +664,13 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	regular_additional_craft={
+	{output="default:uraniumblock",
+	recipe={
+		{"default:uranium_lump","default:uranium_lump","default:uranium_lump"},
+		{"default:uranium_lump","default:uranium_lump","default:uranium_lump"},
+		{"default:uranium_lump","default:uranium_lump","default:uranium_lump"},
+	}}},
 })
 
 default.registry_mineral({

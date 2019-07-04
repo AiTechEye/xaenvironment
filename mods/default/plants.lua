@@ -76,9 +76,7 @@ default.register_plant=function(def)
 	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
 	def.dye_colors = def.dye_colors or			{palette=90}
 
-
 	minetest.register_node(mod .. def.name, def)
-
 
 	ddef.decoration = def.name
 	ddef.deco_type = ddef.deco_type or			"simple"
