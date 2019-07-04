@@ -290,6 +290,42 @@ default.register_tree({
 	}
 })
 
+--[[
+--schematics coming soon, need a schematics first
+
+
+default.register_tree({
+	name="maple",
+	chair = true,
+	door = true,
+	fence = true,
+	tree={tiles={"plants_maple_tree_top.png","plants_maple_tree_top.png","plants_maple_tree.png"}},
+	sapling={tiles={"plants_maple_treesapling.png"}},
+	wood={tiles={"plants_maple_wood.png"}},
+	leaves={
+		tiles={"plants_maple_leavs.png"},groups={leaves=1,snappy=3,leafdecay=14,flammable=2},
+		drop={max_items = 1,items = {{items = {"plants:maple_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {"plants:maple_leaf"}, rarity = 5},{items = {"plants:maple_leaves"}}}},
+	},
+	
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=12,[2]=4,[3]=18,[4]=19}
+		rad = rad[r]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_palm" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_palm1.mts",
+	},
+})
+
+minetest.register_craftitem("plants:maple_leaf", {
+	description = "Maple leaf",
+	inventory_image = "plants_maple_leaf.png",
+	groups = {flammable = 1,leaves=1},
+})
+
+--]]
+
 --||||||||||||||||
 -- ======================= plants
 --||||||||||||||||
