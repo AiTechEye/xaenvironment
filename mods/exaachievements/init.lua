@@ -1,6 +1,7 @@
 exaachievements={
 	events={customize={},dig={},place={},craft={},eat={}},
-	tmp={regnames={}}
+	tmp={regnames={}},
+	all={achievements=0,skill=0}
 }
 
 minetest.register_chatcommand("exaach_clear", {
@@ -33,6 +34,23 @@ exaachievements.get_skills=function(user)
 	return user:get_meta():get_int("exaskills")
 end
 
+exaachievements.do_a=function(def)		
+	local name = def.item:sub(def.item:find(":")+1,-1)
+	local uname =  name.upper(name:sub(1,1)) ..  name:sub(2,-1)
+	def.type = def.type or "craft"
+	local detyp = def.type.upper(def.type:sub(1,1)) ..  def.type:sub(2,-1)
+	exaachievements.register({
+		type= def.type,
+		count=1,
+		name=uname,
+		item=def.item,
+		description=detyp .. " a " ..  name:gsub("_"," "),
+		skills=def.skills or 1,
+		hide_until=def.hide_until or 20,
+		completed=def.completed,
+	})
+end
+
 exaachievements.register=function(def)
 	if not def.name or type(def.name) ~="string" then
 		error('exaachievements: "name" required, is '..type(def.name)..'')
@@ -51,6 +69,8 @@ exaachievements.register=function(def)
 		error('exaachievements '..def.name..':\n '..type(v)..' "hide_until" number only')
 	elseif def.approve and type(def.approve) ~="function" then
 		error('exaachievements '..def.name..':\n '..type(v)..' "approve" function only')
+	elseif def.completed and type(def.completed) ~="function" then
+		error('exaachievements '..def.name..':\n '..type(v)..' "completed" function only')
 	end
 
 	if exaachievements.tmp.regnames[def.name] then
@@ -70,9 +90,13 @@ exaachievements.register=function(def)
 		skills=		def.skills or 1,
 		image=		def.image,
 		approve=		def.approve,
+		completed=	def.completed,
 		min=		def.min,
 		hide_until=	def.hide_until,
 	}
+
+	exaachievements.all.skill=exaachievements.all.skill+(def.skills or 1)
+	exaachievements.all.achievements=exaachievements.all.achievements+1
 end
 
 exaachievements.customize=function(user,name)
@@ -163,7 +187,7 @@ dofile(minetest.get_modpath("exaachievements") .. "/achievements.lua")
 exaachievements.skills=function(a,num,user,item,pos)
 	local lab = "exaachievements_"..a.name
 
-	if a.approve and not a.approve(user,item,pos) then
+	if not user or (a.approve and not a.approve(user,item,pos)) then
 		return
 	end
 	local m = user:get_meta()
@@ -175,6 +199,9 @@ exaachievements.skills=function(a,num,user,item,pos)
 		if c < a.count and c + num >= a.count then
 			m:set_int("exaskills",skills+a.skills)
 			exaachievements.completed(a,user)
+			if a.completed then
+				a.completed(user)
+			end
 		end
 	end
 end

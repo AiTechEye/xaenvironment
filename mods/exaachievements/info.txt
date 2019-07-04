@@ -11,6 +11,8 @@ exaachievements.register({
 	approve=function(player,item,pos)	-- optional, params depends by type
 		return true or false
 	end
+	completed=function(player)		-- optional, called while achievement completed
+	end
 })
 
 exaachievements.customize(player,achievement_name)	Used by "customize"

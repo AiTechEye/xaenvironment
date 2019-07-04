@@ -33,8 +33,16 @@ exaachievements.register({
 	description="Craft a flint pick",
 })
 
+exaachievements.register({
+	type="craft",
+	count=1,
+	name="Drink",
+	item="player_style:bottle",
+	description="Craft a bottle",
+})
 
 --================ Dirty ==================
+
 exaachievements.register({
 	type="dig",
 	count=25,
@@ -85,7 +93,28 @@ exaachievements.register({
 	description="Place 25 dirts",
 	hide_until=4,
 })
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Caveman",
+	item="default:stone",
+	description="Dig 100 stones",
+	skills=2,
+	image="plants:apple_tree",
+	hide_until=4,
+})
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Desertwalker",
+	item="default:pebble_desert_stone",
+	description="Pick up 100 desert pebbles",
+	skills=2,
+	hide_until=5,
+})
+
 --================ Average ==================
+
 exaachievements.register({
 	type="eat",
 	name="Pears",
@@ -103,16 +132,66 @@ exaachievements.register({
 	hide_until=7,
 })
 
+exaachievements.do_a({type="dig",item="default:obsidian",skills=2})
+exaachievements.do_a({type="dig",item="default:bedrock",skills=2})
+exaachievements.do_a({type="dig",item="default:cobble_porous"})
+exaachievements.do_a({type="dig",item="default:stone_hot"})
+exaachievements.do_a({type="dig",item="default:cooledlava"})
+exaachievements.do_a({type="dig",item="default:ice"})
+exaachievements.do_a({item="default:snowblock"})
+exaachievements.do_a({item="default:workbench",skills=4})
+exaachievements.do_a({item="default:torch"})
+exaachievements.do_a({item="default:ladder"})
+exaachievements.do_a({item="default:paper_compressor"})
+exaachievements.do_a({item="default:dye_workbench"})
+exaachievements.do_a({item="default:furnace"})
+exaachievements.do_a({item="default:chest"})
+exaachievements.do_a({item="default:locked_chest"})
+exaachievements.do_a({item="default:cudgel"})
+exaachievements.do_a({item="default:bucket"})
+exaachievements.do_a({item="default:amberblock",skills=2})
+exaachievements.do_a({item="default:flintblock",skills=2})
+exaachievements.do_a({item="default:tinblock",skills=2})
+exaachievements.do_a({item="default:copperblock",skills=2})
+exaachievements.do_a({item="default:bronzeblock",skills=3})
+exaachievements.do_a({item="default:ironblock",skills=3})
+exaachievements.do_a({item="default:goldblock",skills=3})
+exaachievements.do_a({item="default:silverblock",skills=3})
+exaachievements.do_a({item="default:steelblock",skills=5})
+exaachievements.do_a({item="air_balloons:balloon",skills=7})
+exaachievements.do_a({item="beds:bed",skills=2})
+exaachievements.do_a({item="beds:tent",skills=3})
+exaachievements.do_a({item="clock:clock1"})
+exaachievements.do_a({item="hook:climb_rope_locked",skills=5})
+exaachievements.do_a({item="nitroglycerin:timed_bomb",skills=7})
+exaachievements.do_a({item="synth:synth",skills=10})
+exaachievements.do_a({item="default:diamondblock",skills=7})
+exaachievements.do_a({item="default:electricblock",skills=10})
+exaachievements.do_a({item="default:uraniumblock",skills=15})
+exaachievements.do_a({item="default:uraniumactiveblock",skills=20})
+exaachievements.do_a({item="default:quantum_pick",skills=20})
 
---================ Beta ==================
 
-exaachievements.register({
-	type="customize",
-	name="Hunter",
-	count=100,
-	description="Kill 100 animals",
-	skills=10,
-	hide_until=100,
-})
-
-
+minetest.register_on_mods_loaded(function()
+	local traveler=0
+	for i,v in pairs(minetest.registered_nodes) do
+		if v.groups and  v.groups.spreading_dirt_type then
+			exaachievements.do_a({
+				type="dig",
+				item=i,
+				completed=function(user)
+					exaachievements.customize(user,"Travler")
+				end
+			})
+			traveler=traveler+1
+		end
+	end
+	exaachievements.register({
+		type="customize",
+		name="Traveler",
+		count=traveler,
+		description="Dig all " ..traveler .." kinds of grass",
+		skills=10,
+		hide_until=20,
+	})
+end)
