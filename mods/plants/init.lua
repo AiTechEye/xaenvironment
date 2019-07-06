@@ -3,7 +3,7 @@ dofile(minetest.get_modpath("plants") .. "/water.lua")
 --||||||||||||||||
 -- ======================= trees
 --||||||||||||||||
-
+-- ===================== Apple
 default.register_tree({
 	name="apple",
 	chair = true,
@@ -28,7 +28,7 @@ default.register_tree({
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts", "random", nil, false)
 	end,
 })
-
+-- ===================== Pear
 default.register_tree({
 	name="pear",
 	chair = true,
@@ -53,7 +53,7 @@ default.register_tree({
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_pear_tree.mts", "random", nil, false)
 	end
 })
-
+-- ===================== Pine
 default.register_tree({
 	name="pine",
 	chair = true,
@@ -93,7 +93,7 @@ default.register_tree({
 		visual_scale=0.5,
 	},
 })
-
+-- ===================== Fir
 default.register_tree({
 	name="fir",
 	chair = true,
@@ -124,7 +124,7 @@ default.register_tree({
 		}
 	}
 })
-
+-- ===================== Jungle
 default.register_tree({
 	name="jungle",
 	chair = true,
@@ -155,26 +155,7 @@ default.register_tree({
 		}
 	}
 })
---[[
-minetest.register_decoration({
-	deco_type = "schematic",
-	sidelen = 16,
-	noise_params = {
-			offset=0.1,
-			scale=0.04,
-			spread = {x = 250, y = 250, z = 250},
-			seed = 3,
-			octaves = 3,
-			persist = 0.66,
-	},
-	biomes={"jungle","swamp",},
-	place_on={"default:dirt_with_jungle_grass"},
-	y_min = 1,
-	y_max = 31000,
-	schematic = minetest.get_modpath("plants").."/schematics/plants_jungletree_massive.mts",
-	flags = "place_center_x, place_center_z",
-})
---]]
+
 for i=1,4 do
 minetest.register_decoration({
 	deco_type = "schematic",
@@ -195,7 +176,7 @@ minetest.register_decoration({
 	flags = "place_center_x, place_center_z",
 })
 end
-
+-- ===================== Palm
 default.register_tree({
 	name="palm",
 	chair = true,
@@ -257,7 +238,7 @@ minetest.register_craft({
 	output="plants:coconut_broken",
 	recipe={{"plants:coconut"}}
 })
-
+-- ===================== Acacia
 default.register_tree({
 	name="acacia",
 	chair = true,
@@ -266,7 +247,9 @@ default.register_tree({
 	tree={tiles={"plants_acacia_tree_top.png","plants_acacia_tree_top.png","plants_acacia_tree.png"}},
 	sapling={tiles={"plants_acacia_treesapling.png"}},
 	wood={tiles={"plants_acacia_wood.png"}},
-	leaves={tiles={"plants_acacia_leaves.png"},groups={leaves=1,snappy=3,leafdecay=10,flammable=2}},
+	leaves={
+		tiles={"plants_acacia_leaves.png"},groups={leaves=1,snappy=3,leafdecay=10,flammable=2}
+	},
 	sapling_place_schematic=function(pos)
 		local r = math.random(1,3)
 		r=4
@@ -289,11 +272,7 @@ default.register_tree({
 		}
 	}
 })
-
---[[
---schematics coming soon, need a schematics first
-
-
+-- ===================== Maple
 default.register_tree({
 	name="maple",
 	chair = true,
@@ -303,18 +282,26 @@ default.register_tree({
 	sapling={tiles={"plants_maple_treesapling.png"}},
 	wood={tiles={"plants_maple_wood.png"}},
 	leaves={
+		walkable=false,
 		tiles={"plants_maple_leavs.png"},groups={leaves=1,snappy=3,leafdecay=14,flammable=2},
 		drop={max_items = 1,items = {{items = {"plants:maple_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {"plants:maple_leaf"}, rarity = 5},{items = {"plants:maple_leaves"}}}},
 	},
-	
+	mapgen={
+		noise_params={
+			biomes={"deciduous"},
+			offset=0.001,
+			scale=0.0004,
+		}
+	},
 	sapling_place_schematic=function(pos)
-		local r = math.random(1,3)
-		local rad = {[1]=12,[2]=4,[3]=18,[4]=19}
+		local r = math.random(1,2)
+		local rad = {[1]=2,[2]=9}
 		rad = rad[r]
-		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_palm" .. r .. ".mts", "random", nil, false)
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_maple" .. r .. ".mts", "random", nil, false)
 	end,
 	schematics={
-		minetest.get_modpath("plants").."/schematics/plants_palm1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_maple1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_maple2.mts",
 	},
 })
 
@@ -323,8 +310,52 @@ minetest.register_craftitem("plants:maple_leaf", {
 	inventory_image = "plants_maple_leaf.png",
 	groups = {flammable = 1,leaves=1},
 })
+-- ===================== Hazel
+default.register_tree({
+	name="hazel",
+	chair = true,
+	door = true,
+	fence = true,
+	tree={tiles={"plants_hazel_tree_top.png","plants_hazel_tree_top.png","plants_hazel_tree.png"}},
+	sapling={
+		visual_scale=0.2,
+		tiles={"plants_hazel_nut.png^[colorize:#00ff0022"}
+		},
+	wood={tiles={"plants_hazel_wood.png"}},
+	mapgen={
+		noise_params={
+			biomes={"deciduous"},
+			offset=0.001,
+			scale=0.0004,
+		}
+	},
+	leaves={
+		tiles={"plants_hazel_leaves.png"},groups={leaves=1,snappy=3,leafdecay=14,flammable=2},
+	},
+	sapling_place_schematic=function(pos)
+		local r = math.random(1,3)
+		local rad = {[1]=4,[2]=6,[3]=4}
+		rad = rad[r]
 
---]]
+		minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_hazel" .. r .. ".mts", "random", nil, false)
+	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_hazel1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_hazel2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_hazel3.mts",
+	},
+	fruit={
+		hp=1,
+		gaps=1,
+		wet=0,
+		description = "Hazel nut",
+		tiles={"plants_hazel_nut.png"},
+		inventory_image="plants_hazel_nut.png",
+		dye_colors = {palette=4},
+		visual_scale=0.2,
+	},
+})
+
 
 --||||||||||||||||
 -- ======================= plants
