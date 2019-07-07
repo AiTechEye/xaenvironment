@@ -7,5 +7,4 @@ V4.7
 plans:
 
 + farming
-+ cloud stuff
 + bows
