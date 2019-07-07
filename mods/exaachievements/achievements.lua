@@ -195,3 +195,15 @@ minetest.register_on_mods_loaded(function()
 		hide_until=20,
 	})
 end)
+
+--================ Special ==================
+
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Cloudlands",
+	item="default:cloud",
+	description="Dig 100 cloud",
+	skills=2,
+	hide_until=100,
+})
