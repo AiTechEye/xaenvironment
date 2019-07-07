@@ -8,3 +8,4 @@ plans:
 
 + farming
 + cloud stuff
++ bows
