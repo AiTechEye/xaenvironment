@@ -213,10 +213,56 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 -- =======================Decorations
 --||||||||||||||||
+minetest.register_on_mods_loaded(function()
+	default.cloud_land_map={
+		offset=0,
+		scale=1,
+		spread={x=350,y=18,z=350},
+		seeddiff=24,
+		octaves=3,
+		persist=0.6,
+		lacunarity=2,
+		flags="eased",
+	}
+end)
 
 minetest.register_on_generated(function(minp, maxp, seed)
-	if (minp.y <= -30000 or maxp.y <= -30000 ) or ((minp.x >= 30000 or minp.x <= -30000 or minp.z >= 30000 or minp.z <= -30000) and (maxp.x >= 30000 or maxp.x <= -30000 or maxp.z >= 30000 or maxp.z <= -30000)) then
 
+	if minp.y> 200 and maxp.y< 300 then
+--cloudland
+		local depth = 18
+		local height = 250
+
+		local lenth = maxp.x-minp.x+1
+		local cindx = 1
+		local map = minetest.get_perlin_map(default.cloud_land_map,{x=lenth,y=lenth,z=lenth}):get_3d_map_flat(minp)
+
+		local air = minetest.get_content_id("air")
+		local cloud = minetest.get_content_id("default:cloud")
+		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vm:get_data()
+
+		for z=minp.z,maxp.z do
+		for y=minp.y,maxp.y do
+			local id=area:index(minp.x,y,z)
+		for x=minp.x,maxp.x do
+		local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
+		if data[id] == air and y >= height-depth and y <= height+depth and den > 0.7 then
+			data[id] = cloud
+		end
+			cindx=cindx+1
+			id=id+1
+		end
+		end
+			
+		end
+		vm:set_data(data)
+		vm:write_to_map()
+	end
+
+	if (minp.y <= -30000 or maxp.y <= -30000 ) or ((minp.x >= 30000 or minp.x <= -30000 or minp.z >= 30000 or minp.z <= -30000) and (maxp.x >= 30000 or maxp.x <= -30000 or maxp.z >= 30000 or maxp.z <= -30000)) then
+--world edge
 		local air = minetest.get_content_id("default:end_of_world_air")
 		local airblocking = minetest.get_content_id("default:end_of_world_air2")
 		local sand = minetest.get_content_id("default:end_of_world_sand")
