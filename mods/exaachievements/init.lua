@@ -4,6 +4,15 @@ exaachievements={
 	all={achievements=0,skill=0}
 }
 
+minetest.register_chatcommand("exaach", {
+	params = "",
+	description = "Clear your achievements",
+	privs = {ban=true},
+	func = function(name, param)
+		exaachievements.form(name,minetest.get_player_by_name(name))
+	end
+})
+
 minetest.register_chatcommand("exaach_clear", {
 	params = "",
 	description = "Clear your achievements",
@@ -32,6 +41,18 @@ player_style.register_button({
 
 exaachievements.get_skills=function(user)
 	return user:get_meta():get_int("exaskills")
+end
+
+exaachievements.if_completed=function(user,name)
+	local m = user:get_meta()
+	for i1,v1 in pairs(exaachievements.events) do
+	for i2,v2 in pairs(v1) do
+		if v2.name == name then
+			return m:get_int("exaachievements_"..v2.name) >= v2.count
+		end
+	end
+	end
+	return false
 end
 
 exaachievements.do_a=function(def)		

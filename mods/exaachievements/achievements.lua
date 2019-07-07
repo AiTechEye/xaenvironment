@@ -204,6 +204,6 @@ exaachievements.register({
 	name="Cloudlands",
 	item="default:cloud",
 	description="Dig 100 cloud",
-	skills=2,
+	skills=50,
 	hide_until=100,
 })

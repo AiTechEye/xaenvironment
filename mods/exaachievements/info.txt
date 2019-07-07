@@ -17,5 +17,10 @@ exaachievements.register({
 
 exaachievements.customize(player,achievement_name)	Used by "customize"
 exaachievements.get_skills(user)			Get player skills
-/ach						Achievements
-/ach_clear					Clear your achievements (ban required)
+exaachievements.if_completed(user,achievement_name)	if completed
+exaachievements.do_a(def)				shortcut to dig a ... required item
+
+
+
+/exaach						Achievements
+/exaach_clear					Clear your achievements (ban required)
