@@ -287,8 +287,8 @@ default.register_tree({
 		drop={max_items = 1,items = {{items = {"plants:maple_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {"plants:maple_leaf"}, rarity = 5},{items = {"plants:maple_leaves"}}}},
 	},
 	mapgen={
+		biomes={"deciduous"},
 		noise_params={
-			biomes={"deciduous"},
 			offset=0.001,
 			scale=0.0004,
 		}
@@ -323,8 +323,8 @@ default.register_tree({
 		},
 	wood={tiles={"plants_hazel_wood.png"}},
 	mapgen={
+		biomes={"deciduous"},
 		noise_params={
-			biomes={"deciduous"},
 			offset=0.001,
 			scale=0.0004,
 		}
@@ -390,7 +390,6 @@ end
 default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{inventory_image="plats_berries.png^[colorize:#ff5b19ff",dye_colors = {palette=136}})
 default.register_plant({
 	name="lonicera_tatarica",
-
 	tiles={"plants_lonicera_tatarica.png"},
 	decoration={
 		biomes={"deciduous"},
@@ -549,12 +548,12 @@ default.register_plant({
 
 default.register_plant({
 	name="jungle_grass",
-	biomes={"swamp","jungle"},
 	drawtype="firelike",
 	tiles={"plants_junglegrass.png"},
 	visual_scale=2,
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
 	decoration={
+		biomes={"swamp","jungle"},
 		place_on={"default:dirt_with_jungle_grass"},
 		noise_params={
 			offset=0.5,
@@ -570,11 +569,11 @@ for i=1,5 do
 default.register_plant({
 	name="grass" .. i,
 	description = "Grass",
-	biomes={"deciduous","deciduous_grassland","tropic","grass_land","coniferous","coniferous_foggy"},
 	tiles={"plants_grass"..i..".png"},
 	drop="plants:grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
 	decoration={
+		biomes={"deciduous","deciduous_grassland","tropic","grass_land","coniferous","coniferous_foggy"},
 		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
 		noise_params={
 			offset=0.2,
@@ -596,11 +595,11 @@ default.register_plant({
 default.register_plant({
 	name="dry_grass" .. i,
 	description = "Dry grass",
-	biomes={"savanna"},
 	tiles={"plants_dry_grass"..i..".png"},
 	drop="plants:dry_grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
 	decoration={
+		biomes={"savanna"},
 		place_on={"default:dirt_with_dry_grass"},
 		noise_params={
 			offset=0.2,
@@ -645,9 +644,10 @@ minetest.register_lbm({
 
 default.register_plant({
 	name="wild_cotton",
-	biomes={"deciduous","tropic","jungle","grass_land","semi_desert"},
 	tiles={"plants_wildcotton.png"},
-	decoration={noise_params={
+	decoration={
+		biomes={"deciduous","tropic","jungle","grass_land","semi_desert"},
+		noise_params={
 		offset=-0.0015,
 		scale=0.005,
 		seed=3454365,
@@ -688,7 +688,6 @@ minetest.register_craftitem("plants:cotton", {
 
 default.register_plant({
 	name="cactus",
-	biomes={"desert","semi_desert"},
 	tiles={"plants_cactus.png"},
 	damage_per_second=5,
 	walkable = true,
@@ -714,6 +713,7 @@ default.register_plant({
 		}
 	},
 	decoration={
+		biomes={"desert","semi_desert"},
 		place_on={"default:desert_sand"},
 		noise_params={
 			offset=-0.00015,
@@ -724,3 +724,18 @@ default.register_plant({
 		height_max = 8,
 	},
 })
+
+for i=1,10 do
+default.register_plant({
+	name="unknown"..i,
+	tiles={"plants_unknown"..i..".png"},
+	decoration={
+		biomes={"deciduous","tropic","jungle","grass_land","semi_desert"},
+		noise_params={
+			offset=-0.15,
+			scale=0.5,
+			seed=345*i,
+		}
+	},
+})
+end
