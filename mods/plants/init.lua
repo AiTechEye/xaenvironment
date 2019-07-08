@@ -568,6 +568,7 @@ default.register_plant({
 default.register_plant({
 	name="dry_plant",
 	tiles={"plants_dry_plant.png"},
+	groups={dig_immediate=3},
 })
 
 for i=1,5 do
@@ -587,7 +588,7 @@ default.register_plant({
 			seed=0,
 		},
 	},
-	groups={grass=1,spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	groups={grass=1,spreading_plant=7,dig_immediate=3,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
 		minetest.set_node(pos,{name="plants:grass"..math.random(1,5)})
 	end,
@@ -613,7 +614,7 @@ default.register_plant({
 			seed=0,
 		},
 	},
-	groups={spreading_plant=7,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	groups={spreading_plant=7,dig_immediate=3,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
 		minetest.set_node(pos,{name="plants:dry_grass"..math.random(1,5)})
 	end,
