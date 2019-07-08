@@ -565,6 +565,11 @@ default.register_plant({
 	dye_colors = {palette=93},
 })
 
+default.register_plant({
+	name="dry_plant",
+	tiles={"plants_dry_plant.png"},
+})
+
 for i=1,5 do
 default.register_plant({
 	name="grass" .. i,
@@ -739,3 +744,80 @@ default.register_plant({
 	},
 })
 end
+
+for i=1,3 do
+default.register_plant({
+	name="wheat"..i,
+	tiles={"plants_wheat"..i..".png"},
+	drop= i == 3 and {max_items = 1,items = {{items = {"plants:wheat_seed 3"}, rarity = 3},{items = {"plants:wheat"..i}}}} or "plants:wheat"..i,
+	on_timer = i < 3 and function(pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
+			minetest.set_node(pos,{name="plants:dry_plant"})
+		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 30 and (minetest.get_node_light(pos) or 0) >= 13 then
+			minetest.set_node(pos,{name="plants:wheat"..i+1})
+			if i < 3 then
+				minetest.get_node_timer(pos):start(1)
+			end
+		else
+			return true
+		end
+	end or nil,
+	decoration={
+		biomes={"deciduous","tropic","jungle","grass_land","semi_desert","savanna"},
+		noise_params={
+			offset=-0.15,
+			scale=0.5,
+			seed=37*i,
+		}
+	},
+})
+end
+
+minetest.register_node("plants:wheat_seed", {
+	description = "Wheat seed",
+	drawtype = "raillike",
+	tiles={"plants_wheat_seed.png"},
+	groups = {dig_immediate = 3,flammable=1},
+	sunlight_propagates = true,
+	paramtype = "light",
+	walkable=false,
+	inventory_image="plants_wheat_seed.png",
+	wield_image="plants_wheat_seed.png",
+	selection_box ={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.45,0.5}},
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_int("date",default.date("get"))
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
+			minetest.remove_node(pos)
+			minetest.add_item(pos,"plants:wheat_seed")
+		elseif default.date("s",minetest.get_meta(pos):get_int("date")) >= 3 and (minetest.get_node_light(pos) or 0) >= 13 then
+			minetest.set_node(pos,{name="plants:wheat1"})
+			minetest.get_node_timer(pos):start(1)
+		else
+			return true
+		end
+	end
+})
+
+minetest.register_craftitem("plants:flour", {
+	description = "Flour",
+	inventory_image = "plants_flour.png",
+})
+
+minetest.register_craft({
+	output="plants:flour",
+	recipe={
+		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
+		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
+		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
+	},
+})
+
+minetest.register_craft({
+	output="plants:wheat_seed 3",
+	recipe={
+		{"plants:wheat3"},
+	},
+})
