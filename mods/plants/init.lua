@@ -792,7 +792,7 @@ minetest.register_node("plants:wheat_seed", {
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
 			minetest.remove_node(pos)
 			minetest.add_item(pos,"plants:wheat_seed")
-		elseif default.date("s",minetest.get_meta(pos):get_int("date")) >= 3 and (minetest.get_node_light(pos) or 0) >= 13 then
+		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 1 and (minetest.get_node_light(pos) or 0) >= 13 then
 			minetest.set_node(pos,{name="plants:wheat1"})
 			minetest.get_node_timer(pos):start(1)
 		else
