@@ -756,6 +756,7 @@ default.register_plant({
 		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 30 and (minetest.get_node_light(pos) or 0) >= 13 then
 			minetest.set_node(pos,{name="plants:wheat"..i+1})
 			if i < 3 then
+				minetest.get_meta(pos):set_int("date",default.date("get"))
 				minetest.get_node_timer(pos):start(1)
 			end
 		else
@@ -794,6 +795,7 @@ minetest.register_node("plants:wheat_seed", {
 			minetest.add_item(pos,"plants:wheat_seed")
 		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 1 and (minetest.get_node_light(pos) or 0) >= 13 then
 			minetest.set_node(pos,{name="plants:wheat1"})
+			minetest.get_meta(pos):set_int("date",default.date("get"))
 			minetest.get_node_timer(pos):start(1)
 		else
 			return true
