@@ -127,12 +127,6 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 
 				craft = minetest.get_craft_recipe(item)
 
-
-print(dump(craft))
-
-
-
-
 				if craft.items and craft.type == "normal" then
 					local craftgl = 9
 					for i1=1, craftgl,1 do
