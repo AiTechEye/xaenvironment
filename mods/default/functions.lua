@@ -430,6 +430,25 @@ default.registry_mineral=function(def)
 			full_punch_interval = 2,
 			damage_groups={fleshy=5},
 		}
+		local uses = (def.hoe.uses or 5) - 1
+		def.hoe.on_place=function(itemstack, user, pointed_thing)
+			local pos = pointed_thing.under
+			if pos
+			and not minetest.is_protected(pos,user:get_player_name())
+			and minetest.get_item_group(minetest.get_node(pos).name,"soil") > 0
+			and minetest.find_node_near(pos,7,{"group:water"}) then
+				minetest.set_node(pos,{name="default:wet_soil"})
+				local pos2 = {x=pos.x,y=pos.y+1,z=pos.z}
+				local n2 = minetest.get_node(pos2).name
+				if minetest.get_item_group(n2,"plant") > 0 and not minetest.is_protected(pos2,user:get_player_name()) then
+					minetest.add_item(pos2,n2)
+					minetest.remove_node(pos2)
+				end
+				itemstack:add_wear(math.floor(65535/uses))
+				return itemstack
+			end
+		end
+
 		minetest.register_tool(mod .. def.name .. "_hoe", def.hoe)
 		minetest.register_craft({
 			output=mod .. def.name .. "_hoe",

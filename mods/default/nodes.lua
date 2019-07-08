@@ -350,6 +350,13 @@ minetest.register_node("default:dirt", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
+minetest.register_node("default:wet_soil", {
+	description = "Wet soil",
+	tiles={"default_dirt.png^[colorize:#00000022"},
+	groups = {dirt=1,soil=1,wet_soil=1,crumbly=3},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
 --||||||||||||||||
 -- ======================= Stone
 --||||||||||||||||

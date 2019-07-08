@@ -403,6 +403,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
+	hoe={uses=100},
 	arrow={damage=3},
 	bow={uses=300,level=5},
 })
@@ -470,7 +471,8 @@ default.registry_mineral({
 			snappy={times={[1]=2,[2]=1.5,[3]=1.3},uses=20,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
-	}}
+	}},
+	hoe={uses=200},
 })
 
 default.registry_mineral({
@@ -516,6 +518,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
+	hoe={uses=400},
 	arrow={damage=5},
 	bow={uses=700,level=9},
 })
@@ -557,6 +560,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
+	hoe={uses=800},
 	arrow={damage=6},
 	bow={uses=900,level=12},
 })
@@ -577,6 +581,7 @@ default.registry_mineral({
 	},
 	arrow={damage=5},
 	bow={uses=800,level=10,shots=3},
+	hoe={uses=600},
 })
 
 default.registry_mineral({
@@ -595,6 +600,7 @@ default.registry_mineral({
 	},
 	arrow={damage=5},
 	bow={uses=750,level=10,shots=2},
+	hoe={uses=500},
 })
 
 default.registry_mineral({
@@ -643,6 +649,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
+	hoe={uses=1000},
 	arrow={damage=8},
 	bow={uses=1000,level=15},
 })
@@ -669,6 +676,7 @@ default.registry_mineral({
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
 	}}},
+	hoe={uses=1500},
 	arrow={damage=10},
 	bow={uses=1300,level=17,shots=5},
 })
