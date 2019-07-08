@@ -19,6 +19,8 @@ default.registry_mineral({
 	not_hoe=true,
 	not_ore=true,
 	not_ingot=true,
+	not_bow=true,
+	not_arrow=true,
 	not_vineyardknife=true,
 	block={
 		groups={cracky=3},
@@ -217,6 +219,8 @@ default.registry_mineral({
 	not_hoe=true,
 	not_ore=true,
 	not_vineyardknife=true,
+	not_bow=true,
+	not_arrow=true,
 	block={
 		groups={cracky=3,flammable=1},
 		sounds=default.node_sound_stone_defaults(),
@@ -272,6 +276,8 @@ default.registry_mineral({
 	not_hoe=true,
 	not_ingot=true,
 	not_vineyardknife=true,
+	not_bow=true,
+	not_arrow=true,
 	block={
 		groups={cracky=3,flammable=1},
 		sounds=default.node_sound_stone_defaults(),
@@ -312,6 +318,8 @@ default.registry_mineral({
 	not_lump=true,
 	not_ingot=true,
 	drop={inventory_image="flint"},
+	not_bow=true,
+	not_arrow=true,
 	block={
 		groups={cracky=3,stone=1},
 		sounds=default.node_sound_stone_defaults()
@@ -396,7 +404,9 @@ default.registry_mineral({
 			snappy={times={[1]=2,[2]=1.8,[3]=1.5},uses=17,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
-	}}
+	}},
+	arrow={damage=3},
+	bow={uses=300,level=5},
 })
 
 default.registry_mineral({
@@ -407,6 +417,8 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	not_bow=true,
+	not_arrow=true,
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
@@ -419,6 +431,8 @@ default.registry_mineral({
 	name="bronze",
 	texture="default_bronzeblock.png",
 	not_ore = true,
+	arrow={damage=4},
+	bow={uses=500,level=7},
 	regular_additional_craft={{
 		output="default:bronze_lump 8",
 		recipe={
@@ -503,7 +517,9 @@ default.registry_mineral({
 			snappy={times={[1]=1.8,[2]=1.4,[3]=1.2},uses=22,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
-	}}
+	}},
+	arrow={damage=5},
+	bow={uses=700,level=9},
 })
 
 default.registry_mineral({
@@ -542,7 +558,9 @@ default.registry_mineral({
 			snappy={times={[1]=1.5,[2]=1.2,[3]=0.8},uses=35,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
-	}}
+	}},
+	arrow={damage=6},
+	bow={uses=900,level=12},
 })
 
 default.registry_mineral({
@@ -559,6 +577,8 @@ default.registry_mineral({
 		clust_size=7,
 		y_max=-70,
 	},
+	arrow={damage=5},
+	bow={uses=800,level=10,shots=3},
 })
 
 default.registry_mineral({
@@ -574,7 +594,9 @@ default.registry_mineral({
 		clust_num_ores=3,
 		clust_size=7,
 		y_max=-70,
-	}
+	},
+	arrow={damage=5},
+	bow={uses=750,level=10,shots=2},
 })
 
 default.registry_mineral({
@@ -622,7 +644,9 @@ default.registry_mineral({
 			snappy={times={[1]=1.2,[2]=1,[3]=0.5},uses=50,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
-	}}
+	}},
+	arrow={damage=8},
+	bow={uses=1000,level=15},
 })
 
 default.registry_mineral({
@@ -647,6 +671,8 @@ default.registry_mineral({
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
 	}}},
+	arrow={damage=10},
+	bow={uses=1300,level=17,shots=5},
 })
 
 default.registry_mineral({
@@ -664,6 +690,8 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	not_bow=true,
+	not_arrow=true,
 	regular_additional_craft={
 	{output="default:uraniumblock",
 	recipe={
@@ -682,6 +710,8 @@ default.registry_mineral({
 	not_axe=true,
 	not_shovel=true,
 	not_hoe=true,
+	not_bow=true,
+	not_arrow=true,
 	not_vineyardknife=true,
 	regular_additional_craft={{
 		type = "cooking",
@@ -689,4 +719,46 @@ default.registry_mineral({
 		recipe = "default:uranium_ingot",
 		cooktime = 100
 	}}
+})
+
+default.registry_mineral({
+	name="cloud",
+	texture="default_cloud.png",
+	not_lump=true,
+	not_ore=true,
+	not_ingot=true,
+	pick={tool_capabilities={
+		full_punch_interval = 1.1,
+		max_drop_level = 1,
+		groupcaps = {
+			cracky={times={[1]=7,[2]=2.3,[3]=1.1},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			crumbly={times={[1]=9,[2]=1.6,[3]=1.1},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.5,[2]=1.3,[3]=0.9},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			snappy={times={[1]=1.3,[2]=1.1,[3]=0.5},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	arrow={damage=7},
+	bow={uses=1500,level=17},
 })

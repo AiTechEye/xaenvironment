@@ -514,6 +514,35 @@ default.registry_mineral=function(def)
 			},
 		})
 	end
+--bow
+	if not def.not_bow then
+		def.bow = def.bow or {}
+
+		local item = (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")
+
+		bows.register_bow(def.bow.name or def.name,{
+			description=def.bow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
+			texture=def.texture,
+			uses=def.bow.uses or 50,
+			level=def.bow.level or 1,
+			shots=def.bow.shots or 1,
+			craft = def.bow.craft or {{"",item,"materials:string"},{item,"","materials:string"},{"",item,"materials:string"}},
+		})
+	end
+--arrow
+	if not def.not_arrow then
+		def.arrow = def.arrow or {}
+		bows.register_arrow(def.arrow.name or def.name,{
+			description=def.arrow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
+			texture=def.texture,
+			damage=def.arrow.damage or 1,
+			craft_count=def.arrow.craft_count or 1,
+			on_hit_node=def.arrow.on_hit_node,
+			on_hit_object=def.arrow.on_hit_object,
+			craft=def.arrow.craft or {{"group:arrow",(not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")}}
+		})
+	end
+
 	if def.regular_additional_craft then
 		for _,c in pairs(def.regular_additional_craft) do
 			minetest.register_craft(c)

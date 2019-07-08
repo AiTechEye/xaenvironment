@@ -146,28 +146,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 bows.nothing=function(self,target,hp,user,lastpos)
 	return self
 end
@@ -315,16 +293,6 @@ minetest.register_entity("default:arrow",{
 
 
 
-
-
-
-
-
-
-
-
-
-
 bows.register_bow("wood",{
 	description="Wooden bow",
 	uses=50,
@@ -461,22 +429,6 @@ bows.register_arrow("tetanus",{
 		{"","group:arrow",""}
 	}
 })
-
-bows.register_bow("triple_steel",{
-	description="Steel triple bow",
-	texture="default_steelblock.png",
-	uses=500,
-	level=8,
-	shots=3,
-	craft={
-		{"","default:steel_ingot","materials:string"},
-		{"default:steel_block","","materials:string"},
-		{"","default:steel_ingot","materials:string"}
-	},
-})
-
-
-
 
 bows.register_arrow("exposive",{
 	description="Exposive arrow",
