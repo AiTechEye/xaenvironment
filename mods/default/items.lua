@@ -26,7 +26,7 @@ default.registry_mineral({
 		groups={cracky=3},
 		sounds=default.node_sound_stone_defaults(),
 	},
-	regular_additional_craft={
+	additional_craft={
 		{output="default:amberblock",recipe={
 			{"default:amber_lump","default:amber_lump","default:amber_lump"},
 			{"default:amber_lump","default:amber_lump","default:amber_lump"},
@@ -228,7 +228,7 @@ default.registry_mineral({
 	},
 	ore={groups={cracky=3}},
 	lump={groups={flammable=1}},
-	regular_additional_craft={
+	additional_craft={
 		{output="default:carbonblock",recipe={
 			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},
 			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},

@@ -17,8 +17,6 @@ minetest.register_on_mods_loaded(function()
 	end
 end)
 
-
-
 minetest.register_craft_predict(function(itemstack, player, old_craft_grid, craft_inv)
 	if minetest.get_item_group(itemstack:get_name(),"not_regular_craft") > 0 then
 		return ""
@@ -129,7 +127,13 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 
 				craft = minetest.get_craft_recipe(item)
 
-				if craft.items and (craft.type == "normal" or craft.type == "workbench") then
+
+print(dump(craft))
+
+
+
+
+				if craft.items and craft.type == "normal" then
 					local craftgl = 9
 					for i1=1, craftgl,1 do
 						local it2s = (i1 and craft.items[i1] or "")
@@ -153,8 +157,10 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 							y = y + y_add
 						end
 					end
-					itlist = itlist .. (craft.type == "workbench" and "item_image_button[" .. (x_start+x_add*4) .. "," .. (y_start_crafring+y_add) .. ";" .. but_size ..";default:workbench;guide_item#default:workbench;]" or "")
-				elseif craft.type and craft.type == "cooking" and craft.item then
+					itlist = itlist .. (minetest.get_item_group(item,"not_regular_craft") > 0 and "item_image_button[" .. (x_start+x_add*4) .. "," .. (y_start_crafring+y_add) .. ";" .. but_size ..";default:workbench;guide_item#default:workbench;]" or "")
+				elseif craft.type and craft.type == "cooking" and craft.items then
+					craft.item = craft.items[1]
+
 					local kind = "item"
 					local label = ""
 					local itkind = craft.item

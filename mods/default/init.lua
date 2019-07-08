@@ -8,6 +8,7 @@ default={
 	registered_bios={},
 	registered_bios_list={},
 	bucket={},
+	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit"))
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")
