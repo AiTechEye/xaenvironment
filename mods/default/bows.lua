@@ -452,9 +452,9 @@ bows.register_arrow("exposive",{
 	craft_count=2,
 	damage=15,
 	craft={
-		{"","default:coal",""},
-		{"default:coal","group:arrow","default:coal"},
-		{"","default:coal",""}
+		{"","default:coal_lump",""},
+		{"default:coal_lump","group:arrow","default:coal_lump"},
+		{"","default:coal_lump",""}
 	}
 })
 
