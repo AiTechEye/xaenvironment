@@ -121,90 +121,6 @@ default.tool_breaks_defaults=function(a)
 	return a
 end
 
-default.workbench.get_craft_recipe=function(item)
-	if item then
-		local a = minetest.get_all_craft_recipes(item)
-		if a then
-			for _,c in pairs(a) do
-				if c.type and c.type == "cooking" then
-					return {item=c.items[1],output=item,type="cooking"}
-				end
-			end
-		end
-	end
-
-	local craft = minetest.get_craft_recipe(item)
-
-	if craft.type then
-		return craft
-	end
-	for _,it in pairs(default.workbench.registered_crafts) do
-		if it.output == item then
-			local its = {}
-			for _,i2 in pairs(it.recipe) do
-			for _,i3 in pairs(i2) do
-				table.insert(its,i3)
-			end
-			end
-			return {output=it.output,type = it.type,items = its}
-		end
-	end
-	return {}
-end
-
-default.workbench.get_craft_result=function(list)
-
-	local a = minetest.get_craft_result({method = "normal",width = 3, items = list})
-	local regcraft = a.item:get_name()
-	if regcraft~="" then
-		return a.item
-	end
-
-	for _,i1 in pairs(default.workbench.registered_crafts) do
-		local i = 0
-		local s = 0
-		local br
-		for _,i2 in pairs(i1.recipe) do
-		for _,i3 in pairs(i2) do
-			i = i +1
-			if i3 ~= list[i]:get_name() and not (string.sub(i3,1,6) == "group:" and minetest.get_item_group(list[i]:get_name(),string.sub(i3,7,-1)) > 0) then
-				br = true
-				break
-			end
-			s = s + 1
-		end
-			if br then
-				break
-			end
-		end
-
-		if s == i then
-			return i1.output
-		end
-	end
-	return ""
-end
-
-default.workbench.take_from_craftgreed=function(inv,name)
-	local list = inv:get_list(name)
-	for i,item in ipairs(list) do
-		inv:remove_item(name,item:get_name() .." 1")
-	end
-end
-
-default.workbench.register_craft=function(c)
-	if not c.output and type(c.output) == "string" then
-		error("efault.workbench.register_craft: output string expected")
-		return
-	elseif not (c.recipe and type(c.recipe) == "table") then
-		error("efault.workbench.register_craft: recipe table expected")
-		return
-	end
-	c.type = "workbench"
-	c.mathod = "workbench"
-	table.insert(default.workbench.registered_crafts,c)
-end
-
 default.date=function(a,c)
 	if a=="get" then
 		return os.time()
@@ -348,6 +264,11 @@ default.registry_mineral=function(def)
 			})
 		end
 	end
+
+	if def.craftitem then
+		def.dropingot = def.craftitem
+	end
+
 --block
 	if not def.not_block then
 		def.block = def.block or {}
@@ -401,6 +322,7 @@ default.registry_mineral=function(def)
 --pick
 	if not def.not_pick then
 		def.pick = def.pick or {}
+		def.pick.groups = def.pick.groups or {not_regular_craft=1}
 		def.pick.sound = default.tool_breaks_defaults()
 		def.pick.description = def.pick.description or 		 uname .." pickaxe"
 		def.pick.inventory_image = def.pick.inventory_image or	def.texture .. "^default_alpha_pick.png^[makealpha:0,255,0"
@@ -413,7 +335,7 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2}
 		}
 		minetest.register_tool(mod .. def.name .. "_pick", def.pick)
-		default.workbench.register_craft({
+		minetest.register_craft({
 			output=mod .. def.name .. "_pick",
 			recipe={
 				{def.dropingot,def.dropingot,def.dropingot},
@@ -425,6 +347,7 @@ default.registry_mineral=function(def)
 --shovel
 	if not def.not_shovel then
 		def.shovel = def.shovel or {}
+		def.shovel.groups = def.shovel.groups or {not_regular_craft=1}
 		def.shovel.description = def.shovel.description or 			uname .." shovel"
 		def.shovel.inventory_image = def.shovel.inventory_image or	def.texture .. "^default_alpha_shovel.png^[makealpha:0,255,0"
 		def.shovel.sound = default.tool_breaks_defaults()
@@ -437,7 +360,7 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=1},
 		}
 		minetest.register_tool(mod .. def.name .. "_shovel", def.shovel)
-		default.workbench.register_craft({
+		minetest.register_craft({
 			output=mod .. def.name .. "_shovel",
 			recipe={
 				{"",def.dropingot,""},
@@ -449,6 +372,7 @@ default.registry_mineral=function(def)
 --axe
 	if not def.not_axe then
 		def.axe = def.axe or {}
+		def.axe.groups = def.axe.groups or {not_regular_craft=1}
 		def.axe.sound = default.tool_breaks_defaults()
 		def.axe.description = def.axe.description or 			uname .." axe"
 		def.axe.inventory_image = def.axe.inventory_image or	def.texture .. "^default_alpha_axe.png^[makealpha:0,255,0"
@@ -461,7 +385,7 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2},
 		}
 		minetest.register_tool(mod .. def.name .. "_axe", def.axe)
-		default.workbench.register_craft({
+		minetest.register_craft({
 			output=mod .. def.name .. "_axe",
 			recipe={
 				{def.dropingot,def.dropingot,""},
@@ -473,6 +397,7 @@ default.registry_mineral=function(def)
 --vineyardknife
 	if not def.not_vineyardknife then
 		def.vineyardknife = def.vineyardknife or {}
+		def.vineyardknife.groups = def.vineyardknife.groups or {not_regular_craft=1}
 		def.vineyardknife.sound = default.tool_breaks_defaults()
 		def.vineyardknife.description = def.vineyardknife.description or 		uname .." vineyardknife"
 		def.vineyardknife.inventory_image = def.vineyardknife.inventory_image or	def.texture .. "^default_alpha_vineyardknife.png^[makealpha:0,255,0"
@@ -485,7 +410,7 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=2},
 		}
 		minetest.register_tool(mod .. def.name .. "_vineyardknife", def.vineyardknife)
-		default.workbench.register_craft({
+		minetest.register_craft({
 			output=mod .. def.name .. "_vineyardknife",
 			recipe={
 				{"",def.dropingot,def.dropingot},
@@ -497,6 +422,7 @@ default.registry_mineral=function(def)
 --hoe
 	if not def.not_hoe then
 		def.hoe = def.hoe or {}
+		def.hoe.groups = def.hoe.groups or {not_regular_craft=1}
 		def.hoe.sound = default.tool_breaks_defaults()
 		def.hoe.description = def.hoe.description or 		uname .." hoe"
 		def.hoe.inventory_image = def.hoe.inventory_image or	def.texture .. "^default_alpha_hoe.png^[makealpha:0,255,0"
@@ -505,7 +431,7 @@ default.registry_mineral=function(def)
 			damage_groups={fleshy=5},
 		}
 		minetest.register_tool(mod .. def.name .. "_hoe", def.hoe)
-		default.workbench.register_craft({
+		minetest.register_craft({
 			output=mod .. def.name .. "_hoe",
 			recipe={
 				{def.dropingot,def.dropingot,""},
@@ -518,11 +444,12 @@ default.registry_mineral=function(def)
 	if not def.not_bow then
 		def.bow = def.bow or {}
 
-		local item = (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")
+		local item = def.dropingot or (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")
 
 		bows.register_bow(def.bow.name or def.name,{
 			description=def.bow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
 			texture=def.texture,
+			groups = def.bow.groups or {not_regular_craft=1},
 			uses=def.bow.uses or 50,
 			level=def.bow.level or 1,
 			shots=def.bow.shots or 1,
@@ -536,21 +463,16 @@ default.registry_mineral=function(def)
 			description=def.arrow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
 			texture=def.texture,
 			damage=def.arrow.damage or 1,
-			craft_count=def.arrow.craft_count or 1,
+			craft_count=def.arrow.craft_count or 8,
 			on_hit_node=def.arrow.on_hit_node,
 			on_hit_object=def.arrow.on_hit_object,
-			craft=def.arrow.craft or {{"group:arrow",(not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")}}
+			craft=def.arrow.craft or {{"group:arrow", def.dropingot or (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")}}
 		})
 	end
 
-	if def.regular_additional_craft then
-		for _,c in pairs(def.regular_additional_craft) do
+	if def.additional_craft then
+		for _,c in pairs(def.additional_craft) do
 			minetest.register_craft(c)
-		end
-	end
-	if def.workbench_additional_craft then 
-		for _,c in pairs(def.workbench_additional_craft) do
-			default.workbench.register_craft(c)
 		end
 	end
 end

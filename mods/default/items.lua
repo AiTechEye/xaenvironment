@@ -250,8 +250,6 @@ default.registry_mineral({
 		recipe = "group:tree",
 		cooktime = 10
 		},
-	},
-	workbench_additional_craft={
 		{output="default:steel_lump",recipe={{"default:carbon_ingot","default:iron_ingot"}}}
 	},
 	ore_settings={
@@ -284,7 +282,7 @@ default.registry_mineral({
 	},
 	ore={groups={cracky=3}},
 	lump={groups={flammable=1}},
-	regular_additional_craft={
+	additional_craft={
 		{
 			type = "fuel",
 			recipe = "default:coal_lump",
@@ -324,7 +322,7 @@ default.registry_mineral({
 		groups={cracky=3,stone=1},
 		sounds=default.node_sound_stone_defaults()
 	},
-	regular_additional_craft={
+	additional_craft={
 
 	{output="default:flint_pick",
 	recipe={
@@ -433,7 +431,7 @@ default.registry_mineral({
 	not_ore = true,
 	arrow={damage=4},
 	bow={uses=500,level=7},
-	regular_additional_craft={{
+	additional_craft={{
 		output="default:bronze_lump 8",
 		recipe={
 			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
@@ -664,7 +662,7 @@ default.registry_mineral({
 		clust_size=9,
 		y_max=-100,
 	},
-	regular_additional_craft={
+	additional_craft={
 	{output="default:electricblock",
 	recipe={
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
@@ -692,7 +690,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	not_bow=true,
 	not_arrow=true,
-	regular_additional_craft={
+	additional_craft={
 	{output="default:uraniumblock",
 	recipe={
 		{"default:uranium_lump","default:uranium_lump","default:uranium_lump"},
@@ -713,7 +711,7 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	not_vineyardknife=true,
-	regular_additional_craft={{
+	additional_craft={{
 		type = "cooking",
 		output = "default:uraniumactive_ingot",
 		recipe = "default:uranium_ingot",
@@ -727,6 +725,8 @@ default.registry_mineral({
 	not_lump=true,
 	not_ore=true,
 	not_ingot=true,
+	not_block=true,
+	craftitem="default:cloud",
 	pick={tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,

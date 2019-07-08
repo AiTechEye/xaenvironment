@@ -18,6 +18,14 @@ minetest.register_on_mods_loaded(function()
 end)
 
 
+
+minetest.register_craft_predict(function(itemstack, player, old_craft_grid, craft_inv)
+	if minetest.get_item_group(itemstack:get_name(),"not_regular_craft") > 0 then
+		return ""
+	end
+	return itemstack
+end)
+
 default.workbench.set_form=function(pos,add)
 	local meta = minetest.get_meta(pos)
 	local page = meta:get_int("page")
@@ -67,6 +75,8 @@ default.workbench.set_form=function(pos,add)
 		"listring[current_name;stock]" .. 
 		"listring[current_name;craft]".. 
 		"listring[current_player;main]" ..
+		"listring[current_name;output]".. 
+		"listring[current_player;main]" ..
 		craftguide_items ..
 		"image_button[-0.2,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
 		"image_button[0.3,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
@@ -112,10 +122,12 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 			if  string.sub(i,1,11) == "guide_item#" then
 				local item = string.sub(i,12,-1)
 
-				local craft = default.workbench.get_craft_recipe(item)
+				local craft
 				local x = x_start
 				local y = y_start_crafring
 				local itlist = ""
+
+				craft = minetest.get_craft_recipe(item)
 
 				if craft.items and (craft.type == "normal" or craft.type == "workbench") then
 					local craftgl = 9
@@ -194,6 +206,7 @@ minetest.register_node("default:workbench", {
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
+
 		inv:set_size("craft", 9)
 		inv:set_size("output", 1)
 		inv:set_size("stock", 16)
@@ -210,53 +223,66 @@ minetest.register_node("default:workbench", {
 		meta:set_int("but_am_w", 7)
 		default.workbench.set_form(pos)
 	end,
-	on_timer = function (pos, elapsed)
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if listname=="craft" then
 			local inv = minetest.get_meta(pos):get_inventory()
-			inv:set_stack("output",1,default.workbench.get_craft_result(inv:get_list("craft")))
+			local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
+			inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
+		end
+	end,
+	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		if to_list=="craft" or from_list=="craft" or from_list=="output" then
+			local inv = minetest.get_meta(pos):get_inventory()
+			if from_list=="output" then
+				for i,item in ipairs(inv:get_list("craft")) do
+					inv:set_stack("craft",i,item:get_name() .." " .. item:get_count()-1)
+				end
+			end
+			local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
+			inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
+		end
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		if listname=="craft" or listname=="output" then
+			local inv = minetest.get_meta(pos):get_inventory()
+			if listname=="output" then
+				for i,item in ipairs(inv:get_list("craft")) do
+					inv:set_stack("craft",i,item:get_name() .." " .. item:get_count()-1)
+				end
+			end
+			local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
+			inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
+		end
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		if listname=="craft" then
-			minetest.get_node_timer(pos):start(0.1)
-		elseif listname=="output" then
+		local owner = minetest.get_meta(pos):get_string("owner")
+		local name = player:get_player_name()
+		if listname=="output" or (name ~= owner and owner ~= "") or not minetest.check_player_privs(name, {protection_bypass=true}) then
 			return 0
 		end
 		return stack:get_count()
 	end,
 	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
-		local meta = minetest.get_meta(pos)
+		local owner = minetest.get_meta(pos):get_string("owner")
 		local name = player:get_player_name()
-		if name==meta:get_string("owner") or not minetest.is_protected(pos,name) then
-			if listname == "output" then
-				local inv = minetest.get_meta(pos):get_inventory()
-				default.workbench.take_from_craftgreed(inv,"craft")
-				minetest.get_node_timer(pos):start(0.1)
-			end
-			if listname == "craft" then
-				minetest.get_node_timer(pos):start(0.1)
-				local inv = minetest.get_meta(pos):get_inventory()
-				inv:set_stack("output",1,default.workbench.get_craft_result(inv:get_list("craft")))
-			end
-			return stack:get_count()
-		end
-		return 0
-	end,
-	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		if to_list == "output" then
+		if name ~= owner and owner ~= "" and not minetest.check_player_privs(name, {protection_bypass=true}) then
 			return 0
 		end
-		if from_list == "output" then
-			local inv = minetest.get_meta(pos):get_inventory()
-			default.workbench.take_from_craftgreed(inv,"craft")
-			minetest.get_node_timer(pos):start(0.1)
-		end
-		if to_list == "craft" or from_list == "craft" then
-			minetest.get_node_timer(pos):start(0.1)
+		return stack:get_count()
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		local owner = minetest.get_meta(pos):get_string("owner")
+		local name = player:get_player_name()
+		if to_list == "output" or (name ~= owner and owner ~= "" and not minetest.check_player_privs(name, {protection_bypass=true})) then
+			return 0
 		end
 		return count
 	end,
 	can_dig = function(pos, player)
 		local inv = minetest.get_meta(pos):get_inventory()
-		return inv:is_empty("craft") and inv:is_empty("stock")
+		local owner = minetest.get_meta(pos):get_string("owner")
+		local name = player:get_player_name()
+		return (inv:is_empty("craft") and inv:is_empty("stock")) and (name == owner or owner ~= "")
 	end
 })
 

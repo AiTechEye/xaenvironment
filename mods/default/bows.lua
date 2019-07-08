@@ -43,6 +43,9 @@ bows.register_bow=function(name,def)
 	def.uses = def.uses-1 or 49
 	def.shots = def.shots or 1
 	def.texture = def.texture or "default_wood.png"
+	def.groups = def.groups or {}
+
+	def.groups.bow=1
 
 	bows.registed_bows[def.replace]=def
 
@@ -50,13 +53,13 @@ bows.register_bow=function(name,def)
 		description = def.description or name,
 		inventory_image = def.texture .. "^default_bow.png^[makealpha:0,255,0",
 		on_use =bows.load,
-		groups = {bow=1},
+		groups = def.groups,
 	})
 	minetest.register_tool(def.replace, {
 		description = def.description or name,
 		inventory_image = def.texture .. (def.shots == 1 and "^default_bow_loaded.png" or "^default_bow_loaded_multi.png") .. "^[makealpha:0,255,0",
 		on_use =bows.shoot,
-		groups = {bow=1,stick=1,not_in_creative_inventory=1},
+		groups = {bow=1,not_in_creative_inventory=1},
 	})
 	if def.craft then
 		minetest.register_craft({output = def.name,recipe = def.craft})
