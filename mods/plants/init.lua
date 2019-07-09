@@ -813,8 +813,6 @@ minetest.register_craft({
 	output="plants:flour",
 	recipe={
 		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
-		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
-		{"plants:wheat_seed","plants:wheat_seed","plants:wheat_seed"},
 	},
 })
 
