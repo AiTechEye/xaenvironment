@@ -352,8 +352,9 @@ minetest.register_node("default:dirt", {
 
 minetest.register_node("default:wet_soil", {
 	description = "Wet soil",
+	drop="default:dirt",
 	tiles={"default_dirt.png^[colorize:#00000022"},
-	groups = {dirt=1,soil=1,wet_soil=1,crumbly=3},
+	groups = {dirt=1,soil=1,wet_soil=1,crumbly=3,not_in_creative_inventory=1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
