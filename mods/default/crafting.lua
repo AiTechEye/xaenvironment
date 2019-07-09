@@ -206,7 +206,6 @@ minetest.register_node("default:workbench", {
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-
 		inv:set_size("craft", 9)
 		inv:set_size("output", 1)
 		inv:set_size("stock", 16)
@@ -257,7 +256,7 @@ minetest.register_node("default:workbench", {
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local owner = minetest.get_meta(pos):get_string("owner")
 		local name = player:get_player_name()
-		if listname=="output" or (name ~= owner and owner ~= "") or not minetest.check_player_privs(name, {protection_bypass=true}) then
+		if listname=="output" or (name ~= owner and owner ~= "") or ( name ~= owner and not minetest.check_player_privs(name, {protection_bypass=true})) then
 			return 0
 		end
 		return stack:get_count()
