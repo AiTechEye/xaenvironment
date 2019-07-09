@@ -758,3 +758,50 @@ examobs.register_mob({
 		end
 	end
 })
+
+examobs.register_mob({
+	name = "sandmonster",
+	type = "monster",
+	dmg = 2,
+	aggressivity = 2,
+	walk_speed = 4,
+	run_speed = 5,
+	lay_on_death = 0,
+	swiming = 0,
+	animation = {
+		stand={x=1,y=39,speed=30},
+		walk={x=80,y=99,speed=30},
+		run={x=80,y=99,speed=30},
+		attack={x=65,y=75,speed=30},
+		lay={x=113,y=123,speed=0},
+	},
+	textures = {"default_desert_sand.png"},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	spawn_on={"default:desert_sand","default:desert_stone"},
+	death=function(self)
+		local pos=apos(self:pos(),0,1.5)
+		minetest.add_particlespawner({
+			amount = 15,
+			time =0.1,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=2, y=2, z=2},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.1,
+			maxsize = 3,
+			texture = "default_desert_sand.png",
+			collisiondetection = true,
+		})
+	end,
+	step=function(self)
+		if minetest.get_item_group(minetest.get_node(self:pos()).name,"water") > 0 then
+			self:hurt(100)
+		end
+	end
+})
