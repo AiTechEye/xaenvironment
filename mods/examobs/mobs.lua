@@ -736,7 +736,7 @@ examobs.register_mob({
 	name = "gass_man",
 	type = "npc",
 	team = "gass",
-	textures = {"nitroglycerin_gassman.png"},
+	textures = {"examobs_gassman.png"},
 	aggressivity = 2,
 	walk_speed = 1,
 	dmg = 0,
