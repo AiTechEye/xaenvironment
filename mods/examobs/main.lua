@@ -233,9 +233,15 @@ examobs.register_mob=function(def)
 		dmg = tool_capabilities.damage_groups.fleshy or 1
 
 		if puncher:is_player() then
-			local tool = puncher:get_wielded_item()
-			tool:add_wear(math.ceil(self.add_wear/(dmg*dmg)))
-			puncher:set_wielded_item(tool)
+			local item = minetest.registered_tools[puncher:get_wielded_item():get_name()]
+			if item and item.tool_capabilities and item.tool_capabilities.damage_groups then
+				local d = tool_capabilities.damage_groups.fleshy
+				if d and d > 0 then
+					local tool = puncher:get_wielded_item()
+					tool:add_wear(math.ceil(self.add_wear/(dmg*dmg)))
+					puncher:set_wielded_item(tool)
+				end
+			end
 		end
 
 		local v={x = dir.x*3,y = self.object:get_velocity().y,z = dir.z*3}
