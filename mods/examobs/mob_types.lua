@@ -12,6 +12,7 @@ examobs.register_bird=function(def)
 	def2.inv = def.inv or {["examobs:chickenleg"]=1,["examobs:feather"]=2}
 	def2.walk_speed = def.run_speed or 2
 	def2.run_speed = def.run_speed or 4
+	def2.swiming = def2.swiming or 0
 	def2.animation = {
 		stand = {x=20,y=25,speed=0},
 		walk = {x=40,y=50,speed=20},
