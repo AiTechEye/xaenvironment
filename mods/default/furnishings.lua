@@ -370,6 +370,10 @@ minetest.register_node("default:itemframe", {
 		end
 	end,
 	on_rightclick=function(pos, node, player, itemstack, pointed_thing)
+		if itemstack:get_name() == "" then
+			return
+		end
+
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("owner") ~= player:get_player_name() then
 			return
