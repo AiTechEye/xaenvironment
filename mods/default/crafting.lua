@@ -281,7 +281,7 @@ minetest.register_node("default:workbench", {
 		local inv = minetest.get_meta(pos):get_inventory()
 		local owner = minetest.get_meta(pos):get_string("owner")
 		local name = player:get_player_name()
-		return (inv:is_empty("craft") and inv:is_empty("stock")) and (name == owner or owner ~= "")
+		return (inv:is_empty("craft") and inv:is_empty("stock")) and (name == owner or owner == "")
 	end
 })
 
