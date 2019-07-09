@@ -766,7 +766,7 @@ examobs.generate_npc_house=function(pos)
 				p = 2
 			end
 			p = minetest.get_item_group(nset,"bed") > 0 and mirror[p] or p
-
+			p = minetest.get_item_group(nset,"tankstorage") > 0 and 0 or p
 		elseif (y==0 or y== 1) and ((wint == 2 and x == 0 and (z==door)) or (wint == 1 and z == 0 and x == door)
 		or ((wint == 0 or wint == 3) and ((door_rnd == 1 and z == 0 and x == door) or (door_rnd == 2 and x == 0 and z == door)))) then
 --door

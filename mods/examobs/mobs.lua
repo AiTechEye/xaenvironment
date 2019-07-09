@@ -742,7 +742,7 @@ examobs.register_mob({
 	dmg = 0,
 	run_speed = 4,
 	animation = "default",
-	spawn_chance = 1000,
+	spawn_chance = 800,
 	extimer = 20,
 	inv = {["nitroglycerin:c4"]=1},
 	step=function(self)
