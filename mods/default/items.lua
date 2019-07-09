@@ -334,8 +334,6 @@ default.registry_mineral({
 		{output="default:flint",
 			recipe={
 				{"default:gravel","default:gravel","default:gravel"},
-				{"default:gravel","default:gravel","default:gravel"},
-				{"default:gravel","default:gravel","default:gravel"},
 			}
 		}
 	}

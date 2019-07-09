@@ -30,7 +30,7 @@ minetest.register_ore({
 	ore_type = "blob",
 	ore= "default:gravel",
 	wherein= "default:stone",
-	clust_scarcity = 20 * 20 * 20,
+	clust_scarcity = 10 * 10 * 10,
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 31000,
