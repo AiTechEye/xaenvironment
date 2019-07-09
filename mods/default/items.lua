@@ -322,45 +322,24 @@ default.registry_mineral({
 		groups={cracky=3,stone=1},
 		sounds=default.node_sound_stone_defaults()
 	},
-	additional_craft={
 
-	{output="default:flint_pick",
-	recipe={
-		{"default:flint","default:flint","default:flint"},
-		{"","default:stick",""},
-		{"","default:stick",""},
-	}},
-	{output="default:flint_shovel",
-	recipe={
-		{"","default:flint",""},
-		{"","default:stick",""},
-		{"","default:stick",""},
-	}},
-	{output="default:flint_axe",
-	recipe={
-		{"default:flint","default:flint",""},
-		{"default:flint","default:stick",""},
-		{"","default:stick",""},
-	}},
-	{output="default:flint_hoe",
-	recipe={
-		{"default:flint","default:flint",""},
-		{"","default:stick",""},
-		{"","default:stick",""},
-	}},
-	{output="default:flint_vineyardknife",
-	recipe={
-		{"","default:flint","default:flint"},
-		{"","","default:flint"},
-		{"","default:stick",""},
-	}},
-	{output="default:flint",
-	recipe={
-		{"default:gravel","default:gravel","default:gravel"},
-		{"default:gravel","default:gravel","default:gravel"},
-		{"default:gravel","default:gravel","default:gravel"},
-	}}
-}})
+	pick={groups={not_regular_craft=0}},
+	axe={groups={not_regular_craft=0}},
+	shovel={groups={not_regular_craft=0}},
+	pick={groups={not_regular_craft=0}},
+	vineyardknife={groups={not_regular_craft=0}},
+	hoe={groups={not_regular_craft=0}},
+
+	additional_craft={
+		{output="default:flint",
+			recipe={
+				{"default:gravel","default:gravel","default:gravel"},
+				{"default:gravel","default:gravel","default:gravel"},
+				{"default:gravel","default:gravel","default:gravel"},
+			}
+		}
+	}
+})
 
 default.registry_mineral({
 	name="copper",
