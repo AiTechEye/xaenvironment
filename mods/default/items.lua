@@ -513,6 +513,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
+	lump={groups={not_regular_craft=1}},
 	shovel={tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
