@@ -5,6 +5,7 @@ apos=function(pos,x,y,z)
 end
 
 minetest.register_node("quads:quad", {
+	stack_max=1,
 	description="Quad",
 	drawtype="mesh",
 	mesh="quads_quad.b3d",
@@ -14,7 +15,7 @@ minetest.register_node("quads:quad", {
 	visual_scale = 0.1,
 	param2="facedir",
 	on_place = function(itemstack, user, pointed_thing)
-		if pointed_thing.type=="node" then
+		if pointed_thing.type=="node" and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
 			local pos = pointed_thing.above
 			pos.y=pos.y+0.5
 			minetest.add_entity(pos, "quads:quad"):set_yaw(user:get_look_yaw() - math.pi/2)
@@ -125,7 +126,15 @@ minetest.register_entity("quads:quad",{
 		return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		self:hurt(tool_capabilities.damage_groups.fleshy or 1)
+		if puncher:is_player() and not self.user then
+			local inv = puncher:get_inventory()
+			if inv:room_for_item("main","quads:quad") then
+				inv:add_item("main","quads:quad")
+				self.object:remove()
+			end
+		else
+			self:hurt(tool_capabilities.damage_groups.fleshy or 1)
+		end
 	end,
 	on_step=function(self,dtime)
 		local v = self.object:get_velocity()
@@ -145,9 +154,9 @@ minetest.register_entity("quads:quad",{
 			self.object:set_rotation({x=r.x,y=r.y-0.1,z=r.z})
 		end
 
-		if key.up and self.speed < 20 and not self.falling then
+		if key.up and self.speed < 20 then
 			self.speed = self.speed + 0.2
-		elseif key.down and self.speed > -5 and not self.falling  then
+		elseif key.down and self.speed > -5 and not self.falling then
 			self.speed = self.speed - 0.2
 		elseif key.sneak and not self.falling  then
 			self.speed = math.abs(self.speed) > 1 and self.speed * 0.95 or 0
@@ -172,8 +181,10 @@ minetest.register_entity("quads:quad",{
 			local r = self.object:get_rotation()
 			if key.down and key.aux1 then
 				self.object:set_rotation({x=r.x-0.1,y=r.y,z=r.z})
+				self.rotation = true
 			elseif key.up and key.aux1 then
 				self.object:set_rotation({x=r.x+0.1,y=r.y,z=r.z})
+				self.rotation = true
 			end
 		end
 
@@ -181,7 +192,7 @@ minetest.register_entity("quads:quad",{
 			local r = self.object:get_rotation()
 			if self.falling then
 				local dmg = math.floor(self.falling-p.y)*10
-				if self.user and math.abs(r.x) > 1.3 then
+				if self.user and math.abs(r.x) > 1.3 and math.abs(r.x) < 5 then
 					dmg = dmg*10
 					default.punch(self.user,self.object,dmg)
 				end
@@ -190,7 +201,7 @@ minetest.register_entity("quads:quad",{
 				end
 				self.falling = nil
 			end
-			if self.rotation then
+			if walku and self.rotation and v.y <= 0.1 then
 				self.rotation = nil
 				self.object:set_rotation({x=0,y=r.y,z=r.z})
 			end
