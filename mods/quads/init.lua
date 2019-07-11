@@ -1,8 +1,73 @@
-quads={}
-
 apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
 end
+
+minetest.register_craft({
+	output="quads:petrol_tank",
+	recipe={
+		{"materials:plant_extracts_gas","default:carbon_lump","default:iron_ingot"},
+		{"player_style:bottle 1 1","quads:bottle_with_oil",""},
+	},
+})
+
+minetest.register_craft({
+	output="quads:bottle",
+	recipe={
+		{"materials:glass_bottle","default:coal_lump"},
+	},
+})
+
+minetest.register_node("quads:petrol_tank", {
+	description="Petrol tank",
+	tiles={"default_ironblock.png"},
+	groups = {dig_immediate = 3},
+	paramtype = "light",
+	paramtype2="facedir",
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.125, -0.5, -0.25, 0.125, 0.0625, 0.25},
+			{-0.0625, 0.1875, -0.1875, 0.0625, 0.25, 0.1875},
+			{-0.0625, 0.0625, -0.25, 0.0625, 0.25, -0.125},
+			{-0.0625, 0.0625, 0.0625, 0.0625, 0.25, 0.25},
+		}
+	}
+})
+
+
+
+
+minetest.register_tool("quads:bottle", {
+	description = "Oil storable bottle",
+	liquids_pointable = true,
+	inventory_image = "materials_plant_extracts.png",
+	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.under and minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"oil") > 0 then
+			local item = itemstack:to_table()
+			item.name = "quads:bottle_with_oil"
+			return item
+		end
+		return itemstack
+	end
+})
+minetest.register_node("quads:bottle_with_oil", {
+	description = "Bottle with oil",
+	liquids_pointable = true,
+	inventory_image = "materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png",
+	tiles = {"materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png"},
+	drawtype="plantlike",
+	groups = {dig_immediate = 3},
+})
+
+
+
+
+
+
+
+
+
 
 minetest.register_node("quads:quad", {
 	stack_max=1,
@@ -13,7 +78,6 @@ minetest.register_node("quads:quad", {
 	groups = {dig_immediate = 3},
 	wield_scale={x=0.1,y=0.1,z=0.1},
 	visual_scale = 0.1,
-	param2="facedir",
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type=="node" and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
 			local pos = pointed_thing.above
