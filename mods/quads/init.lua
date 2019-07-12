@@ -110,9 +110,11 @@ minetest.register_node("quads:quad", {
 	drawtype="mesh",
 	mesh="quads_quad.b3d",
 	tiles={"quads_quad1.png","quads_quad1.png"},
-	groups = {dig_immediate = 3},
 	wield_scale={x=0.1,y=0.1,z=0.1},
 	visual_scale = 0.1,
+	walkable=false,
+	pointable=false,
+	buildable_to=true,
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type=="node" and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
 			local pos = pointed_thing.above
@@ -183,6 +185,7 @@ minetest.register_entity("quads:quad",{
 		elseif self.user and self.user:get_player_name() == self.user_name then
 			self.user:set_detach()
 			self.user:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+			player_style.player_attached[self.user_name] = nil
 			self.user = nil
 			clicker:hud_remove(self.hud.hp)
 			clicker:hud_remove(self.hud.hp_back)
@@ -193,6 +196,7 @@ minetest.register_entity("quads:quad",{
 			self.user_name = clicker:get_player_name()
 			self.user:set_attach(self.object, "",{x=0, y=-10, z=0}, {x=0, y=0,z=0})
 			self.user:set_eye_offset({x=0, y=-3, z=-3}, {x=0, y=0, z=0})
+			player_style.player_attached[self.user_name] = true
 			self.hud={
 				hp_back=clicker:hud_add({
 					hud_elem_type="statbar",
