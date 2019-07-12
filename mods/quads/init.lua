@@ -322,10 +322,10 @@ minetest.register_entity("quads:quad",{
 
 		local key = self.user and self.user:get_player_control() or {}
 
-		if key.left and self.petrol > 0 then
+		if key.left and self.speed ~= 0 then
 			local r = self.object:get_rotation()
 			self.object:set_rotation({x=r.x,y=r.y+0.1,z=r.z})
-		elseif key.right and self.petrol > 0 then
+		elseif key.right and  self.speed ~= 0 then
 			local r = self.object:get_rotation()
 			self.object:set_rotation({x=r.x,y=r.y-0.1,z=r.z})
 		end
