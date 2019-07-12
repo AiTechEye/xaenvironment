@@ -191,11 +191,15 @@ minetest.register_entity("quads:quad",{
 			clicker:hud_remove(self.hud.hp_back)
 			clicker:hud_remove(self.hud.petrol)
 			clicker:hud_remove(self.hud.petrol_back)
-		elseif self.user_name =="" or self.user_name == clicker:get_player_name() then
+		elseif (self.user_name =="" or self.user_name == clicker:get_player_name()) and not player_style.player_attached[clicker:get_player_name()] then
 			self.user = clicker
 			self.user_name = clicker:get_player_name()
 			self.user:set_attach(self.object, "",{x=0, y=-10, z=0}, {x=0, y=0,z=0})
-			self.user:set_eye_offset({x=0, y=-3, z=-3}, {x=0, y=0, z=0})
+			if minetest.get_item_group(minetest.get_node(clicker:get_pos()).name,"liquid") == 0 then
+				self.user:set_eye_offset({x=0, y=-3, z=-3}, {x=0, y=0, z=0})
+			else
+				self.user:set_eye_offset({x=0, y=5, z=-3}, {x=0, y=0, z=0})
+			end
 			player_style.player_attached[self.user_name] = true
 			self.hud={
 				hp_back=clicker:hud_add({
@@ -324,10 +328,18 @@ minetest.register_entity("quads:quad",{
 
 		if key.left and self.speed ~= 0 then
 			local r = self.object:get_rotation()
-			self.object:set_rotation({x=r.x,y=r.y+0.1,z=r.z})
+			if key.sneak then
+				self.object:set_rotation({x=r.x,y=r.y+0.05,z=r.z})
+			else
+				self.object:set_rotation({x=r.x,y=r.y+0.1,z=r.z})
+			end
 		elseif key.right and  self.speed ~= 0 then
 			local r = self.object:get_rotation()
-			self.object:set_rotation({x=r.x,y=r.y-0.1,z=r.z})
+			if key.sneak then
+				self.object:set_rotation({x=r.x,y=r.y-0.05,z=r.z})
+			else
+				self.object:set_rotation({x=r.x,y=r.y-0.1,z=r.z})
+			end
 		end
 
 		if self.user and self.user:get_hp() <=0 then
@@ -385,7 +397,7 @@ minetest.register_entity("quads:quad",{
 			end
 		end
 
-		if walkable(ap) then
+		if self.speed > 0 and walkable(ap) then
 			if walkable(apos(p,X,1,Z)) then
 				x = 0
 				z = 0
@@ -395,6 +407,16 @@ minetest.register_entity("quads:quad",{
 				local r = self.object:get_rotation()
 				self.object:set_rotation({x=0.785,y=r.y,z=r.z})
 				self.jump = self.jump + self.jump< 3 and self.speed*0.1 or 0
+			end
+		elseif self.speed < 0 and walkable(apos(p,-X,0,-Z)) then
+			if walkable(apos(p,-X,1,-Z)) then
+				x = 0
+				z = 0
+				self.speed = 0
+			else
+				self.rotation = true
+				local r = self.object:get_rotation()
+				self.object:set_rotation({x=-0.785,y=r.y,z=r.z})
 			end
 		else
 			self.jump =  0
