@@ -207,3 +207,21 @@ exaachievements.register({
 	skills=50,
 	hide_until=100,
 })
+
+exaachievements.do_a({item="quads:quad",skills=5})
+exaachievements.register({
+	type="customize",
+	name="Quad_frontflip_stunt",
+	count=1,
+	description="Do a full frontflip with a quad (down+use in air)",
+	skills=20,
+	hide_until=100,
+})
+exaachievements.register({
+	type="customize",
+	name="Quad_backflip_stunt",
+	count=1,
+	description="Do a full backflip with a quad (up+use in air)",
+	skills=20,
+	hide_until=100,
+})
