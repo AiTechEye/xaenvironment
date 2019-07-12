@@ -5,8 +5,26 @@ end
 minetest.register_craft({
 	output="quads:petrol_tank",
 	recipe={
-		{"materials:plant_extracts_gas","default:carbon_lump","default:iron_ingot"},
-		{"player_style:bottle 1 1","quads:bottle_with_oil",""},
+		{"materials:plant_extracts_gas","default:carbon_lump","quads:petrol_tank_empty"},
+		{"player_style:bottle","quads:bottle_with_oil",""},
+	},
+})
+
+minetest.register_craft({
+	output="quads:quad",
+	recipe={
+		{"default:copper_ingot","default:electric_lump","quads:petrol_tank_empty"},
+		{"default:steel_ingot","default:steelblock","default:steel_ingot"},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+	},
+})
+
+
+minetest.register_craft({
+	output="quads:petrol_tank_empty",
+	recipe={
+		{"default:iron_ingot","default:iron_ingot","default:carbon_lump"},
+		{"default:iron_ingot","default:iron_ingot",""},
 	},
 })
 
@@ -18,7 +36,37 @@ minetest.register_craft({
 })
 
 minetest.register_node("quads:petrol_tank", {
+	stack_max = 1,
 	description="Petrol tank",
+	tiles={"default_ironblock.png"},
+	groups = {dig_immediate = 3,flammable=3},
+	paramtype = "light",
+	paramtype2="facedir",
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.125, -0.5, -0.25, 0.125, 0.0625, 0.25},
+			{-0.0625, 0.1875, -0.1875, 0.0625, 0.25, 0.1875},
+			{-0.0625, 0.0625, -0.25, 0.0625, 0.25, -0.125},
+			{-0.0625, 0.0625, 0.0625, 0.0625, 0.25, 0.25},
+		}
+	},
+	on_blast=function(pos)
+		minetest.set_node(pos,{name="air"})
+		nitroglycerin.explode(pos,{radius=3,set="fire:basic_flame"})
+	end,
+	on_burn = function(pos)
+		minetest.registered_nodes["quads:petrol_tank"].on_blast(pos)
+	end,
+	on_ignite = function(pos, igniter)
+		minetest.registered_nodes["quads:petrol_tank"].on_blast(pos)
+	end,
+})
+
+minetest.register_node("quads:petrol_tank_empty", {
+	stack_max = 1,
+	description="Petrol tank (empty)",
 	tiles={"default_ironblock.png"},
 	groups = {dig_immediate = 3},
 	paramtype = "light",
@@ -34,9 +82,6 @@ minetest.register_node("quads:petrol_tank", {
 		}
 	}
 })
-
-
-
 
 minetest.register_tool("quads:bottle", {
 	description = "Oil storable bottle",
@@ -60,15 +105,6 @@ minetest.register_node("quads:bottle_with_oil", {
 	groups = {dig_immediate = 3},
 })
 
-
-
-
-
-
-
-
-
-
 minetest.register_node("quads:quad", {
 	stack_max=1,
 	description="Quad",
@@ -82,7 +118,9 @@ minetest.register_node("quads:quad", {
 		if pointed_thing.type=="node" and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
 			local pos = pointed_thing.above
 			pos.y=pos.y+0.5
-			minetest.add_entity(pos, "quads:quad"):set_yaw(user:get_look_yaw() - math.pi/2)
+			local en = minetest.add_entity(pos, "quads:quad")
+			en:set_yaw(user:get_look_yaw() - math.pi/2)
+			en:get_luaentity().user_name = user:get_player_name()
 			itemstack:take_item()
 		end
 		return itemstack
@@ -98,32 +136,107 @@ minetest.register_entity("quads:quad",{
 	textures={"quads_quad1.png","quads_quad1.png"},
 	visual_size = {x=1,y=1},
 	makes_footstep_sound = true,
+	stepheight = 1.5,
 	type="npc",
 	speed = 0,
 	jump = 0,
 	timer = 0,
-	stepheight = 1.5,
+	get_staticdata = function(self)
+		return minetest.serialize({petrol=self.petrol,user_name=self.user_name})
+	end,
 	anim=function(self,s)
 		if self.an ~= s then
 			self.an = s
 			self.object:set_animation({x=0,y=40},s*10,0)
 		end
 	end,
+	on_activate=function(self, staticdata)
+		self.object:set_acceleration({x=0,y=-10,z =0})
+		local s = minetest.deserialize(staticdata) or {}
+		self.quad = math.random(1,9999)
+		self.petrol = s.petrol or 0
+		self.user_name = s.user_name or ""
+	end,
+	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
+		if puncher:is_player() and not self.user and (self.user_name =="" or puncher:get_player_name() == self.user_name) then
+			if self.petrol > 0 then
+				minetest.chat_send_player(puncher:get_player_name(),"Empty the tank before pick up the quad ("..math.ceil(self.petrol).." left)")
+				return
+			end
+			local inv = puncher:get_inventory()
+			if inv:room_for_item("main","quads:quad") then
+				inv:add_item("main","quads:quad")
+				self.object:remove()
+			end
+		else
+			self:hurt(tool_capabilities.damage_groups.fleshy or 1)
+		end
+	end,
 	on_rightclick=function(self, clicker)
-		if self.user and self.user:get_player_name() == self.user_name then
+		if clicker:is_player() and clicker:get_wielded_item():get_name() == "quads:petrol_tank" then
+			if self.petrol+25 <= 100 then
+				self.petrol = self.petrol + 25
+				local item = clicker:get_wielded_item():to_table()
+				item.name = "quads:petrol_tank_empty"
+				clicker:set_wielded_item(item)
+				self:hud_update()
+			end
+		elseif self.user and self.user:get_player_name() == self.user_name then
 			self.user:set_detach()
 			self.user = nil
-			self.user_name = nil
-		else
+			clicker:hud_remove(self.hud.hp)
+			clicker:hud_remove(self.hud.hp_back)
+			clicker:hud_remove(self.hud.petrol)
+			clicker:hud_remove(self.hud.petrol_back)
+		elseif self.user_name =="" or self.user_name == clicker:get_player_name() then
 			self.user = clicker
 			self.user_name = clicker:get_player_name()
 			self.user:set_attach(self.object, "",{x = 0, y = -5, z = 0}, {x = 0, y = 0, z = 0})
+			self.hud={
+				hp_back=clicker:hud_add({
+					hud_elem_type="statbar",
+					position={x=1,y=0},
+					text="quads_backbar.png",
+					number=100,
+					size={x=10,y=10},
+					direction=1,
+				}),
+				hp=clicker:hud_add({
+					hud_elem_type="statbar",
+					position={x=1,y=0},
+					text="quads_hpbar.png",
+					number=self.object:get_hp(),
+					size={x=10,y=10},
+					direction=1,
+				}),
+				petrol_back=clicker:hud_add({
+					hud_elem_type="statbar",
+					position={x=1,y=-2},
+					text="quads_backbar.png",
+					number=100,
+					size={x=10,y=10},
+					direction=1,
+					offset={x=0,y=15},
+				}),
+				petrol=clicker:hud_add({
+					hud_elem_type="statbar",
+					position={x=1,y=0},
+					text="quads_petrolbar.png",
+					number=self.petrol,
+					size={x=10,y=10},
+					direction=1,
+					offset={x=0,y=15},
+				})
+			}
+			self:hud_update()
 		end
 		return self
 	end,
-	on_activate=function(self, staticdata)
-		self.object:set_acceleration({x=0,y=-10,z =0})
-		self.quad = math.random(1,9999)
+	hud_update=function(self)
+		if self.user and self.user:get_pos() then
+			self.user:hud_change(self.hud.hp, "number", self.object:get_hp())
+			self.user:hud_change(self.hud.petrol, "number", self.petrol)
+		end
 	end,
 	node_timer=function(self,dtime)
 		self.timer = self.timer + dtime
@@ -178,8 +291,13 @@ minetest.register_entity("quads:quad",{
 			})
 		end
 		if d <= 0 then
+			if self.user then
+				self:on_rightclick(self.user)
+			end
 			self.object:remove()
 			nitroglycerin.explode(pos,{radius=3,set="fire:basic_flame"})
+		else
+			self:hud_update()
 		end
 	end,
 	pos=function(self)
@@ -188,17 +306,6 @@ minetest.register_entity("quads:quad",{
 	yaw=function(self)
 		local a = self.object:get_yaw()
 		return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
-	end,
-	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		if puncher:is_player() and not self.user then
-			local inv = puncher:get_inventory()
-			if inv:room_for_item("main","quads:quad") then
-				inv:add_item("main","quads:quad")
-				self.object:remove()
-			end
-		else
-			self:hurt(tool_capabilities.damage_groups.fleshy or 1)
-		end
 	end,
 	on_step=function(self,dtime)
 		local v = self.object:get_velocity()
@@ -210,17 +317,19 @@ minetest.register_entity("quads:quad",{
 
 		local key = self.user and self.user:get_player_control() or {}
 
-		if key.left then
+		if key.left and self.petrol > 0 then
 			local r = self.object:get_rotation()
 			self.object:set_rotation({x=r.x,y=r.y+0.1,z=r.z})
-		elseif key.right then
+		elseif key.right and self.petrol > 0 then
 			local r = self.object:get_rotation()
 			self.object:set_rotation({x=r.x,y=r.y-0.1,z=r.z})
 		end
 
-		if key.up and self.speed < 20 then
+		if self.user and self.user:get_hp() <=0 then
+			self:on_rightclick(self.user)
+		elseif key.up and self.speed < 20 and self.petrol > 0 then
 			self.speed = self.speed + 0.2
-		elseif key.down and self.speed > -5 and not self.falling then
+		elseif key.down and self.speed > -5 and not self.falling and self.petrol > 0 then
 			self.speed = self.speed - 0.2
 		elseif key.sneak and not self.falling  then
 			self.speed = math.abs(self.speed) > 1 and self.speed * 0.95 or 0
@@ -293,6 +402,13 @@ minetest.register_entity("quads:quad",{
 		end
 
 		if self.falling and math.abs(self.object:get_rotation().x) >=6.28 then
+			local x = self.object:get_rotation().x
+			if x < 0 then
+				exaachievements.customize(self.user,"Quad_frontflip_stunt")
+			elseif x > 0 then
+				exaachievements.customize(self.user,"Quad_backflip_stunt")
+			end
+
 			local r = self.object:get_rotation()
 			self.object:set_rotation({x=0,y=r.y,z=r.z})
 		end
@@ -304,6 +420,15 @@ minetest.register_entity("quads:quad",{
 			y=v.y + self.jump,
 			z=z,
 		})
+
+		if x+z ~= 0 and self.petrol > 0 then
+			if self.petrol ~= math.ceil(self.petrol+0.001) then
+				self.petrol = self.petrol -0.001
+				self:hud_update()
+			else
+				self.petrol = self.petrol -0.001
+			end
+		end
 
 		if self.speed > 4 then
 			for _, ob in ipairs(minetest.get_objects_inside_radius(ap, 1)) do
