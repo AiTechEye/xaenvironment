@@ -19,7 +19,6 @@ minetest.register_craft({
 	},
 })
 
-
 minetest.register_craft({
 	output="quads:petrol_tank_empty",
 	recipe={
