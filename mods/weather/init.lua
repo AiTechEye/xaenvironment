@@ -161,6 +161,15 @@ weather.ac=function()
 			local p=player:get_pos()
 			local range = player:get_player_control().aux1 == false and 1 or 2
 
+			local d = player:get_look_dir()
+			p = apos(p,d.x*5,0,d.z*5)
+
+			if player_style.player_attached[player:get_player_name()] then
+				range = 2
+				local d = player:get_look_dir()
+				p = apos(p,d.x*5,0,d.z*5)
+			end
+
 			if p.y>-20 and p.y<120 and vector.distance(w.pos,p)<=w.size then
 				local name=player:get_player_name()
 --if the player is in another bio, then limit the area to that bio
@@ -296,7 +305,7 @@ weather.add=function(set)
 		players[n]=player
 	end
 	for o=1,n,1 do
-		local p=players[math.random(1,n)+10]
+		local p=players[math.random(1,n+20)]
 		if p then
 			local pos = p:get_pos()
 			pos={x=math.floor(pos.x+0.5),y=math.floor(pos.y+0.5),z=math.floor(pos.z+0.5)}
