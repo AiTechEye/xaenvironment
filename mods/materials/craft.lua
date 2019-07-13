@@ -76,3 +76,8 @@ minetest.register_craft({
 	}
 })
 
+minetest.register_craft({
+	type = "cooking",
+	output = "materials:bread",
+	recipe = "plants:flour",
+})

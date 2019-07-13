@@ -85,3 +85,9 @@ minetest.register_craftitem("materials:string", {
 	inventory_image = "materials_string.png",
 	groups = {flammable = 1},
 })
+
+default.register_eatable("craftitem","materials:bread",1,10,{
+	description = "Bread",
+	inventory_image="materials_bread.png",
+	groups={flammable=3},
+})
