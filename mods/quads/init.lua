@@ -8,6 +8,10 @@ minetest.register_craft({
 		{"materials:plant_extracts_gas","default:carbon_lump","quads:petrol_tank_empty"},
 		{"player_style:bottle","quads:bottle_with_oil",""},
 	},
+	replacements={
+		{"player_style:bottle","materials:glass_bottle"},
+		{"quads:bottle_with_oil","materials:glass_bottle"}
+	}
 })
 
 minetest.register_craft({
