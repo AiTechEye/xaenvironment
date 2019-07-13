@@ -194,6 +194,28 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 		end
 end
 
+default.workbench.result=function(pos,form)
+	local inv = minetest.get_meta(pos):get_inventory()
+	local craft = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")})
+	inv:set_stack("output",1,craft.item)
+	if form=="output" and craft.item:get_name() ~= "" then
+		for i,ite in ipairs(inv:get_list("craft")) do
+			inv:set_stack("craft",i,ite:get_name() .." " .. ite:get_count()-1)
+		end
+		if #craft.replacements > 0 then
+			for i,ite in pairs(craft.replacements) do
+				if inv:room_for_item("craft",ite) then
+					inv:add_item("craft",ite)
+				elseif inv:room_for_item("stock",ite) then
+					inv:add_item("stock",ite)
+				else
+					minetest.add_item({x=pos.x,y=pos.y+1,z=pos.z},ite)
+				end
+			end
+		end
+	end
+end
+
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
@@ -231,26 +253,12 @@ minetest.register_node("default:workbench", {
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		if to_list=="craft" or from_list=="craft" or from_list=="output" then
-			local inv = minetest.get_meta(pos):get_inventory()
-			if from_list=="output" then
-				for i,item in ipairs(inv:get_list("craft")) do
-					inv:set_stack("craft",i,item:get_name() .." " .. item:get_count()-1)
-				end
-			end
-			local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
-			inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
+			default.workbench.result(pos,from_list)
 		end
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname=="craft" or listname=="output" then
-			local inv = minetest.get_meta(pos):get_inventory()
-			if listname=="output" then
-				for i,item in ipairs(inv:get_list("craft")) do
-					inv:set_stack("craft",i,item:get_name() .." " .. item:get_count()-1)
-				end
-			end
-			local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
-			inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
+			default.workbench.result(pos,listname)
 		end
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
