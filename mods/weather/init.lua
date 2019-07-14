@@ -1,7 +1,3 @@
-apos=function(pos,x,y,z)
-	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
-end
-
 weather={
 	mintimeout=200,
 	maxtimeout=1000,
@@ -25,6 +21,61 @@ weather={
 	},
 }
 
+apos=function(pos,x,y,z)
+	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
+end
+
+weather.lightning=function(posA,posB)
+	local pos1,pos2
+	if posA and posB then
+		pos1 = posA
+		pos2 = posB
+	else
+		pos1 = apos(posA,math.random(-40,40),math.random(20,40),math.random(-40,40))
+		pos2 = apos(posA,math.random(-40,40),math.random(-20,30),math.random(-40,40))
+	end
+
+	local d=vector.distance(pos1,pos2)
+	local allpos={}
+	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
+	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5
+	local d=math.sqrt((pos1.x-pos2.x)*(pos1.x-pos2.x) + (pos1.y-pos2.y)*(pos1.y-pos2.y)+(pos1.z-pos2.z)*(pos1.z-pos2.z))
+	v.x = (v.x  / amount)*-1
+	v.y = (v.y  / amount)*-1
+	v.z = (v.z  / amount)*-1
+	for i=1,d,1 do
+		local posn={x=pos1.x+(v.x*i),y=pos1.y+(v.y*i),z=pos1.z+(v.z*i)}
+
+		if minetest.is_protected(posn,"") then
+			return
+
+
+		elseif not default.defpos(posn,"buildable_to") then
+			nitroglycerin.explode(posn,{radius=3})
+			return
+		end
+		minetest.set_node(posn,{name="weather:lightsning"})
+	end
+end
+
+
+minetest.register_node("weather:lightsning", {
+	drawtype = "glasslike",
+	tiles={"default_cloud.png"},
+	floodable = true,
+	pointable=false,
+	buildable_to=true,
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	light_source = 15,
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5)
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.remove_node(pos)
+	end
+})
 
 minetest.register_chatcommand("weather", {
 	params = "<0 - "..weather.strength..">",
@@ -44,6 +95,9 @@ minetest.register_chatcommand("weather", {
 				else
 					weather.currweather[i].strength=a
 					weather.currweather[i].change_strength=1
+
+
+
 					return
 				end
 			end
@@ -95,8 +149,8 @@ minetest.register_on_leaveplayer(function(player)
 	local name=player:get_player_name()
 	if weather.players[name] and weather.players[name].sound then
 		minetest.sound_stop(weather.players[name].sound)
-		weather.players[name]=nil
 	end
+	weather.players[name]=nil
 end)
 
 weather.get_temp=function(pos)
@@ -181,6 +235,66 @@ weather.ac=function()
 						end
 						weather.players[name]={player=player,sound=sound,bio=w.bio}
 					end
+
+						if w.thunder > 0 and w.strength >= 50 then
+							if w.thunder == 1 and math.random(1,50) == 1 then
+								minetest.sound_play("weather_thunder", {to_player = name,gain = 4})
+							elseif w.thunder == 2 then
+								local r = math.random(1,50)
+								if r == 1 then
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 4})
+								elseif r == 2 then
+									minetest.sound_play("weather_lightning", {to_player = name,gain = 4})
+								end
+							elseif w.thunder == 3 then
+								local r = math.random(1,100)
+								if r == 1 then
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 5})
+								elseif r == 2 then
+									for i=1,5 do
+										local id = player:hud_add({
+											hud_elem_type="image",
+											scale = {x=-100, y=-100},
+											name="weather_thunder",
+											position={x=0,y=0},
+											text="default_cloud.png",
+											alignment = {x=1, y=1},
+										})
+										minetest.after(math.random(i*0.01,i*0.01+0.04),function(id,player)
+											player:hud_remove(id)
+										end,id,player)
+									end
+									minetest.after(math.random(1,5),function(name)
+										minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+									end,name)
+								end
+							elseif w.thunder == 4 then
+								local r = math.random(1,100)
+								if r == 1 then
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 5})
+								elseif r == 2 then
+									for i=1,5 do
+										local id = player:hud_add({
+											hud_elem_type="image",
+											scale = {x=-100, y=-100},
+											name="weather_thunder",
+											position={x=0,y=0},
+											text="default_cloud.png",
+											alignment = {x=1, y=1},
+										})
+										minetest.after(math.random(i*0.01,i*0.01+0.04),function(id,player)
+											player:hud_remove(id)
+										end,id,player)
+									end
+									minetest.after(math.random(1,5),function(name)
+										minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+									end,name)
+								elseif r == 3 then
+									minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+									weather.lightning(p)
+								end
+							end
+						end
 
 					for s=1,w.strength*range,1 do
 						local p={x=p.x+math.random(-7*range,7*range),y=p.y+math.random(5,10),z=p.z+math.random(-7*range,7*range)}
@@ -268,7 +382,17 @@ weather.add=function(set)
 		if set.pos.y>-20 and set.pos.y<120 then
 			local b=weather.get_bio(set.pos)
 			if b==1 or b==2 or b==3 then 
-				table.insert(weather.currweather,{timeout=math.random(weather.mintimeout,weather.maxtimeout),pos=set.pos,size=math.random(20,weather.size),strength=set.strength,sound=1,bio=b})
+				local s = set.strength
+				table.insert(weather.currweather,{
+					timeout=math.random(weather.mintimeout,
+					weather.maxtimeout),
+					pos=set.pos,
+					size=math.random(20,weather.size),
+					strength=s,
+					sound=1,
+					bio=b,
+					thunder= b==1 and s >= 90 and math.random(1,4) or 0,
+				})
 			end
 		end
 		return
@@ -297,7 +421,16 @@ weather.add=function(set)
 				if not ins then
 					local b=weather.get_bio(pos)
 					if b==1 or b==2 or b==3 then 
-						table.insert(weather.currweather,{timeout=math.random(weather.mintimeout,weather.maxtimeout),pos=pos,size=math.random(20,weather.size),strength=math.random(2,weather.strength),sound=1,bio=b})
+						local s = math.random(2,weather.strength)
+						table.insert(weather.currweather,{
+							timeout=math.random(weather.mintimeout,weather.maxtimeout),
+							pos=pos,
+							size=math.random(20,weather.size),
+							strength=s,
+							sound=1,
+							bio=b,
+							thunder= b==1 and s >= 50 and math.random(1,10) == 1 and math.random(1,4) or 0,
+						})
 						return
 					end
 				end
