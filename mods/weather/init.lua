@@ -27,34 +27,12 @@ weather={
 
 
 minetest.register_chatcommand("weather", {
-	params = "",
-	description = "weather settings: <set 20-400> or <stop>",
+	params = "<0 - "..weather.strength..">",
+	description = "set weather",
 	privs = {settime=true},
 	func = function(name, param)
-		local a
-		if string.find(param,"set ")~=nil then
-			local s=param.split(param," ")
-			if not s then return end
-			for _,n in pairs(s) do
-				local num=tonumber(n)
-				if num then
-					a=num
-					break
-				end
-			end
-			if not a then
-				minetest.chat_send_player(name, "<weather> /weather set <20-" .. weather.strength ..">")
-				return
-			end
-			a = a <= weather.strength and a or weather.strength
-		elseif string.find(param,"stop")~=nil then
-			a=0
-		else
-			minetest.chat_send_player(name, "<weather> /weather set <20-" .. weather.strength ..">")
-			minetest.chat_send_player(name, "<weather> /weather stop")
-			return
-		end
-
+		local num=tonumber(param)
+		local a = not num and 0 or num < 0 and 0 or num <= weather.strength and num or weather.strength
 		local user=minetest.get_player_by_name(name)
 		if not user then return end
 		local pos=user:get_pos()
@@ -196,7 +174,7 @@ weather.ac=function()
 						end
 						if t>6 and t<19 then
 							player:set_sky({r=149-(s*2),g=154-(s*3),b=209-(s*9),a=255},"plain",{})
-							player:set_clouds({density=0.5+(s*0.05),color={r=240/s,g=240/s,b=255/s,a=229*s}})
+							player:set_clouds({density=0.5+(s*0.05),color={r=240/s,g=240/s,b=250/s,a=229*s}})
 						end
 						if weather.players[name] and weather.players[name].sound then
 							minetest.sound_stop(weather.players[name].sound)
@@ -237,7 +215,7 @@ weather.ac=function()
 --cold/snowy
 				elseif w.bio==3 then
 					if  not weather.players[name] or weather.players[name].bio~=w.bio or weather.currweather[i].change_strength then
-						local s=(w.strength*0.01)*1.2
+						local s=(w.strength*0.01)
 						if t>6 and t<19 then
 							player:set_sky({r=149-(s*2),g=154-(s*3),b=209-(s*9),a=255},"plain",{})
 							player:set_clouds({density=0.5+(s*0.05),color={r=240/s,g=240/s,b=255/s,a=229*s}})
