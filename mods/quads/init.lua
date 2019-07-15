@@ -177,19 +177,20 @@ minetest.register_entity("quads:quad",{
 		if puncher:is_player() and not self.user and (self.user_name =="" or puncher:get_player_name() == self.user_name) then
 			if self.petrol > 0 then
 				minetest.chat_send_player(puncher:get_player_name(),"Empty the tank before pick up the quad ("..math.ceil(self.petrol).." left)")
-				return
+			else
+				local inv = puncher:get_inventory()
+				if inv:room_for_item("main","quads:quad") then
+					inv:add_item("main","quads:quad")
+					self.object:remove()
+				end
 			end
-			local inv = puncher:get_inventory()
-			if inv:room_for_item("main","quads:quad") then
-				inv:add_item("main","quads:quad")
-				self.object:remove()
-			end
-		else
-			self:hurt(tool_capabilities.damage_groups.fleshy or 1)
 		end
+		minetest.after(0,function(self)
+			self:hurt()
+		end, self)
 	end,
 	on_rightclick=function(self, clicker)
-		if self.user and clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "quads:petrol_tank" then
+		if not self.leave and clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "quads:petrol_tank" then
 			if self.petrol+25 <= 100 then
 				self.petrol = self.petrol + 25
 				local item = clicker:get_wielded_item():to_table()
@@ -197,7 +198,7 @@ minetest.register_entity("quads:quad",{
 				clicker:set_wielded_item(item)
 				self:hud_update()
 			end
-		elseif clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "default:dye" then
+		elseif not self.leave and clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "default:dye" then
 			local color = clicker:get_wielded_item():to_table()
 			self.palette_index = color.meta and color.meta.palette_index
 			default.take_item(clicker)
@@ -297,9 +298,12 @@ minetest.register_entity("quads:quad",{
 		return self
 	end,
 	hurt=function(self,d)
-		d = self.object:get_hp() - d or 1
-		self.object:set_hp(d)
-		self:showtext(d .. "/" .. self.hp_max,"F00")
+		local hp = self.object:get_hp()
+		if d then
+			hp = hp - d
+			self.object:set_hp(hp - d)
+		end
+		self:showtext(hp .. "/" .. self.hp_max,"F00")
 		local pos = self:pos()
 		if minetest.get_item_group(minetest.get_node(pos).name, "igniter") > 0 then
 			minetest.add_particlespawner({
@@ -319,8 +323,9 @@ minetest.register_entity("quads:quad",{
 				collisiondetection = true,
 			})
 		end
-		if d <= 0 then
+		if hp <= 0 then
 			if self.user then
+				self.leave = true
 				self:on_rightclick(self.user)
 			end
 			self.object:remove()
