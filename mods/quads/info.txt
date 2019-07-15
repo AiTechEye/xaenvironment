@@ -1,0 +1,11 @@
+Controls:
+
+up/down = drive
+left/right = turn
+shift + left/right = turn slowly
+use + up/down in air = flip
+
+- hurts from fall over 7 blocks
+- explodes when it dies
+- must be contain petrol (fuel) before you can drive it
+you dies if you fails in a flip
