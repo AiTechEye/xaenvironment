@@ -376,7 +376,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			snappy={times={[1]=2,[2]=1.8,[3]=1.5},uses=17,maxlevel=2}
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}},
@@ -445,7 +445,7 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			snappy={times={[1]=2,[2]=1.5,[3]=1.3},uses=20,maxlevel=2}
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=40,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}},
@@ -491,13 +491,57 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
-			snappy={times={[1]=1.8,[2]=1.4,[3]=1.2},uses=22,maxlevel=2}
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=70,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=400},
-	arrow={damage=5},
+	arrow={damage=7},
 	bow={uses=700,level=9},
+})
+
+default.registry_mineral({
+	name="cloud",
+	texture="default_cloud.png",
+	not_lump=true,
+	not_ore=true,
+	not_ingot=true,
+	not_block=true,
+	craftitem="default:cloud",
+	pick={tool_capabilities={
+		full_punch_interval = 1.1,
+		max_drop_level = 1,
+		groupcaps = {
+			cracky={times={[1]=7,[2]=2.3,[3]=1.1},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			crumbly={times={[1]=9,[2]=1.6,[3]=1.1},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.5,[2]=1.3,[3]=0.9},uses=25,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=100,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	arrow={damage=8},
+	bow={uses=1500,level=17},
 })
 
 default.registry_mineral({
@@ -509,7 +553,7 @@ default.registry_mineral({
 		full_punch_interval = 1,
 		max_drop_level = 3,
 		groupcaps = {
-			cracky={times={[1]=5,[2]=2,[3]=1.1},uses=25,maxlevel=3}
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
 	}},
@@ -534,12 +578,12 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
-			snappy={times={[1]=1.5,[2]=1.2,[3]=0.8},uses=35,maxlevel=2}
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=150,maxlevel=2}
 		},
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=800},
-	arrow={damage=6},
+	arrow={damage=10},
 	bow={uses=900,level=12},
 })
 
@@ -557,7 +601,7 @@ default.registry_mineral({
 		clust_size=7,
 		y_max=-70,
 	},
-	arrow={damage=5},
+	arrow={damage=6},
 	bow={uses=800,level=10,shots=3},
 	hoe={uses=600},
 })
@@ -623,12 +667,12 @@ default.registry_mineral({
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
-			snappy={times={[1]=1.2,[2]=1,[3]=0.5},uses=50,maxlevel=2}
+			snappy={times={[1]=1,[2]=0.5,[3]=0.1},uses=500,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
 	}},
 	hoe={uses=1000},
-	arrow={damage=8},
+	arrow={damage=20},
 	bow={uses=1000,level=15},
 })
 
@@ -655,7 +699,24 @@ default.registry_mineral({
 		{"default:electric_lump","default:electric_lump","default:electric_lump"},
 	}}},
 	hoe={uses=1500},
-	arrow={damage=10},
+	arrow={
+		damage=10,
+		on_hit_object=function(self,target,hp,usee,lastpos)
+			local name = target:is_player() and target:get_player_name() or nil
+			if name then
+				default.set_on_player_death(name,"electric_arrow",name,true)
+			end
+			for i=1,math.random(7,15) do
+				minetest.after(math.random(i*0.1,(i*0.1)+0.2),function(target,name,user)
+					if not (name and not default.get_on_player_death(name,"electric_arrow")) and target:get_pos() then
+						user = user and user:get_pos() and user or target
+						default.punch(target,user,3)
+					end
+				end,target,name,user)
+			end
+		end
+
+	},
 	bow={uses=1300,level=17,shots=5},
 })
 
@@ -703,48 +764,4 @@ default.registry_mineral({
 		recipe = "default:uranium_ingot",
 		cooktime = 100
 	}}
-})
-
-default.registry_mineral({
-	name="cloud",
-	texture="default_cloud.png",
-	not_lump=true,
-	not_ore=true,
-	not_ingot=true,
-	not_block=true,
-	craftitem="default:cloud",
-	pick={tool_capabilities={
-		full_punch_interval = 1.1,
-		max_drop_level = 1,
-		groupcaps = {
-			cracky={times={[1]=7,[2]=2.3,[3]=1.1},uses=25,maxlevel=2}
-		},
-		damage_groups={fleshy=4}
-	}},
-	shovel={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 2,
-		groupcaps = {
-			crumbly={times={[1]=9,[2]=1.6,[3]=1.1},uses=25,maxlevel=2}
-		},
-		damage_groups={fleshy=3}
-	}},
-	axe={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 2,
-		groupcaps = {
-			choppy={times={[1]=2.5,[2]=1.3,[3]=0.9},uses=25,maxlevel=2}
-		},
-		damage_groups={fleshy=5}
-	}},
-	vineyardknife={tool_capabilities={
-		full_punch_interval = 1.5,
-		max_drop_level = 2,
-		groupcaps = {
-			snappy={times={[1]=1.3,[2]=1.1,[3]=0.5},uses=25,maxlevel=2}
-		},
-		damage_groups={fleshy=3}
-	}},
-	arrow={damage=7},
-	bow={uses=1500,level=17},
 })

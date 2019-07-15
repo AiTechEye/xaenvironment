@@ -17,7 +17,9 @@ end)
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	if default.on_player_death[name] then
-		default.on_player_death[name]()
+		if type(default.on_player_death[name]) == "function" then
+			default.on_player_death[name]()
+		end
 		default.on_player_death[name] = nil
 	end
 end)
@@ -405,7 +407,7 @@ default.registry_mineral=function(def)
 			full_punch_interval = 0.5,
 			max_drop_level = 0,
 			groupcaps = {
-				snappy={times={[1]=0.5,[2]=1.1,[3]=0.5},uses=20,maxlevel=1},
+				snappy={times={[1]=1.5,[2]=1,[3]=0.5},uses=20,maxlevel=1},
 			},
 			damage_groups={fleshy=2},
 		}
