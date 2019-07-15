@@ -1,5 +1,6 @@
 bones={
-	enabled=minetest.settings:get_bool("xaenvironment_itemlosing") ==  true
+	enabled=minetest.settings:get_bool("xaenvironment_itemlosing") ==  true,
+	corpses={},
 }
 minetest.register_privilege("bones", {
 	description = "Don't droping bones",
@@ -48,14 +49,22 @@ minetest.register_craftitem("bones:bone", {
 	wield_scale={x=2,y=2,z=2},
 })
 
+minetest.register_on_leaveplayer(function(player)
+	bones.corpses[player:get_player_name()] = nil
+end)
+
+minetest.register_on_respawnplayer(function(player)
+	bones.corpses[player:get_player_name()] = nil
+end)
+
 minetest.register_on_dieplayer(function(player)
 	if bones.enabled then
 		local name = player:get_player_name()
 
-		if minetest.check_player_privs(name, {bones=true}) then
+		if bones.corpses[name] or minetest.check_player_privs(name, {bones=true}) then
 			return
 		end
-
+		bones.corpses[name] = true
 		local pos = player:get_pos()
 		local bpos
 		if not minetest.is_protected(pos,name) then
