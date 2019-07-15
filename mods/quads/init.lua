@@ -147,7 +147,7 @@ minetest.register_entity("quads:quad",{
 	jump = 0,
 	timer = 0,
 	get_staticdata = function(self)
-		return minetest.serialize({petrol=self.petrol,user_name=self.user_name})
+		return minetest.serialize({petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index})
 	end,
 	anim=function(self,s)
 		if self.an ~= s then
@@ -160,7 +160,18 @@ minetest.register_entity("quads:quad",{
 		local s = minetest.deserialize(staticdata) or {}
 		self.quad = math.random(1,9999)
 		self.petrol = s.petrol or 0
+		self.palette_index = s.palette_index
 		self.user_name = s.user_name or ""
+		self:color(self)
+	end,
+	color=function(self)
+		if self.palette_index then
+			local color = "^"..default.dye_texturing(self.palette_index,{opacity=200,image_w=8,image_h=8})
+			self.object:set_properties({textures={
+				"quads_quad1.png" .. color,
+				"quads_quad1.png" .. color
+			}})
+		end
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		if puncher:is_player() and not self.user and (self.user_name =="" or puncher:get_player_name() == self.user_name) then
@@ -178,7 +189,7 @@ minetest.register_entity("quads:quad",{
 		end
 	end,
 	on_rightclick=function(self, clicker)
-		if clicker:is_player() and clicker:get_wielded_item():get_name() == "quads:petrol_tank" then
+		if self.user and clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "quads:petrol_tank" then
 			if self.petrol+25 <= 100 then
 				self.petrol = self.petrol + 25
 				local item = clicker:get_wielded_item():to_table()
@@ -186,7 +197,12 @@ minetest.register_entity("quads:quad",{
 				clicker:set_wielded_item(item)
 				self:hud_update()
 			end
-		elseif self.user and self.user:get_player_name() == self.user_name then
+		elseif clicker:get_player_name() == self.user_name and clicker:get_wielded_item():get_name() == "default:dye" then
+			local color = clicker:get_wielded_item():to_table()
+			self.palette_index = color.meta and color.meta.palette_index
+			default.take_item(clicker)
+			self:color(self)
+		elseif self.user and clicker:get_player_name() == self.user_name then
 			self.user:set_detach()
 			self.user:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 			player_style.player_attached[self.user_name] = nil
