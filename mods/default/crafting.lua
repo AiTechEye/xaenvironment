@@ -261,10 +261,10 @@ minetest.register_node("default:workbench", {
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname=="craft" or listname=="output" then
-			default.workbench.result(pos,from_list)
-			minetest.after(0,function(pos,from_list)
-				default.workbench.result(pos,from_list)
-			end,pos,from_list)
+			default.workbench.result(pos,listname)
+			minetest.after(0,function(pos,listname)
+				default.workbench.result(pos,listname)
+			end,pos,listname)
 		end
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
