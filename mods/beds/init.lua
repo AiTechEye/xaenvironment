@@ -1,5 +1,22 @@
 beds={}
 
+minetest.after(0,function()
+player_style.register_button({
+	name="Bed",
+	image="beds:bed",
+	type="item_image",
+	info="Go to bed",
+	action=function(player)
+		local pos = player:get_meta():get_string("beds_position")
+		if pos ~= "" then
+			player:set_pos(minetest.string_to_pos(pos))
+			return true
+		else
+			minetest.chat_send_player(player:get_player_name(),"You have to sleep in a bed first")
+		end
+	end
+})
+end)
 minetest.register_on_respawnplayer(function(player)
 	local pos = player:get_meta():get_string("beds_position")
 	if pos ~= "" then
