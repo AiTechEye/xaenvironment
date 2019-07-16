@@ -13,7 +13,8 @@ minetest.register_node("bones:boneblock", {
 	groups = {dig_immediate = 3,flammable=3},
 	paramtype2="facedir",
 	can_dig = function(pos, player)
-		return minetest.get_meta(pos):get_inventory():is_empty("main")
+		local owner = minetest.get_meta(pos):get_string("owner")
+		return minetest.get_meta(pos):get_inventory():is_empty("main") and (owner == "" or owner == player:get_player_name())
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
@@ -26,7 +27,12 @@ minetest.register_node("bones:boneblock", {
 		local m = minetest.get_meta(pos)
 		local inv = m:get_inventory()
 		local pinv = player:get_inventory()
-		for i,v in pairs(inv:get_list("main")) do
+		local main = inv:get_list("main")
+		local owner = m:get_string("owner")
+		if not main or owner ~= "" and owner ~= player:get_player_name() then
+			return
+		end
+		for i,v in pairs(main) do
 			if pinv:room_for_item("main",v) then
 				pinv:add_item("main",v)
 				inv:remove_item("main",v)
@@ -41,7 +47,16 @@ minetest.register_node("bones:boneblock", {
 			m:set_string("formspec","")
 
 		end
-	end
+	end,
+	on_timer=function(pos, elapsed)
+		local m = minetest.get_meta(pos)
+		if default.date("s",m:get_int("date")) >= 24 then
+			m:set_string("infotext",m:get_string("owner").."'s old remains")
+			m:set_string("owner","")
+			return false
+		end
+		return true
+	end,
 })
 minetest.register_craftitem("bones:bone", {
 	description = "Bone",
@@ -101,6 +116,12 @@ minetest.register_on_dieplayer(function(player)
 			for i,v in pairs(pinv:get_list("main")) do
 				inv:add_item("main",v)
 			end
+
+			m:set_int("date",default.date("get"))
+
+			m:set_string("owner",name)
+			m:set_string("infotext",name.."'s remains")
+			minetest.get_node_timer(bpos):start(10)
 		else
 			for i,v in pairs(pinv:get_list("craft")) do
 				minetest.add_item(pos,v)
