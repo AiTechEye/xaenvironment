@@ -254,11 +254,17 @@ minetest.register_node("default:workbench", {
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		if to_list=="craft" or from_list=="craft" or from_list=="output" then
 			default.workbench.result(pos,from_list)
+			minetest.after(0,function(pos,from_list)
+				default.workbench.result(pos,from_list)
+			end,pos,from_list)
 		end
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname=="craft" or listname=="output" then
-			default.workbench.result(pos,listname)
+			default.workbench.result(pos,from_list)
+			minetest.after(0,function(pos,from_list)
+				default.workbench.result(pos,from_list)
+			end,pos,from_list)
 		end
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
