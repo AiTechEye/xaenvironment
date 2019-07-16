@@ -376,10 +376,18 @@ minetest.register_entity("nitroglycerin:ice",{
 			self.object:remove()
 		end
 		self.object:set_acceleration({x = 0, y = -10, z = 0})
-		self.object:set_velocity({x = 0, y = -10, z = 0})
+		--self.object:set_velocity({x = 0, y = -10, z = 0})
 	end,
 	on_step = function(self, dtime)
 		self.timer=self.timer+dtime
+
+		if not self.falling and self.object:get_velocity().y < 0 then
+			self.falling=self.object:get_pos().y
+		elseif self.falling and self.object:get_velocity().y >=0 then
+			self.timer2=1
+			self.timer=1
+		end
+
 		if self.timer<1 then return true end
 		self.timer=0
 		self.timer2=self.timer2+dtime
