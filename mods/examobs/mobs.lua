@@ -633,6 +633,43 @@ examobs.register_bird({
 	end
 })
 
+examobs.register_bird({
+	name = "hawk",
+	aggressivity = 1,
+	is_food=function(self,item)
+		return true
+	end,
+	hp = 20,
+	dmg = 4,
+	team = "hawk",
+	type = "animal",
+	run_speed = 4,
+	walk_speed = 2,
+	textures={"examobs_hawk.png"},
+	on_spawn=function(self)
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		self.object:set_properties({
+			visual_size={x=2,y=2},
+			collisionbox={-0.4,-0.33,-0.5,0.5,0.3,0.5}
+		})
+	end,
+	step=function(self)
+		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
+			local en = ob:get_luaentity()
+			if en and en.bird and self.team ~= en.team and examobs.visiable(self.object,ob) then
+				self.fight = ob
+				return
+			end
+		end
+
+	end,
+	is_food=function(self,item)
+		return true
+	end
+})
+
 examobs.register_fish({
 	color = true,
 	on_spawn=function(self)

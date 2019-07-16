@@ -6,6 +6,7 @@ examobs.register_bird=function(def)
 	def2.mesh = def.mesh or "examobs_bird.b3d"
 	def2.type = def.type or "animal"
 	def2.team = def.team or "bird"
+	def2.bird = true
 	def2.dmg = def.dmg or 1
 	def2.hp = def.hp or 5
 	def2.aggressivity = def.aggressivity or -2
