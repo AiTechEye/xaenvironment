@@ -270,6 +270,7 @@ minetest.register_entity("default:arrow",{
 			self.object:set_acceleration({x=0, y=0, z=0})
 			self.stuck=true
 			self.timer2=0.2
+			minetest.check_for_falling(pos)
 			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,{x=self.x,y=self.y,z=self.z})
 			minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 			return self
