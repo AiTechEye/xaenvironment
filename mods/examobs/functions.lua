@@ -538,7 +538,25 @@ examobs.gethp=function(ob,even_dead)
 	return en and ((even_dead and en.examob and en.dead and en.hp) or (en.examob and en.dead and 0) or en.hp or en.health) or ob:get_hp() or 0
 end
 
-examobs.viewfield=function(self,ob)
+examobs.viewfield=function(self,ob2)
+	local ob1 = self and self.object or self
+	if not ob1 and ob2 then return false end
+	local p1 = ob1:get_pos()
+	local a = vector.normalize(vector.subtract(ob2:get_pos(), p1))
+	local b
+	if ob1:get_luaentity() then
+		local yaw = math.floor(ob1:get_yaw()*100)/100
+		b = {x=math.sin(yaw)*-1,y=0,z=math.cos(yaw)*1}
+	elseif ob1:is_player() then
+		b=ob1:get_look_dir()
+	else
+		return false
+	end
+	local deg = math.acos((a.x*b.x)+(a.y*b.y)+(a.z*b.z)) * (180 / math.pi)
+	return not (deg < 0 or deg > 50) --45
+end
+
+examobs.faceside=function(self,ob)
 	if not (self and self.object and ob) then return false end
 	local pos1=self.object:get_pos()
 	local pos2 = type(ob) == "userdata" and ob:get_pos() or ob
