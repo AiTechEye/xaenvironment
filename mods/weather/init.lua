@@ -156,19 +156,17 @@ end)
 weather.get_temp=function(pos)
 	if pos.y<-50 then return 0 end
 	local p={x=math.floor(pos.x),y=0,z=math.floor(pos.z)}
-	return minetest.get_perlin(weather.perlin):get2d({x=p.x,y=p.z}) - 40
+	return minetest.get_perlin(weather.perlin):get2d({x=p.x,y=p.z})
 end
-
-
 
 weather.get_bio=function(pos)
 	local green,dry,cold=0,0,0
 
 	local tmp=weather.get_temp(pos)
 
-	if tmp>25 then
+	if tmp>95 then
 		dry=dry+1
-	elseif tmp<=0 then
+	elseif tmp<=20 then
 		cold=cold+1
 	else
 		green=green+1
