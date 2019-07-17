@@ -369,7 +369,7 @@ examobs.fly=function(self,run)
 		local x = ((pos1.x-pos2.x)/d)*run
 		local y = ((pos1.y-pos2.y)/d)*run
 		local z = ((pos1.z-pos2.z)/d)*run
-		self.object:set_velocity({x=x,y=y,z=z})
+		self.object:set_velocity({x=examobs.num(x),y=examobs.num(y),z=examobs.num(z)})
 		self.on_fly(self,x,y,z)
 		return true
 	end
