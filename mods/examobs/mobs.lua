@@ -232,6 +232,7 @@ examobs.register_mob({
 })
 examobs.register_mob({
 	name = "chicken",
+	bird=true,
 	swiming = 0,
 	textures = {"examobs_chicken1.png"},
 	mesh = "examobs_chicken.b3d",
@@ -413,6 +414,7 @@ examobs.register_mob({
 
 examobs.register_mob({
 	name = "duck",
+	bird=true,
 	textures = {"examobs_duck1.png"},
 	mesh = "examobs_duck.b3d",
 	type = "animal",
@@ -658,7 +660,7 @@ examobs.register_bird({
 	step=function(self)
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 			local en = ob:get_luaentity()
-			if en and en.bird and self.team ~= en.team and examobs.visiable(self.object,ob) then
+			if en and en.bird and en.examob ~= self.examob and examobs.visiable(self.object,ob) then
 				self.fight = ob
 				return
 			end
@@ -666,7 +668,7 @@ examobs.register_bird({
 
 	end,
 	is_food=function(self,item)
-		return true
+		return minetest.get_item_group(item,"meat") > 0
 	end
 })
 
