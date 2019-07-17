@@ -43,7 +43,7 @@ examobs.register_mob({
 		attack = {x=53,y=65},
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
-	spawn_on={"default:dirt_with_snow","default:dirt_with_coniferous_grass"},
+	spawn_on={"default:dirt_with_snow","default:dirt_with_coniferous_grass","default:dirt_with_grass"},
 	on_click=function(self,clicker)
 		if clicker:is_player() then
 			local item = clicker:get_wielded_item():get_name()
