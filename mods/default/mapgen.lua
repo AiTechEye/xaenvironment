@@ -213,20 +213,87 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 -- =======================Decorations
 --||||||||||||||||
-minetest.register_on_mods_loaded(function()
-	default.cloud_land_map={
-		offset=0,
-		scale=1,
-		spread={x=350,y=18,z=350},
-		seeddiff=24,
-		octaves=3,
-		persist=0.6,
-		lacunarity=2,
-		flags="eased",
-	}
-end)
+default.cloud_land_map={
+	offset=0,
+	scale=1,
+	spread={x=350,y=18,z=350},
+	seeddiff=24,
+	octaves=3,
+	persist=0.6,
+	lacunarity=2,
+	flags="eased",
+}
+
+default.water_land_map={
+	offset=0,
+	scale=1,
+	spread={x=35,y=18,z=35},
+	seeddiff=24,
+	octaves=3,
+	persist=0.6,
+	lacunarity=2,
+	flags="eased",
+}
+
+
 
 minetest.register_on_generated(function(minp, maxp, seed)
+
+	if minp.y> -50 and maxp.y< 50 then
+--waterland
+		local depth = 10
+		local height = -50
+		local heat = minetest.get_heat(minp)
+
+		local lenth = maxp.x-minp.x+1
+		local cindx = 1
+		local map = minetest.get_perlin_map(default.water_land_map,{x=lenth,y=lenth,z=lenth}):get_3d_map_flat(minp)
+
+		local water= minetest.get_content_id("default:salt_water_source")
+		local sand = minetest.get_content_id("default:sand")
+		local dsand = minetest.get_content_id("default:desert_sand")
+		local stone = minetest.get_content_id("default:stone")
+		local dstone = minetest.get_content_id("default:desert_stone")
+
+		local sandtype = sand
+
+		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vm:get_data()
+
+		for z=minp.z,maxp.z do
+		for y=minp.y,maxp.y do
+			local id=area:index(minp.x,y,z)
+		for x=minp.x,maxp.x do
+			if y > -20 and y < -6 and (data[id] == sand or data[id] == dsand) then
+				height = y
+				sandtype = data[id]
+			end
+			local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
+			if (data[id] == water or data[id] == sand or data[id] == dsand) and y >= height-depth and y <= -6 and den > 0.7 then
+				data[id] = stone
+				data[id+area.ystride] = sandtype
+
+				if sandtype ~= dsand then
+					if heat > 85 and math.random(1,40) == 1 then
+						data[id+area.ystride] = minetest.get_content_id("coral"..math.random(1,2).."_"..math.random(1,20))
+					elseif math.random(1,10) == 1 then
+						data[id+area.ystride] = minetest.get_content_id("plants:kelp"..math.random(1,4))
+					elseif math.random(1,10) == 1 then
+						data[id+area.ystride] = minetest.get_content_id("plants:seaweed"..math.random(1,3))
+					end
+				else
+					data[id] = dstone
+				end
+			end
+			cindx=cindx+1
+			id=id+1
+		end
+		end
+		end
+		vm:set_data(data)
+		vm:write_to_map()
+	end
 
 	if minp.y> 200 and maxp.y< 300 then
 --cloudland

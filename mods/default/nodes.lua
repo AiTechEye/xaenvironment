@@ -688,6 +688,7 @@ minetest.register_node("default:salt_water_source", {
 	pointable = false,
 	diggable = false,
 	buildable_to = true,
+	sunlight_propagates = true,
 	drop = "",
 	drowning = 1,
 	liquidtype = "source",
