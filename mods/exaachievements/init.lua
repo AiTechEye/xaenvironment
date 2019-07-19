@@ -322,9 +322,12 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	if a then
 		exaachievements.skills(a,1,digger,ItemStack(oldnode.name),pos)
 	end
-	for i,v in pairs(minetest.registered_items[oldnode.name].groups) do
-		if exaachievements.events.dig[i] then
-			exaachievements.skills(exaachievements.events.dig[i],1,digger,ItemStack(oldnode.name),pos)
+	local def = minetest.registered_items[oldnode.name]
+	if def and def.groups then
+		for i,v in pairs(def.groups) do
+			if exaachievements.events.dig[i] then
+				exaachievements.skills(exaachievements.events.dig[i],1,digger,ItemStack(oldnode.name),pos)
+			end
 		end
 	end
 end)
