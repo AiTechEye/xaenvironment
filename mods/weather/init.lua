@@ -189,7 +189,9 @@ weather.ac=function()
 	for i, w in pairs(weather.currweather) do
 		for _,player in ipairs(minetest.get_connected_players()) do
 			local p=player:get_pos()
+
 			local range = player:get_player_control().aux1 == false and 1 or 2
+			local water = minetest.get_item_group(minetest.get_node(apos(p,0,1)).name,"water") > 0
 
 			local d = player:get_look_dir()
 			p = apos(p,d.x*5,0,d.z*5)
@@ -200,7 +202,7 @@ weather.ac=function()
 				p = apos(p,d.x*5,0,d.z*5)
 			end
 
-			if p.y>-20 and p.y<120 and vector.distance(w.pos,p)<=w.size then
+			if p.y>-20 and p.y<120 and vector.distance(w.pos,p)<=w.size and not water then
 				local name=player:get_player_name()
 --if the player is in another bio, then limit the area to that bio
 				weather.timecheck=weather.timecheck+1
