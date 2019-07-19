@@ -2,9 +2,11 @@ default.register_pebble=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local ddef = table.copy(def.decoration or {})
 	local name = def.name
+	local block = def.block
 
 	def.decoration =			nil
 	def.name =			nil
+	def.block =			nil
 	def.groups =			def.groups or			{}
 	def.groups.dig_immediate =		def.groups.dig_immediate or		3
 	def.description =			def.description or			string.gsub(name,"_"," ")
@@ -43,8 +45,48 @@ default.register_pebble=function(def)
 		y_max = ddef.y_max or 31000,
 		decoration = mod.."pebble_" ..name,
 		spawn_by = ddef.spawn_by,
-	--	num_spawn_by = 1,
 	})
+
+	if block then
+		local bdef = table.copy(def)
+
+		bdef.mesh="default_blockpebble.obj"
+		bdef.tiles[2] = bdef.tiles[2] or "default_sand.png"
+		bdef.sunlight_propagates = false
+		bdef.visual_scale = 1
+		bdef.drop = mod.."pebble_" ..name
+		bdef.collision_box = {
+			type = "fixed",
+			fixed = {{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},{-0.3, 0.5, -0.3, 0.3, 0.8, 0.3}}
+		}
+		bdef.selection_box = {
+			type = "fixed",
+			fixed = {{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},{-0.3, 0.5, -0.3, 0.3, 0.8, 0.3}}
+		}
+		bdef.after_destruct=function(pos)
+			minetest.set_node(pos,{name=block})
+		end
+		minetest.register_node(mod.."pebbleblock_" ..name, bdef)
+		minetest.register_decoration({
+			deco_type = "simple",
+			place_on = ddef.place_on or {block},
+			sidelen = 16,
+			noise_params = {
+				offset = 0.002,
+				scale = 0.004,
+				spread = {x = 100, y = 100, z = 100},
+				seed = ddef.seed,
+				octaves = 3,
+				persist = 0.6
+			},
+			y_min = ddef.y_min or -50,
+			y_max = ddef.y_max or 5,
+			decoration = mod.."pebbleblock_" ..name,
+			spawn_by = ddef.spawn_by,
+			place_offset_y = -1,
+			flags = "force_placement",
+		})
+	end
 end
 
 default.register_plant=function(def)
