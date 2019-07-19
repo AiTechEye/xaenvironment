@@ -8,7 +8,27 @@ default={
 	registered_bios={},
 	registered_bios_list={},
 	bucket={},
-	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit"))
+	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit")),
+	cloud_land_map={
+		offset=0,
+		scale=1,
+		spread={x=350,y=18,z=350},
+		seeddiff=24,
+		octaves=3,
+		persist=0.6,
+		lacunarity=2,
+		flags="eased",
+	},
+	water_land_map={
+		offset=0,
+		scale=1,
+		spread={x=35,y=18,z=35},
+		seeddiff=24,
+		octaves=3,
+		persist=0.6,
+		lacunarity=2,
+		flags="eased",
+	},
 }
 
 dofile(minetest.get_modpath("default") .. "/functions.lua")

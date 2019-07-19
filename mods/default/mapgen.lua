@@ -213,29 +213,6 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 -- =======================Decorations
 --||||||||||||||||
-default.cloud_land_map={
-	offset=0,
-	scale=1,
-	spread={x=350,y=18,z=350},
-	seeddiff=24,
-	octaves=3,
-	persist=0.6,
-	lacunarity=2,
-	flags="eased",
-}
-
-default.water_land_map={
-	offset=0,
-	scale=1,
-	spread={x=35,y=18,z=35},
-	seeddiff=24,
-	octaves=3,
-	persist=0.6,
-	lacunarity=2,
-	flags="eased",
-}
-
-
 
 minetest.register_on_generated(function(minp, maxp, seed)
 
@@ -285,6 +262,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				else
 					data[id] = dstone
 				end
+
+
+
+
+
 			end
 			cindx=cindx+1
 			id=id+1

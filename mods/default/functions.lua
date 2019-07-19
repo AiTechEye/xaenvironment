@@ -621,3 +621,33 @@ default.dye_coloring=function(pos, node, player, pointed_thing)
 		minetest.swap_node(pos,{name=node.name,param2=color.meta.palette_index or 1})
 	end
 end
+
+default.treasure=function(def)
+	local items={}
+	def.node = def.node or "default:chest"
+	if not (def.items or def.level) then
+		for i,v in pairs(minetest.registered_items) do
+			if not (v.groups and (v.groups.not_in_creative_inventory or v.groups.not_in_craftguide)) and v.drop ~= "" then
+				table.insert(items,i)
+			end
+		end
+	elseif not def.items and def.level > 0 then
+		for i,v in pairs(minetest.registered_items) do
+			if v.groups and v.groups.treasure <= def.level then
+				table.insert(items,i)
+			end
+		end
+	else
+		items = def.items
+	end
+	minetest.set_node(def.pos,{name=def.node})
+	local m = minetest.get_meta(def.pos):get_inventory()
+	local size = m:get_size("main")
+	local its = #items
+
+	for i=1,size do
+		if math.random(1,def.chance or math.floor(size/2)) == 1 then
+			m:set_stack(def.list or "main",i,items[math.random(1,its)].." ".. math.random(1,10))
+		end
+	end
+end
