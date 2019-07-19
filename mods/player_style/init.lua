@@ -414,8 +414,9 @@ end)
 
 player_style.player_run=function(name,player,a)
 	player_style.hunger(player,-0.001)
+	local hunger = player_style.players[name].hunger
 	if player_style.player_dive[name] then
-	elseif a and not player_style.player_running[name] and player_style.players[name].hunger.level > 15 then
+	elseif a and not player_style.player_running[name] and (hunger and hunger.level or 20 > 15) then
 		player_style.player_running[name] = {wallrun=1}
 		player:set_physics_override({
 			jump=1.25,
