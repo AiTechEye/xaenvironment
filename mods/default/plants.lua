@@ -12,6 +12,7 @@ default.register_blockdetails=function(def)
 	def.node.tiles = def.node.tiles or {"default_sand.png","default_stick.png"}
 	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1}
 	def.node.drowning = def.node.drowning or 1
+	def.paramtype2 = def.paramtype2 or "facedir"
 	def.node.after_destruct = def.node.block and function(pos)
 		minetest.set_node(pos,{name=def.node.block})
 	end or nil

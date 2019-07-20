@@ -96,7 +96,7 @@ node = {
 		builtin_falling_node.set_node(self,node,meta)
 		self.itemstring = node.name
 		local def = default.def(self.itemstring)
-		local s = def.sounds
+		local s = def.sounds or {}
 		self.damage = def.damage_per_second
 		self.damage = self.damage > 0 and self.damage or nil
 		self.sound = (s.dug and s.dug.name) or (s.dig and s.dig.name) or (s.footstep and s.footstep.name) or (s.place and s.place.name)

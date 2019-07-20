@@ -377,6 +377,7 @@ default.register_pebble({
 		place_on={"default:desert_stone","default:desert_sand"},
 	}	
 })
+
 default.register_blockdetails({
 	name="starfish",
 	node={
@@ -386,8 +387,15 @@ default.register_blockdetails({
 	},
 	item={},
 })
-
-
+default.register_blockdetails({
+	name="shell",
+	node={
+		tiles={"default_sand.png","default_shell.png"},
+		drop="default:shell",
+		block="default:sand",
+	},
+	item={},
+})
 
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",

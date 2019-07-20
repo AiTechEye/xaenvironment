@@ -646,7 +646,7 @@ default.treasure=function(def)
 	local its = #items
 
 	for i=1,size do
-		if math.random(1,def.chance or math.floor(size/2)) == 1 then
+		if math.random(1,def.chance or math.floor(size/4)) == 1 then
 			m:set_stack(def.list or "main",i,items[math.random(1,its)].." ".. math.random(1,10))
 		end
 	end

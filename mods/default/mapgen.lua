@@ -233,6 +233,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local dstone = minetest.get_content_id("default:desert_stone")
 
 		local sandtype = sand
+		local treasure
+		local gened
 
 		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
 		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
@@ -250,7 +252,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if (data[id] == water or data[id] == sand or data[id] == dsand) and y >= height-depth and y <= -6 and den > 0.7 then
 				data[id] = stone
 				data[id+area.ystride] = sandtype
-
+				gened = true
 				if sandtype ~= dsand then
 					if heat > 85 and math.random(1,40) == 1 then
 						data[id+area.ystride] = minetest.get_content_id("coral"..math.random(1,2).."_"..math.random(1,20))
@@ -262,11 +264,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				else
 					data[id] = dstone
 				end
-
-
-
-
-
+			elseif not treasure and gened and den > 0.6 and data[id] == water and data[id-area.ystride] == sandtype and data[id+area.ystride] == water then
+				local pos = area:position(id)
+				treasure = true
+				minetest.after(0,function(pos)
+					default.treasure({pos=pos})
+				end,pos)
 			end
 			cindx=cindx+1
 			id=id+1
