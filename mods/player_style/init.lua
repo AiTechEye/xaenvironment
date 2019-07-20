@@ -8,6 +8,7 @@ player_style={
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst"),
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger"),
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage"),
+	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death"),
 }
 dofile(minetest.get_modpath("player_style") .. "/stuff.lua")
 
@@ -46,12 +47,28 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	return hp_change
 end,true)
 
+minetest.register_on_dieplayer(function(player)
+	if player_style.survive_black_death then
+		player_style.players[player:get_player_name()].black_death_id = player:hud_add({
+			hud_elem_type="image",
+			scale = {x=-100, y=-100},
+			name="black_death",
+			position={x=0,y=0},
+			text="player_style_black.png",
+			alignment = {x=1, y=1},
+		})
+	end
+end)
+
 minetest.register_on_respawnplayer(function(player)
 	local name = player:get_player_name()
 	player_style.player_attached[name] = nil
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
+	if player_style.players[name].black_death_id then
+		player:hud_remove(player_style.players[name].black_death_id)
+	end
 end)
 
 minetest.register_on_newplayer(function(player)
