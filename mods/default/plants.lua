@@ -1,3 +1,54 @@
+default.register_blockdetails=function(def)
+	local mod = minetest.get_current_modname() ..":"
+	local name = def.name
+
+	def=def or {}
+	def.node=def.node or {}
+	def.ddef = def.ddef or {}
+	def.node.block = def.node.block or "default:sand"
+	def.node.description = def.node.description or "Sand with " ..name
+	def.node.drawtype = def.node.drawtype or "mesh"
+	def.node.mesh = def.node.mesh or "default_blockdetails.obj"
+	def.node.tiles = def.node.tiles or {"default_sand.png","default_stick.png"}
+	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1}
+	def.node.drowning = def.node.drowning or 1
+	def.node.after_destruct = def.node.block and function(pos)
+		minetest.set_node(pos,{name=def.node.block})
+	end or nil
+
+	if def.item then
+		def.node.drop=mod..name
+	end
+
+	minetest.register_node(mod.."blockdetails_"..name, def.node,mod..name)
+
+	minetest.register_decoration({
+		deco_type = "simple",
+		place_on = def.ddef.place_on or def.node.block and {def.node.block} or "defaut:sand",
+		sidelen = 16,
+		noise_params = {
+			offset = 0.001,
+			scale = 0.002,
+			spread = {x = 200, y = 200, z = 200},
+			seed = def.ddef.seed,
+			octaves = 3,
+			persist = 0.6
+		},
+		y_min = def.ddef.y_min or -50,
+		y_max = def.ddef.y_max or 0,
+		decoration = mod.."blockdetails_"..name,
+		spawn_by = def.ddef.spawn_by,
+		place_offset_y = -1,
+		flags = "force_placement",
+	})
+
+	if def.item then
+		def.item.description = def.item.description or def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+		def.item.inventory_image = def.item.inventory_image or def.node.tiles[2]
+		minetest.register_craftitem(mod..name, def.item)
+	end
+end
+
 default.register_pebble=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local ddef = table.copy(def.decoration or {})
@@ -80,7 +131,7 @@ default.register_pebble=function(def)
 				persist = 0.6
 			},
 			y_min = ddef.y_min or -50,
-			y_max = ddef.y_max or 5,
+			y_max = ddef.y_max or 0,
 			decoration = mod.."pebbleblock_" ..name,
 			spawn_by = ddef.spawn_by,
 			place_offset_y = -1,
