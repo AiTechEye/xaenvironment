@@ -253,7 +253,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[id] = stone
 				data[id+area.ystride] = sandtype
 				gened = true
-				if sandtype ~= dsand then
+				if sandtype == sand and den < 0.8 then
 					if heat > 85 and math.random(1,40) == 1 then
 						data[id+area.ystride] = minetest.get_content_id("coral"..math.random(1,2).."_"..math.random(1,20))
 					elseif math.random(1,10) == 1 then
@@ -261,10 +261,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif math.random(1,10) == 1 then
 						data[id+area.ystride] = minetest.get_content_id("plants:seaweed"..math.random(1,3))
 					end
-				else
+				elseif sandtype == dsand then
 					data[id] = dstone
 				end
-			elseif not treasure and gened and den > 0.6 and data[id] == water and data[id-area.ystride] == sandtype and data[id+area.ystride] == water then
+			elseif not treasure and gened and den > 0.6 and y <= 7 and data[id] == water and data[id-area.ystride] == sandtype and data[id+area.ystride] == water then
 				local pos = area:position(id)
 				treasure = true
 				minetest.after(0,function(pos)
