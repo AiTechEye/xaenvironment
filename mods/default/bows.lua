@@ -128,7 +128,12 @@ bows.shoot=function(itemstack, user, pointed_thing)
 			local y=math.random(-1,1)*0.1
 			local z=math.random(-1,1)*0.1
 
-			local e=minetest.add_entity({x=pos.x+x,y=pos.y+1.5+y,z=pos.z+z}, "default:arrow")
+			local e=minetest.add_entity(
+				{x=pos.x+x,
+				y=pos.y+((user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.5 or 1.5)+y,
+				z=pos.z+z
+			}, "default:arrow")
+
 			e:set_velocity({x=dir.x*level, y=dir.y*level, z=dir.z*level})
 			e:set_acceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
 			e:set_yaw(user:get_look_yaw()+math.pi)
