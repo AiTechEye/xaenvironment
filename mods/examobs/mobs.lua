@@ -665,7 +665,13 @@ examobs.register_bird({
 				return
 			end
 		end
-
+	end,
+	before_punching=function(self)
+		local en = self.fight:get_luaentity()
+		if en and examobs.gethp(self.fight)-self.dmg <=0 then
+			en.inv["examobs:feather"]=nil
+			en.inv["examobs:chickenleg"]=nil
+		end
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0

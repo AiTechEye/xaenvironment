@@ -316,7 +316,9 @@ examobs.fighting=function(self)
 				if en and en.name == "__builtin:item" then
 					self:eat_item(en.itemstring)
 				end
+				self:before_punching()
 				examobs.punch(self.object,self.fight,self.dmg)
+				self:on_punching()
 				examobs.anim(self,"attack")
 				if examobs.gethp(self.fight) < 1 then
 					self.fight = nil
