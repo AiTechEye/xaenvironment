@@ -68,6 +68,7 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.thirst(player,0,true)
 	if player_style.players[name].black_death_id then
 		player:hud_remove(player_style.players[name].black_death_id)
+		player_style.players[name].black_death_id = nil
 	end
 end)
 
