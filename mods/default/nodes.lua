@@ -385,8 +385,6 @@ default.register_blockdetails({
 		block="default:sand",
 	},
 	item={},
---wield_scale={x=0.1,y=0.1,z=0.1},
-
 })
 
 
