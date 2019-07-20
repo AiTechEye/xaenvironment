@@ -10,7 +10,7 @@ default.register_blockdetails=function(def)
 	def.node.drawtype = def.node.drawtype or "mesh"
 	def.node.mesh = def.node.mesh or "default_blockdetails.obj"
 	def.node.tiles = def.node.tiles or {"default_sand.png","default_stick.png"}
-	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1}
+	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1,not_in_creative_inventory=1,not_in_craftguide=1}
 	def.node.drowning = def.node.drowning or 1
 	def.paramtype2 = def.paramtype2 or "facedir"
 	def.node.after_destruct = def.node.block and function(pos)
@@ -107,6 +107,9 @@ default.register_pebble=function(def)
 		bdef.sunlight_propagates = false
 		bdef.visual_scale = 1
 		bdef.drop = mod.."pebble_" ..name
+		bdef.groups.not_in_creative_inventory=1
+		bdef.groups.not_in_craftguide=1
+
 		bdef.collision_box = {
 			type = "fixed",
 			fixed = {{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},{-0.3, 0.5, -0.3, 0.3, 0.8, 0.3}}
