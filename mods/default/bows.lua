@@ -11,7 +11,7 @@ bows={
 bows.register_arrow=function(name,def)
 	if name==nil or name=="" then return false end
 
-	def.damage = def.damage or 0
+	def.damage = def.damage or 1
 	def.name = minetest.get_current_modname() ..":arrow_".. name
 	def.level = def.level or 1
 	def.on_hit_object = def.on_hit_object or bows.nothing
@@ -139,25 +139,13 @@ bows.shoot=function(itemstack, user, pointed_thing)
 	return itemstack
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-bows.nothing=function(self,target,hp,user,lastpos)
+bows.nothing=function()
 	return self
 end
 
 bows.on_hit_object=function(self,target,hp,user,lastpos)
 	local hp2=target:get_hp()-hp
-	default.punch(target,target,1)
+	default.punch(target,target,hp)
 	if hp2>0 then
 		local pos=self.object:get_pos()
 		local opos=target:get_pos()
@@ -294,10 +282,6 @@ minetest.register_entity("default:arrow",{
 	return self
 	end,
 })
-
-
-
-
 
 bows.register_bow("wood",{
 	description="Wooden bow",
