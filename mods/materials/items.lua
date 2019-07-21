@@ -91,3 +91,44 @@ default.register_eatable("craftitem","materials:bread",1,10,{
 	inventory_image="materials_bread.png",
 	groups={flammable=3},
 })
+
+minetest.register_node("materials:qblock_red", {
+	description = "!",
+	tiles={
+		"[combine:21x21:0,-21=materials_qblock.png",
+		"[combine:21x21:0,-21=materials_qblock.png",
+		"[combine:21x21:0,0=materials_qblock.png",
+	},
+	groups = {dig_immediate = 3,not_in_creative_inventory=1},
+	sounds = default.node_sound_wood_defaults(),
+})
+minetest.register_node("materials:qblock_blue", {
+	description = "!",
+	tiles={
+		"[combine:21x21:-21,-21=materials_qblock.png",
+		"[combine:21x21:-21,-21=materials_qblock.png",
+		"[combine:21x21:-21,0=materials_qblock.png",
+	},
+	groups = {dig_immediate = 3,not_in_creative_inventory=1},
+	sounds = default.node_sound_wood_defaults(),
+})
+minetest.register_node("materials:qblock_green", {
+	description = "!",
+	tiles={
+		"[combine:21x21:-42,-21=materials_qblock.png",
+		"[combine:21x21:-42,-21=materials_qblock.png",
+		"[combine:21x21:-42,0=materials_qblock.png",
+	},
+	groups = {dig_immediate = 3,not_in_creative_inventory=1},
+	sounds = default.node_sound_wood_defaults(),
+})
+minetest.register_node("materials:qblock_yellow", {
+	description = "!",
+	tiles={
+		"[combine:21x21:-63,-21=materials_qblock.png",
+		"[combine:21x21:-63,-21=materials_qblock.png",
+		"[combine:21x21:-63,0=materials_qblock.png",
+	},
+	groups = {dig_immediate = 3,not_in_creative_inventory=1},
+	sounds = default.node_sound_wood_defaults(),
+})
