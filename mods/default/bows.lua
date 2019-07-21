@@ -384,7 +384,7 @@ bows.register_arrow("toxic",{
 			bows.arrow_remove(self)
 		end
 		default.punch(target,target,3)
-		if math.random(1,5) == 1 or target:get_hp() == 0 or not target:get_pos() then
+		if math.random(1,15) == 1 or target:get_hp() == 0 or not target:get_pos() then
 			return
 		end
 		minetest.after(math.random(0.5,2),function(target)
