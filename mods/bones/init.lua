@@ -1,6 +1,9 @@
 bones={
 	enabled=minetest.settings:get_bool("xaenvironment_itemlosing") ==  true,
 	corpses={},
+	functions_add={},
+	functions_drop={},
+	functions_remove={},
 }
 minetest.register_privilege("bones", {
 	description = "Don't droping bones",
@@ -101,7 +104,7 @@ minetest.register_on_dieplayer(function(player)
 			local m = minetest.get_meta(bpos)
 			local inv = m:get_inventory()
 
-			inv:set_size("main", 41)
+			inv:set_size("main", 45)
 			m:set_string("formspec",
 				"size[9,9]" ..
 				"listcolors[#77777777;#777777aa;#000000ff]"..
@@ -116,6 +119,10 @@ minetest.register_on_dieplayer(function(player)
 			for i,v in pairs(pinv:get_list("main")) do
 				inv:add_item("main",v)
 			end
+			for i,v in pairs(bones.functions_add) do
+				v(player,inv)
+			end
+
 
 			m:set_int("date",default.date("get"))
 
@@ -129,6 +136,9 @@ minetest.register_on_dieplayer(function(player)
 			for i,v in pairs(pinv:get_list("main")) do
 				minetest.add_item(pos,v)
 			end
+			for i,v in pairs(bones.functions_drop) do
+				v(player,pos)
+			end
 		end
 
 		for i,v in pairs(pinv:get_list("craft")) do
@@ -136,6 +146,9 @@ minetest.register_on_dieplayer(function(player)
 		end
 		for i,v in pairs(pinv:get_list("main")) do
 			pinv:remove_item("main",v)
+		end
+		for i,v in pairs(bones.functions_remove) do
+			v(player)
 		end
 	end
 end)
