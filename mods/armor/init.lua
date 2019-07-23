@@ -1,6 +1,6 @@
 if 1 then return end
 
-not ready yet
+--not ready yet
 
 armor={
 	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5,overall=6},
