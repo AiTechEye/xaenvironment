@@ -1,6 +1,6 @@
 if 1 then return end
 
---not ready yet
+--still problems
 
 armor={
 	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5,overall=6},
@@ -49,17 +49,28 @@ armor.update=function(player,wear)
 		if not data.skin then
 			data.skin = player:get_properties().textures[1]
 		end
-		local texture = data.skin
+		local texture = "default_air.png"--data.skin
 		local t
 		for i,v in pairs(inv) do
-			
 			if v:get_name() ~= "" then
-				t = true
 				texture = texture .. "^"..armor.registered_items[v:get_name()]
+				t = true
 			end
 		end
 		if t then
 			player:set_properties({textures={texture}})
+
+
+print(texture)
+	minetest.after(0.2, function(name,texture)
+		return minetest.show_formspec(name, "dssaasd","size[10,10]image[0,0;4,2;"..texture.."]")
+	end, name,texture)
+
+
+
+
+
+
 		end
 	end
 end
@@ -73,17 +84,18 @@ armor.register_item=function(name,def)
 		error("Armor: declare a image")
 	end
 	local mod = minetest.get_current_modname() ..":"
-	local texture = "([combine:64x32:"
 
-	for i=0,64,16 do
-		texture =  texture ..":0,"..i.."="..def.image ..":16,"..i.."="..def.image
-	end
+	armor.registered_items[mod..name.."_"..def.type] =""..def.image.."^armor_alpha_"..def.type..".png^[makealpha:0,255,0"
 
-	armor.registered_items[mod..name.."_"..def.type] = texture .. "^armor_alpha_"..def.type..".png^[makealpha:0,255,0)"
+
+
+
+
+
 
 	minetest.register_tool(mod..name.."_"..def.type, {
-		description=def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type,
-		inventory_image=def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0",
+		description = def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type,
+		inventory_image = def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0",
 		groups = {level=def.level or 1,armor=armor.types[def.type],weaknes=math.abs(math.floor(65000/(def.resistance or 100)))},
 	})
 
