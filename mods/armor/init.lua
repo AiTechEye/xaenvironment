@@ -1,7 +1,3 @@
-if 1 then return end
-
---still problems
-
 armor={
 	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5,overall=6},
 	user={},
@@ -34,44 +30,32 @@ armor.update=function(player,wear)
 	local inv = data.inv:get_list("main")
 	local d = {}
 	local arml = 0
-	wear = wear or 0
 	for i,v in pairs(inv) do
-		v:add_wear(wear*minetest.get_item_group(v:get_name(),"weaknes"))
+		local item = v:to_table()
+		if wear and wear>0 and v:get_name() ~= "" then
+			item.wear = item.wear + (math.floor(wear*10/minetest.get_item_group(v:get_name(),"level"))*10)
+			data.inv:set_stack("main",i,item)
+		end
 		arml = arml + minetest.get_item_group(v:get_name(),"level")
-		table.insert(d,v:to_table())
+		table.insert(d,item)
 	end
-	player:get_meta():set_string("armor",minetest.serialize(d))
 
+	player:get_meta():set_string("armor",minetest.serialize(d))
 	data.playerlevel = data.playerlevel or player:get_armor_groups().fleshy
 
-	if player:get_armor_groups() ~= armor.user[name].playerlevel+arml then
-		player:set_armor_groups({fleshy=data.playerlevel+arml})
+	if player:get_armor_groups().fleshy ~= armor.user[name].playerlevel-arml then
+		player:set_armor_groups({fleshy=data.playerlevel-arml})
 		if not data.skin then
 			data.skin = player:get_properties().textures[1]
 		end
-		local texture = "default_air.png"--data.skin
-		local t
+		local texture =data.skin
 		for i,v in pairs(inv) do
 			if v:get_name() ~= "" then
-				texture = texture .. "^"..armor.registered_items[v:get_name()]
-				t = true
+				texture = texture .. "^("..armor.registered_items[v:get_name()]..")"
+				--t = true
 			end
 		end
-		if t then
-			player:set_properties({textures={texture}})
-
-
-print(texture)
-	minetest.after(0.2, function(name,texture)
-		return minetest.show_formspec(name, "dssaasd","size[10,10]image[0,0;4,2;"..texture.."]")
-	end, name,texture)
-
-
-
-
-
-
-		end
+		player:set_properties({textures={texture}})
 	end
 end
 
@@ -84,21 +68,12 @@ armor.register_item=function(name,def)
 		error("Armor: declare a image")
 	end
 	local mod = minetest.get_current_modname() ..":"
-
 	armor.registered_items[mod..name.."_"..def.type] =""..def.image.."^armor_alpha_"..def.type..".png^[makealpha:0,255,0"
-
-
-
-
-
-
-
 	minetest.register_tool(mod..name.."_"..def.type, {
 		description = def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type,
 		inventory_image = def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0",
 		groups = {level=def.level or 1,armor=armor.types[def.type],weaknes=math.abs(math.floor(65000/(def.resistance or 100)))},
 	})
-
 	if def.item then
 		local recipe = {
 			chestplate={{def.item,"",def.item},{def.item,def.item,def.item},{def.item,def.item,def.item}},
@@ -139,13 +114,9 @@ table.insert(bones.functions_remove,function(player)
 	armor.update(player)
 end)
 
-minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-	armor.update(player,tool_capabilities.damage_groups.fleshy or 1)
-end)
-
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
-	if player then
-		armor.update(player,hp_change)
+	if player and hp_change < 0 and modifer.type ~= "respawn" then
+		armor.update(player,hp_change*-1)
 	end
 	return hp_change
 end,true)
