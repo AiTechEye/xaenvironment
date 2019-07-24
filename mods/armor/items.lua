@@ -1,37 +1,3 @@
--- ============== leather
-
-armor.register_item("leather",{
-	type="chestplate",
-	image="examobs_meat.png",
-	level=3,
-	item="examobs:pelt",
-})
-armor.register_item("leather",{
-	type="helmet",
-	image="examobs_meat.png",
-	level=2,
-	item="examobs:pelt",
-})
-armor.register_item("leather",{
-	type="boots",
-	image="examobs_meat.png",
-	level=2,
-	item="examobs:pelt",
-})
-armor.register_item("leather",{
-	type="leggings",
-	image="examobs_meat.png",
-	level=2,
-	item="examobs:pelt",
-})
-armor.register_item("leather",{
-	type="gloves",
-	image="examobs_meat.png",
-	level=1,
-	item="examobs:pelt",
-})
-
--- ============== iron
 armor.register_item("iron",{
 	type="chestplate",
 	image="default_ironblock.png",
@@ -47,7 +13,7 @@ armor.register_item("iron",{
 armor.register_item("iron",{
 	type="boots",
 	image="default_ironblock.png",
-	level=8,
+	level=7,
 	item="default:iron_ingot",
 })
 armor.register_item("iron",{
@@ -61,103 +27,4 @@ armor.register_item("iron",{
 	image="default_ironblock.png",
 	level=5,
 	item="default:iron_ingot",
-})
-
--- ============== steel
-
-armor.register_item("steel",{
-	type="chestplate",
-	image="default_steelblock.png",
-	level=12,
-	item="default:steel_ingot",
-})
-armor.register_item("steel",{
-	type="helmet",
-	image="default_steelblock.png",
-	level=12,
-	item="default:steel_ingot",
-})
-armor.register_item("steel",{
-	type="boots",
-	image="default_steelblock.png",
-	level=12,
-	item="default:steel_ingot",
-})
-armor.register_item("steel",{
-	type="leggings",
-	image="default_steelblock.png",
-	level=12,
-	item="default:steel_ingot",
-})
-armor.register_item("steel",{
-	type="gloves",
-	image="default_steelblock.png",
-	level=6,
-	item="default:steel_ingot",
-})
-
--- ============== diamond
-
-armor.register_item("diamond",{
-	type="chestplate",
-	image="default_diamondblock.png",
-	level=16,
-	item="default:diamond",
-})
-armor.register_item("diamond",{
-	type="helmet",
-	image="default_diamondblock.png",
-	level=16,
-	item="default:diamond",
-})
-armor.register_item("diamond",{
-	type="boots",
-	image="default_diamondblock.png",
-	level=16,
-	item="default:diamond",
-})
-armor.register_item("diamond",{
-	type="leggings",
-	image="default_diamondblock.png",
-	level=16,
-	item="default:diamond",
-})
-armor.register_item("diamond",{
-	type="gloves",
-	image="default_diamondblock.png",
-	level=6,
-	item="default:diamond",
-})
-
--- ============== quantum
-
-armor.register_item("quantum",{
-	type="chestplate",
-	image="armor_quantum.png",
-	level=18,
-	item="default:quantumblock",
-})
-armor.register_item("quantum",{
-	type="helmet",
-	image="armor_quantum.png",
-	level=18,
-	item="default:quantumblock",
-})
-armor.register_item("quantum",{
-	type="boots",
-	image="armor_quantum.png",
-	level=18,
-	item="default:quantumblock",
-})
-armor.register_item("quantum",{
-	type="leggings",
-	image="armor_quantum.png",
-	level=18,
-	item="default:quantumblock",
-})
-armor.register_item("quantum",{
-	type="gloves",
-	image="armor_quantum.png",
-	level=8,
-	item="default:quantumblock",
 })
