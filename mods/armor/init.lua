@@ -78,9 +78,9 @@ end
 
 armor.register_item=function(name,def)
 	if type(def.type) ~= "string" then
-		error('Armor: declare a specific "type" : chestplate, helmet, gloves, boots, leggings, overall')
+		error('Armor: declare a specific "type" : chestplate, helmet, gloves, boots, leggings')
 	elseif not armor.types[def.type] then
-		error("Armor: invaild type ("..def.type..") : chestplate, helmet, gloves, boots, leggings, overall")
+		error("Armor: invaild type ("..def.type..") : chestplate, helmet, gloves, boots, leggings")
 	elseif not def.image then
 		error("Armor: declare a image")
 	end
@@ -98,8 +98,6 @@ armor.register_item=function(name,def)
 			leggings={{def.item,def.item,def.item},{def.item,"",def.item},{def.item,"",def.item}},
 			boots={{def.item,"",def.item},{def.item,"",def.item}},
 			gloves={{def.item,"",def.item}},
-			overall={{def.item,def.item,def.item},{def.item,def.item,def.item},{def.item,"",def.item}},
-
 		}
 		minetest.register_craft({output=mod..name.."_"..def.type,recipe=recipe[def.type]})
 	end
