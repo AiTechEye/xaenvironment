@@ -45,7 +45,7 @@ armor.update=function(player,wear)
 	wear = wear or 0
 	for i,v in pairs(inv) do
 		local item = v:to_table()
-		if wear > 0 and item.name ~= "" then
+		if item and wear > 0 and item.name ~= "" then
 			item.wear = item.wear + (math.floor(wear*10/minetest.get_item_group(item.name,"level"))*10)
 			if item.wear >= 65000 then
 				item.name = ""
