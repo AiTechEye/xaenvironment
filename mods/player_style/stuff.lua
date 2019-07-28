@@ -51,3 +51,29 @@ minetest.register_node("player_style:glass_bottle_water", {
 	walkable = false,
 	paramtype = "light",
 })
+
+minetest.register_node("player_style:edgehook", {
+	drawtype = "airlike",
+	drop = "",
+	liquid_viscosity = 3,
+	pointable= false,
+	liquidtype = "source",
+	liquid_alternative_flowing="player_style:edgehook",
+	liquid_alternative_source="player_style:edgehook",
+	liquid_renewable = false,
+	liquid_range = 0,
+	sunlight_propagates = false,
+	walkable = false,
+	groups = {not_in_creative_inventory=1},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5)
+	end,
+	on_timer = function (pos, elapsed)
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1.5)) do
+			if ob:is_player() then
+				return true
+			end
+		end
+		minetest.remove_node(pos)
+	end
+})

@@ -67,10 +67,15 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
-	if player_style.players[name].black_death_id then
-		player:hud_remove(player_style.players[name].black_death_id)
-		player_style.players[name].black_death_id = nil
-	end
+	minetest.after(0,function(player,name)
+		if player_style.players[name].black_death_id then
+			player:hud_remove(player_style.players[name].black_death_id)
+			player_style.players[name].black_death_id = nil
+		end
+	end,player,name)
+
+
+
 end)
 
 minetest.register_on_newplayer(function(player)
@@ -357,6 +362,11 @@ player_style.set_animation=function(name,typ,n)
 	end
 end
 
+player_style.get_airlike=function(pos)
+	local d  = default.def(minetest.get_node(pos).name)
+	return d.name == "air" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
+end
+
 local attached_players = player_style.player_attached
 
 minetest.register_globalstep(function(dtime)
@@ -392,6 +402,20 @@ minetest.register_globalstep(function(dtime)
 						elseif run.wallrun == 2 and not walkable then
 							player:set_physics_override({jump=1.25})
 							run.wallrun = 1
+						end
+					end
+				end
+				if player:get_player_velocity().y < 0 and not default.defpos(apos(p,0,-1),"walkable") then
+					local d = player:get_look_dir()
+					local w = vector.add(apos(p,0),{x=d.x,y=0,z=d.z})
+					if default.defpos(apos(w,0,1),"walkable") and not default.defpos(apos(w,0,2),"walkable") then
+						if player_style.get_airlike(p) and player_style.get_airlike(apos(p,0,1)) then
+							minetest.set_node(apos(p,0,0),{name="player_style:edgehook"})
+							minetest.set_node(apos(p,0,1),{name="player_style:edgehook"})
+						end
+					elseif default.defpos(apos(w,0,0),"walkable") and not default.defpos(apos(w,0,1),"walkable") then
+						if player_style.get_airlike(p) then
+							minetest.set_node(apos(p,0,0),{name="player_style:edgehook"})
 						end
 					end
 				end
