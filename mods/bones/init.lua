@@ -1,10 +1,11 @@
 bones={
-	enabled=minetest.settings:get_bool("xaenvironment_itemlosing") ==  true,
+	enabled=minetest.settings:get_bool("xaenvironment_itemlosing") ~= false,
 	corpses={},
 	functions_add={},
 	functions_drop={},
 	functions_remove={},
 }
+
 minetest.register_privilege("bones", {
 	description = "Don't droping bones",
 	give_to_singleplayer = false,
