@@ -2,6 +2,10 @@ minetest.register_on_newplayer(function(player)
 	player:get_inventory():add_item("main","default:craftguide")
 end)
 
+apos=function(pos,x,y,z)
+	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
+end
+
 minetest.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
 	if default.on_player_death[name] then
