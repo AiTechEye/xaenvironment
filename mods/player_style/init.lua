@@ -440,7 +440,7 @@ player_style.player_run=function(name,player,a)
 			jump=1.25,
 			speed = 2,
 		})
-	elseif  (not a or player_style.players[name].hunger.level < 15) and player_style.player_running[name] then
+	elseif (not a or hunger and hunger.level < 15) and player_style.player_running[name] then
 		player_style.player_running[name] = nil
 		player:set_physics_override({
 			jump=1,
