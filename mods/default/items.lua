@@ -125,10 +125,10 @@ minetest.register_craftitem("default:paper", {
 	groups = {flammable = 1,treasure=1},
 })
 
-default.registry_bycket("default:water_source")
-default.registry_bycket("default:lava_source")
-default.registry_bycket("default:salt_water_source")
-default.registry_bycket("default:oil_source")
+default.registry_bucket("default:water_source")
+default.registry_bucket("default:lava_source")
+default.registry_bucket("default:salt_water_source")
+default.registry_bucket("default:oil_source")
 
 minetest.register_craftitem("default:bucket", {
 	description = "Bucket",
