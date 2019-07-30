@@ -95,9 +95,6 @@ minetest.register_chatcommand("weather", {
 				else
 					weather.currweather[i].strength=a
 					weather.currweather[i].change_strength=1
-
-
-
 					return
 				end
 			end
@@ -235,7 +232,6 @@ weather.ac=function()
 						end
 						weather.players[name]={player=player,sound=sound,bio=w.bio}
 					end
-
 						if w.thunder > 0 and w.strength >= 50 then
 							if w.thunder == 1 and math.random(1,50) == 1 then
 								minetest.sound_play("weather_thunder", {to_player = name,gain = 4})
@@ -295,10 +291,8 @@ weather.ac=function()
 								end
 							end
 						end
-
 					for s=1,w.strength*range,1 do
 						local p={x=p.x+math.random(-7*range,7*range),y=p.y+math.random(5,10),z=p.z+math.random(-7*range,7*range)}
-
 						if minetest.get_node_light(p,0.5)==15  then
 							minetest.add_particle({
 								pos=p,
@@ -381,14 +375,13 @@ weather.add=function(set)
 	if set then
 		if set.pos.y>-20 and set.pos.y<120 then
 			local b=weather.get_bio(set.pos)
-			if b==1 or b==2 or b==3 then 
-				local s = set.strength
+			if b==1 or b==2 or b==3 then
 				table.insert(weather.currweather,{
 					timeout=math.random(weather.mintimeout,
 					weather.maxtimeout),
 					pos=set.pos,
 					size=math.random(20,weather.size),
-					strength=s,
+					strength=set.strength,
 					sound=1,
 					bio=b,
 					thunder= b==1 and s >= 90 and math.random(1,4) or 0,
@@ -426,7 +419,7 @@ weather.add=function(set)
 							timeout=math.random(weather.mintimeout,weather.maxtimeout),
 							pos=pos,
 							size=math.random(20,weather.size),
-							strength=s,
+							strength=s*0.1,
 							sound=1,
 							bio=b,
 							thunder= b==1 and s >= 50 and math.random(1,10) == 1 and math.random(1,4) or 0,
