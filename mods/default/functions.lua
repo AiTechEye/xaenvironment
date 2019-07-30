@@ -503,7 +503,7 @@ default.registry_mineral=function(def)
 	end
 end
 
-default.registry_bycket=function(node_name)
+default.registry_bucket=function(node_name)
 	local mod = minetest.get_current_modname() ..":"
 	local def = minetest.registered_nodes[node_name]
 	if not def then
