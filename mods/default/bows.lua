@@ -152,24 +152,6 @@ bows.on_hit_object=function(self,target,hp,user,lastpos)
 end
 
 bows.on_hit_node=function(self,pos,user,lastpos)
-	if 1==2 and not default.defpos(pos,"node_box") then
-		local mpos={x=(pos.x-lastpos.x),y=(pos.y-lastpos.y),z=(pos.z-lastpos.z)}
-		local npos={x=bows.rnd(pos.x),y=bows.rnd(pos.y),z=bows.rnd(pos.z)}
-		local m={x=-0.6,y=-0.6,z=-0.6}
-		local bigest={x=mpos.x,y=mpos.y,z=mpos.z}
-		if bigest.x<0 then bigest.x=bigest.x*-1 m.x=0.6 end
-		if bigest.y<0 then bigest.y=bigest.y*-1 m.y=0.6 end
-		if bigest.z<0 then bigest.z=bigest.z*-1 m.z=0.6 end
-		local b=math.max(bigest.x,bigest.y,bigest.z)
-		if b==bigest.x then
-			pos.x=npos.x+m.x
-		elseif b==bigest.y then
-			pos.y=npos.y+m.y
-		else
-			pos.z=npos.z+m.z
-		end
-		self.object:set_pos(pos)
-	end
 	return self
 end
 
