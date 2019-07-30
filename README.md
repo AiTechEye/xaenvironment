@@ -28,8 +28,12 @@ stone1                   craftable as stone
 not_regular_craft = 1    onlt craftable by workbench  
 igniter = 0 - 3          starts fire  
 admin_tool = 1           admin tool  
+on_load=1                api calls on_load=function(pos,node)
+armor 1 - 6              armor type
+  
   
 explaining later...  
+  
   
 eatable  
 gaps  
@@ -43,3 +47,16 @@ oddly_breakable_by_hand=3
 used_by_npc=1  
 wood=1  
 choppy=3  
+bed=1, sleeping  
+tent=1 tempoary  
+meat=1  
+dirt=1  
+soil=1  
+fish=1  
+cloth=1  
+peace_of_wood=1  
+leaves=1  
+snappy=3  
+leafdecay=14  
+spreading_plant=16  
+grass=1  
