@@ -264,7 +264,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				elseif sandtype == dsand then
 					data[id] = dstone
 				end
-			elseif not treasure and gened and den > 0.6 and y <= 7 and data[id] == water and data[id-area.ystride] == sandtype and data[id+area.ystride] == water and math.random(1,10) == 1 then
+			elseif not treasure and gened and den > 0.6 and y <= 7 and data[id] == water and data[id-area.ystride] == sandtype and data[id+area.ystride] == water and math.random(1,15) == 1 then
 				local pos = area:position(id)
 				treasure = true
 				minetest.after(0,function(pos)

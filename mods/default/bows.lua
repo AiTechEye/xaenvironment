@@ -24,7 +24,7 @@ bows.register_arrow=function(name,def)
 	minetest.register_craftitem(def.name, {
 		description = def.description or name,
 		inventory_image = (def.texture or "default_wood.png") .. "^default_arrow.png^[makealpha:0,255,0",
-		groups = {arrow=1}
+		groups = {arrow=1,treasure=1}
 	})
 	if def.craft then
 		def.craft_count= def.craft_count or 4
@@ -46,6 +46,7 @@ bows.register_bow=function(name,def)
 	def.groups = def.groups or {}
 
 	def.groups.bow=1
+	def.groups.treasure=1
 
 	bows.registed_bows[def.replace]=def
 

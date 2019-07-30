@@ -629,15 +629,17 @@ end
 default.treasure=function(def)
 	local items={}
 	def.node = def.node or "default:chest"
-	if not (def.items or def.level) then
+	def.level = def.level or 1
+
+	if def.level > 1 then
 		for i,v in pairs(minetest.registered_items) do
-			if not (v.groups and (v.groups.not_in_creative_inventory or v.groups.not_in_craftguide)) and v.drop ~= "" then
+			if v.groups and v.groups.treasure and v.groups.treasure == def.level then
 				table.insert(items,i)
 			end
 		end
-	elseif not def.items and def.level > 0 then
+	elseif not def.items then
 		for i,v in pairs(minetest.registered_items) do
-			if v.groups and v.groups.treasure <= def.level then
+			if v.groups and v.groups.treasure and v.groups.treasure == 1 then
 				table.insert(items,i)
 			end
 		end

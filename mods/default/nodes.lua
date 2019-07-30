@@ -2,7 +2,7 @@ minetest.register_node("default:cloud", {
 	description="Cloud",
 	drawtype="glasslike",
 	tiles={"default_cloud.png"},
-	groups = {cracky=1,level=2,fall_damage_add_percent=-90},
+	groups = {cracky=1,level=2,fall_damage_add_percent=-90,treasure=2},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 13,
@@ -32,7 +32,7 @@ minetest.register_node("default:dye", {
 minetest.register_node("default:wool", {
 	description = "Wool",
 	tiles={"default_wool.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=3},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=3,treasure=1},
 	sounds = default.node_sound_wood_defaults(),
 	palette="default_palette.png",
 	paramtype2="color",
@@ -41,7 +41,7 @@ minetest.register_node("default:wool", {
 
 minetest.register_node("default:quantumblock", {
 	tiles={"default_quantumblock.png"},
-	groups = {cracky=1,level=2},
+	groups = {cracky=1,level=2,treasure=3},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 13
@@ -88,7 +88,7 @@ minetest.register_node("default:gas", {
 minetest.register_node("default:ladder", {
 	description = "Ladder",
 	tiles={"default_wood.png"},
-	groups = {ladder=1,choppy=3,oddly_breakable_by_hand=3,flammable=2},
+	groups = {ladder=1,choppy=3,oddly_breakable_by_hand=3,flammable=2,treasure=1},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	node_box = {
@@ -132,7 +132,7 @@ minetest.register_node("default:torch", {
 	description = "Torch",
 	tiles={"default_torch.png"},
 	wield_scale = {x=2,y=2,z=2},
-	groups = {dig_immediate=3,flammable=3,igniter=1},
+	groups = {dig_immediate=3,flammable=3,igniter=1,treasure=1},
 	drawtype = "mesh",
 	mesh="default_torch.obj",
 	paramtype = "light",
@@ -253,7 +253,7 @@ minetest.register_node("default:lightsource", {
 minetest.register_node("default:tankstorage", {
 	description = "Tankstorage",
 	tiles={"default_glass_with_frame.png"},
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1,treasure=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed",
 	sunlight_propagates = true,
@@ -263,7 +263,7 @@ minetest.register_node("default:tankstorage", {
 minetest.register_node("default:glass_tabletop", {
 	description = "Glass tabletop",
 	tiles={"default_glass_with_frame.png"}, --,"default_glass.png"
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	paramtype = "light",
@@ -281,7 +281,7 @@ minetest.register_node("default:glass_tabletop", {
 minetest.register_node("default:glass", {
 	description = "Glass",
 	tiles={"default_glass_with_frame.png","default_glass.png"},
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
@@ -412,14 +412,14 @@ default.register_blockdetails({
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},
-	groups = {cracky=1,level=3},
+	groups = {cracky=1,level=3,treasure=2},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:cooledlava", {
 	description = "Cooled lava",
 	tiles={"default_cooledlava.png"},
-	groups = {cracky=2},
+	groups = {cracky=2,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -427,14 +427,14 @@ minetest.register_node("default:stone", {
 	description = "Stone",
 	drop = "default:cobble",
 	tiles={"default_stone.png"},
-	groups = {stone=1,cracky=3},
+	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:cobble", {
 	description = "Cobble",
 	tiles={"default_cobble.png"},
-	groups = {stone=1,cracky=3},
+	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -453,7 +453,7 @@ minetest.register_node("default:stone_hot", {
 minetest.register_node("default:cobble_porous", {
 	description = "Porous cobble",
 	tiles={"default_cobble.png"},
-	groups = {stone=1,cracky=3,falling_node=1},
+	groups = {stone=1,cracky=3,falling_node=1,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 	damage_per_second = 10,
 })
@@ -468,7 +468,7 @@ minetest.register_node("default:bedrock", {
 minetest.register_node("default:mossycobble", {
 	description = "Mossy cobble",
 	tiles={"default_cobble.png^default_stonemoss.png"},
-	groups = {stone=1,cracky=3},
+	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -476,21 +476,21 @@ minetest.register_node("default:desert_stone", {
 	description = "Desert stone",
 	drop = "default:desert_cobble",
 	tiles={"default_desertstone.png"},
-	groups = {stone=1,cracky=3},
+	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:desert_cobble", {
 	description = "Desert cobble",
 	tiles={"default_desertcobble.png"},
-	groups = {stone=1,cracky=3},
+	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:gravel", {
 	description = "Gravel",
 	tiles={"default_gravel.png"},
-	groups = {crumbly=2,falling_node=1},
+	groups = {crumbly=2,falling_node=1,treasure=1},
 	sounds = default.node_sound_gravel_defaults(),
 	drowning = 1,
 	drop ={
@@ -505,7 +505,7 @@ minetest.register_node("default:gravel", {
 minetest.register_node("default:desert_sand", {
 	description = "Desert sand",
 	tiles={"default_desert_sand.png"},
-	groups = {crumbly=3,sand=1,falling_node=1},
+	groups = {crumbly=3,sand=1,falling_node=1,treasure=1},
 	sounds = default.node_sound_dirt_defaults(),
 	drowning = 1
 })
@@ -513,14 +513,14 @@ minetest.register_node("default:desert_sand", {
 minetest.register_node("default:sandstone", {
 	description = "Sand stone",
 	tiles={"default_sandstone.png"},
-	groups = {cracky=3},
+	groups = {cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("default:sand", {
 	description = "Sand",
 	tiles={"default_sand.png"},
-	groups = {crumbly=3,sand=1,falling_node=1},
+	groups = {crumbly=3,sand=1,falling_node=1,treasure=1},
 	sounds = default.node_sound_dirt_defaults(),
 	drowning = 1,
 	drop ={
@@ -572,7 +572,7 @@ minetest.register_node("default:snowblock_thin", {
 minetest.register_node("default:snowblock", {
 	description = "Snowblock",
 	tiles={"default_snow.png"},
-	groups = {snowy=1,crumbly=3,cools_lava=1,fall_damage_add_percent=-25,disable_jump=1},
+	groups = {snowy=1,crumbly=3,cools_lava=1,fall_damage_add_percent=-25,disable_jump=1,treasure=1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -582,7 +582,7 @@ minetest.register_node("default:snow", {
 	inventory_image="default_snowball.png",
 	wield_image="default_snowball.png",
 	wield_scale = {x=0.5,y=0.5,z=2},
-	groups = {snowy=1,crumbly=3,falling_node=1,cools_lava=1},
+	groups = {snowy=1,crumbly=3,falling_node=1,cools_lava=1,treasure=1},
 	buildable_to=true,
 	sunlight_propagates=true,
 	paramtype="light",
@@ -600,7 +600,7 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:ice", {
 	description = "Ice",
 	tiles={"default_ice.png"},
-	groups = {cracky=3,slippery=10},
+	groups = {cracky=3,slippery=10,treasure=1},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -629,7 +629,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	alpha =165,
-	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
+	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,

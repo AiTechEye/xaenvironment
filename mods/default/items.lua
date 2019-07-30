@@ -2,12 +2,14 @@ minetest.register_craftitem("default:gold_flake", {
 	description = "Gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
 	wield_scale={x=0.3,y=0.3,z=0.3},
+	groups={treasure=1},
 })
 
 minetest.register_craftitem("default:micro_gold_flake", {
 	description = "Micro gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
 	wield_scale={x=0.1,y=0.1,z=0.1},
+	groups={treasure=1},
 })
 
 default.registry_mineral({
@@ -96,6 +98,7 @@ minetest.register_tool("default:quantum_pick", {
 		},
 		damage_groups={fleshy=10},
 	},
+	groups={treasure=3},
 })
 
 minetest.register_tool("default:cudgel", {
@@ -110,7 +113,7 @@ minetest.register_tool("default:cudgel", {
 			oddly_breakable_by_hand = {times={[3]=3.5,[2]=2,[3]=0.7}, uses=0},
 			choppy = {times={[3]=3.5}, uses=0}
 		},
-		damage_groups = {fleshy=3},
+		damage_groups = {fleshy=3,treasure=1},
 	},
 	groups = {flammable = 2,stick=1},
 	sound=default.tool_breaks_defaults()
@@ -119,7 +122,7 @@ minetest.register_tool("default:cudgel", {
 minetest.register_craftitem("default:paper", {
 	description = "Paper",
 	inventory_image = "default_paper.png",
-	groups = {flammable = 1},
+	groups = {flammable = 1,treasure=1},
 })
 
 default.registry_bycket("default:water_source")
@@ -130,7 +133,7 @@ default.registry_bycket("default:oil_source")
 minetest.register_craftitem("default:bucket", {
 	description = "Bucket",
 	inventory_image = "default_bucket.png",
-	groups = {bucket=1},
+	groups = {bucket=1,treasure=1},
 	liquids_pointable = true,
 	on_use = function(itemstack, user, pointed_thing)
 		local p = pointed_thing
@@ -166,7 +169,7 @@ minetest.register_craftitem("default:bucket", {
 minetest.register_node("default:tankstorage", {
 	description = "Tankstorage",
 	tiles={"default_glass_with_frame.png"},
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=1,treasure=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed",
 	sunlight_propagates = true,
@@ -176,7 +179,7 @@ minetest.register_node("default:tankstorage", {
 minetest.register_craftitem("default:stick", {
 	description = "Wooden stick",
 	inventory_image = "default_stick.png",
-	groups = {flammable = 1,stick=1},
+	groups = {flammable = 1,stick=1,treasure=1},
 })
 
 minetest.register_craftitem("default:unknown", {
@@ -222,12 +225,12 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	block={
-		groups={cracky=3,flammable=1},
+		groups={cracky=3,flammable=1,treasure=1},
 		sounds=default.node_sound_stone_defaults(),
 		drop="default:carbon_lump 3",
 	},
 	ore={groups={cracky=3}},
-	lump={groups={flammable=1}},
+	lump={groups={flammable=1,treasure=1}},
 	additional_craft={
 		{output="default:carbonblock",recipe={
 			{"default:carbon_lump","default:carbon_lump","default:carbon_lump"},
@@ -281,7 +284,7 @@ default.registry_mineral({
 		sounds=default.node_sound_stone_defaults(),
 	},
 	ore={groups={cracky=3}},
-	lump={groups={flammable=1}},
+	lump={groups={flammable=1,treasure=1}},
 	additional_craft={
 		{
 			type = "fuel",
@@ -319,17 +322,15 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	block={
-		groups={cracky=3,stone=1},
+		groups={cracky=3,stone=1,treasure=1},
 		sounds=default.node_sound_stone_defaults()
 	},
-
-	pick={groups={not_regular_craft=0}},
-	axe={groups={not_regular_craft=0}},
-	shovel={groups={not_regular_craft=0}},
-	pick={groups={not_regular_craft=0}},
-	vineyardknife={groups={not_regular_craft=0}},
-	hoe={groups={not_regular_craft=0}},
-
+	pick={groups={not_regular_craft=0,treasure=1}},
+	axe={groups={not_regular_craft=0,treasure=1}},
+	shovel={groups={not_regular_craft=0,treasure=1}},
+	pick={groups={not_regular_craft=0,treasure=1}},
+	vineyardknife={groups={not_regular_craft=0,treasure=1}},
+	hoe={groups={not_regular_craft=0,treasure=1}},
 	additional_craft={
 		{output="default:flint",
 			recipe={
@@ -342,21 +343,25 @@ default.registry_mineral({
 default.registry_mineral({
 	name="copper",
 	texture="default_copperblock.png",
+	ingot={groups={treasure=1}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
 		clust_size=6,
 		y_max=-50,
 	},
-	pick={tool_capabilities={
+	pick={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.2,
 		max_drop_level = 1,
 		groupcaps = {
 			cracky={times={[1]=10,[2]=3,[3]=1.4},uses=17,maxlevel=1}
 		},
-		damage_groups={fleshy=2}
+		damage_groups={fleshy=2},
+
 	}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -364,7 +369,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -372,7 +378,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -395,6 +402,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	not_bow=true,
 	not_arrow=true,
+	ingot={groups={treasure=1}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
@@ -409,6 +417,7 @@ default.registry_mineral({
 	not_ore = true,
 	arrow={damage=4},
 	bow={uses=500,level=7},
+	ingot={groups={treasure=1}},
 	additional_craft={{
 		output="default:bronze_lump 8",
 		recipe={
@@ -417,7 +426,8 @@ default.registry_mineral({
 			{"default:copper_ingot","default:copper_ingot","default:copper_ingot"},
 		}
 	}},
-	pick={tool_capabilities={
+	pick={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.2,
 		max_drop_level = 1,
 		groupcaps = {
@@ -425,7 +435,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -433,7 +444,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -441,7 +453,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -457,13 +470,15 @@ default.registry_mineral({
 	texture="default_ironblock.png",
 	lump={inventory_image="default_lump_iron.png"},
 	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
+	ingot={groups={treasure=1}},
 	ore_settings={
 		clust_scarcity= 12 * 12 * 12,
 		clust_num_ores=4,
 		clust_size=7,
 		y_max=5,
 	},
-	pick={tool_capabilities={
+	pick={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,
 		groupcaps = {
@@ -471,7 +486,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -479,7 +495,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -487,7 +504,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=4}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=1},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -508,7 +526,8 @@ default.registry_mineral({
 	not_ingot=true,
 	not_block=true,
 	craftitem="default:cloud",
-	pick={tool_capabilities={
+	pick={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,
 		groupcaps = {
@@ -516,7 +535,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=4}
 	}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -524,7 +544,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -532,7 +553,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=5}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -549,7 +571,9 @@ default.registry_mineral({
 	texture="default_steelblock.png",
 	not_ore = true,
 	block={groups={cracky=1}},
-	pick={tool_capabilities={
+	ingot={groups={treasure=2}},
+	pick={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1,
 		max_drop_level = 3,
 		groupcaps = {
@@ -558,7 +582,8 @@ default.registry_mineral({
 		damage_groups={fleshy=3}
 	}},
 	lump={groups={not_regular_craft=1}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
@@ -566,7 +591,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
@@ -574,7 +600,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=4}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=2},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
 		groupcaps = {
@@ -595,6 +622,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ingot={groups={treasure=2}},
 	ore_settings={
 		clust_scarcity= 20 * 20 * 20,
 		clust_num_ores=3,
@@ -614,6 +642,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	ingot={groups={treasure=2}},
 	ore_settings={
 		clust_scarcity= 20 * 20 * 20,
 		clust_num_ores=3,
@@ -628,7 +657,7 @@ default.registry_mineral({
 default.registry_mineral({
 	name="diamond",
 	texture="default_diamondblock.png",
-	drop={inventory_image="diamond"},
+	drop={inventory_image="diamond",groups={treasure=3}},
 	block={groups={cracky=1}},
 	not_lump = true,
 	not_ingot = true,
@@ -639,7 +668,8 @@ default.registry_mineral({
 		clust_size=8,
 		y_max=-90,
 	},
-	pick={tool_capabilities={
+	pick={	groups={treasure=3},
+		tool_capabilities={
 		full_punch_interval = 1,
 		max_drop_level = 2,
 		groupcaps = {
@@ -647,7 +677,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=4}
 	}},
-	shovel={tool_capabilities={
+	shovel={	groups={treasure=3},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
@@ -655,7 +686,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	axe={tool_capabilities={
+	axe={	groups={treasure=3},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
 		groupcaps = {
@@ -663,7 +695,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=5}
 	}},
-	vineyardknife={tool_capabilities={
+	vineyardknife={	groups={treasure=3},
+		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
 		groupcaps = {
@@ -685,6 +718,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
+	lump={groups={treasure=2}},
 	ore_settings={
 		clust_scarcity= 30 * 30 * 30,
 		clust_num_ores=1,
