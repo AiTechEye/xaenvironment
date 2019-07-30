@@ -1,6 +1,7 @@
 minetest.register_tool("player_style:bottle", {
 	description = "Liquid storable bottle",
 	liquids_pointable = true,
+	groups = {treasure=1},
 	inventory_image = "materials_plant_extracts_gas.png^[invert:b^materials_plant_extracts.png",
 	on_use=function(itemstack, user, pointed_thing)
 		local wear = itemstack:get_wear()
@@ -46,7 +47,7 @@ minetest.register_node("player_style:glass_bottle_water", {
 	tiles={"materials_plant_extracts_gas.png^[invert:b^materials_plant_extracts.png"},
 	inventory_image = "materials_plant_extracts_gas.png^[invert:b^materials_plant_extracts.png",
 	drawtype = "plantlike",
-	groups = {dig_immediate = 3,used_by_npc=1,not_in_craftguide=1},
+	groups = {dig_immediate = 3,used_by_npc=1,not_in_craftguide=1,treasure=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -56,6 +57,7 @@ minetest.register_tool("player_style:matel_bottle", {
 	description = "Liquid storable metal bottle",
 	liquids_pointable = true,
 	inventory_image = "materials_metal_bottle.png",
+	groups = {treasure=2},
 	on_use=function(itemstack, user, pointed_thing)
 		local wear = itemstack:get_wear()
 		local max = 65535
@@ -84,7 +86,6 @@ minetest.register_craft({
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
 	},
 })
-
 
 minetest.register_node("player_style:edgehook", {
 	drawtype = "airlike",
