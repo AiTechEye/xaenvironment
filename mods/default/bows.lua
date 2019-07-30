@@ -18,13 +18,16 @@ bows.register_arrow=function(name,def)
 	def.on_hit_node = def.on_hit_node or bows.on_hit_node
 	def.on_hit_sound= def.on_hit_sound or "default_dig_dig_immediate"
 	def.on_step = def.on_step or bows.nothing
+	def.groups = def.groups or {}
+	def.groups.arrow = 1
+	def.groups.treasure = def.groups.treasure or 1
 
 	bows.registed_arrows[def.name]=def
 
 	minetest.register_craftitem(def.name, {
 		description = def.description or name,
 		inventory_image = (def.texture or "default_wood.png") .. "^default_arrow.png^[makealpha:0,255,0",
-		groups = {arrow=1,treasure=1}
+		groups = def.groups,
 	})
 	if def.craft then
 		def.craft_count= def.craft_count or 4
@@ -44,9 +47,8 @@ bows.register_bow=function(name,def)
 	def.shots = def.shots or 1
 	def.texture = def.texture or "default_wood.png"
 	def.groups = def.groups or {}
-
-	def.groups.bow=1
-	def.groups.treasure=1
+	def.groups.bow = 1
+	def.groups.treasure = def.groups.treasure or 1
 
 	bows.registed_bows[def.replace]=def
 
@@ -262,6 +264,7 @@ bows.register_arrow("fire",{
 	texture="default_wood.png^[colorize:#ffb400cc",
 	damage=10,
 	craft_count=1,
+	groups={treasure=2},
 	on_hit_node=function(self,pos,user,lastpos)
 		if not minetest.is_protected(lastpos, user:get_player_name()) and default.defpos(lastpos,"buildable_to") then
 			minetest.set_node(lastpos,{name="fire:basic_flame"})
@@ -283,6 +286,7 @@ bows.register_arrow("fire",{
 bows.register_arrow("build",{
 	description="Build arrow",
 	texture="default_wood.png^[colorize:#33336677",
+	groups={treasure=2},
 	on_hit_node=function(self,pos,user,lastpos)
 		local name=user:get_player_name()
 		local node=minetest.get_node(lastpos).name
@@ -311,6 +315,7 @@ bows.register_arrow("build",{
 
 bows.register_arrow("dig",{
 	description="Dig arrow",
+	groups={treasure=2},
 	texture="default_wood.png^[colorize:#333333aa",
 	on_hit_node=function(self,pos,user,lastpos)
 		minetest.node_dig(pos, minetest.get_node(pos), user)
@@ -328,6 +333,7 @@ bows.register_arrow("dig",{
 
 bows.register_arrow("toxic",{
 	description="Toxic arrow",
+	groups={treasure=2},
 	texture="default_wood.png^[colorize:#66aa11aa",
 	on_hit_object=function(self,target,hp,user,lastpos)
 		if self then
@@ -350,6 +356,7 @@ bows.register_arrow("toxic",{
 
 bows.register_arrow("tetanus",{
 	description="Tetanus arrow (currently affects mobs only)",
+	groups={treasure=2},
 	texture="default_wood.png^[colorize:#aa5500aa",
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.arrow_remove(self)
@@ -378,6 +385,7 @@ bows.register_arrow("tetanus",{
 bows.register_arrow("exposive",{
 	description="Exposive arrow",
 	texture="default_wood.png^[colorize:#aa0000aa",
+	groups={treasure=2},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.registed_arrows["default:arrow_exposive"].on_hit_node(self,target:get_pos(),user)
 	end,
@@ -403,6 +411,7 @@ bows.register_arrow("exposive",{
 bows.register_arrow("nitrogen",{
 	description="Nitrogen arrow",
 	texture="default_wood.png^[colorize:#00c482aa",
+	groups={treasure=2},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.arrow_remove(self)
 		if target:get_hp() <= 13 then

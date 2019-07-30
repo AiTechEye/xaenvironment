@@ -388,8 +388,8 @@ default.registry_mineral({
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=100},
-	arrow={damage=3},
-	bow={uses=300,level=5},
+	arrow={damage=3,groups={treasure=1}},
+	bow={uses=300,level=5,groups={treasure=1}},
 })
 
 default.registry_mineral({
@@ -415,8 +415,8 @@ default.registry_mineral({
 	name="bronze",
 	texture="default_bronzeblock.png",
 	not_ore = true,
-	arrow={damage=4},
-	bow={uses=500,level=7},
+	arrow={damage=4,groups={treasure=1}},
+	bow={uses=500,level=7,groups={treasure=1}},
 	ingot={groups={treasure=1}},
 	additional_craft={{
 		output="default:bronze_lump 8",
@@ -514,8 +514,8 @@ default.registry_mineral({
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=400},
-	arrow={damage=7},
-	bow={uses=700,level=9},
+	arrow={damage=7,groups={treasure=1}},
+	bow={uses=700,level=9,groups={treasure=1}},
 })
 
 default.registry_mineral({
@@ -562,8 +562,8 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	arrow={damage=8},
-	bow={uses=1500,level=17},
+	arrow={damage=8,groups={treasure=2}},
+	bow={uses=1500,level=17,groups={treasure=2}},
 })
 
 default.registry_mineral({
@@ -610,8 +610,8 @@ default.registry_mineral({
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=800},
-	arrow={damage=10},
-	bow={uses=900,level=12},
+	arrow={damage=10,groups={treasure=2}},
+	bow={uses=900,level=12,groups={treasure=2}},
 })
 
 default.registry_mineral({
@@ -629,9 +629,9 @@ default.registry_mineral({
 		clust_size=7,
 		y_max=-70,
 	},
-	arrow={damage=6},
-	bow={uses=800,level=10,shots=3},
-	hoe={uses=600},
+	arrow={damage=6,groups={treasure=3}},
+	bow={uses=800,level=10,shots=3,groups={treasure=3}},
+	hoe={uses=600,groups={treasure=3}},
 })
 
 default.registry_mineral({
@@ -649,9 +649,9 @@ default.registry_mineral({
 		clust_size=7,
 		y_max=-70,
 	},
-	arrow={damage=5},
-	bow={uses=750,level=10,shots=2},
-	hoe={uses=500},
+	arrow={damage=5,groups={treasure=3}},
+	bow={uses=750,level=10,shots=2,groups={treasure=3}},
+	hoe={uses=500,groups={treasure=3}},
 })
 
 default.registry_mineral({
@@ -704,9 +704,9 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	hoe={uses=1000},
-	arrow={damage=20},
-	bow={uses=1000,level=15},
+	hoe={uses=1000,groups={treasure=3}},
+	arrow={damage=20,groups={treasure=3}},
+	bow={uses=1000,level=15,groups={treasure=3}},
 })
 
 default.registry_mineral({
@@ -734,6 +734,7 @@ default.registry_mineral({
 	}}},
 	hoe={uses=1500},
 	arrow={
+		groups={treasure=3},
 		damage=10,
 		on_hit_object=function(self,target,hp,usee,lastpos)
 			local name = target:is_player() and target:get_player_name() or nil
@@ -751,7 +752,7 @@ default.registry_mineral({
 		end
 
 	},
-	bow={uses=1300,level=17,shots=5},
+	bow={uses=1300,level=17,shots=5,groups={treasure=3}},
 })
 
 default.registry_mineral({

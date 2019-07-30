@@ -489,6 +489,7 @@ default.registry_mineral=function(def)
 			texture=def.texture,
 			damage=def.arrow.damage or 1,
 			craft_count=def.arrow.craft_count or 8,
+			groups = def.arrow.groups,
 			on_hit_node=def.arrow.on_hit_node,
 			on_hit_object=def.arrow.on_hit_object,
 			craft=def.arrow.craft or {{"group:arrow", def.dropingot or (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")}}
