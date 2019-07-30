@@ -746,7 +746,7 @@ examobs.generate_npc_house=function(pos)
 	end
 
 	for i,v in pairs(minetest.registered_items) do
-		if not (v.groups and (v.groups.not_in_creative_inventory or v.groups.not_in_craftguide)) and v.drop ~= "" then
+		if v.groups and v.groups.treasure == 1 then
 			table.insert(items,i)
 		end
 	end
