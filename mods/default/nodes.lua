@@ -156,6 +156,18 @@ minetest.register_node("default:torch", {
 		return itemstack
 	end,
 	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.type =="object" then
+			local p = pointed_thing.ref:get_pos()
+			if not minetest.is_protected(p, user:get_player_name()) and default.defpos(p,"buildable_to") then
+				minetest.set_node(p,{name="fire:basic_flame"})
+				local en =  pointed_thing.ref:get_luaentity()
+				if not (en and en.name == "__builtin:item") and math.random(1,5) == 1 then
+					user:get_inventory():add_item("main","default:stick")
+					itemstack:take_item()
+					return itemstack
+				end
+			end
+		end
 		default.wieldlight(user:get_player_name(),user:get_wield_index(),"default:torch")
 	end
 
