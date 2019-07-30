@@ -1,3 +1,17 @@
+minetest.register_node("default:lamp", {
+	description = "Lamp",
+	tiles={"default_cloud.png"},
+	groups = {dig_immediate=3,wallmounted=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "nodebox",
+	node_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.3, 0.2}},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	on_place = minetest.rotate_node,
+	sunlight_propagates = true,
+	light_source = 15,
+})
+
 minetest.register_node("default:cloud", {
 	description="Cloud",
 	drawtype="glasslike",

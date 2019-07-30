@@ -42,6 +42,14 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:lamp 4",
+	recipe={
+		{"","default:glass_tabletop",""},
+		{"default:glass_tabletop","default:electric_lump","default:glass_tabletop"},
+		{"","default:glass_tabletop",""},
+	},
+})
+minetest.register_craft({
 	output="default:dye_workbench",
 	recipe={
 		{"group:wood","group:wood","group:wood"},
