@@ -145,23 +145,14 @@ bows.shoot=function(itemstack, user, pointed_thing)
 end
 
 bows.nothing=function()
-	return self
 end
 
 bows.on_hit_object=function(self,target,hp,user,lastpos)
-	local hp2=target:get_hp()-hp
-	default.punch(target,target,hp)
-	if hp2>0 then
-		local pos=self.object:get_pos()
-		local opos=target:get_pos()
-		local dir = user:get_look_dir()
-		self.object:set_attach(target, "", {x=(opos.x-pos.x)*4,y=(pos.y-opos.y)*4,z=(pos.z-opos.z)*4},{x=0,y=-90,z=0})
-	end
-	return self
+	default.punch(target,self.user and self.user:get_pos() and self.user or target,hp)
 end
 
 bows.on_hit_node=function(self,pos,user,lastpos)
-	if not default.defpos(pos,"node_box") then
+	if 1==2 and not default.defpos(pos,"node_box") then
 		local mpos={x=(pos.x-lastpos.x),y=(pos.y-lastpos.y),z=(pos.z-lastpos.z)}
 		local npos={x=bows.rnd(pos.x),y=bows.rnd(pos.y),z=bows.rnd(pos.z)}
 		local m={x=-0.6,y=-0.6,z=-0.6}
@@ -187,8 +178,8 @@ bows.rnd=function(r)
 end
 
 bows.arrow_remove=function(self)
-	if self.object:get_attach() then self.object:set_detach() end
 	if self.target then default.punch(self.target,self.object,1) end
+	self.removed = true
 	self.object:remove()
 	return self
 end
@@ -229,62 +220,38 @@ minetest.register_entity("default:arrow",{
 			self.object:remove()
 		end
 	end,
-	stuck=false,
 	bow_arrow=true,
 	timer=20,
-	timer2=0,
-	timer3=0,
-	x=0,
-	y=0,
-	z=0,
 	on_step=	function(self, dtime)
 		self.timer=self.timer-dtime
-		self.timer3=self.timer3+dtime
-		if self.timer3<self.timer2 then return self end
-		self.timer3=0
-		if self.stuck then
-			if self.node and minetest.get_node(self.node_pos).name~=self.node then
-				minetest.add_item(self.object:get_pos(),self.name .." 1"):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
-				self.timer=-1
-			elseif self.node==nil and not self.object:get_attach() then
-				minetest.add_item(self.object:get_pos(),self.name .." 1"):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
-				self.timer=-1
-			end
-			if self.timer<0 then
-				bows.arrow_remove(self)
-			end
-			return self
-		end
 		local pos=self.object:get_pos()
 		local no=minetest.registered_nodes[minetest.get_node(pos).name]
-		if not no then bows.arrow_remove(self) return self end
-		if (self.user==nil or self.timer<16 ) or no.walkable then
-			self.object:set_velocity({x=0, y=0, z=0})
-			self.object:set_acceleration({x=0, y=0, z=0})
-			self.stuck=true
-			self.timer2=0.2
+		if (self.user==nil or self.timer<16 ) or no and no.walkable then
 			minetest.check_for_falling(pos)
-			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,{x=self.x,y=self.y,z=self.z})
+			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
 			minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+			if not self.removed then
+				minetest.add_item(self.oldpos,self.name):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+				self.object:remove()
+			end
 			return self
 		end
-		self.x=pos.x
-		self.y=pos.y
-		self.z=pos.z
-		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,{x=self.x,y=self.y,z=self.z})
+		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,self.oldpos or pos)
 		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
-			if ob and ((bows.pvp and ob:is_player() and ob:get_player_name()~=self.user:get_player_name()) or (ob:get_luaentity() and ob:get_luaentity().physical and ob:get_luaentity().bow_arrow==nil and ob:get_luaentity().name~="__builtin:item" )) then
-				self.object:set_velocity({x=0, y=0, z=0})
-				self.object:set_acceleration({x=0, y=0, z=0})
-				self.stuck=true
-				self.timer2=0.2
-				bows.on_hit_object(self,ob,self.dmg,self.user,{x=self.x,y=self.y,z=self.z})
-				bows.registed_arrows[self.name].on_hit_object(self,ob,self.dmg,self.user,{x=self.x,y=self.y,z=self.z})
+			local en  = ob:get_luaentity()
+			if (bows.pvp and ob:is_player() and ob:get_player_name() ~= self.user:get_player_name()) or (en and en.physical and not en.bow_arrow and en.name ~= "__builtin:item") then
+				bows.on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
+				bows.registed_arrows[self.name].on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
 				minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+				if not self.removed then
+					minetest.add_item(self.oldpos,self.name .." 1"):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+					self.object:remove()
+				end
 				return self
 			end
 		end
-	return self
+		self.oldpos = vector.new(pos)
+		return self
 	end,
 })
 
