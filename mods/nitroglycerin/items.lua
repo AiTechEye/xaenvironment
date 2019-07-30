@@ -1,7 +1,7 @@
 minetest.register_node("nitroglycerin:timed_bomb", {
 	description = "Timed bomb",
 	tiles = {"nitroglycerin_timed_bomb.png"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5},
+	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -67,6 +67,7 @@ minetest.register_craft({
 minetest.register_craftitem("nitroglycerin:c4", {
 	description = "C4",
 	inventory_image = "nitroglycerin_c4.png",
+	groups={treasure=1},
 	on_use=function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "object" then
 			local ref = pointed_thing.ref
