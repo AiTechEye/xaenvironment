@@ -13,7 +13,6 @@ bows.register_arrow=function(name,def)
 
 	def.damage = def.damage or 1
 	def.name = minetest.get_current_modname() ..":arrow_".. name
-	def.level = def.level or 1
 	def.on_hit_object = def.on_hit_object or bows.nothing
 	def.on_hit_node = def.on_hit_node or bows.on_hit_node
 	def.on_hit_sound= def.on_hit_sound or "default_dig_dig_immediate"
@@ -45,6 +44,7 @@ bows.register_bow=function(name,def)
 	def.name = minetest.get_current_modname()..":bow_".. name
 	def.uses = def.uses-1 or 49
 	def.shots = def.shots or 1
+	def.level = def.level or 1
 	def.texture = def.texture or "default_wood.png"
 	def.groups = def.groups or {}
 	def.groups.bow = 1
