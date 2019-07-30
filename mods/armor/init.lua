@@ -84,12 +84,17 @@ armor.register_item=function(name,def)
 	elseif not def.image then
 		error("Armor: declare a image")
 	end
+
+	def.groups = def.groups or {}
+	def.groups.level=def.level or 1
+	def.groups.armor=armor.types[def.type]
+
 	local mod = minetest.get_current_modname() ..":"
 	armor.registered_items[mod..name.."_"..def.type] =""..def.image.."^armor_alpha_"..def.type..".png^[makealpha:0,255,0"
 	minetest.register_tool(mod..name.."_"..def.type, {
 		description = def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type .." (level "..(def.level or 1)..")",
 		inventory_image = def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0",
-		groups = {level=def.level or 1,armor=armor.types[def.type],weaknes=math.abs(math.floor(65000/(def.resistance or 100)))},
+		groups = def.groups
 	})
 	if def.item then
 		local recipe = {
