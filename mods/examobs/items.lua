@@ -13,6 +13,7 @@ minetest.register_tool("examobs:hiding_poison", {
 	description = "Hiding poison from mobs",
 	inventory_image = "materials_plant_extracts.png",
 	sound=default.tool_breaks_defaults(),
+	groups={treasure=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local name = user:get_player_name()
 		if examobs.hiding[name] then
@@ -50,12 +51,13 @@ minetest.register_craft({
 
 minetest.register_craftitem("examobs:pelt",{
 	description = "Pelt",
-	groups = {flammable=3},
+	groups = {flammable=3,treasure=1},
 	inventory_image = "examobs_pelt.png",
 	wield_scale={x=2,y=2,z=1},
 })
 minetest.register_craftitem("examobs:tooth",{
 	description = "Tooth",
+	groups = {treasure=1},
 	inventory_image = "examobs_tooth.png",
 	wield_scale={x=0.3,y=0.3,z=0.4},
 })
@@ -118,13 +120,14 @@ minetest.register_node("examobs:egg", {
 })
 minetest.register_craftitem("examobs:feather",{
 	description = "Feather",
-	groups = {flammable=3},
+	groups = {flammable=3,treasure=1},
 	inventory_image = "examobs_feather.png",
 	wield_scale={x=0.5,y=0.5,z=0.2},
 })
 -- ================ sheep ================
 minetest.register_tool("examobs:shears",{
 	description = "Shears",
+	groups={treasure=1},
 	inventory_image = "examobs_shears.png",
 })
 minetest.register_craft({
@@ -252,13 +255,13 @@ minetest.register_entity("examobs:fishing_float",{
 minetest.register_craftitem("examobs:fishing_rod", {
 	description = "Fishing rod",
 	inventory_image = "examobs_fishing_rod.png",
-	groups={flammable=3},
+	groups={flammable=3,treasure=1},
 })
 
 minetest.register_tool("examobs:fishing_rod_with_string", {
 	description = "Fishing rod with string",
 	inventory_image = "examobs_fishing_rod_with_string.png",
-	groups={flammable=3},
+	groups={flammable=3,treasure=2},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		local name = user:get_player_name()
