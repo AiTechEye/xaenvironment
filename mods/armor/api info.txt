@@ -1,0 +1,7 @@
+armor.register_item("",{			-- "chestplate"," helmet", "gloves", "boots", "leggings"
+	type="chestplate",
+	image="default_steelblock.png",	-- material
+	level=3,				-- armor_group, 0 and higher, 100 = immortal
+	item="default:steel_ingot",		-- craft item
+	groups={},			-- itemgroups, can be nil
+})
