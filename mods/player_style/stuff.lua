@@ -52,6 +52,40 @@ minetest.register_node("player_style:glass_bottle_water", {
 	paramtype = "light",
 })
 
+minetest.register_tool("player_style:matel_bottle", {
+	description = "Liquid storable metal bottle",
+	liquids_pointable = true,
+	inventory_image = "materials_metal_bottle.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local wear = itemstack:get_wear()
+		local max = 65535
+		wear = wear ~= 0 and wear or max
+		if pointed_thing.under and player_style.drinkable(pointed_thing.under,user) and wear > 1 then
+			wear=math.floor(wear-(max/20))
+		elseif wear < max then
+			wear=math.floor(wear+(max/20))
+			player_style.thirst(user,1)
+		end
+		if wear > max then
+			wear = max
+		elseif wear < 1 then
+			wear = 1
+		end
+		itemstack:set_wear(wear)
+		return itemstack
+	end,
+})
+
+minetest.register_craft({
+	output="player_style:matel_bottle",
+	recipe={
+		{"","default:iron_ingot",""},
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+	},
+})
+
+
 minetest.register_node("player_style:edgehook", {
 	drawtype = "airlike",
 	drop = "",
