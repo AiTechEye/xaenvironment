@@ -157,17 +157,6 @@ default.defname=function(name,n)
 	return no and no[n] or nil
 end
 
-default.punch=function(ob1,ob2,hp)
-	if type(ob1)~="userdata" or type(ob2)~="userdata" then return end
-	hp=hp or 1
-	if ob1:get_luaentity() and ob1:get_luaentity().itemstring then ob1:remove() return end
-	ob1:punch(ob2,1,{full_punch_interval=1,damage_groups={fleshy=hp}})
-	if ob1:get_hp()<=0 then
-		return true
-	end
-	return false	
-end
-
 default.register_eatable=function(kind,name,hp,gaps,def)
 	def.groups = def.groups or {}
 	def.groups.eatable=hp
