@@ -622,7 +622,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
-	ingot={groups={treasure=2}},
+	ingot={groups={treasure=3}},
 	ore_settings={
 		clust_scarcity= 20 * 20 * 20,
 		clust_num_ores=3,
@@ -642,7 +642,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
-	ingot={groups={treasure=2}},
+	ingot={groups={treasure=3}},
 	ore_settings={
 		clust_scarcity= 20 * 20 * 20,
 		clust_num_ores=3,
