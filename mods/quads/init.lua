@@ -42,7 +42,7 @@ minetest.register_node("quads:petrol_tank", {
 	stack_max = 1,
 	description="Petrol tank",
 	tiles={"default_ironblock.png"},
-	groups = {dig_immediate = 3,flammable=3},
+	groups = {dig_immediate = 3,flammable=3,treasure=1},
 	paramtype = "light",
 	paramtype2="facedir",
 	drawtype = "nodebox",
@@ -71,7 +71,7 @@ minetest.register_node("quads:petrol_tank_empty", {
 	stack_max = 1,
 	description="Petrol tank (empty)",
 	tiles={"default_ironblock.png"},
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3,treasure=1},
 	paramtype = "light",
 	paramtype2="facedir",
 	drawtype = "nodebox",
@@ -105,13 +105,14 @@ minetest.register_node("quads:bottle_with_oil", {
 	inventory_image = "materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png",
 	tiles = {"materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png"},
 	drawtype="plantlike",
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3,treasure=1},
 })
 
 minetest.register_node("quads:quad", {
 	stack_max=1,
 	description="Quad",
 	drawtype="mesh",
+	groups = {treasure=3},
 	mesh="quads_quad.b3d",
 	tiles={"quads_quad1.png","quads_quad1.png"},
 	wield_scale={x=0.1,y=0.1,z=0.1},
