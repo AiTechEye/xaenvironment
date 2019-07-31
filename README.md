@@ -16,10 +16,7 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 [player_style](mods/player_style/info.txt)  
 [examobs](mods/examobs/api%20info.txt)  
 
-
-
-
---
+---
 
 ## common itemgroups:
 treasure = 1 - 3         used as by treasures  
