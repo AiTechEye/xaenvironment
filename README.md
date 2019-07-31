@@ -13,13 +13,17 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 [exaachievements ](mods/exaachievements/info.txt)  
 [nitroglycerin](mods/nitroglycerin/api.lua)  
 [player_style](mods/player_style/info.txt)  
+[examobs](mods/examobs/api%20info.txt)  
+
+
 
 
 --
 
-## itemgroups:
+## common itemgroups:
 treasure = 1 - 3         used as by treasures  
 not_in_craftguide = 1    not showen in craftguide  
+not_in_creative_inventory 1
 stick = 1                craftable as stick  
 flammable 1 - 3          can be burned and as furnace fuel  
 tankstorage = 1          used as tankstorage  
@@ -30,33 +34,28 @@ igniter = 0 - 3          starts fire
 admin_tool = 1           admin tool  
 on_load=1                api calls on_load=function(pos,node)
 armor 1 - 6              armor type
-  
-  
-explaining later...  
-  
-  
-eatable  
-gaps  
-wet  
+spreading_dirt_type = 1  spreading dirt
+spreading_plant=20        chance to spread node  
+eatable = hp              eaten by player, created by api  
+gaps                      gaps to eat
+wet                       -num to num, get tirsty whil eaten 
 dig_immediate  
-not_in_creative_inventory  
-bucket=1  
-bucket_water  
+bucket=1                  used by bycket api, created by api   
+bucket_water=1            used by bycket api, created by ap  
 cracky=3  
 oddly_breakable_by_hand=3  
-used_by_npc=1  
+used_by_npc=1             placed in npc's houses  
 wood=1  
 choppy=3  
-bed=1, sleeping  
-tent=1 tempoary  
-meat=1  
+bed=1,  
+tent=1                    tempoary bed  
+meat=1                    eaten by most mobs  
 dirt=1  
 soil=1  
-fish=1  
+fish=1                    fish item  
 cloth=1  
 peace_of_wood=1  
 leaves=1  
 snappy=3  
-leafdecay=14  
-spreading_plant=16  
+leafdecay=14              leaves falls outside this area  
 grass=1  
