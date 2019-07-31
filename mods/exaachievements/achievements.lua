@@ -11,6 +11,15 @@ exaachievements.register({
 	end
 })
 exaachievements.register({
+	type="craft",
+	count=10,
+	name="Gravel_to_flint",
+	item="default:flint",
+	image="default:gravel",
+	description="Craft flint from gravel",
+})
+
+exaachievements.register({
 	type="dig",
 	count=25,
 	name="Sukkah",
