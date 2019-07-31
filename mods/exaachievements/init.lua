@@ -278,6 +278,26 @@ minetest.register_on_mods_loaded(function()
 	exaachievements.tmp.regnames=nil
 end)
 
+exaachievements.qblock=function(def)
+	minetest.register_node(minetest.get_current_modname() ..":qblock_".. (def.name or def.color), {
+		description = "!",
+		tiles={
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=achievements_qblock.png)",
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=achievements_qblock.png)",
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,0=achievements_qblock.png)",
+		},
+		groups = {dig_immediate = 2,not_in_creative_inventory=1},
+		sounds = default.node_sound_wood_defaults(),
+		drop = "",
+	})
+end
+
+exaachievements.qblock({color="FF0000"})
+exaachievements.qblock({color="0000FF"})
+exaachievements.qblock({color="1c7800"})
+exaachievements.qblock({color="e29f00"})
+exaachievements.qblock({color="800080"})
+
 minetest.register_on_player_receive_fields(function(user, form, pressed)
 	if form=="exaachievements" then
 		if pressed.list then
