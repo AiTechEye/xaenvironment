@@ -34,10 +34,6 @@ exaachievements.register({
 	hide_until=10,
 })
 
-apos=function(pos,x,y,z)
-	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
-end
-
 walkable=function(pos)
 	local n = minetest.get_node(pos).name
 	return (n ~= "air" and false) or examobs.def(n).walkable

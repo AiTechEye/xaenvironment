@@ -34,12 +34,12 @@ examobs.register_mob=function(def)
 
 	def.hp =				def.hp or				20
 	def.hp_max = 			def.hp
-	def.physical =			def.physical or			true
+	def.physical =			def.physical or			def.physical ~= false
 	def.collisionbox =			def.collisionbox or			{-0.35,0,-0.35,0.35,1.8,0.35}
 	def.visual =			def.visual or			"mesh"
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
-	def.makes_footstep_sound =		def.makes_footstep_sound or		true
+	def.makes_footstep_sound =		def.makes_footstep_sound or		def.physical ~= false
 
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
