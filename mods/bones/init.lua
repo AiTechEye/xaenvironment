@@ -4,6 +4,7 @@ bones={
 	functions_add={},
 	functions_drop={},
 	functions_remove={},
+	creative = minetest.settings:get_bool("creative_mode") == true,
 }
 
 minetest.register_privilege("bones", {
@@ -77,7 +78,7 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 minetest.register_on_dieplayer(function(player)
-	if bones.enabled then
+	if bones.enabled and not bones.creative then
 		local name = player:get_player_name()
 
 		if bones.corpses[name] or minetest.check_player_privs(name, {bones=true}) then
