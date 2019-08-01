@@ -1,17 +1,9 @@
 exaachievements={
 	events={customize={},dig={},place={},craft={},eat={}},
 	tmp={regnames={}},
-	all={achievements=0,skill=0}
+	all={achievements=0,skill=0},
+	creative = minetest.settings:get_bool("creative_mode") == true,
 }
-
-minetest.register_chatcommand("exaach", {
-	params = "",
-	description = "Clear your achievements",
-	privs = {ban=true},
-	func = function(name, param)
-		exaachievements.form(name,minetest.get_player_by_name(name))
-	end
-})
 
 minetest.register_chatcommand("exaach_clear", {
 	params = "",
@@ -27,17 +19,18 @@ minetest.register_chatcommand("exaach_clear", {
 		end
 	end
 })
-
-player_style.register_button({
-	exit=true,
-	name="achievements",
-	image="achievements_icon.png",
-	type="image",
-	info="Achievements",
-	action=function(user)
-		exaachievements.form(user:get_player_name(),user)
-	end
-})
+if not exaachievements.creative then
+	player_style.register_button({
+		exit=true,
+		name="achievements",
+		image="achievements_icon.png",
+		type="image",
+		info="Achievements",
+		action=function(user)
+			exaachievements.form(user:get_player_name(),user)
+		end
+	})
+end
 
 exaachievements.get_skills=function(user)
 	return user:get_meta():get_int("exaskills")
@@ -73,7 +66,9 @@ exaachievements.do_a=function(def)
 end
 
 exaachievements.register=function(def)
-	if not def.name or type(def.name) ~="string" then
+	if exaachievements.creative then
+		return
+	elseif not def.name or type(def.name) ~="string" then
 		error('exaachievements: "name" required, is '..type(def.name)..'')
 	elseif not def.item and def.type ~= "customize" then
 		error('exaachievements '..def.name..':\n "item" required')
