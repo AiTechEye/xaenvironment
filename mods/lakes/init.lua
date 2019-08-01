@@ -1,36 +1,5 @@
 lakes={registered_lakes={}}
 
-minetest.register_tool("lakes:test", {
-	inventory_image = "default_stick.png",
-	groups={not_in_creative_inventory=1},
-	on_use=function(itemstack, user, pointed_thing)
-		if pointed_thing.type~="node" then return itemstack end
-	lakes.set_lake({
-		radius = 5, --math.random(5,20),
-		source = "default:water_source",
-		pos = pointed_thing.under,
-		in_nodes = {
-			"default:dirt",
-			"default:dirt_with_grass",
-			"default:sand",
-			"default:water_source",
-		}
-	})
-	end,
-})
-
-minetest.register_tool("lakes:test2", {
-	inventory_image = "default_stick.png",
-	groups={not_in_creative_inventory=1},
-	on_use=function(itemstack, user, pointed_thing)
-		if pointed_thing.type~="node" then return itemstack end
-
-		local d=lakes.registered_lakes["lava"]
-		d.pos=pointed_thing.under
-		lakes.set_lake(d)
-	end
-})
-
 lakes.registry_lake=function(name,def)
 	def.spawn_in=minetest.get_content_id(def.spawn_in)
 	lakes.registered_lakes[name]=def
