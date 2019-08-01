@@ -26,8 +26,30 @@ player_style.register_button=function(def)
 	player_style.buttons.action[def.name]=def.action
 end
 
+player_style.register_button({
+	name="Backpack",
+	image="player_style_backpack.png",
+	type="image",
+	info="Backpack",
+	action=function(player)
+		return minetest.show_formspec(player:get_player_name(), "backpack",
+			"size[8,8]" 
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."list[current_player;main;0,4;8,4;]"
+			.."list[current_player;backpack;1,0;6,3;]"
+			.."listring[current_player;main]"
+			.."listring[current_player;backpack]"
+		)
+	end
+})
+
 player_style.inventory=function(player)
 	local name = player:get_player_name()
+
+	if player:get_inventory():get_size("backpack") == 0 then
+		player:get_inventory():set_size("backpack",18) 
+	end
+
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 		player:set_inventory_formspec(
 			"size[8,8]" 
