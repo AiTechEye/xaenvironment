@@ -25,7 +25,7 @@ player_style.register_button=function(def)
 	player_style.buttons.num = player_style.buttons.num + 1
 	player_style.buttons.action[def.name]=def.action
 end
-
+--[[
 player_style.register_button({
 	name="Backpack",
 	image="player_style_backpack.png",
@@ -42,6 +42,7 @@ player_style.register_button({
 		)
 	end
 })
+--]]
 
 player_style.inventory=function(player)
 	local name = player:get_player_name()
