@@ -76,8 +76,8 @@ minetest.register_craftitem("materials:piece_of_wood", {
 
 minetest.register_node("materials:mixed_wood", {
 	description = "Mixed wood",
-	tiles = {"materials_mixed_wood.png",treasure=1},
-	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1},
+	tiles = {"materials_mixed_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1},
 	sounds = default.node_sound_wood_defaults(),
 })
 minetest.register_craftitem("materials:string", {
