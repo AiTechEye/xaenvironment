@@ -6,14 +6,14 @@ player_style={
 	player_dive = {},
 	player_running = {},
 	creative = minetest.settings:get_bool("creative_mode") == true,
-	damage = minetest.settings:get_bool("enable_damge") == true,
+	damage = minetest.settings:get_bool("enable_damage") == true,
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst") ~= false,
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
 }
 
-if not player_style.damage then
+if player_style.damage == false then
 	player_style.survive_thirst = false
 	player_style.survive_hunger = false
 end
