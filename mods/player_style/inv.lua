@@ -1,3 +1,16 @@
+player_style.register_button=function(def)
+	local b = (def.type and (def.type .. "_button") or "button")
+	.. (def.exit and "_exit" or "")
+	.. "["..player_style.buttons.num..",7.2;1,1;"
+	.. (((def.type == "image" or def.type == "item_image") and def.image and (def.image .. ";")) or "")
+	.. def.name ..";"
+	.. (def.label or "") .."]"
+	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
+	player_style.buttons.text = player_style.buttons.text .. b
+	player_style.buttons.num = player_style.buttons.num + 1
+	player_style.buttons.action[def.name]=def.action
+end
+
 minetest.register_privilege("creative", {
 	description = "Creative",
 	give_to_singleplayer= false,
@@ -13,43 +26,82 @@ minetest.register_privilege("creative", {
 	end
 })
 
-player_style.register_button=function(def)
-	local b = (def.type and (def.type .. "_button") or "button")
-	.. (def.exit and "_exit" or "")
-	.. "["..player_style.buttons.num..",7.2;1,1;"
-	.. (((def.type == "image" or def.type == "item_image") and def.image and (def.image .. ";")) or "")
-	.. def.name ..";"
-	.. (def.label or "") .."]"
-	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
-	player_style.buttons.text = player_style.buttons.text .. b
-	player_style.buttons.num = player_style.buttons.num + 1
-	player_style.buttons.action[def.name]=def.action
-end
---[[
 player_style.register_button({
 	name="Backpack",
 	image="player_style_backpack.png",
 	type="image",
 	info="Backpack",
 	action=function(player)
-		return minetest.show_formspec(player:get_player_name(), "backpack",
-			"size[8,8]" 
-			.."listcolors[#77777777;#777777aa;#000000ff]"
-			.."list[current_player;main;0,4;8,4;]"
-			.."list[current_player;backpack;1,0;6,3;]"
-			.."listring[current_player;main]"
-			.."listring[current_player;backpack]"
-		)
+		local name = player:get_player_name()
+		local invp = player_style.players[name].inv
+		local bn = invp.backpackslot:get_stack("main",1):get_name()
+		if minetest.get_item_group(bn,"backpack") > 0 then
+			local list = {}
+			for i,v in pairs(minetest.deserialize(player:get_meta():get_string("backpack") or "") or {}) do
+				--local g = minetest.get_item_group(v.name,"armor")
+				--if g > 0 then
+				--	list[g] = ItemStack(v)
+				--end
+				table.insert(list,ItemStack(v))
+			end
+			invp.backpack:set_list("main", list)
+			return minetest.show_formspec(player:get_player_name(), "backpack",
+				"size[8,8]" 
+				.."listcolors[#77777777;#777777aa;#000000ff]"
+				.."list[current_player;main;0,4;8,4;]"
+				.."list[current_player;backpack;1,0;6,3;]"
+				.."listring[current_player;main]"
+				.."listring[current_player;backpack]"
+			)
+		end
 	end
 })
---]]
 
 player_style.inventory=function(player)
 	local name = player:get_player_name()
+	player_style.players[name].inv = player_style.players[name].inv or {}
+	local invp = player_style.players[name].inv
 
-	if player:get_inventory():get_size("backpack") == 0 then
-		player:get_inventory():set_size("backpack",18) 
+	if not invp.backpackslot then
+		invp.backpackslot = minetest.create_detached_inventory("backpackslot", {
+			allow_put = function(inv, listname, index, stack, player)
+				return minetest.get_item_group(stack:get_name(),"backpack") > 0 and stack:get_count() or 0
+			end,
+			on_put = function(inv, listname, index, stack, player)
+				player:get_meta():set_string("backpackslot",minetest.serialize(stack:to_table()))
+			end,
+			on_take = function(inv, listname, index, stack, player)
+				player:get_meta():set_string("backpackslot","")
+			end
+		})
+		invp.backpackslot:set_size("main",1)
+		invp.backpackslot:set_stack("main",1,ItemStack(minetest.deserialize(player:get_meta():get_string("backpackslot") or "")) or {})
+
+		invp.backpack = minetest.create_detached_inventory("backpack", {
+			on_put = function(inv, listname, index, stack, player)
+				local name = player:get_player_name()
+				local d = ""
+				for i,v in pairs(inv) do
+					table.insert(d,v:to_table())
+				end
+				player:get_meta():set_string("backpack",minetest.serialize(d))
+			end,
+			on_take = function(inv, listname, index, stack, player)
+				local name = player:get_player_name()
+				local d = ""
+				for i,v in pairs(inv) do
+					table.insert(d,v:to_table())
+				end
+				player:get_meta():set_string("backpack",minetest.serialize(d))
+			end
+		})
+		invp.backpack:set_size("main",18)
 	end
+
+
+
+
+
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 		player:set_inventory_formspec(
@@ -58,6 +110,7 @@ player_style.inventory=function(player)
 			.."list[current_player;main;0,3;8,4;]"
 			.."list[current_player;craft;4,0;3,3;]"
 			.."list[current_player;craftpreview;7,1;1,1;]"
+			.."list[detached:backpackslot;main;7,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
 			..player_style.buttons.text
@@ -80,12 +133,14 @@ player_style.inventory=function(player)
 
 		end
 
-		player_style.players[name].inv = player_style.players[name].inv or {index=1,size=27}
+		invp.index = invp.index or 1
+		invp.size = invp.size or 27
+
+		--player_style.players[name].inv = player_style.players[name].inv or {index=1,size=27}
 
 		local pages = math.floor(#player_style.inventory_items/player_style.players[name].inv.size)
 		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
 		local itembutts = ""
-		local invp=player_style.players[name].inv
 		local x=8
 		local y=0
 		for i=invp.index,invp.index+invp.size do
@@ -105,6 +160,7 @@ player_style.inventory=function(player)
 			.."list[current_player;main;0,3;8,4;]"
 			.."list[current_player;craft;4,0;3,3;]"
 			.."list[current_player;craftpreview;7,1;1,1;]"
+			.."list[detached:backpackslot;main;7,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
 			..player_style.buttons.text
