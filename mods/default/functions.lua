@@ -28,6 +28,25 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
+if default.creative then
+	local ohnd = minetest.handle_node_drops
+	minetest.handle_node_drops=function(pos,drops,digger)
+		if not (digger and digger:is_player()) then
+			return ohnd(pos,drops,digger)
+		end
+		local inv = digger:get_inventory()
+		for i,v in pairs(drops) do
+			if not inv:contains_item("main",v) then
+				inv:add_item("main",v)
+			end
+		end
+	end
+end
+
+minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
+	return default.creative
+end)
+
 default.get_on_player_death=function(name,event)
 	local a = default.on_player_death[name] or {}
 	return a[event]

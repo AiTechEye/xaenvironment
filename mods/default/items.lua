@@ -40,14 +40,13 @@ default.registry_mineral({
 	}
 })
 
-
-
 minetest.register_tool(":", {
 	type = "none",
 	wield_image = "wieldhand.png",
 	wield_scale={x=1,y=1,z=2},
 	groups={not_in_creative_inventory=1},
-	tool_capabilities = {
+	range = not default.creative and 4 or 15,
+	tool_capabilities = not default.creative and {
 		full_punch_interval = 1,
 		max_drop_level = 0,
 		groupcaps={
@@ -57,7 +56,20 @@ minetest.register_tool(":", {
 			dig_immediate={times={[1]=2,[2]=1,[3]=0}, uses=0}
 		},
 		damage_groups = {fleshy=1},
-	},
+	} or {
+		full_punch_interval = 0.1,
+		max_drop_level = 0,
+		groupcaps = {
+			fleshy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			choppy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			bendy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			cracky={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			crumbly={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			snappy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			dig_immediate={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+		},
+		damage_groups={fleshy=10},
+	}
 })
 
 minetest.register_tool("default:admin_pickaxe", {
