@@ -58,6 +58,7 @@ lakes.set_lake=function(def)
 	local min, max = vox:read_from_map(pos1, pos2)
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
+	local gy
 	for y = 0, -math.floor(rad/2),-1 do
 	for z = -rad-y, rad+y do
 	for x = -rad-y, rad+y do
@@ -68,13 +69,20 @@ lakes.set_lake=function(def)
 		and nodes[data[area:index(c.x+1,c.y,c.z-1)]]
 		and nodes[data[area:index(c.x-1,c.y,c.z-1)]]
 		and nodes[data[area:index(c.x-1,c.y,c.z+1)]]
-		and nodes[data[area:index(c.x,c.y-1,c.z)]] then
+		and nodes[data[area:index(c.x,gy or c.y-1,c.z)]] then
 			local uid = data[area:index(c.x,c.y+1,c.z)]
+
+			if not gy then
+				gy = c.y
+			elseif y > gy then
+				data[area:index(c.x,c.y,c.z)] = c_air
+			end
+
 			if (y~=0 and uid == c_source) or def.underground then
 				data[area:index(c.x,c.y,c.z)] = c_source
 			else
-				local ndef = minetest.registered_items[minetest.get_name_from_content_id(uid)]
-				if uid == c_air or (ndef and not ndef.walkable) then
+				local ndef = minetest.registered_items[minetest.get_name_from_content_id(uid)] or {}
+				if uid == c_air or not ndef.walkable then
 					data[area:index(c.x,c.y,c.z)] = c_source
 					data[area:index(c.x,c.y+1,c.z)] = c_air
 				end
