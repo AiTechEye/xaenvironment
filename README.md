@@ -57,3 +57,4 @@ leaves=1
 snappy=3  
 leafdecay=14              leaves falls outside this area  
 grass=1  
+backpack  
