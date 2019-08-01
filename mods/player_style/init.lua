@@ -5,7 +5,7 @@ player_style={
 	player_attached={},
 	player_dive = {},
 	player_running = {},
-	creative = minetest.settings:get_bool("creative") ~= false,
+	creative = minetest.settings:get_bool("creative_mode") == true,
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst") ~= false,
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,

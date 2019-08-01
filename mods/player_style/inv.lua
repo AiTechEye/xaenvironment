@@ -1,3 +1,8 @@
+minetest.register_privilege("creative", {
+	description = "Creative",
+	give_to_singleplayer= false,
+})
+
 player_style.register_button=function(def)
 	local b = (def.type and (def.type .. "_button") or "button")
 	.. (def.exit and "_exit" or "")
@@ -88,15 +93,16 @@ end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
 	if form == "" then
-
+		local name = player:get_player_name()
 		for i,v in pairs(pressed) do
 			if player_style.buttons.action[i] then
 				player_style.buttons.action[i](player)
+				if minetest.check_player_privs(name, {creative=true}) then
+					player_style.inventory(player)
+				end
 				return
 			end
 		end
-
-		local name = player:get_player_name()
 		local invp = player_style.players[name].inv
 		if invp then
 			if pressed.quit then
@@ -124,12 +130,15 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						inv:set_stack("main",i,"")
 					end
 					player_style.players[name].inv.clean = nil
+					player_style.inventory(player)
+					return
 				end
 			end
 			for i,v in pairs(pressed) do
 				if i:sub(1,8) == "itembut_" then
 					local t = i:sub(9,-1)
 					player:get_inventory():add_item("main",t.." "..minetest.registered_items[t].stack_max)
+					player_style.inventory(player)
 					return
 				end
 			end
