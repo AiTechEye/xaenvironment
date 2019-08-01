@@ -49,7 +49,8 @@ player_style.inventory=function(player)
 
 		player_style.players[name].inv = player_style.players[name].inv or {index=1,size=27}
 
-
+		local pages = math.floor(#player_style.inventory_items/player_style.players[name].inv.size)
+		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
 		local itembutts = ""
 		local invp=player_style.players[name].inv
 		local x=8
@@ -83,6 +84,7 @@ player_style.inventory=function(player)
 			.."tooltip[reset;Reset]"
 			.."tooltip[clean;Clean your inventory]"
 			.."image[7,2;1,1;default_bucket.png]list[detached:deleteslot;main;7,2;1,1;]"
+			.."label[9.6,7.9;"..page.."/"..pages.."]"
 			..itembutts
 		)
 
