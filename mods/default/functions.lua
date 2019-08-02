@@ -6,6 +6,10 @@ apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
 end
 
+memory_mb=function()
+	return string.format("%.03f",collectgarbage("count")/1000)
+end
+
 minetest.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
 	if default.on_player_death[name] then

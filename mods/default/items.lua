@@ -589,7 +589,7 @@ default.registry_mineral({
 		full_punch_interval = 1,
 		max_drop_level = 3,
 		groupcaps = {
-			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=2}
+			cracky={times={[1]=2,[2]=1,[3]=0.5},uses=30,maxlevel=2}
 		},
 		damage_groups={fleshy=3}
 	}},
