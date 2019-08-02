@@ -36,22 +36,14 @@ player_style.register_button({
 		local invp = player_style.players[name].inv
 		local bn = invp.backpackslot:get_stack("main",1):get_name()
 		if minetest.get_item_group(bn,"backpack") > 0 then
-			local list = {}
-			for i,v in pairs(minetest.deserialize(player:get_meta():get_string("backpack") or "") or {}) do
-				--local g = minetest.get_item_group(v.name,"armor")
-				--if g > 0 then
-				--	list[g] = ItemStack(v)
-				--end
-				table.insert(list,ItemStack(v))
-			end
-			invp.backpack:set_list("main", list)
+
 			return minetest.show_formspec(player:get_player_name(), "backpack",
 				"size[8,8]" 
 				.."listcolors[#77777777;#777777aa;#000000ff]"
 				.."list[current_player;main;0,4;8,4;]"
-				.."list[current_player;backpack;1,0;6,3;]"
+				.."list[detached:backpack;main;1,0;6,3;]"
 				.."listring[current_player;main]"
-				.."listring[current_player;backpack]"
+				.."listring[detached:backpack;main]"
 			)
 		end
 	end
@@ -62,10 +54,15 @@ player_style.inventory=function(player)
 	player_style.players[name].inv = player_style.players[name].inv or {}
 	local invp = player_style.players[name].inv
 
-	if not invp.backpackslot then
+	if not invp.backpack then
+
+--detached inventory
 		invp.backpackslot = minetest.create_detached_inventory("backpackslot", {
 			allow_put = function(inv, listname, index, stack, player)
 				return minetest.get_item_group(stack:get_name(),"backpack") > 0 and stack:get_count() or 0
+			end,
+			allow_take = function(inv, listname, index, stack, player)
+				return invp.backpack:is_empty("main") and stack:get_count() or 0
 			end,
 			on_put = function(inv, listname, index, stack, player)
 				player:get_meta():set_string("backpackslot",minetest.serialize(stack:to_table()))
@@ -80,30 +77,32 @@ player_style.inventory=function(player)
 		invp.backpack = minetest.create_detached_inventory("backpack", {
 			on_put = function(inv, listname, index, stack, player)
 				local name = player:get_player_name()
-				local d = ""
-				for i,v in pairs(inv) do
-					table.insert(d,v:to_table())
+				local d = {}
+				for i,v in pairs(inv:get_list("main")) do
+					d[i]=v:to_table()
 				end
 				player:get_meta():set_string("backpack",minetest.serialize(d))
 			end,
 			on_take = function(inv, listname, index, stack, player)
 				local name = player:get_player_name()
-				local d = ""
-				for i,v in pairs(inv) do
-					table.insert(d,v:to_table())
+				local d = {}
+				for i,v in pairs(inv:get_list("main")) do
+					d[i]=v:to_table()
 				end
 				player:get_meta():set_string("backpack",minetest.serialize(d))
 			end
+
 		})
 		invp.backpack:set_size("main",18)
+		local list = {}
+		for i,v in pairs(minetest.deserialize(player:get_meta():get_string("backpack") or "") or {}) do
+			list[i]=ItemStack(v)
+		end
+		invp.backpack:set_list("main", list)
 	end
 
-
-
-
-
-
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
+--default inventory
 		player:set_inventory_formspec(
 			"size[8,8]" 
 			.."listcolors[#77777777;#777777aa;#000000ff]"
@@ -116,6 +115,7 @@ player_style.inventory=function(player)
 			..player_style.buttons.text
 		)
 	else
+--creative inventory items
 		if not player_style.inventory_items then
 			player_style.inventory_items={}
 			for i,it in pairs(minetest.registered_items) do
@@ -130,13 +130,10 @@ player_style.inventory=function(player)
 					inv:set_stack("main",1,"")
 				end
 			}):set_size("main", 1)
-
 		end
-
+--creative inventory
 		invp.index = invp.index or 1
 		invp.size = invp.size or 27
-
-		--player_style.players[name].inv = player_style.players[name].inv or {index=1,size=27}
 
 		local pages = math.floor(#player_style.inventory_items/player_style.players[name].inv.size)
 		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
@@ -176,9 +173,6 @@ player_style.inventory=function(player)
 			.."label[9.6,7.9;"..page.."/"..pages.."]"
 			..itembutts
 		)
-
-
-
 	end
 end
 
