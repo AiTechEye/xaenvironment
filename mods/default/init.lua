@@ -8,6 +8,7 @@ default={
 	registered_bios={},
 	registered_bios_list={},
 	bucket={},
+	creative = minetest.settings:get_bool("creative_mode") == true,
 	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit")),
 	cloud_land_map={
 		offset=0,

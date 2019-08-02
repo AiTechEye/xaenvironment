@@ -176,7 +176,6 @@ minetest.register_tool("default:biocheck", {
 	inventory_image = "default_stick.png",
 	groups={not_in_creative_inventory = 1},
 	on_use=function(itemstack, user, pointed_thing)
-
 		local pos = user:get_pos()
 		--local heat = math.floor(minetest.get_heat(pos)/10+0.5)*10
 		--local humidity =math.floor(minetest.get_humidity(pos)/10+0.5)*10
@@ -215,7 +214,6 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 
 minetest.register_on_generated(function(minp, maxp, seed)
-
 	if minp.y> -50 and maxp.y< 50 then
 --waterland
 		local depth = 10
@@ -224,7 +222,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 		local lenth = maxp.x-minp.x+1
 		local cindx = 1
-		local map = minetest.get_perlin_map(default.water_land_map,{x=lenth,y=lenth,z=lenth}):get_3d_map_flat(minp)
+
+
+		default.waterland_perlin_map = default.waterland_perlin_map or minetest.get_perlin_map(default.water_land_map,{x=lenth,y=lenth,z=lenth})
+
+		local map = default.waterland_perlin_map:get_3d_map_flat(minp)
 
 		local water= minetest.get_content_id("default:salt_water_source")
 		local sand = minetest.get_content_id("default:sand")
@@ -235,7 +237,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local sandtype = sand
 		local treasure
 		local gened
-
 		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
 		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 		local data = vm:get_data()
@@ -287,27 +288,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 		local lenth = maxp.x-minp.x+1
 		local cindx = 1
-		local map = minetest.get_perlin_map(default.cloud_land_map,{x=lenth,y=lenth,z=lenth}):get_3d_map_flat(minp)
+
+		default.cloudland_perlin_map = default.cloudland_perlin_map or minetest.get_perlin_map(default.cloud_land_map,{x=lenth,y=lenth,z=lenth})
+
+		local map = default.cloudland_perlin_map:get_3d_map_flat(minp)
 
 		local air = minetest.get_content_id("air")
 		local cloud = minetest.get_content_id("default:cloud")
 		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
 		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 		local data = vm:get_data()
-
 		for z=minp.z,maxp.z do
 		for y=minp.y,maxp.y do
 			local id=area:index(minp.x,y,z)
 		for x=minp.x,maxp.x do
-		local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
-		if data[id] == air and y >= height-depth and y <= height+depth and den > 0.7 then
-			data[id] = cloud
-		end
+			local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
+			if data[id] == air and y >= height-depth and y <= height+depth and den > 0.7 then
+				data[id] = cloud
+			end
 			cindx=cindx+1
 			id=id+1
 		end
-		end
-			
+		end	
 		end
 		vm:set_data(data)
 		vm:write_to_map()
