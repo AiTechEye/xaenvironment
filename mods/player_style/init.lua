@@ -75,7 +75,7 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
-	minetest.after(0,function(player,name)
+	minetest.after(0.1,function(player,name)
 		if player_style.players[name].black_death_id then
 			player:hud_remove(player_style.players[name].black_death_id)
 			player_style.players[name].black_death_id = nil
