@@ -527,3 +527,76 @@ minetest.register_node("default:dye_workbench", {
 		}
 	}
 })
+
+minetest.register_node("default:recycling_mill", {
+	description = "Recycling mill",
+	tiles={"default_ironblock.png^synth_repeat.png"},
+	groups = {cracky=3,flammable=2,used_by_npc=1},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
+	end,
+	on_construct=function(pos)
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
+		inv:set_size("input", 1)
+		inv:set_size("output", 9)
+		meta:set_string("formspec",
+			"size[8,7]" ..
+			"listcolors[#77777777;#777777aa;#000000ff]"..
+			"list[context;input;2,1;1,1;]" ..
+			"list[context;output;4,0;3,3;]" ..
+			"list[current_player;main;0,3.5;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[current_name;input]" ..
+			"listring[current_name;output]" ..
+			"listring[current_player;main]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		if listname == "input" and inv:is_empty("output") and inv:is_empty("input") and stack:get_wear() == 0 then
+			return 1
+		end
+		return 0
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		if to_list == "output" or to_list ~= from_list then
+			return 0
+		end
+		return count
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		if listname == "output" then
+			inv:set_list("input",{})
+		elseif listname == "input" then
+			inv:set_list("output",{})
+		end
+	end,
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		if inv:is_empty("output") then
+			local craft = minetest.get_craft_recipe(inv:get_stack("input",1):get_name())
+			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
+				for i,v in pairs(craft.items) do
+					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
+					if a.item and a.item:get_name() == inv:get_stack("input",1):get_name() then
+						return
+					end
+
+				end
+				for i,v in pairs(craft.items) do
+					if not minetest.registered_items[v] then
+						craft.items[i] = ""
+					end
+				end
+				inv:set_list("output",craft.items)	
+			end
+		end
+	end,
+	can_dig = function(pos, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		return inv:is_empty("input") and inv:is_empty("output")
+	end,
+})

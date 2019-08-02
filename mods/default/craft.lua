@@ -41,6 +41,16 @@ minetest.register_craft({
 -- ======================= Node-tools
 --||||||||||||||||
 
+
+minetest.register_craft({
+	output="default:recycling_mill",
+	recipe={
+		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},
+		{"default:iron_ingot","default:copper_ingot","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_pick","default:iron_ingot"},
+	},
+})
+
 minetest.register_craft({
 	output="default:lamp 4",
 	recipe={
