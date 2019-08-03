@@ -428,3 +428,69 @@ bows.register_arrow("nitrogen",{
 		{"","default:ice",""}
 	}
 })
+
+
+bows.register_arrow("lightning",{
+	description="Lightning arrow",
+	texture="default_wood.png^[colorize:#FFFFFFFF",
+	groups={not_in_craftguide=1},
+	on_hit_object=function(self,target,hp,user,lastpos)
+		bows.arrow_remove(self)
+		if target:get_hp() <= 13 then
+			nitroglycerin.freeze(target)
+		else
+			default.punch(target,target,10)
+		end
+	end,
+	on_step=function(self)
+		local d = self.user:get_look_dir()
+		local pos1 = self.object:get_pos()
+		local uname  = self.user:get_player_name()
+		local pos2
+		for i=1,100 do
+			pos2 = {x=pos1.x+(d.x*i),y=pos1.y+(d.y*i),z=pos1.z+(d.z*i)}
+			if default.defpos(pos2,"walkable") then
+				break
+			end
+			for i, ob in pairs(minetest.get_objects_inside_radius(pos2, 1)) do
+				local en  = ob:get_luaentity()
+				if not (en and en.bow_arrow or ob:is_player() and ob:get_player_name() == uname) then
+					default.punch(ob,self.user,20)
+				end
+			end
+		end
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		lightning:set_properties({visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03}})
+		bows.arrow_remove(self)
+	end,
+	craft_count=3,
+	damage=0,
+	craft={
+		{"","group:arrow",""},
+		{"group:arrow","default:eletric_lump",""},
+		{"","group:arrow",""}
+	}
+})
+
+
+
+
+minetest.register_entity("default:arrow_lightning",{
+	physical = false,
+	visual = "cube",
+	pointable = false,
+	textures={"default_cloud.png","default_cloud.png","default_cloud.png","default_cloud.png","default_cloud.png","default_cloud.png"},
+	on_step=function(self,dtime)
+		self.t = self.t - dtime
+		if self.t < 0 then
+			self.object:remove()
+		end
+	end,
+	t=1
+})
