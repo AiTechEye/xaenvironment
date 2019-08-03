@@ -43,7 +43,7 @@ hook.slingshot_onuse=function(itemstack, user)
 		itemstack:set_wear(9999999)
 	end
 	user:get_inventory():remove_item("main", item)
-	minetest.sound_play("hook_throw", {pos=pos, gain = 1.0, max_hear_distance = 5,})
+	minetest.sound_play("default_bow_shoot", {pos=pos, gain = 1.0, max_hear_distance = 5})
 	return itemstack
 end
 
@@ -99,7 +99,6 @@ minetest.register_globalstep(function(dtime)
 					t.ob:set_acceleration({x=0, y=-10,z=0})
 					t.ob:set_velocity({x=0, y=-10, z=0})
 					table.remove(hook.tmp_throw,i)
-					minetest.sound_play("hook_hard_punch", {pos=ob:get_pos(), gain = 1.0, max_hear_distance = 5,})
 					break
 				end
 			end
@@ -155,7 +154,7 @@ minetest.register_tool("hook:hook", {
 			end
 		end
 		return itemstack
-	end,
+	end
 })
 
 minetest.register_tool("hook:hook_upgrade", {
@@ -193,7 +192,7 @@ minetest.register_tool("hook:hook_upgrade", {
 			end
 		end
 		return itemstack
-	end,
+	end
 })
 
 minetest.register_tool("hook:climb_rope", {
@@ -209,6 +208,7 @@ minetest.register_tool("hook:climb_rope", {
 			local m=minetest.add_entity({x=pos.x,y=pos.y+1.5,z=pos.z}, "hook:power")
 			m:set_velocity({x=d.x*15, y=d.y*15, z=d.z*15})
 			m:set_acceleration({x=0, y=-5, z=0})
+			minetest.sound_play("default_bow_shoot", {pos=pos, gain = 1.0, max_hear_distance = 5,})
 			return itemstack
 		else
 			local pos=pointed_thing.under
@@ -234,7 +234,7 @@ minetest.register_tool("hook:climb_rope", {
 			end
 			return itemstack
 		end
-	end,
+	end
 })
 
 
@@ -251,6 +251,7 @@ minetest.register_tool("hook:climb_rope_locked", {
 			local m=minetest.add_entity({x=pos.x,y=pos.y+1.5,z=pos.z}, "hook:power")
 			m:set_velocity({x=d.x*15, y=d.y*15, z=d.z*15})
 			m:set_acceleration({x=0, y=-5, z=0})
+			minetest.sound_play("default_bow_shoot", {pos=pos, gain = 1.0, max_hear_distance = 5,})
 			return itemstack
 		else
 			local pos=pointed_thing.under
@@ -281,7 +282,7 @@ minetest.register_tool("hook:climb_rope_locked", {
 			end
 			return itemstack
 		end
-	end,
+	end
 })
 
 
@@ -319,6 +320,7 @@ minetest.register_node("hook:rope", {
 		minetest.set_node(pos, {name = "air"})
 		return false
 	end,
+	sounds = {footstep = {name = "hook_rope", gain = 1}}
 })
 
 minetest.register_node("hook:rope2", {
@@ -357,6 +359,7 @@ minetest.register_node("hook:rope2", {
 			if minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:rope2" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:hooking" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y+i,z=pos.z},{name = "air"}) else return false end
 		end
 	end,
+	sounds = {footstep = {name = "hook_rope", gain = 1}}
 })
 
 minetest.register_node("hook:rope3", {
@@ -402,13 +405,14 @@ minetest.register_node("hook:rope3", {
 			if minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:rope3" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:hooking" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y+i,z=pos.z},{name = "air"}) else return false end
 		end
 	end,
+	sounds = {footstep = {name = "hook_rope", gain = 1}}
 })
 
 minetest.register_node("hook:hooking", {
 	description = "Hooking",
 	drawtype = "mesh",
 	mesh="hook_hook.obj",
-	tiles = {"hook_rope.png"},
+	tiles = {"default_ironblock.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	walkable=false,
@@ -423,7 +427,7 @@ minetest.register_node("hook:hooking", {
 			return false
 		end
 		return true
-	end,
+	end
 })
 
 
@@ -450,18 +454,18 @@ minetest.register_tool("hook:mba", {
 minetest.register_craft({
 	output = "hook:mba",
 	recipe = {
-		{"","default:steel_ingot",""},
-		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
-		{"default:steel_ingot","","default:steel_ingot"},
+		{"","default:iron_ingot",""},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","","default:iron_ingot"},
 	}
 })
 
 minetest.register_craft({
 	output = "hook:hook",
 	recipe = {
-		{"","default:steel_ingot",""},
-		{"","default:steel_ingot","default:steel_ingot"},
-		{"default:steel_ingot","",""},
+		{"","default:iron_ingot",""},
+		{"","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","",""},
 	}
 })
 minetest.register_craft({
@@ -469,30 +473,30 @@ minetest.register_craft({
 	recipe = {
 		{"","hook:hook",""},
 		{"","hook:hook",""},
-		{"","default:steel_ingot",""},
+		{"","default:iron_ingot",""},
 	}
 })
 
 minetest.register_craft({
 	output = "hook:climb_rope",
 	recipe = {
-		{"","default:steel_ingot",""},
-		{"","default:steelblock",""},
-		{"","default:steel_ingot",""},
+		{"","default:iron_ingot",""},
+		{"","default:ironblock",""},
+		{"","default:iron_ingot",""},
 	}
 })
 minetest.register_craft({
 	output = "hook:climb_rope_locked",
 	recipe = {
-		{"hook:climb_rope","default:steel_ingot",""},
+		{"hook:climb_rope","default:iron_ingot",""},
 	}
 })
 
 minetest.register_craft({
 	output = "hook:slingshot",
 	recipe = {
-		{"default:steel_ingot","","default:steel_ingot"},
-		{"","default:steelblock",""},
-		{"","default:steel_ingot",""},
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"","default:ironblock",""},
+		{"","default:iron_ingot",""},
 	}
 })
