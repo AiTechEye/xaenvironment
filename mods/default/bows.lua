@@ -429,19 +429,33 @@ bows.register_arrow("nitrogen",{
 	}
 })
 
+bows.register_arrow("teleport",{
+	description="Teleport arrow",
+	texture="default_quantumblock.png",
+	groups={not_in_craftguide=1},
+	on_hit_object=function(self,target,hp,user,lastpos)
+		local d = user:get_look_dir()
+		local p = user:get_pos()
+		target:set_pos({x=p.x+(d.x*2),y=p.y+(d.y*2),z=p.z+(d.z*2)})
+		bows.arrow_remove(self)
+	end,
+	on_hit_node=function(self,pos2,user,lastpos)
+		user:set_pos(lastpos)
+		bows.arrow_remove(self)
+	end,
+	craft_count=99,
+	damage=0,
+	craft={
+		{"","group:arrow",""},
+		{"group:arrow","default:quantumblock",""},
+		{"","group:arrow",""}
+	}
+})
 
 bows.register_arrow("lightning",{
 	description="Lightning arrow",
 	texture="default_wood.png^[colorize:#FFFFFFFF",
 	groups={not_in_craftguide=1},
-	on_hit_object=function(self,target,hp,user,lastpos)
-		bows.arrow_remove(self)
-		if target:get_hp() <= 13 then
-			nitroglycerin.freeze(target)
-		else
-			default.punch(target,target,10)
-		end
-	end,
 	on_step=function(self)
 		local d = self.user:get_look_dir()
 		local pos1 = self.object:get_pos()
@@ -477,9 +491,6 @@ bows.register_arrow("lightning",{
 		{"","group:arrow",""}
 	}
 })
-
-
-
 
 minetest.register_entity("default:arrow_lightning",{
 	physical = false,
