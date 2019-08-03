@@ -120,7 +120,6 @@ end
 
 minetest.register_tool("hook:hook", {
 	description = "Hook with rope (hit a corner to climb)",
-	range = 2,
 	inventory_image = "hook_hook.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type~="node" then return itemstack end
@@ -159,7 +158,7 @@ minetest.register_tool("hook:hook", {
 
 minetest.register_tool("hook:hook_upgrade", {
 	description = "Hook with rope (double)",
-	range = 5,
+	range = 6,
 	inventory_image = "hook_hookup.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type~="node" then return itemstack end
