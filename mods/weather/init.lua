@@ -221,7 +221,7 @@ weather.ac=function()
 						local s=(w.strength*0.01)*1.2
 						local sound
 						if w.strength>30 then
-							sound=minetest.sound_play("weather_rain", {to_player = name,gain = 2.0,loop=true})
+							sound=minetest.sound_play("weather_rain", {to_player = name,gain = 6,loop=true})
 						end
 						if t>6 and t<19 then
 							player:set_sky({r=149-(s*2),g=154-(s*3),b=209-(s*9),a=255},"plain",{})
@@ -234,18 +234,18 @@ weather.ac=function()
 					end
 						if w.thunder > 0 and w.strength >= 50 then
 							if w.thunder == 1 and math.random(1,50) == 1 then
-								minetest.sound_play("weather_thunder", {to_player = name,gain = 4})
+								minetest.sound_play("weather_thunder", {to_player = name,gain = 8})
 							elseif w.thunder == 2 then
 								local r = math.random(1,50)
 								if r == 1 then
-									minetest.sound_play("weather_thunder", {to_player = name,gain = 4})
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 8})
 								elseif r == 2 then
-									minetest.sound_play("weather_lightning", {to_player = name,gain = 4})
+									minetest.sound_play("weather_lightning", {to_player = name,gain = 8})
 								end
 							elseif w.thunder == 3 then
 								local r = math.random(1,100)
 								if r == 1 then
-									minetest.sound_play("weather_thunder", {to_player = name,gain = 5})
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 10})
 								elseif r == 2 then
 									for i=1,5 do
 										local id = player:hud_add({
@@ -261,13 +261,13 @@ weather.ac=function()
 										end,id,player)
 									end
 									minetest.after(math.random(1,5),function(name)
-										minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+										minetest.sound_play("weather_lightning", {to_player = name,gain = 10})
 									end,name)
 								end
 							elseif w.thunder == 4 then
 								local r = math.random(1,100)
 								if r == 1 then
-									minetest.sound_play("weather_thunder", {to_player = name,gain = 5})
+									minetest.sound_play("weather_thunder", {to_player = name,gain = 10})
 								elseif r == 2 then
 									for i=1,5 do
 										local id = player:hud_add({
@@ -283,10 +283,10 @@ weather.ac=function()
 										end,id,player)
 									end
 									minetest.after(math.random(1,5),function(name)
-										minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+										minetest.sound_play("weather_lightning", {to_player = name,gain = 10})
 									end,name)
 								elseif r == 3 then
-									minetest.sound_play("weather_lightning", {to_player = name,gain = 5})
+									minetest.sound_play("weather_lightning", {to_player = name,gain = 10})
 									weather.lightning(p)
 								end
 							end
@@ -384,7 +384,7 @@ weather.add=function(set)
 					strength=set.strength,
 					sound=1,
 					bio=b,
-					thunder= b==1 and s >= 90 and math.random(1,4) or 0,
+					thunder= b==1 and set.strength >= 90 and math.random(1,4) or 0,
 				})
 			end
 		end
