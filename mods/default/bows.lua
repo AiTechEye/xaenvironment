@@ -444,7 +444,7 @@ bows.register_arrow("teleport",{
 		bows.arrow_remove(self)
 	end,
 	craft_count=99,
-	groups={treasure=0},
+	groups={treasure=0,not_in_creative_inventory=1},
 	damage=0,
 	craft={
 		{"","group:arrow",""},
@@ -486,7 +486,7 @@ bows.register_arrow("lightning",{
 	end,
 	craft_count=3,
 	damage=0,
-	groups={treasure=0},
+	groups={treasure=0,not_in_creative_inventory=1},
 	craft={
 		{"","group:arrow",""},
 		{"group:arrow","default:eletric_lump",""},
