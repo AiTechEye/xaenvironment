@@ -53,6 +53,9 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 			player_style.hunger(player,-1)
 		end
 	end
+	if player and hp_change < 0 then
+			minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
+	end
 	return hp_change
 end,true)
 
