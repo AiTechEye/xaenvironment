@@ -552,6 +552,12 @@ default.register_plant({
 	tiles={"plants_junglegrass.png"},
 	visual_scale=2,
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+	liquidtype = "source",
+	liquid_alternative_flowing="plants:jungle_grass",
+	liquid_alternative_source="plants:jungle_grass",
+	liquid_renewable = false,
+	liquid_range = 0,
+	liquid_viscosity = 15,
 	decoration={
 		biomes={"swamp","jungle"},
 		place_on={"default:dirt_with_jungle_grass"},
