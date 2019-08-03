@@ -60,7 +60,7 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 end,true)
 
 minetest.register_on_dieplayer(function(player)
-	if player_style.survive_black_death then
+	if player_style.survive_black_death and not black_death_id then
 		player_style.players[player:get_player_name()].black_death_id = player:hud_add({
 			hud_elem_type="image",
 			scale = {x=-100, y=-100},
@@ -78,12 +78,10 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
-	minetest.after(0.1,function(player,name)
-		if player_style.players[name].black_death_id then
-			player:hud_remove(player_style.players[name].black_death_id)
-			player_style.players[name].black_death_id = nil
-		end
-	end,player,name)
+	if player_style.players[name].black_death_id then
+		player:hud_remove(player_style.players[name].black_death_id)
+		player_style.players[name].black_death_id = nil
+	end
 end)
 
 minetest.register_on_newplayer(function(player)
@@ -256,7 +254,7 @@ player_style.thirst=function(player,add,reset)
 		end,player)
 	elseif a > 20 then
 		a = 20
-	elseif a <= 10 and add <= 0 then
+	elseif a <= 5 and add <= 0 then
 		minetest.after(0,function(player)
 			player:set_hp(player:get_hp()-1)
 		end,player)
@@ -268,7 +266,7 @@ player_style.thirst=function(player,add,reset)
 	player:get_meta():set_int("thirst",p.thirst.num)
 	player:hud_change(p.thirst.bar, "number", p.thirst.num)
 
-	if p.thirst.num <= 9 and not p.thirst.to_death then
+	if p.thirst.num <= 4 and not p.thirst.to_death then
 		p.thirst.to_death = true
 		player_style.thirst_to_death(player)
 	end
