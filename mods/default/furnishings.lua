@@ -82,28 +82,28 @@ default.register_door=function(def)
 			local p=meta:get_int("p")
 			if pp==2 and p==2 then
 				minetest.swap_node(pos, {name=name, param2=3})
-				minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==3 and p==2 then
 				minetest.swap_node(pos, {name=name, param2=2})
-				minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_close",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==0 and p==0 then
 				minetest.swap_node(pos, {name=name, param2=1})
-				minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==1 and p==0 then
 				minetest.swap_node(pos, {name=name, param2=0})
-				minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})	
+				minetest.sound_play("default_door_close",{pos=pos,gain=1,max_hear_distance=10})	
 			elseif pp==3 and p==3 then
 				minetest.swap_node(pos, {name=name, param2=0})
-				minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==0 and p==3 then
 				minetest.swap_node(pos, {name=name, param2=3})
-				minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_close",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==1 and p==1 then
 				minetest.swap_node(pos, {name=name, param2=2})
-				minetest.sound_play("doors_door_open",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			elseif pp==2 and p==1 then
 				minetest.swap_node(pos, {name=name, param2=1})
-				minetest.sound_play("doors_door_close",{pos=pos,gain=0.3,max_hear_distance=10})
+				minetest.sound_play("default_door_close",{pos=pos,gain=1,max_hear_distance=10})
 			else
 				meta:set_int("autoopen",1)
 				minetest.get_node_timer(pos):start(0.2)
