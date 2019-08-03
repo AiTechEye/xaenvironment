@@ -352,9 +352,9 @@ minetest.register_globalstep(function(dtime)
 				a="walk"
 				local p = player:get_pos()
 				if key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
-					hunger = -0.002
+					hunger = -0.001
 					a="dive"
-					player_style.player_diveing(name,player,true,key.sneak)
+					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
 				elseif key.aux1 then
 					a="run"
 					player_style.player_run(name,player,true)
@@ -445,7 +445,7 @@ player_style.player_run=function(name,player,a)
 	end
 end
 
-player_style.player_diveing=function(name,player,a)
+player_style.player_diveing=function(name,player,a,water)
 	if a and not player_style.player_dive[name] then
 		player_style.player_run(name,player)
 		player_style.player_dive[name] = {}
@@ -455,7 +455,7 @@ player_style.player_diveing=function(name,player,a)
 			stepheight=1.1,
 		})
 		player:set_physics_override({
-			jump=0,
+			jump= water == 0 and 0 or 1,
 		})
 	elseif not a and player_style.player_dive[name] then
 		local profile=player_style.registered_profiles[player_style.players[name].profile]
