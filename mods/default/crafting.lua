@@ -580,6 +580,15 @@ minetest.register_node("default:recycling_mill", {
 					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
 					if a.item and a.item:get_name() == inv:get_stack("input",1):get_name() then
 						return
+					elseif v:sub(1,6) == "group:" then
+						local g = v:sub(7,-1)
+						for i2,v2 in pairs(minetest.registered_items) do
+							if v2.groups and (v2.groups[g] or 0) > 0 then
+								craft.items[i]=i2
+								break
+							end
+
+						end
 					end
 
 				end
