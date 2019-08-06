@@ -54,7 +54,7 @@ examobs.register_mob({
 		local pos1 = self.object:get_pos()
 		local pos2 = target:get_pos()
 		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.013),z=(pos1.z-pos2.z)/-d}
+		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.011),z=(pos1.z-pos2.z)/-d}
 
 		local user = {
 			get_look_dir=function()
