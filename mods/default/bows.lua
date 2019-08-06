@@ -216,7 +216,7 @@ minetest.register_entity("default:arrow",{
 			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
 			minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 			if not self.removed then
-				minetest.add_item(self.oldpos,self.name):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+				minetest.add_item(self.oldpos or pos,self.name):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
 				self.object:remove()
 			end
 			return self
