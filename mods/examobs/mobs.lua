@@ -3,7 +3,7 @@ examobs.register_mob({
 	type = "monster",
 	team="bone",
 	dmg = 1,
-	textures = {"examobs_skeleton.png","default_stone.png"},
+	textures = {"examobs_skeleton.png","default_air.png"},
 	mesh = "examobs_skeleton.b3d",
 	inv={["bones:bone"]=1},
 	punch_chance=2,
