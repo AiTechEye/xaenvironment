@@ -1,11 +1,12 @@
 examobs.register_mob({
 	name = "skeleton",
 	type = "monster",
-	team="bone",
+	team="metal",
 	dmg = 1,
+	hp= 50,
 	textures = {"examobs_skeleton.png","default_air.png"},
 	mesh = "examobs_skeleton.b3d",
-	inv={["bones:bone"]=1},
+	inv={["default:iron_ingot"]=1},
 	punch_chance=2,
 	animation = {
 		stand = {x=1,y=10,speed=0},
@@ -19,15 +20,15 @@ examobs.register_mob({
 	aggressivity = 2,
 	walk_speed = 2,
 	run_speed = 4,
-	spawn_chance = 500,
-	spawn_on={"group:stone","group:spreading_dirt_type"},
+	spawn_chance = 100,
+	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
 	light_min = 1,
 	light_max = 15,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
 	end,
 	on_spawn=function(self)
-		local types = {"fight_bone","fight_hand","fight_bow"}
+		local types = {"fight_ingot","fight_hand","fight_bow"}
 		self.storage.type = types[math.random(1,3)]
 		self:on_load()
 	end,
@@ -35,8 +36,8 @@ examobs.register_mob({
 		self[self.storage.type] = true
 		local t
 
-		if self.fight_bone then
-			t = "bones_bone.png"
+		if self.fight_ingot then
+			t = "default_ironblock.png^default_alpha_ingot.png^[makealpha:0,255,0"
 			self.dmg = 3
 		elseif self.fight_bow then
 			t = "default_wood.png^default_bow.png^[makealpha:0,255,0"
@@ -72,7 +73,7 @@ examobs.register_mob({
 				return {}
 			end,
 			get_look_horizontal=function()
-				return self.object:get_yaw()+(math.pi/2)
+				return self.object:get_yaw()
 			end,
 			get_player_name=function()
 				return ""
