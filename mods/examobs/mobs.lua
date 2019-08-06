@@ -20,7 +20,7 @@ examobs.register_mob({
 	aggressivity = 2,
 	walk_speed = 2,
 	run_speed = 4,
-	spawn_chance = 100,
+	spawn_chance = 400,
 	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
 	light_min = 1,
 	light_max = 15,
