@@ -95,7 +95,7 @@ bows.load=function(itemstack, user, pointed_thing)
 	return itemstack
 end
 
-bows.shoot=function(itemstack, user, pointed_thing)
+bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 	local item=itemstack:to_table()
 	local meta=minetest.deserialize(item.metadata)
 
@@ -140,6 +140,7 @@ bows.shoot=function(itemstack, user, pointed_thing)
 			e:set_velocity({x=dir.x*level, y=dir.y*level, z=dir.z*level})
 			e:set_acceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
 			e:set_yaw(user:get_look_horizontal()+math.pi)
+			e:get_luaentity().on_dropitem=on_dropitem or function() end
 			minetest.sound_play("default_bow_shoot", {pos=pos})
 		end,level,user,meta)
 	end
@@ -216,7 +217,9 @@ minetest.register_entity("default:arrow",{
 			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
 			minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 			if not self.removed then
-				minetest.add_item(self.oldpos or pos,self.name):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+				local e = minetest.add_item(self.oldpos or pos,self.name)
+				e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+				self.on_dropitem(e)
 				self.object:remove()
 			end
 			return self
@@ -229,7 +232,9 @@ minetest.register_entity("default:arrow",{
 				bows.registed_arrows[self.name].on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
 				minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 				if not self.removed then
-					minetest.add_item(self.oldpos,self.name .." 1"):set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+					local e = minetest.add_item(self.oldpos,self.name .." 1")
+					e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+					self.on_dropitem(e)
 					self.object:remove()
 				end
 				return self
