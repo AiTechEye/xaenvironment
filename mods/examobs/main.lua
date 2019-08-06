@@ -35,7 +35,7 @@ examobs.register_mob=function(def)
 	def.hp =				def.hp or				20
 	def.hp_max = 			def.hp
 	def.physical =			def.physical or			def.physical ~= false
-	def.collisionbox =			def.collisionbox or			{-0.35,0,-0.35,0.35,1.8,0.35}
+	def.collisionbox =			def.collisionbox or			{-0.35,-0.1,-0.35,0.35,1.8,0.35}
 	def.visual =			def.visual or			"mesh"
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
