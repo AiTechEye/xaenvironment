@@ -303,7 +303,6 @@ examobs.fighting=function(self)
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
-			examobs.walk(self,true)
 			if math.random(1,self.punch_chance) == 1 then
 				if self.fight:get_pos().y > self:pos().y then
 					examobs.jump(self)
@@ -601,11 +600,15 @@ examobs.dropall=function(self)
 	end
 	for i,v in pairs(self.inv) do
 		if minetest.registered_items[i] then
-			minetest.add_item(pos,i .. " " .. v):set_velocity({
-				x=math.random(-1.5,1.5),
-				y=math.random(0.5,1),
-				z=math.random(-1.5,1.5)
-			})
+			local e = minetest.add_item(pos,i .. " " .. v)
+			if e then
+				e:set_velocity({
+					x=math.random(-1.5,1.5),
+					y=math.random(0.5,1),
+					z=math.random(-1.5,1.5)
+
+				})
+			end
 		end
 		self.inv[i] = nil
 	end
