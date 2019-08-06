@@ -597,6 +597,7 @@ default.punch_pos=function(pos,damage,even_items)
 end
 
 default.punch=function(target,puncher,damage)
+	if type(puncher)=="table" and puncher.object then puncher=puncher.object end
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
 end
 

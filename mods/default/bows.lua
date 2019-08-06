@@ -139,7 +139,7 @@ bows.shoot=function(itemstack, user, pointed_thing)
 
 			e:set_velocity({x=dir.x*level, y=dir.y*level, z=dir.z*level})
 			e:set_acceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
-			e:set_yaw(user:get_look_yaw()+math.pi)
+			e:set_yaw(user:get_look_horizontal()+math.pi)
 			minetest.sound_play("default_bow_shoot", {pos=pos})
 		end,level,user,meta)
 	end
