@@ -261,7 +261,7 @@ examobs.register_mob({
 	mesh = "examobs_wolf.b3d",
 	type = "monster",
 	team = "coal",
-	dmg = 4,
+	dmg = 2,
 	hp = 30,
 	aggressivity = 2,
 	swiming = 0,
@@ -735,7 +735,7 @@ examobs.register_bird({
 		return true
 	end,
 	hp = 10,
-	dmg = 4,
+	dmg = 1,
 	team = "coal",
 	type = "monster",
 	run_speed = 4,
