@@ -7,7 +7,9 @@ examobs.register_mob({
 	textures = {"examobs_skeleton.png","default_air.png"},
 	mesh = "examobs_skeleton.b3d",
 	inv={["default:iron_ingot"]=1},
-	punch_chance=2,
+	punch_chance=4,
+	collisionbox = {-0.35,-1.1,-0.35,0.35,0.8,0.35},
+	bottom=-1,
 	animation = {
 		stand = {x=1,y=10,speed=0},
 		walk = {x=12,y=31},
@@ -24,9 +26,6 @@ examobs.register_mob({
 	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
 	light_min = 1,
 	light_max = 15,
-	is_food=function(self,item)
-		return minetest.get_item_group(item,"meat") > 0
-	end,
 	on_spawn=function(self)
 		local types = {"fight_ingot","fight_hand","fight_bow"}
 		self.storage.type = types[math.random(1,3)]
@@ -35,7 +34,6 @@ examobs.register_mob({
 	on_load=function(self)
 		self[self.storage.type] = true
 		local t
-
 		if self.fight_ingot then
 			t = "default_ironblock.png^default_alpha_ingot.png^[makealpha:0,255,0"
 			self.dmg = 3
@@ -51,17 +49,15 @@ examobs.register_mob({
 		self.object:set_properties({textures={"examobs_skeleton.png",t}})
 	end,
 	use_bow=function(self,target)
-		local pos1 = self.object:get_pos()
+		local pos1 = apos(self.object:get_pos(),0,-1)
 		local pos2 = target:get_pos()
 		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.011),z=(pos1.z-pos2.z)/-d}
-
+		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
 		local user = {
 			get_look_dir=function()
 				return dir
 			end,
-			punch=function(a,b,c,d,g)
-				print(a,b,c,d,g)
+			punch=function()
 			end,
 			get_pos=function()
 				return pos1
@@ -73,11 +69,15 @@ examobs.register_mob({
 				return {}
 			end,
 			get_look_horizontal=function()
-				return self.object:get_yaw()
+				return self.object:get_yaw() or 0
 			end,
 			get_player_name=function()
-				return ""
+				return self.examob ..""
 			end,
+			is_player=function()
+				return true
+			end,
+			examob=self.examob,
 			object=self.object,
 		}
 		local item = ItemStack({
