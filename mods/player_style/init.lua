@@ -5,6 +5,7 @@ player_style={
 	player_attached={},
 	player_dive = {},
 	player_running = {},
+	player_tired = {},
 	creative = minetest.settings:get_bool("creative_mode") == true,
 	damage = minetest.settings:get_bool("enable_damage") == true,
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst") ~= false,
@@ -353,27 +354,33 @@ minetest.register_globalstep(function(dtime)
 				a="walk"
 				local p = player:get_pos()
 				if key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
-					hunger = -0.001
+					hunger = -0.0005
 					a="dive"
 					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
 				elseif key.aux1 then
 					a="run"
 					player_style.player_run(name,player,true)
 					local run = player_style.player_running[name]
+					if run then
+						hunger = -0.0005
+					end
 					if run and run.wallrun then
 						local d=player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
 						local v = player:get_player_velocity()
-						hunger = -0.01
+						hunger = -0.002
 						if key.jump then
 							run.wallrun = nil
 							player:set_physics_override({jump=1.25})
+							hunger = -0.05
 						elseif run.wallrun == 1 and walkable and v.y == 0 and math.abs(v.x+v.z) > 1.5 then
 							player:set_physics_override({jump=1.8})
 							run.wallrun = 2
+							hunger = -0.05
 						elseif run.wallrun == 2 and not walkable then
 							player:set_physics_override({jump=1.25})
 							run.wallrun = 1
+							hunger = -0.05
 						end
 					end
 				end
@@ -423,21 +430,43 @@ minetest.register_globalstep(function(dtime)
 			player_style.set_animation(name,a)
 			player_style.hunger(player,hunger)
 			player_style.thirst(player,hunger*2)
+			player_style.tired(name,player)
+
 		end
 	end
 end)
 
-player_style.player_run=function(name,player,a)
-	player_style.hunger(player,-0.001)
+player_style.tired=function(name,player)
 	local hunger = player_style.players[name].hunger
+	local h = (hunger and hunger.level or 20)
+	if player_style.player_dive[name] or player_style.player_running[name] then
+		player_style.player_tired[name] = nil
+	elseif not player_style.player_tired[name] and h <= 8 then
+		player_style.player_tired[name] = true
+		player:set_physics_override({
+			jump=0.7,
+			speed = 0.7,
+		})
+	elseif h > 8 and player_style.player_tired[name] then
+		player_style.player_tired[name] = nil
+		player:set_physics_override({
+			jump=1,
+			speed = 1,
+		})
+	end
+end
+
+player_style.player_run=function(name,player,a)
+	local hunger = player_style.players[name].hunger
+	local h = (hunger and hunger.level or 20)
 	if player_style.player_dive[name] then
-	elseif a and not player_style.player_running[name] and (hunger and hunger.level or 20 > 15) then
+	elseif a and not player_style.player_running[name] and h > 10 then
 		player_style.player_running[name] = {wallrun=1}
 		player:set_physics_override({
 			jump=1.25,
 			speed = 2,
 		})
-	elseif (not a or hunger and hunger.level < 15) and player_style.player_running[name] then
+	elseif (not a or h <= 10) and player_style.player_running[name] then
 		player_style.player_running[name] = nil
 		player:set_physics_override({
 			jump=1,
