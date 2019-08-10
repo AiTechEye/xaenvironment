@@ -132,21 +132,21 @@ player_style.inventory=function(player)
 			}):set_size("main", 1)
 		end
 --creative inventory
-		invp.index = invp.index or 1
-		invp.size = invp.size or 27
+		invp.index = invp.index or 0
+		invp.size = invp.size or 35
 
 		local pages = math.floor(#player_style.inventory_items/player_style.players[name].inv.size)
 		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
 		local itembutts = ""
 		local x=8
 		local y=0
-		for i=invp.index,invp.index+invp.size do
+		for i=1+invp.index,invp.index+invp.size do
 			local it = player_style.inventory_items[i]
 			if it then
 				itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";]"
-				x = x + 1
+				x = x + 0.8
 				if x >= 12 then
-					y = y + 1
+					y = y + 0.9
 					x = 8
 				end
 			end
