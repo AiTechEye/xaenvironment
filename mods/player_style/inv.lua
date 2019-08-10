@@ -132,16 +132,19 @@ player_style.inventory=function(player)
 			}):set_size("main", 1)
 		end
 --creative inventory
-		invp.index = invp.index or 0
-		invp.size = invp.size or 35
+		invp.index = invp.index or 1
+		invp.size = invp.size or 34
+		invp.search = invp.search and invp.search.text ~= "" and invp.search or nil
 
-		local pages = math.floor(#player_style.inventory_items/player_style.players[name].inv.size)
+		local itemlist = invp.search and invp.search.items or player_style.inventory_items
+		local pages = math.floor(#itemlist/player_style.players[name].inv.size)
 		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
 		local itembutts = ""
 		local x=8
 		local y=0
-		for i=1+invp.index,invp.index+invp.size do
-			local it = player_style.inventory_items[i]
+
+		for i=invp.index,invp.index+invp.size do
+			local it = itemlist[i]
 			if it then
 				itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";]"
 				x = x + 0.8
@@ -171,6 +174,10 @@ player_style.inventory=function(player)
 			.."tooltip[clean;Clean your inventory]"
 			.."image[7,2;1,1;default_bucket.png]list[detached:deleteslot;main;7,2;1,1;]"
 			.."label[9.6,7.9;"..page.."/"..pages.."]"
+
+			.."field[8.3,6.5;3,1;searchbox;;"..(invp.search and invp.search.text or "").."]"
+			.."image_button[11,6.3;1,0.8;;search;]"
+
 			..itembutts
 		)
 	end
@@ -190,16 +197,17 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if pressed.quit then
 				player_style.players[name].inv.clean = nil
 				return
-			elseif pressed.creinvright and invp.index+invp.size < #player_style.inventory_items then
-				invp.index = invp.index + invp.size
+			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
+				invp.index = invp.index + invp.size+1
 				player_style.inventory(player)
 				return
 			elseif pressed.creinvleft and invp.index > 1 then
-				invp.index = invp.index - invp.size
+				invp.index = invp.index - invp.size-1
 				player_style.inventory(player)
 				return
 			elseif pressed.reset then
 				invp.index = 1
+				invp.search = nil
 				player_style.inventory(player)
 				return
 			elseif pressed.clean then
@@ -213,6 +221,21 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					end
 					player_style.players[name].inv.clean = nil
 				end
+			elseif pressed.search then
+				local its = {}
+				local s = pressed.searchbox:lower()
+				for i,it in pairs(player_style.inventory_items) do
+					if it:find(s) or (minetest.registered_items[it].description or ""):lower():find(s) then
+						table.insert(its,it)
+					end
+				end
+				invp.index = 1
+				invp.search={
+					text = s,
+					items = its
+				}
+				player_style.inventory(player)
+				return
 			end
 			for i,v in pairs(pressed) do
 				if i:sub(1,8) == "itembut_" then
