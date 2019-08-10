@@ -497,7 +497,7 @@ default.registry_mineral=function(def)
 	if not def.not_arrow then
 		def.arrow = def.arrow or {}
 		bows.register_arrow(def.arrow.name or def.name,{
-			description=def.arrow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
+			description=def.arrow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." arrow",
 			texture=def.texture,
 			damage=def.arrow.damage or 1,
 			craft_count=def.arrow.craft_count or 8,
