@@ -136,11 +136,11 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 				y=pos.y+((user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.5 or 1.5)+y,
 				z=pos.z+z
 			}, "default:arrow")
-
 			e:set_velocity({x=dir.x*level, y=dir.y*level, z=dir.z*level})
 			e:set_acceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
 			e:set_yaw(user:get_look_horizontal()-math.pi/2)
 			e:get_luaentity().on_dropitem=on_dropitem or function() end
+			e:get_luaentity().dir ={x=dir.x/2,y=dir.y/2,z=dir.z/2,}
 			minetest.sound_play("default_bow_shoot", {pos=pos})
 		end,level,user,meta)
 	end
@@ -208,7 +208,7 @@ minetest.register_entity("default:arrow",{
 	end,
 	bow_arrow=true,
 	timer=20,
-	on_step=	function(self, dtime)
+	on_step=function(self, dtime)
 		self.timer=self.timer-dtime
 		local pos=self.object:get_pos()
 		local no=minetest.registered_nodes[minetest.get_node(pos).name]
@@ -225,9 +225,8 @@ minetest.register_entity("default:arrow",{
 			return self
 		end
 		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,self.oldpos or pos)
-		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
-			local en  = ob:get_luaentity()
-			if (bows.pvp and ob:is_player() and ob:get_player_name() ~= self.user:get_player_name()) or (en and en.physical and not en.bow_arrow and en.name ~= "__builtin:item") then
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 3)) do
+			if self:is_hit(pos,ob) then
 				bows.on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
 				bows.registed_arrows[self.name].on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
 				minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
@@ -239,9 +238,19 @@ minetest.register_entity("default:arrow",{
 				end
 				return self
 			end
+
 		end
 		self.oldpos = vector.new(pos)
 		return self
+	end,
+	is_hit=function(self,p,ob)
+		local en  = ob:get_luaentity()
+		if (bows.pvp and ob:is_player() and ob:get_player_name() ~= self.user:get_player_name()) or en and en.physical and (not en.bow_arrow and en.name ~= "__builtin:item" and self.user.examob ~= en.examob) then
+			local c = ob:get_properties().collisionbox
+			local o = ob:get_pos()
+			local pp = {x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z}
+			return vector.distance(p,o) <= 1 or math.max(p.x,o.x+c[1],o.x+c[4])~=p.x and math.min(p.x,o.x+c[1],o.x+c[4])~=p.x and math.max(p.z,o.z+c[3],o.z+c[6])~=p.z and math.min(p.z,o.z+c[3],o.z+c[6])~=p.z and math.max(p.y,o.y+c[2],o.y+c[5])~=p.y and math.min(p.y,o.y+c[2],o.y+c[5])~=p.y or           math.max(pp.x,o.x+c[1],o.x+c[4])~=pp.x and math.min(pp.x,o.x+c[1],o.x+c[4])~=pp.x and math.max(pp.z,o.z+c[3],o.z+c[6])~=pp.z and math.min(pp.z,o.z+c[3],o.z+c[6])~=pp.z and math.max(pp.y,o.y+c[2],o.y+c[5])~=pp.y and math.min(pp.y,o.y+c[2],o.y+c[5])~=pp.y
+		end
 	end,
 })
 
