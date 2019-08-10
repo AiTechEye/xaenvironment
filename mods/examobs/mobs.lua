@@ -26,6 +26,9 @@ examobs.register_mob({
 	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
 	light_min = 1,
 	light_max = 15,
+	is_food=function(self,item)
+		return false
+	end,
 	on_spawn=function(self)
 		local types = {"fight_ingot","fight_hand","fight_bow"}
 		self.storage.type = types[math.random(1,3)]
@@ -89,7 +92,7 @@ examobs.register_mob({
 		end)
 	end,
 	step=function(self)
-		if self.fight and self.fight_bow and (self.aim > 0 or math.random(1,3)) then
+		if self.fight and self.fight_bow and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
 			examobs.stand(self)
 			examobs.anim(self,"aim")
 			examobs.lookat(self,self.fight)
@@ -114,16 +117,6 @@ examobs.register_mob({
 	end,
 	aim=0,
 })
-
-
-
-
-
-
-
-
-
-
 
 examobs.register_mob({
 	name = "npc",
