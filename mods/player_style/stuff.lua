@@ -117,7 +117,7 @@ minetest.register_tool("player_style:backpack", {
 	description = "Backpack",
 	inventory_image = "player_style_backpack.png",
 	wield_scale={x=2,y=2,z=3},
-	groups={treasure=1,backpack=2},
+	groups={treasure=1,backpack=2,flammable=1},
 })
 minetest.register_craft({
 	output="player_style:backpack",
