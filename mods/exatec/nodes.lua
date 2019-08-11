@@ -45,12 +45,35 @@ minetest.register_node("exatec:autocrafter", {
 				list[v] = (list[v] and list[v]+1) or 1
 			end
 			for i,v in pairs(list) do
-				if not inv:contains_item("input",ItemStack(i .." " .. v)) then
+				if i:sub(1,6) == "group:" then
+					local it = 0
+					local n = i:sub(7,-1)
+					for i2,v2 in pairs(inv:get_list("input")) do
+						if minetest.get_item_group(v2:get_name(),n) > 0 then
+							it = it + v2:get_count()
+							if it >= v then
+								break
+							end
+						end
+					end
+					if it < v then
+						return
+					end
+				elseif not inv:contains_item("input",ItemStack(i .." " .. v)) then
 					return
 				end
 			end
 			for i,v in pairs(list) do
-				inv:remove_item("input",ItemStack(i .." " .. v))
+				if i:sub(1,6) == "group:" then
+					for i2,v2 in pairs(inv:get_list("input")) do
+						if minetest.get_item_group(v2:get_name(),i:sub(7,-1)) > 0 then
+							inv:remove_item("input",v2:get_name() .. " " .. v)
+							break
+						end
+					end
+				else
+					inv:remove_item("input",ItemStack(i .." " .. v))
+				end
 			end
 			inv:add_item("output",ItemStack(m:get_string("item").." " .. m:get_string("count")))
 			return true
