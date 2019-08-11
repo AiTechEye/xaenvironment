@@ -1,3 +1,53 @@
+minetest.register_node("exatec:tube", {
+	description = "Tube",
+	tiles = {"exatec_glass.png"},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {dig_immediate = 3,exatec_tube=1},
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube"},
+	--on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+	--	node.param2=node.param2+1
+	--	print(node.param2)
+	--	minetest.swap_node(pos,node)
+	--end,
+	after_place_node = function(pos, placer)
+		--minetest.set_node(pos,{name="was:wire",param2=135})
+	end,
+})
+
+minetest.register_node("exatec:tube_distribution", {
+	description = "Tube distribution",
+	tiles = {"exatec_glass.png"},
+	paramtype = "light",
+	drawtype = "glasslike",
+	sunlight_propagates=true,
+	groups = {dig_immediate = 3,exatec_tube=2},
+	exatec={
+		input=function(pos,stack)
+			for i,d in pairs(exatec.tube_rules) do
+				local t = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+				if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 then
+					local e = minetest.add_entity(t,"exatec:tubeitem")
+					e:get_luaentity():new_item(stack,d)
+					return
+				end
+			end
+			minetest.add_item(pos,stack)
+		end
+	},
+})
+
 minetest.register_node("exatec:autocrafter", {
 	description = "Autocrafter",
 	tiles={"default_ironblock.png^default_craftgreed.png"},
@@ -109,4 +159,52 @@ minetest.register_node("exatec:autocrafter", {
 		local inv = minetest.get_meta(pos):get_inventory()
 		return inv:is_empty("input") and inv:is_empty("output") and inv:is_empty("craft")
 	end,
+	exatec={
+		input_list="input",
+		output_list="output",
+	},
+})
+
+minetest.register_node("exatec:extraction", {
+	description = "Extraction",
+	tiles={
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png^default_crafting_arrowright.png",
+		"default_ironblock.png^default_crafting_arrowleft.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	paramtype2 = "facedir",
+	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
+		local b1 = exatec.def(b)
+		if b1.output_list then
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			local f1 = exatec.def(f)
+			for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
+				if v:get_name() ~= "" then
+					local stack = ItemStack(v:get_name() .." " .. 1)
+					if minetest.get_item_group(minetest.get_node(f).name,"exatec_tube") == 2 or exatec.test_input(f,stack) and exatec.test_output(b,stack) then
+						exatec.input(f,stack) 
+						exatec.output(b,stack)
+						return true
+					end
+				end
+			end
+		end
+		return true
+	end,
+	groups = {choppy=3,oddly_breakable_by_hand=3},
+	exatec={
+		on_input=function(pos,stack)
+		end,
+		on_output=function(pos,stack)
+		end,
+	},
 })

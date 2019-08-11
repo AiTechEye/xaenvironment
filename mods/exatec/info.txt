@@ -1,0 +1,20 @@
+exatec={
+	input_max=1,			-- max stack to put
+	output_max=1,			-- max stack to take
+
+	input_list="listname",		-- list to put in
+	output_list="listname",		-- list to stack take from
+
+	input=function(pos,stack)		-- put in function
+	end,
+	output=function(pos,stack)		-- return from function
+	end,
+
+	on_input=function(pos,stack)		-- while input
+	end,
+	on_output=function(pos,stack)	-- while output
+	end,
+},
+
+
+
