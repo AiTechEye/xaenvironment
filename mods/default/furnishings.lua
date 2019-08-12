@@ -321,6 +321,10 @@ default.register_chest=function(def)
 			local pname = player:get_player_name()
 			return (owner == "" or owner == pname or minetest.check_player_privs(pname, {protection_bypass=true})) and meta:get_inventory():is_empty("main")
 		end,
+		exatec = not locked and {
+			input_list="main",
+			output_list="main",
+		} or nil,
 	})
 
 	minetest.register_craft({
