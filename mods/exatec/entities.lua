@@ -4,7 +4,7 @@ minetest.register_entity("exatec:tubeitem",{
 	collisionbox = {0,0,0,0,0,0},
 	physical=false,
 	textures={"air"},
-	timer = 0,
+	timer = 1,
 	get_staticdata = function(self)
 		return minetest.serialize(self.storage)
 	end,
@@ -37,7 +37,6 @@ minetest.register_entity("exatec:tubeitem",{
 				return
 			end
 		end
-
 		local ap = {x=math.floor(pos.x+0.5),y=math.floor(pos.y+0.5),z=math.floor(pos.z+0.5)}
 		for i,d in pairs(exatec.tube_rules) do
 			local t = {x=ap.x+d.x,y=ap.y+d.y,z=ap.z+d.z}
