@@ -220,7 +220,7 @@ end
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1},
+	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
 	after_place_node = function(pos, placer, itemstack)
@@ -291,7 +291,11 @@ minetest.register_node("default:workbench", {
 		local owner = minetest.get_meta(pos):get_string("owner")
 		local name = player:get_player_name()
 		return (inv:is_empty("craft") and inv:is_empty("stock")) and (name == owner or owner == "")
-	end
+	end,
+	exatec={
+		input_list="stock",
+		output_list="stock",
+	},
 })
 
 minetest.register_node("default:craftguide", {
@@ -528,7 +532,7 @@ minetest.register_node("default:dye_workbench", {
 minetest.register_node("default:recycling_mill", {
 	description = "Recycling mill",
 	tiles={"default_ironblock.png^synth_repeat.png"},
-	groups = {cracky=3,flammable=2,used_by_npc=1},
+	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube=1},
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
@@ -605,4 +609,13 @@ minetest.register_node("default:recycling_mill", {
 		local inv = minetest.get_meta(pos):get_inventory()
 		return inv:is_empty("input") and inv:is_empty("output")
 	end,
+	exatec={
+		input_max=1,
+		input_list="input",
+		output_list="output",
+		test_input=function(pos,stack)
+			local inv = minetest.get_meta(pos):get_inventory()
+			return inv:is_empty("input") and inv:is_empty("output")
+		end,
+	},
 })
