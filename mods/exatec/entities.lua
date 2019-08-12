@@ -41,10 +41,13 @@ minetest.register_entity("exatec:tubeitem",{
 		for i,d in pairs(exatec.tube_rules) do
 			local t = {x=ap.x+d.x,y=ap.y+d.y,z=ap.z+d.z}
 			local e = exatec.def(t)
-			if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 and vector.distance(t,self.storage.oldpos) > 1 and vector.distance(pos,ap) < 0.2 then
-				self.storage.oldpos = ap
+--if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 and vector.distance(t,self.storage.oldpos) > 1 and vector.distance(pos,ap) < 0.5 then
+			if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 and not exatec.samepos(t,self.storage.oldpos) and vector.distance(pos,ap) < 0.5 then
 				self.object:set_velocity(d)
-				if vector.distance(self.storage.dir,d) > 0 then
+				self.storage.oldpos = ap
+
+--if vector.distance(self.storage.dir,d) > 0 then
+				if not exatec.samepos(self.storage.dir,d) then
 					self.storage.dir = d
 					self.object:set_pos(ap)
 				end

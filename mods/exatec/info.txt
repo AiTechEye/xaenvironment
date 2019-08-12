@@ -1,3 +1,5 @@
+groups={exatec_tube=1}			-- conntected to tubes
+
 exatec={
 	input_max=1,			-- max stack to put
 	output_max=1,			-- max stack to take

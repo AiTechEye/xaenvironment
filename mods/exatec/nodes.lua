@@ -34,6 +34,9 @@ minetest.register_node("exatec:tube_distribution", {
 	sunlight_propagates=true,
 	groups = {dig_immediate = 3,exatec_tube=2},
 	exatec={
+		test_input=function(pos,stack)
+			return true
+		end,
 		input=function(pos,stack)
 			for i,d in pairs(exatec.tube_rules) do
 				local t = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
@@ -51,7 +54,7 @@ minetest.register_node("exatec:tube_distribution", {
 minetest.register_node("exatec:autocrafter", {
 	description = "Autocrafter",
 	tiles={"default_ironblock.png^default_craftgreed.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -190,8 +193,8 @@ minetest.register_node("exatec:extraction", {
 			for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
 				if v:get_name() ~= "" then
 					local stack = ItemStack(v:get_name() .." " .. 1)
-					if minetest.get_item_group(minetest.get_node(f).name,"exatec_tube") == 2 or exatec.test_input(f,stack) and exatec.test_output(b,stack) then
-						exatec.input(f,stack) 
+					if exatec.test_input(f,stack) and exatec.test_output(b,stack) then
+						exatec.input(f,stack)
 						exatec.output(b,stack)
 						return true
 					end
