@@ -20,6 +20,7 @@ minetest.register_entity("exatec:tubeitem",{
 		self.stack = stack
 		self.storage.stack = stack:to_table()
 		self.storage.name = stack:get_name()
+		self.storage.dir = dir
 		self.object:set_properties({textures={self.storage.name}})
 		self.object:set_velocity(dir)
 	end,
@@ -28,7 +29,7 @@ minetest.register_entity("exatec:tubeitem",{
 		local pos = self.object:get_pos()
 		if self.timer > 0.5 then
 			self.timer = 0
-			if minetest.get_item_group(minetest.get_node(pos).name,"exatec_tube") == 0 then
+			if minetest.get_item_group(minetest.get_node(pos).name,"exatec_tube") == 0 or not self.storage.dir then
 				if self.storage.stack then
 					minetest.add_item(pos,ItemStack(self.storage.stack))
 				end
@@ -44,6 +45,10 @@ minetest.register_entity("exatec:tubeitem",{
 			if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 and vector.distance(t,self.storage.oldpos) > 1 and vector.distance(pos,ap) < 0.2 then
 				self.storage.oldpos = ap
 				self.object:set_velocity(d)
+				if vector.distance(self.storage.dir,d) > 0 then
+					self.storage.dir = d
+					self.object:set_pos(ap)
+				end
 				return
 			elseif e and e.input_list and exatec.test_input(t,self.stack) then
 				exatec.input(t,self.stack)

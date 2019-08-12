@@ -6,8 +6,17 @@ exatec={
 	output_list="listname",		-- list to stack take from
 
 	input=function(pos,stack)		-- put in function
+		return stack or nil
 	end,
 	output=function(pos,stack)		-- return from function
+		return stack or nil
+	end,
+
+	test_input=function(pos,stack)	-- test for input
+		return true or false/nil
+	end,
+	test_output=function(pos,stack)	-- test for output
+		return true or false/nil
 	end,
 
 	on_input=function(pos,stack)		-- while input

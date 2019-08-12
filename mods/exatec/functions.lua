@@ -5,11 +5,17 @@ end
 
 exatec.test_input=function(pos,stack)
 	local a = exatec.def(pos)
+	if a.test_input then
+		return a.test_input(pos,stack)
+	end
 	return minetest.get_meta(pos):get_inventory():room_for_item(a.input_list,stack)
 end
 
 exatec.test_output=function(pos,stack)
 	local a = exatec.def(pos)
+	if a.test_output then
+		return a.test_output(pos,stack)
+	end
 	return minetest.get_meta(pos):get_inventory():contains_item(a.output_list,stack)
 end
 
@@ -25,8 +31,6 @@ exatec.input=function(pos,stack)
 		inv:add_item(a.input_list,stack)
 	elseif a.input then
 		re = a.input(pos,stack)
-	--else
-	--	minetest.add_item(pos,stack)
 	end
 	if a.on_input then
 		f.on_input(f,stack)
