@@ -1,9 +1,9 @@
 xaenvironment_thirst (Thirst) bool true
-
+
 xaenvironment_hunger (Hunger) bool true
-
+
 xaenvironment_quadruplet_fall_damage (4x Fall Damage) bool true
-
+
 xaenvironment_itemlosing (Itemlosing / Bones) bool true
 
 xaenvironment_black_death (Black death) bool true
