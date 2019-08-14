@@ -266,7 +266,7 @@ default.register_chest=function(def)
 	local tiles
 	local locked = def.locked
 	groups.flammable = def.burnable and 1 or nil
-	groups.exatec_tube = not locked and 1 or nil
+	groups.exatec_tube_connected = not locked and 1 or nil
 	if def.texture and string.find(def.texture,".png") then
 		tiles = {
 			def.texture .."^default_chest_top.png",

@@ -220,7 +220,7 @@ end
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube=1},
+	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
 	after_place_node = function(pos, placer, itemstack)
@@ -532,7 +532,7 @@ minetest.register_node("default:dye_workbench", {
 minetest.register_node("default:recycling_mill", {
 	description = "Recycling mill",
 	tiles={"default_ironblock.png^synth_repeat.png"},
-	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube=1},
+	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube_connected=1},
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
