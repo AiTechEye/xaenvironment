@@ -15,7 +15,7 @@ minetest.register_node("exatec:tube", {
 		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
 		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
 	},
-	connects_to={"group:exatec_tube"},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
 	--on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 	--	node.param2=node.param2+1
 	--	print(node.param2)
@@ -37,7 +37,7 @@ minetest.register_node("exatec:tube", {
 minetest.register_node("exatec:autocrafter", {
 	description = "Autocrafter",
 	tiles={"default_ironblock.png^default_craftgreed.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -186,7 +186,7 @@ minetest.register_node("exatec:extraction", {
 		end
 		return true
 	end,
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1},
 	exatec={
 		test_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -199,8 +199,6 @@ minetest.register_node("exatec:extraction", {
 			if exatec.test_input(f,stack,pos) then
 				exatec.input(f,stack,pos)
 			end
-		end,
-		on_output=function(pos,stack,opos)
 		end,
 	},
 })

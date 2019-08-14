@@ -1,4 +1,7 @@
-groups={exatec_tube=1}				-- conntected to tubes
+groups={
+	exatec_tube=1,				-- is tube / used as tubes
+	exatec_tube_connected=1,			-- tubes is connected to
+}
 
 exatec={
 	input_max=1,				-- max stack to put
