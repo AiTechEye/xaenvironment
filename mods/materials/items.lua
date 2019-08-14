@@ -91,3 +91,8 @@ default.register_eatable("craftitem","materials:bread",1,10,{
 	inventory_image="materials_bread.png",
 	groups={flammable=3,treasure=1},
 })
+minetest.register_craftitem("materials:plastic_sheet", {
+	description = "Plastic sheet",
+	inventory_image = "materials_plastic_sheet.png",
+	groups = {flammable = 1,treasure=1},
+})

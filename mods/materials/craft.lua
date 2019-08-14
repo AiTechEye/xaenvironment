@@ -37,6 +37,14 @@ minetest.register_craft({
 		{"group:leaves","group:leaves","group:leaves"},
 	},
 })
+
+minetest.register_craft({
+	type = "cooking",
+	output = "materials:plastic_sheet",
+	recipe = "materials:plant_extracts_gas",
+	cooktime = 10,
+})
+
 minetest.register_craft({
 	type = "cooking",
 	output = "materials:plant_extracts_gas",
