@@ -38,7 +38,7 @@ minetest.register_entity("exatec:tubeitem",{
 		self.object:set_velocity(self.storage.dir)
 	end,
 	input=function(self,pos)
-		if exatec.test_input(pos,self.stack) then
+		if exatec.test_input(pos,self.stack,self.storage.oldpos) then
 			local ap = {x=math.floor(pos.x+0.5),y=math.floor(pos.y+0.5),z=math.floor(pos.z+0.5)}
 			exatec.input(ap,self.stack,self.storage.oldpos)
 			self.object:remove()
