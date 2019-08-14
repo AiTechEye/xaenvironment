@@ -161,10 +161,41 @@ local timer =  function (pos, elapsed)
 	end
 end
 
+
+exatec_furnace = {
+	output_list="fried",
+	test_input=function(pos,stack,opos)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		if opos.y < pos.y and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
+			return true
+		elseif opos.y >= pos.y and inv:room_for_item("cook",stack) then
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
+			return result.item:get_name() ~= ""
+		end
+	end,
+	on_input=function(pos,stack,opos)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		if opos.y < pos.y and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
+			inv:add_item("fuel",stack)
+		elseif opos.y >= pos.y and inv:room_for_item("cook",stack) then
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
+			if result.item:get_name() ~= "" then
+				inv:add_item("cook",stack)
+			end
+		end
+		if not (inv:is_empty("cook") and inv:is_empty("fuel")) then
+			minetest.swap_node(pos,{name="default:furnace_active",param2=minetest.get_node(pos).param2})
+			minetest.get_node_timer(pos):start(1)
+		end
+	end
+}
+
 minetest.register_node("default:furnace", {
 	description = "Furnace",
 	tiles = {"default_cobble.png","default_air.png"},
-	groups = {stone=2,cracky=3,used_by_npc=1},
+	groups = {stone=2,cracky=3,used_by_npc=1,exatec_tube = 1},
 	drawtype="mesh",
 	mesh="default_furnace.b3d",
 	paramtype = "light",
@@ -198,13 +229,14 @@ minetest.register_node("default:furnace", {
 	allow_metadata_inventory_move = move,
 	can_dig = dig,
 	on_timer = timer,
+	exatec = exatec_furnace,
 })
 
 minetest.register_node("default:furnace_active", {
 	description = "Furnace",
 	drop = "default:furnace",
 	tiles = {"default_cobble.png","default_fire.png"},
-	groups = {stone=2,cracky=2,not_in_creative_inventory=1},
+	groups = {stone=2,cracky=2,not_in_creative_inventory=1,exatec_tube = 1},
 	drawtype="mesh",
 	mesh="default_furnace.b3d",
 	light_source = 10,
@@ -220,4 +252,5 @@ minetest.register_node("default:furnace_active", {
 	allow_metadata_inventory_move = move,
 	can_dig = dig,
 	on_timer = timer,
+	exatec = exatec_furnace,
 })
