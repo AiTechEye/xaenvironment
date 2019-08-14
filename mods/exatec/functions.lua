@@ -12,11 +12,11 @@ exatec.samepos=function(p1,p2)
 	return p1.x == p2.x and p1.y == p2.y and p1.z == p2.z
 end
 
-exatec.test_input=function(pos,stack)
+exatec.test_input=function(pos,stack,opos)
 	local a = exatec.def(pos)
 	local def = exatec.getnodedefpos(pos)
 	if a.test_input then
-		return a.test_input(pos,stack)
+		return a.test_input(pos,stack,opos)
 	--elseif def.allow_metadata_inventory_put then --mess
 	--	return ItemStack(stack:get_name() .. " " ..allow_metadata_inventory_put(pos, a.input_list,1, stack, ""))
 	elseif a.input_list then
@@ -26,10 +26,10 @@ exatec.test_input=function(pos,stack)
 	end
 end
 
-exatec.test_output=function(pos,stack)
+exatec.test_output=function(pos,stack,opos)
 	local a = exatec.def(pos)
 	if a.test_output then
-		return a.test_output(pos,stack)
+		return a.test_output(pos,stack,opos)
 	--elseif def.allow_metadata_inventory_take then --mess
 	--	return ItemStack(stack:get_name() .. " " ..allow_metadata_inventory_take(pos, a.input_list,1, stack, ""))
 	elseif a.output_list then
@@ -39,7 +39,7 @@ exatec.test_output=function(pos,stack)
 	end
 end
 
-exatec.input=function(pos,stack)
+exatec.input=function(pos,stack,opos)
 	local a = exatec.def(pos)
 	local re
 	stack = a.input_max and stack:get_count() > a.input_max and ItemStack(stack:get_name() .." " .. a.input_max) or stack
@@ -49,13 +49,9 @@ exatec.input=function(pos,stack)
 			return false
 		end
 		inv:add_item(a.input_list,stack)
-	elseif a.input then
-		re = a.input(pos,stack)
+	elseif a.on_input then
+		a.on_input(pos,stack,opos)
 	end
-	if a.on_input then
-		f.on_input(f,stack)
-	end
-
 	local def = exatec.getnodedefpos(pos)
 	if def.on_metadata_inventory_put then
 		def.on_metadata_inventory_put(pos, a.input_list, 1, stack, "")
@@ -64,18 +60,15 @@ exatec.input=function(pos,stack)
 	return re					
 end
 
-exatec.output=function(pos,stack)
+exatec.output=function(pos,stack,opos)
 	local a = exatec.def(pos)
 	stack = a.output_max and stack:get_count() > a.output_max and ItemStack(stack:get_name() .." " .. a.output_max) or stack
 	local new_stack
 	if a.output_list then
 		local inv = minetest.get_meta(pos):get_inventory()
 		new_stack = inv:remove_item(a.output_list,stack)
-	elseif a.input then
-		new_stack = a.input(pos,stack)
-	end
-	if a.on_input then
-		f.on_input(f,new_stack)
+	elseif a.on_input then
+		a.on_input(f,new_stack,opos)
 	end
 	local def = exatec.getnodedefpos(pos)
 	if def.on_metadata_inventory_take then

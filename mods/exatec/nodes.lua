@@ -24,29 +24,12 @@ minetest.register_node("exatec:tube", {
 	after_place_node = function(pos, placer)
 		--minetest.set_node(pos,{name="was:wire",param2=135})
 	end,
-})
-
-minetest.register_node("exatec:tube_distribution", {
-	description = "Tube distribution",
-	tiles = {"exatec_glass.png"},
-	paramtype = "light",
-	drawtype = "glasslike",
-	sunlight_propagates=true,
-	groups = {dig_immediate = 3,exatec_tube=2},
 	exatec={
-		test_input=function(pos,stack)
+		test_input=function(pos,stack,opos)
 			return true
 		end,
-		input=function(pos,stack)
-			for i,d in pairs(exatec.tube_rules) do
-				local t = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-				if minetest.get_item_group(minetest.get_node(t).name,"exatec_tube") == 1 then
-					local e = minetest.add_entity(t,"exatec:tubeitem")
-					e:get_luaentity():new_item(stack,d)
-					return
-				end
-			end
-			minetest.add_item(pos,stack)
+		on_input=function(pos,stack,opos)
+			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
 		end
 	},
 })
@@ -193,9 +176,9 @@ minetest.register_node("exatec:extraction", {
 			for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
 				if v:get_name() ~= "" then
 					local stack = ItemStack(v:get_name() .." " .. 1)
-					if exatec.test_input(f,stack) and exatec.test_output(b,stack) then
-						exatec.input(f,stack)
-						exatec.output(b,stack)
+					if exatec.test_input(f,stack,pos) and exatec.test_output(b,stack,pos) then
+						exatec.input(f,stack,pos)
+						exatec.output(b,stack,pos)
 						return true
 					end
 				end
@@ -203,11 +186,21 @@ minetest.register_node("exatec:extraction", {
 		end
 		return true
 	end,
-	groups = {choppy=3,oddly_breakable_by_hand=3},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube=1},
 	exatec={
-		on_input=function(pos,stack)
+		test_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			return exatec.test_input(f,stack,pos)
 		end,
-		on_output=function(pos,stack)
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			if exatec.test_input(f,stack,pos) then
+				exatec.input(f,stack,pos)
+			end
+		end,
+		on_output=function(pos,stack,opos)
 		end,
 	},
 })
