@@ -1,5 +1,10 @@
 exatec={
-	tube_rules={{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}}
+	tube_rules={{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}},
+	wire_rules={{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}},
+
+	wire_sends={last=os.time(),times=0},
+	wire_signals={},
+
 }
 
 dofile(minetest.get_modpath("exatec") .. "/functions.lua")

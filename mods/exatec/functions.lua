@@ -76,3 +76,70 @@ exatec.output=function(pos,stack,opos)
 	end
 	return new_stack					
 end
+
+
+exatec.send=function(pos)
+	local na=pos.x .."." .. pos.y .."." ..pos.z
+	if not exatec.wire_signals[na] then
+		local t=os.time()
+		if os.difftime(t, exatec.wire_sends.last)>1 then
+			exatec.wire_sends.last=t
+			exatec.wire_sends.times=0
+		else
+			exatec.wire_sends.times=exatec.wire_sends.times+1
+			if exatec.wire_sends.times>50 then
+				return
+			end
+		end
+		exatec.wire_signals[na]=pos
+		minetest.after(0, function()
+			exatec.wire_leading()
+		end)
+	end
+end
+
+exatec.get_node=function(pos,wire)
+	local n=minetest.get_node(pos).name
+	if n=="ignore" then
+		local vox=minetest.get_voxel_manip()
+		local min, max=vox:read_from_map(pos, pos)
+		local area=VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data=vox:get_data()
+		local i=area:indexp(pos)
+		n=minetest.get_name_from_content_id(data[i])
+	end
+	return n
+end
+
+exatec.wire_leading=function()
+	local c=0
+	for i, pos in pairs(exatec.wire_signals) do
+		for ii, p in pairs(exatec.wire_rules) do
+			local n={x=pos.x+p.x,y=pos.y+p.y,z=pos.z+p.z}
+			local s=n.x .. "." .. n.y .."." ..n.z
+			local na=exatec.get_node(n)
+			if not exatec.wire_signals[s] then
+				if minetest.get_item_group(na,"exatec_wire") > 0 then
+					exatec.wire_signals[s]=n
+					minetest.swap_node(n,{name=na,param2=3})
+					minetest.get_node_timer(n):start(0.1)
+					c=c+1
+				end
+				if minetest.get_item_group(na,"exatec_wire_connected") > 0 then
+					exatec.wire_signals[s]=n
+					local e = exatec.def(n)
+					if e.on_wire then
+						e.on_wire(n)
+					end
+				end
+			end
+		end
+	end
+	if c > 0 then
+		minetest.after(0, function()
+			exatec.wire_leading()
+		end)
+	else
+		exatec.wire_signals={}
+	end
+end

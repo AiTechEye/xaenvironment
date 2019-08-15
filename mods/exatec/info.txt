@@ -1,6 +1,8 @@
 groups={
 	exatec_tube=1,				-- is tube / used as tubes
 	exatec_tube_connected=1,			-- tubes is connected to
+	exatec_wire=1,				-- used as wire / leading
+	exatec_wire_connected,			-- wire is connected to
 }
 
 exatec={
@@ -21,7 +23,10 @@ exatec={
 	end,
 	on_output=function(pos,stack,oldpos)		-- while output
 	end,
+
+	on_wire = function(pos)			-- while wire connected
+	end
 },
 
 
-
+exatec.send(pos)		send wire signal
