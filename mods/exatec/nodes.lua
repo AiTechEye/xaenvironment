@@ -243,7 +243,6 @@ minetest.register_node("exatec:extraction", {
 					end
 				end
 			end
-			return true
 		end,
 		test_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -255,6 +254,54 @@ minetest.register_node("exatec:extraction", {
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 			if exatec.test_input(f,stack,pos) then
 				exatec.input(f,stack,pos)
+			end
+		end,
+	},
+})
+
+minetest.register_node("exatec:dump", {
+	description = "Dump",
+	tiles={
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png^default_crafting_arrowright.png",
+		"default_ironblock.png^default_crafting_arrowleft.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	paramtype2 = "facedir",
+	sounds = default.node_sound_wood_defaults(),
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1},
+	exatec={
+		on_wire = function(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
+			local b1 = exatec.def(b)
+			if b1.output_list then
+				local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+				for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
+					if v:get_name() ~= "" then
+						local stack = ItemStack(v:get_name() .." " .. 1)
+						if exatec.test_output(b,stack,pos) then
+							exatec.output(b,stack,pos)
+							minetest.add_item(f,stack)
+							return true
+						end
+					end
+				end
+			end
+		end,
+		test_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			return not exatec.getnodedefpos(f).walkable
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+
+			if not exatec.getnodedefpos(f).walkable then
+				minetest.add_item(f,stack)
 			end
 		end,
 	},
