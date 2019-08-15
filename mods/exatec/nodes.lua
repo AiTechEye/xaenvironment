@@ -29,6 +29,8 @@ minetest.register_node("exatec:tube", {
 minetest.register_node("exatec:wire", {
 	description = "Wire",
 	tiles = {{name="default_cloud.png"}},
+	wield_image="exatec_wire.png",
+	inventory_image="exatec_wire.png",
 	drop="exatec:wire",
 	drawtype="nodebox",
 	paramtype = "light",
@@ -48,7 +50,7 @@ minetest.register_node("exatec:wire", {
 	connects_to={"group:exatec_wire","group:exatec_wire_connected"},
 	groups = {dig_immediate = 3,exatec_wire=1},
 	after_place_node = function(pos, placer)
-		minetest.set_node(pos,{name="exatec:wire",param2=91})
+		minetest.set_node(pos,{name="exatec:wire",param2=98})
 	end,
 	on_timer = function (pos, elapsed)
 		minetest.swap_node(pos,{name="exatec:wire",param2=98})
@@ -72,9 +74,7 @@ minetest.register_node("exatec:button", {
 
 minetest.register_node("exatec:autosender", {
 	description = "Auto sender",
-	tiles={
-		"default_ironblock.png",
-	},
+	tiles={"default_ironblock.png^materials_megear_metal.png"},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
 	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
@@ -219,7 +219,7 @@ minetest.register_node("exatec:extraction", {
 		"default_ironblock.png^default_crafting_arrowright.png",
 		"default_ironblock.png^default_crafting_arrowleft.png",
 		"default_ironblock.png",
-		"default_ironblock.png",
+		"default_ironblock.png^materials_fanblade_metal.png^default_chest_top.png",
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
@@ -267,7 +267,7 @@ minetest.register_node("exatec:dump", {
 		"default_ironblock.png^default_crafting_arrowright.png",
 		"default_ironblock.png^default_crafting_arrowleft.png",
 		"default_ironblock.png",
-		"default_ironblock.png",
+		"default_ironblock.png^materials_fanblade_plastic.png^default_chest_top.png",
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),

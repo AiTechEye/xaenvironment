@@ -121,7 +121,7 @@ exatec.wire_leading=function()
 			if not exatec.wire_signals[s] then
 				if minetest.get_item_group(na,"exatec_wire") > 0 then
 					exatec.wire_signals[s]=n
-					minetest.swap_node(n,{name=na,param2=3})
+					minetest.swap_node(n,{name=na,param2=91})
 					minetest.get_node_timer(n):start(0.1)
 					c=c+1
 				end
