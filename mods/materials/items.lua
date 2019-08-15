@@ -96,7 +96,7 @@ minetest.register_craftitem("materials:plastic_sheet", {
 	inventory_image = "materials_plastic_sheet.png",
 	groups = {flammable = 1,treasure=1},
 })
-minetest.register_craftitem("materials:megear_metal", {
+minetest.register_craftitem("materials:gear_metal", {
 	description = "Metal megear",
 	inventory_image = "materials_megear_metal.png",
 	groups = {treasure=1},

@@ -91,7 +91,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:megear_metal 10",
+	output="materials:gear_metal 10",
 	recipe={
 		{"default:iron_ingot","","default:iron_ingot"},
 		{"","default:iron_ingot",""},
