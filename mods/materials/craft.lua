@@ -89,3 +89,37 @@ minetest.register_craft({
 	output = "materials:bread",
 	recipe = "plants:flour",
 })
+
+minetest.register_craft({
+	output="materials:megear_metal 10",
+	recipe={
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"","default:iron_ingot",""},
+		{"default:iron_ingot","","default:iron_ingot"},
+	}
+})
+
+minetest.register_craft({
+	output="materials:fanblade_metal 10",
+	recipe={
+		{"","default:iron_ingot",""},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"","default:iron_ingot",""},
+	}
+})
+minetest.register_craft({
+	output="materials:fanblade_plastic 10",
+	recipe={
+		{"","materials:plastic_sheet",""},
+		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
+		{"","materials:plastic_sheet",""},
+	}
+})
+minetest.register_craft({
+	output="materials:tube_metal 6",
+	recipe={
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"","",""},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+	}
+})

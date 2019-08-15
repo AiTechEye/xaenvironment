@@ -96,3 +96,23 @@ minetest.register_craftitem("materials:plastic_sheet", {
 	inventory_image = "materials_plastic_sheet.png",
 	groups = {flammable = 1,treasure=1},
 })
+minetest.register_craftitem("materials:megear_metal", {
+	description = "Metal megear",
+	inventory_image = "materials_megear_metal.png",
+	groups = {treasure=1},
+})
+minetest.register_craftitem("materials:fanblade_metal", {
+	description = "Metal fanblade",
+	inventory_image = "materials_fanblade_metal.png",
+	groups = {treasure=1},
+})
+minetest.register_craftitem("materials:fanblade_plastic", {
+	description = "Plastic fanblade",
+	inventory_image = "materials_fanblade_plastic.png",
+	groups = {flammable=1,treasure=1},
+})
+minetest.register_craftitem("materials:tube_metal", {
+	description = "Tube",
+	inventory_image = "materials_tube_metal.png",
+	groups = {flammable=1,treasure=1},
+})
