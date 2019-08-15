@@ -1,7 +1,7 @@
 minetest.register_node("default:lamp", {
 	description = "Lamp",
 	tiles={"default_cloud.png"},
-	groups = {dig_immediate=3,wallmounted=1},
+	groups = {dig_immediate=3,exatec_wire_connected=1,wallmounted=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "nodebox",
 	node_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.3, 0.2}},
@@ -10,6 +10,30 @@ minetest.register_node("default:lamp", {
 	on_place = minetest.rotate_node,
 	sunlight_propagates = true,
 	light_source = 15,
+	exatec={
+		on_wire = function(pos)
+			minetest.set_node(pos,{name="default:lamp_off",param2=minetest.get_node(pos).param2})
+		end
+	}
+})
+
+minetest.register_node("default:lamp_off", {
+	description = "Lamp (off)",
+	drop="default:lamp",
+	tiles={"default_cloud.png^[colorize:#33333333"},
+	groups = {dig_immediate=3,wallmounted=1,exatec_wire_connected=1,not_in_creative_inventory=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "nodebox",
+	node_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.3, 0.2}},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	on_place = minetest.rotate_node,
+	exatec={
+		on_wire = function(pos)
+			minetest.set_node(pos,{name="default:lamp",param2=minetest.get_node(pos).param2})
+		end
+	}
+
 })
 
 minetest.register_node("default:cloud", {
