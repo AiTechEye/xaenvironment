@@ -116,3 +116,10 @@ minetest.register_craftitem("materials:tube_metal", {
 	inventory_image = "materials_tube_metal.png",
 	groups = {flammable=1,treasure=1},
 })
+
+minetest.register_node("materials:spaceyfloor", {
+	description = "Spacey floor",
+	tiles={"materials_spaceyfloor.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_metal_defaults(),
+})
