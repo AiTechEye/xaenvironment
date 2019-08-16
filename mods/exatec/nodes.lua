@@ -627,7 +627,7 @@ minetest.register_node("exatec:node_breaker", {
 			local def = minetest.registered_nodes[n] or {}
 			local owner = minetest.get_meta(f):get_string("owner")
 
-			if n ~= "air" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, minetest.get_player_by_name(owner)) ==  false) and not minetest.is_protected(f, owner) then
+			if n ~= "air" and def.drop ~= "" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, {get_player_name=function() return owner end}) ==  false) and not minetest.is_protected(f, owner) then
 				local stack = ItemStack(n)
 				if exatec.test_input(b,stack,pos) then
 					exatec.input(b,stack,pos)
