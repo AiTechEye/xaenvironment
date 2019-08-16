@@ -549,7 +549,6 @@ minetest.register_node("exatec:object_detector", {
 	end,
 })
 
-
 minetest.register_node("exatec:vacuum", {
 	description = "Vacuum",
 	tiles={"default_stone.png^default_chest_top.png"},
@@ -591,6 +590,65 @@ minetest.register_node("exatec:vacuum", {
 					else
 						return
 					end
+				end
+			end
+		end,
+	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
+})
+
+minetest.register_node("exatec:node_breaker", {
+	description = "Node breaker",
+	tiles={
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png^materials_sawblade.png^default_chest_top.png",
+		"default_ironblock.png^default_chest_top.png",
+	},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype2 = "facedir",
+
+	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_wire = function(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			local n = minetest.get_node(f).name
+			local def = minetest.registered_nodes[n] or {}
+			local owner = minetest.get_meta(f):get_string("owner")
+
+			if n ~= "air" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, minetest.get_player_by_name(owner)) ==  false) and not minetest.is_protected(f, owner) then
+				local stack = ItemStack(n)
+				if exatec.test_input(b,stack,pos) then
+					exatec.input(b,stack,pos)
+				else
+					minetest.add_item(b,stack)
+				end
+				minetest.remove_node(f)
+			end
+			local inv = minetest.get_meta(pos):get_inventory()
+			for _, ob in pairs(minetest.get_objects_inside_radius(f,1)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "__builtin:item" then
+					local s = ItemStack(en.itemstring)
+					if exatec.test_input(b,s,pos) then
+						exatec.input(b,s,pos)
+					else
+						minetest.add_item(b,s)
+					end
+					ob:remove()
+				else
+					default.punch(ob,ob,20)
 				end
 			end
 		end,

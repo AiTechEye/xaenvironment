@@ -135,3 +135,12 @@ minetest.register_craft({
 		{"materials:plastic_sheet","default:diamond","materials:plastic_sheet"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:node_breaker",
+	recipe={
+		{"exatec:tube","materials:sawblade","exatec:wire"},
+		{"default:iron_ingot","materials:tube_metal","default:iron_ingot"},
+		{"default:iron_ingot","materials:gear_metal","default:iron_ingot"},
+	},
+})
