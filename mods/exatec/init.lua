@@ -11,3 +11,5 @@ dofile(minetest.get_modpath("exatec") .. "/functions.lua")
 dofile(minetest.get_modpath("exatec") .. "/nodes.lua")
 dofile(minetest.get_modpath("exatec") .. "/craft.lua")
 dofile(minetest.get_modpath("exatec") .. "/entities.lua")
+
+dofile(minetest.get_modpath("exatec") .. "/nodeswitch.lua")

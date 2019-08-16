@@ -108,3 +108,30 @@ minetest.register_craft({
 		{"group:wood","group:wood","group:wood"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:vacuum",
+	recipe={
+		{"default:chest","materials:tube_metal","exatec:wire"},
+		{"materials:plastic_sheet","materials:diode","materials:plastic_sheet"},
+		{"materials:plastic_sheet","materials:fanblade_plastic","materials:plastic_sheet"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:object_detector",
+	recipe={
+		{"default:copper_ingot","exatec:vacuum","exatec:wire"},
+		{"default:stone","materials:diode","default:stone"},
+		{"default:stone","materials:gear_metal","default:stone"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:nodeswitch",
+	recipe={
+		{"default:bronze_ingot","materials:gear_metal","exatec:wire"},
+		{"materials:plastic_sheet","materials:diode","materials:plastic_sheet"},
+		{"materials:plastic_sheet","default:diamond","materials:plastic_sheet"},
+	},
+})

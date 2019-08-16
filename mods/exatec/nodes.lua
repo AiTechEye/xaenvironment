@@ -460,7 +460,7 @@ minetest.register_node("exatec:delayer", {
 minetest.register_node("exatec:toggleable_storage", {
 	description = "Toggleable storage",
 	tiles={"default_wood.png^default_chest_top.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -486,10 +486,12 @@ minetest.register_node("exatec:toggleable_storage", {
 		test_input=function(pos,stack,opos)
 			return minetest.get_meta(pos):get_int("open") == 1
 		end,
+		test_output=function(pos,stack,opos)
+			return minetest.get_meta(pos):get_int("open") == 1
+		end,
 	},
 	can_dig = function(pos, player)
-		local inv = minetest.get_meta(pos):get_inventory()
-		return inv:is_empty("main")
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
 	end,
 })
 
@@ -516,4 +518,84 @@ minetest.register_node("exatec:wire_gate", {
 			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true)
 		end,
 	}
+})
+
+minetest.register_node("exatec:object_detector", {
+	description = "Object detector (Click to change radius)",
+	tiles = {"default_steelblock.png^exatec_glass.png^default_chest_top.png"},
+	groups = {dig_immediate = 2,exatec_wire=1},
+	sounds = default.node_sound_wood_defaults(),
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local radius=meta:get_int("radius")
+			radius = radius < 10 and radius or 0
+			meta:set_int("radius",radius+1)
+			meta:set_string("infotext","Radius (" .. (radius+1) ..")")
+		end
+	end,
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("radius",1)
+		meta:set_string("infotext","Radius (1)")
+		minetest.get_node_timer(pos):start(2)
+	end,
+	on_timer = function (pos, elapsed)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, minetest.get_meta(pos):get_int("radius"))) do
+			exatec.send(pos,true)
+			break	
+		end
+		return true
+	end,
+})
+
+
+minetest.register_node("exatec:vacuum", {
+	description = "Vacuum",
+	tiles={"default_stone.png^default_chest_top.png"},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_string("infotext","Radius (1)")
+		m:set_int("radius",1)
+		m:set_string("formspec",
+			"size[8,8]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local radius=m:get_int("radius")
+			radius = radius < 10 and radius or 0
+			m:set_int("radius",radius+1)
+			m:set_string("infotext","Radius (" .. (radius+1) ..")")
+		end
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_wire = function(pos)
+			local inv = minetest.get_meta(pos):get_inventory()
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,minetest.get_meta(pos):get_int("radius"))) do
+				local en = ob:get_luaentity()
+				if en and en.name == "__builtin:item" then
+					if inv:room_for_item("main",en.itemstring) then
+						exatec.input(pos,ItemStack(en.itemstring),pos)
+						ob:remove()
+					else
+						return
+					end
+				end
+			end
+		end,
+	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
 })
