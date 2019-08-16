@@ -42,6 +42,11 @@ minetest.register_entity("exatec:tubeitem",{
 		end
 		self.object:set_properties({textures={self.storage.name}})
 		self.object:set_velocity(self.storage.dir)
+		local def = exatec.def(pos)
+		self.tube_activated = pos
+		if def.on_tube then
+			def.on_tube(pos,self.stack,opos)
+		end
 	end,
 	input=function(self,pos)
 		if exatec.test_input(pos,self.stack,self.storage.oldpos) then
@@ -71,6 +76,13 @@ minetest.register_entity("exatec:tubeitem",{
 			end
 			self.object:remove()
 		elseif not exatec.samepos(ap,self.storage.curpos) then
+			if self:is_tube(ap) and not exatec.samepos(ap,self.tube_activated or pos) then
+				local def = exatec.def(ap)
+				self.tube_activated = ap
+				if def.on_tube then
+					def.on_tube(ap,self.stack,self.storage.oldpos)
+				end
+			end
 			if self:is_tube(npos) then
 				self.storage.oldpos = self.storage.curpos
 				self.storage.curpos = ap

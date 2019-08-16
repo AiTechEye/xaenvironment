@@ -33,6 +33,13 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:tube_detector",
+	recipe={
+		{"exatec:tube","exatec:wire",""},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:button",
 	recipe={
 		{"group:wood","exatec:wire",""},
@@ -53,6 +60,14 @@ minetest.register_craft({
 	recipe={
 		{"default:iron_ingot","exatec:button","exatec:wire"},
 		{"materials:plastic_sheet","materials:gear_metal","materials:plastic_sheet"},
+		{"materials:plastic_sheet","materials:gear_metal","materials:plastic_sheet"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:counter",
+	recipe={
+		{"default:copper_ingot","exatec:button","exatec:wire"},
 		{"materials:plastic_sheet","materials:gear_metal","materials:plastic_sheet"},
 	},
 })

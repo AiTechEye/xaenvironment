@@ -77,10 +77,9 @@ exatec.output=function(pos,stack,opos)
 	return new_stack					
 end
 
-
-exatec.send=function(pos)
+exatec.send=function(pos, ignore)
 	local na=pos.x .."." .. pos.y .."." ..pos.z
-	if not exatec.wire_signals[na] then
+	if not exatec.wire_signals[na] or ignore then
 		local t=os.time()
 		if os.difftime(t, exatec.wire_sends.last)>1 then
 			exatec.wire_sends.last=t
@@ -91,7 +90,7 @@ exatec.send=function(pos)
 				return
 			end
 		end
-		exatec.wire_signals[na]=pos
+		exatec.wire_signals[na]={pos=pos}
 		minetest.after(0, function()
 			exatec.wire_leading()
 		end)
@@ -113,23 +112,25 @@ end
 
 exatec.wire_leading=function()
 	local c=0
-	for i, pos in pairs(exatec.wire_signals) do
-		for ii, p in pairs(exatec.wire_rules) do
-			local n={x=pos.x+p.x,y=pos.y+p.y,z=pos.z+p.z}
-			local s=n.x .. "." .. n.y .."." ..n.z
-			local na=exatec.get_node(n)
-			if not exatec.wire_signals[s] then
-				if minetest.get_item_group(na,"exatec_wire") > 0 then
-					exatec.wire_signals[s]=n
-					minetest.swap_node(n,{name=na,param2=91})
-					minetest.get_node_timer(n):start(0.1)
-					c=c+1
-				end
-				if minetest.get_item_group(na,"exatec_wire_connected") > 0 then
-					exatec.wire_signals[s]=n
-					local e = exatec.def(n)
-					if e.on_wire then
-						e.on_wire(n)
+	for i, v in pairs(exatec.wire_signals) do
+		if not v.ignore then
+			for ii, p in pairs(exatec.wire_rules) do
+				local n={x=v.pos.x+p.x,y=v.pos.y+p.y,z=v.pos.z+p.z}
+				local s=n.x .. "." .. n.y .."." ..n.z
+				local na=exatec.get_node(n)
+				if not exatec.wire_signals[s] then
+					if minetest.get_item_group(na,"exatec_wire") > 0 then
+						exatec.wire_signals[s]={pos=n}
+						minetest.swap_node(n,{name=na,param2=91})
+						minetest.get_node_timer(n):start(0.1)
+						c=c+1
+					end
+					if minetest.get_item_group(na,"exatec_wire_connected") > 0 then
+						exatec.wire_signals[s]={pos=n,ignore=true}
+						local e = exatec.def(n)
+						if e.on_wire then
+							e.on_wire(n)
+						end
 					end
 				end
 			end

@@ -26,6 +26,10 @@ exatec={
 
 	on_wire = function(pos)			-- while wire connected
 	end
+
+	on_tube = function(pos,stack,oldpos)		-- stack incoming to tube
+	end
+
 },
 
 
