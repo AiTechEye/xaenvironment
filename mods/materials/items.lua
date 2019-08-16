@@ -128,3 +128,8 @@ minetest.register_craftitem("materials:diode", {
 	description = "Diode",
 	inventory_image = "materials_diode.png"
 })
+
+minetest.register_craftitem("materials:sawblade", {
+	description = "Sawblade",
+	inventory_image = "materials_sawblade.png"
+})

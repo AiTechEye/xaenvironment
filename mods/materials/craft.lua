@@ -129,3 +129,12 @@ minetest.register_craft({
 		{"materials:plastic_sheet","default:copper_ingot"},
 	}
 })
+
+minetest.register_craft({
+	output="materials:sawblade 2",
+	recipe={
+		{"default:iron_lump","default:iron_ingot","default:iron_lump"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_lump","default:iron_ingot","default:iron_lump"},
+	}
+})
