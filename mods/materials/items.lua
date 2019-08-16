@@ -124,9 +124,7 @@ minetest.register_node("materials:spaceyfloor", {
 	sounds = default.node_sound_metal_defaults(),
 })
 
-minetest.register_node("materials:diode", {
+minetest.register_craftitem("materials:diode", {
 	description = "Diode",
-	tiles={"materials_diode.png"},
-	groups = {cracky=2},
-	sounds = default.node_sound_metal_defaults(),
+	inventory_image = "materials_diode.png"
 })
