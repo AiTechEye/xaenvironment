@@ -71,3 +71,11 @@ minetest.register_craft({
 		{"materials:plastic_sheet","materials:gear_metal","materials:plastic_sheet"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:delayer",
+	recipe={
+		{"default:copper_ingot","exatec:button","exatec:wire"},
+		{"materials:plastic_sheet","clock:clock1","materials:plastic_sheet"},
+	},
+})

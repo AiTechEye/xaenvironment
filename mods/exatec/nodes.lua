@@ -381,7 +381,7 @@ minetest.register_node("exatec:counter", {
 })
 minetest.register_node("exatec:delayer", {
 	description = "Delayer (Click to change time)",
-	tiles = {"default_ironblock.png^clock_1.png^default_chest_top.png"},
+	tiles = {"default_ironblock.png^clock.png^default_chest_top.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png"},
 	groups = {dig_immediate = 2,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
