@@ -330,7 +330,6 @@ minetest.register_node("exatec:dump", {
 		on_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-
 			if not exatec.getnodedefpos(f).walkable then
 				minetest.add_item(f,stack)
 			end
@@ -413,4 +412,40 @@ minetest.register_node("exatec:delayer", {
 			end
 		end
 	}
+})
+
+minetest.register_node("exatec:toggleable_storage", {
+	description = "Toggleable storage",
+	tiles={"default_wood.png^default_chest_top.png"},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_string("infotext","Storage: closed")
+		m:set_string("formspec",
+			"size[8,8]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local open = m:get_int("open") == 1 and 0 or 1
+			m:set_int("open",open)
+			m:set_string("infotext","Storage: " .. (open == 1 and "open" or "closed"))
+		end,
+		test_input=function(pos,stack,opos)
+			return minetest.get_meta(pos):get_int("open") == 1
+		end,
+	},
+	can_dig = function(pos, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		return inv:is_empty("input") and inv:is_empty("output") and inv:is_empty("craft")
+	end,
 })

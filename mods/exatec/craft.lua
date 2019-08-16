@@ -79,3 +79,9 @@ minetest.register_craft({
 		{"materials:plastic_sheet","clock:clock1","materials:plastic_sheet"},
 	},
 })
+minetest.register_craft({
+	output="exatec:toggleable_storage",
+	recipe={
+		{"default:chest","exatec:wire"},
+	},
+})
