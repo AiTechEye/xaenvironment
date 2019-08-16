@@ -98,7 +98,7 @@ minetest.register_craftitem("materials:plastic_sheet", {
 })
 minetest.register_craftitem("materials:gear_metal", {
 	description = "Metal megear",
-	inventory_image = "materials_megear_metal.png",
+	inventory_image = "materials_gear_metal.png",
 	groups = {treasure=1},
 })
 minetest.register_craftitem("materials:fanblade_metal", {
