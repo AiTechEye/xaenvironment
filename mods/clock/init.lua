@@ -25,10 +25,10 @@ end
 for i=1,12 do
 minetest.register_node("clock:clock" .. i, {
 	description = "Clock",
-	tiles={"clock_"..i ..".png","default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png",},
-	drop = "clock:clock1",
-	wield_image="clock_1.png",
-	inventory_image="clock_"..i ..".png",
+	tiles={"[combine:16x16:"..((i-1)*-16)..",0=clock_anim.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png"},
+	wield_image="clock.png",
+	drop="clock:clock1",
+	inventory_image="clock.png",
 	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=i == 1 and 2 or nil},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
