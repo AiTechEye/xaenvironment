@@ -4,7 +4,7 @@ minetest.register_node("exatec:tube", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {dig_immediate = 3,exatec_tube=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -32,7 +32,7 @@ minetest.register_node("exatec:tube_detector", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {dig_immediate = 3,exatec_tube=1,exatec_wire=1,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire=1,exatec_wire_connected=1},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -97,7 +97,7 @@ minetest.register_node("exatec:button", {
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	sounds = default.node_sound_wood_defaults(),
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		exatec.send(pos)
 	end,
@@ -341,7 +341,7 @@ minetest.register_node("exatec:dump", {
 minetest.register_node("exatec:counter", {
 	description = "Counter (click to change count)",
 	tiles = {"default_ironblock.png^materials_gear_metal.png","default_ironblock.png"},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -379,24 +379,16 @@ minetest.register_node("exatec:counter", {
 		end
 	}
 })
---[[
 minetest.register_node("exatec:delayer", {
-	description = "Delayer (Punch to change time)",
-	tiles = {"mesetec_delayer.png","default_sandstone_block.png"},
-	groups = {dig_immediate = 2,mesecon=1},
-	sounds = default.node_sound_stone_defaults(),
+	description = "Delayer (Click to change time)",
+	tiles = {"default_ironblock.png^clock_1.png^default_chest_top.png"},
+	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	sunlight_propagates = true,
 	drawtype="nodebox",
-	node_box = {
-	type="fixed",
-	fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
-	mesecons = {conductor = {
-		state = mesecon.state.on,
-		offstate = "mesetec:ladder",
-		rules = mesetec.rules
-	}},
-on_punch = function(pos, node, player, pointed_thing)
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if minetest.is_protected(pos, player:get_player_name())==false then
 			local meta = minetest.get_meta(pos)
 			local time=meta:get_int("time")
@@ -406,36 +398,19 @@ on_punch = function(pos, node, player, pointed_thing)
 		end
 	end,
 	on_construct = function(pos)
-			local meta = minetest.get_meta(pos)
-			meta:set_int("time",1)
-			meta:set_string("infotext","Delayer (1)")
-			meta:set_int("case",0)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("time",1)
+		meta:set_string("infotext","Delayer (1)")
 	end,
 	on_timer = function (pos, elapsed)
-		local meta = minetest.get_meta(pos)
-		if meta:get_int("case")==2 then
-			meta:set_int("case",0)
-			mesecon.receptor_off(pos)
-		end
-		if meta:get_int("case")==1 then
-			meta:set_int("case",2)
-			mesecon.receptor_on(pos)
-			minetest.get_node_timer(pos):start(meta:get_int("time"))
-		end
-		return false
+		exatec.send(pos,true)
 	end,
-
-
-	mesecons = {effector = {
-		action_on = function (pos, node)
+	exatec={
+		on_wire = function(pos)
 			local meta = minetest.get_meta(pos)
 			if meta:get_int("case")==0 then
-				meta:set_int("case",1)
 				minetest.get_node_timer(pos):start(meta:get_int("time"))
 			end
-
-		end,
-	}}
-
+		end
+	}
 })
---]]
