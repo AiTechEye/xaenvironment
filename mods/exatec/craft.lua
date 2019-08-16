@@ -97,13 +97,6 @@ minetest.register_craft({
 minetest.register_craft({
 	output="exatec:wire_gate",
 	recipe={
-		{"materials:plastic_sheet","exatec:wire","materials:diode"},
-	},
-})
-
-minetest.register_craft({
-	output="exatec:wire_gate",
-	recipe={
 		{"exatec:tube","exatec:wire","materials:diode"},
 		{"group:wood","group:wood","group:wood"},
 	},
@@ -140,6 +133,15 @@ minetest.register_craft({
 	output="exatec:node_breaker",
 	recipe={
 		{"exatec:tube","materials:sawblade","exatec:wire"},
+		{"default:iron_ingot","materials:tube_metal","default:iron_ingot"},
+		{"default:iron_ingot","materials:gear_metal","default:iron_ingot"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:placer",
+	recipe={
+		{"materials:diode","exatec:tube_detector","exatec:wire"},
 		{"default:iron_ingot","materials:tube_metal","default:iron_ingot"},
 		{"default:iron_ingot","materials:gear_metal","default:iron_ingot"},
 	},

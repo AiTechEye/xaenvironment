@@ -612,7 +612,6 @@ minetest.register_node("exatec:node_breaker", {
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
-
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
 	end,
@@ -653,7 +652,43 @@ minetest.register_node("exatec:node_breaker", {
 			end
 		end,
 	},
-	can_dig = function(pos, player)
-		return minetest.get_meta(pos):get_inventory():is_empty("main")
-	end,
+})
+
+minetest.register_node("exatec:placer", {
+	description = "Placer",
+	tiles = {
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png^default_chest_top.png",
+		"default_ironblock.png^default_chest_top.png"
+	},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1},
+	paramtype2 = "facedir",
+	exatec={
+		test_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			local n = minetest.get_node(f).name
+			local sdef = minetest.registered_nodes[stack:get_name()]
+			local def = minetest.registered_nodes[n]
+			local owner = minetest.get_meta(f):get_string("owner")
+			return sdef and def.buildable_to and not minetest.is_protected(f, owner)
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			local n = minetest.get_node(f).name
+			local sdef = minetest.registered_nodes[stack:get_name()]
+			local def = minetest.registered_nodes[n]
+			local owner = minetest.get_meta(f):get_string("owner")
+			if sdef and def.buildable_to and not minetest.is_protected(f, owner) then
+				minetest.add_node(f,{name=stack:get_name()})
+				if sdef.sounds and sdef.sounds.place and sdef.sounds.place.name then
+					minetest.sound_play(sdef.sounds.place.name,{pos=f,max_hear_distance=10,gain=sdef.sounds.place.gain or 1})
+				end
+			end
+		end
+	},
 })
