@@ -123,3 +123,9 @@ minetest.register_craft({
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
 	}
 })
+minetest.register_craft({
+	output="materials:diode 20",
+	recipe={
+		{"materials:plastic_sheet","default:copper_ingot"},
+	}
+})
