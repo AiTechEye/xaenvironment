@@ -57,6 +57,43 @@ minetest.register_node("exatec:tube_detector", {
 	},
 })
 
+minetest.register_node("exatec:tube_gate", {
+	description = "Gate tube",
+	tiles = {"exatec_glass.png^[colorize:#00ff00cc"},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1},
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected","group:exatec_wire"},
+	on_construct=function(pos)
+		minetest.get_meta(pos):set_string("infotext","Storage: closed")
+	end,
+	exatec={
+		test_input=function(pos,stack,opos)
+			return minetest.get_meta(pos):get_int("open") == 1
+		end,
+		on_input=function(pos,stack,opos)
+			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+		end,
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local open = m:get_int("open") == 1 and 0 or 1
+			m:set_int("open",open)
+			m:set_string("infotext","Storage: " .. (open == 1 and "open" or "closed"))
+		end,
+	},
+})
+
 minetest.register_node("exatec:wire", {
 	description = "Wire",
 	tiles = {{name="default_cloud.png"}},
@@ -78,6 +115,7 @@ minetest.register_node("exatec:wire", {
 		connect_top = {-0.05, -0.5, -0.05, 0.05, 0.5, 0.05},
 		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
 	},
+	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,-0.4}},
 	connects_to={"group:exatec_wire","group:exatec_wire_connected"},
 	groups = {dig_immediate = 3,exatec_wire=1},
 	after_place_node = function(pos, placer)
@@ -113,10 +151,13 @@ minetest.register_node("exatec:autosender", {
 	},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local t = minetest.get_node_timer(pos)
+		local m = minetest.get_meta(pos)
 		if t:is_started() then
 			t:stop()
+			m:set_string("infotext","OFF")
 		else
 			t:start(1)
+			m:set_string("infotext","ON")
 		end
 	end,
 	on_timer = function (pos, elapsed)
@@ -391,7 +432,7 @@ minetest.register_node("exatec:delayer", {
 		if minetest.is_protected(pos, player:get_player_name())==false then
 			local meta = minetest.get_meta(pos)
 			local time=meta:get_int("time")
-			if time>=10 then time=0 end
+			time = time < 10 and time or 0
 			meta:set_int("time",time+1)
 			meta:set_string("infotext","Delayer (" .. (time+1) ..")")
 		end
@@ -402,12 +443,14 @@ minetest.register_node("exatec:delayer", {
 		meta:set_string("infotext","Delayer (1)")
 	end,
 	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("case",0)
 		exatec.send(pos,true)
 	end,
 	exatec={
 		on_wire = function(pos)
 			local meta = minetest.get_meta(pos)
-			if meta:get_int("case")==0 then
+			if meta:get_int("case") == 0 then
+				meta:set_int("case",1)
 				minetest.get_node_timer(pos):start(meta:get_int("time"))
 			end
 		end
@@ -446,6 +489,31 @@ minetest.register_node("exatec:toggleable_storage", {
 	},
 	can_dig = function(pos, player)
 		local inv = minetest.get_meta(pos):get_inventory()
-		return inv:is_empty("input") and inv:is_empty("output") and inv:is_empty("craft")
+		return inv:is_empty("main")
 	end,
+})
+
+minetest.register_node("exatec:wire_gate", {
+	description = "Wire gate",
+	tiles={
+		"default_ironblock.png^default_crafting_arrowup.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	exatec={
+		on_wire = function(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true)
+		end,
+	}
 })
