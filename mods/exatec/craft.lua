@@ -114,8 +114,15 @@ minetest.register_craft({
 minetest.register_craft({
 	output="exatec:wire_gate",
 	recipe={
-		{"exatec:tube","exatec:wire","materials:diode"},
+		{"default:tin_ingot","exatec:wire","materials:diode"},
 		{"group:wood","group:wood","group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:wire_gate_toggleable",
+	recipe={
+		{"materials:diode","exatec:wire_gate","materials:diode"},
 	},
 })
 

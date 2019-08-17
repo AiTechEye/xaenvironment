@@ -131,7 +131,7 @@ exatec.wire_leading=function()
 						exatec.wire_signals[s]={pos=n,ignore=true}
 						local e = exatec.def(n)
 						if e.on_wire then
-							e.on_wire(n)
+							e.on_wire(n,v.pos)
 						end
 					end
 				end

@@ -708,9 +708,49 @@ minetest.register_node("exatec:wire_gate", {
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	exatec={
-		on_wire = function(pos)
+		on_wire = function(pos,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true)
+		end,
+	}
+})
+
+minetest.register_node("exatec:wire_gate_toggleable", {
+	description = "Toggleable wire gate",
+	tiles={
+		"default_ironblock.png^default_crafting_arrowup.png^exatec_wire.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("on",1)
+		m:set_string("infotext","On")
+	end,
+	exatec={
+		on_wire = function(pos,opos)
+			local m = minetest.get_meta(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
+			if not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
+				local on = m:get_int("on") == 1 and 0 or 1
+				m:set_int("on",on)
+				m:set_string("infotext",on == 1 and "On" or "Off")
+			elseif m:get_int("on") == 1 then
+				exatec.send(f,true)
+			end
+
 		end,
 	}
 })
