@@ -94,6 +94,53 @@ minetest.register_node("exatec:tube_gate", {
 	},
 })
 
+minetest.register_node("exatec:tube_dir", {
+	description = "Direction tube",
+	tiles = {
+		"exatec_glass.png^[colorize:#ff00ffcc^default_crafting_arrowup.png",
+		"exatec_glass.png^[colorize:#ff00ffcc",
+		"exatec_glass.png^[colorize:#ff00ffcc",
+		"exatec_glass.png^[colorize:#ff00ffcc",
+		"exatec_glass.png^[colorize:#ff00ffcc",
+		"exatec_glass.png^[colorize:#ff00ffcc",
+	},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
+	paramtype2 = "facedir",
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected","group:exatec_wire"},
+	exatec={
+		test_input=function(pos,stack,opos)
+			return true
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local ob = minetest.add_entity(pos,"exatec:tubeitem")
+			local en = ob:get_luaentity()
+			en:new_item(stack,opos)
+			en.storage.dir = d
+			ob:set_velocity(d)
+		end,
+		on_tube = function(pos,stack,opos,ob)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			ob:get_luaentity().storage.dir = d
+			ob:set_velocity(d)
+			ob:set_pos(pos)
+		end,
+	},
+})
+
 minetest.register_node("exatec:tube_filter", {
 	description = "Filter tube",
 	tiles = {
@@ -223,7 +270,6 @@ minetest.register_node("exatec:tube_filter", {
 			ob:get_luaentity().storage.dir = e
 			ob:set_pos(pos)
 		end,
-
 	},
 })
 
