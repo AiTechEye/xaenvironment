@@ -76,11 +76,16 @@ minetest.register_entity("exatec:tubeitem",{
 			end
 			self.object:remove()
 		elseif not exatec.samepos(ap,self.storage.curpos) then
-			if self:is_tube(ap) and not exatec.samepos(ap,self.tube_activated or pos) then
-				local def = exatec.def(ap)
-				self.tube_activated = ap
-				if def.on_tube then
-					def.on_tube(ap,self.stack,self.storage.oldpos,self.object)
+			if not exatec.samepos(ap,self.tube_activated or pos) then
+
+				if self:is_connected(npos) and exatec.test_input(npos,self.stack,self.storage.oldpos) then
+					return self
+				elseif self:is_tube(ap) then
+					local def = exatec.def(ap)
+					self.tube_activated = ap
+					if def.on_tube then
+						def.on_tube(ap,self.stack,self.storage.oldpos,self.object)
+					end
 				end
 			end
 			if self:is_tube(npos) and exatec.test_input(npos,self.stack,self.storage.oldpos) then
