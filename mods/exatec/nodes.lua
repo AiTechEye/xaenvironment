@@ -76,7 +76,7 @@ minetest.register_node("exatec:tube_gate", {
 	},
 	connects_to={"group:exatec_tube","group:exatec_tube_connected","group:exatec_wire"},
 	on_construct=function(pos)
-		minetest.get_meta(pos):set_string("infotext","Storage: closed")
+		minetest.get_meta(pos):set_string("infotext","Gate: closed")
 	end,
 	exatec={
 		test_input=function(pos,stack,opos)
@@ -107,7 +107,7 @@ minetest.register_node("exatec:tube_dir", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1},
 	paramtype2 = "facedir",
 	node_box = {
 		type = "connected",
@@ -120,7 +120,18 @@ minetest.register_node("exatec:tube_dir", {
 		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
 	},
 	connects_to={"group:exatec_tube","group:exatec_tube_connected","group:exatec_wire"},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("on",1)
+		m:set_string("infotext","Direction on")
+	end,
 	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local on = m:get_int("on") == 1 and 0 or 1
+			m:set_int("on",on)
+			m:set_string("infotext","Direction: " .. (on == 1 and "On" or "Off"))
+		end,
 		test_input=function(pos,stack,opos)
 			return true
 		end,
@@ -133,10 +144,13 @@ minetest.register_node("exatec:tube_dir", {
 			ob:set_velocity(d)
 		end,
 		on_tube = function(pos,stack,opos,ob)
-			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			ob:get_luaentity().storage.dir = d
-			ob:set_velocity(d)
-			ob:set_pos(pos)
+
+			if minetest.get_meta(pos):get_int("on") == 1 then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				ob:get_luaentity().storage.dir = d
+				ob:set_velocity(d)
+				ob:set_pos(pos)
+			end
 		end,
 	},
 })
@@ -793,6 +807,18 @@ minetest.register_node("exatec:node_breaker", {
 	paramtype2 = "facedir",
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+		local meta = minetest.get_meta(pos)
+		meta:set_int("range",1)
+		meta:set_string("infotext","Range (1)")
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local range=meta:get_int("range")
+			range = range < 10 and range or 0
+			meta:set_int("range",range+1)
+			meta:set_string("infotext","Range (" .. (range+1) ..")")
+		end
 	end,
 	exatec={
 		input_list="main",
@@ -800,33 +826,34 @@ minetest.register_node("exatec:node_breaker", {
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
-			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-			local n = minetest.get_node(f).name
-			local def = minetest.registered_nodes[n] or {}
-			local owner = minetest.get_meta(f):get_string("owner")
-
-			if n ~= "air" and def.drop ~= "" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, {get_player_name=function() return owner end}) ==  false) and not minetest.is_protected(f, owner) then
-				local stack = ItemStack(n)
-				if exatec.test_input(b,stack,pos) then
-					exatec.input(b,stack,pos)
-				else
-					minetest.add_item(b,stack)
-				end
-				minetest.remove_node(f)
-			end
-			local inv = minetest.get_meta(pos):get_inventory()
-			for _, ob in pairs(minetest.get_objects_inside_radius(f,1)) do
-				local en = ob:get_luaentity()
-				if en and en.name == "__builtin:item" then
-					local s = ItemStack(en.itemstring)
-					if exatec.test_input(b,s,pos) then
-						exatec.input(b,s,pos)
+			for i=1,minetest.get_meta(pos):get_int("range") do
+				local f = {x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}
+				local n = minetest.get_node(f).name
+				local def = minetest.registered_nodes[n] or {}
+				local owner = minetest.get_meta(f):get_string("owner")
+				if n ~= "air" and def.drop ~= "" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, {get_player_name=function() return owner end}) ==  false) and not minetest.is_protected(f, owner) then
+					local stack = ItemStack(n)
+					if exatec.test_input(b,stack,pos) then
+						exatec.input(b,stack,pos)
 					else
-						minetest.add_item(b,s)
+						minetest.add_item(b,stack)
 					end
-					ob:remove()
-				else
-					default.punch(ob,ob,20)
+					minetest.remove_node(f)
+				end
+				local inv = minetest.get_meta(pos):get_inventory()
+				for _, ob in pairs(minetest.get_objects_inside_radius(f,1)) do
+					local en = ob:get_luaentity()
+					if en and en.name == "__builtin:item" then
+						local s = ItemStack(en.itemstring)
+						if exatec.test_input(b,s,pos) then
+							exatec.input(b,s,pos)
+						else
+							minetest.add_item(b,s)
+						end
+						ob:remove()
+					else
+						default.punch(ob,ob,5)
+					end
 				end
 			end
 		end,
@@ -845,27 +872,59 @@ minetest.register_node("exatec:placer", {
 	},
 	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1},
 	paramtype2 = "facedir",
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local range=meta:get_int("range")
+			range = range < 10 and range or 0
+			meta:set_int("range",range+1)
+			meta:set_string("infotext","Range (" .. (range+1) ..")")
+		end
+	end,
+	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+		local meta = minetest.get_meta(pos)
+		meta:set_int("range",1)
+		meta:set_string("infotext","Range (1)")
+	end,
 	exatec={
 		test_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-			local n = minetest.get_node(f).name
-			local sdef = minetest.registered_nodes[stack:get_name()]
-			local def = minetest.registered_nodes[n]
-			local owner = minetest.get_meta(f):get_string("owner")
-			return sdef and def.buildable_to and not minetest.is_protected(f, owner)
+			local owner = minetest.get_meta(pos):get_string("owner")
+			local r = minetest.get_meta(pos):get_int("range")
+			if not minetest.registered_nodes[stack:get_name()] then
+				return false
+			end
+			for i=1,minetest.get_meta(pos):get_int("range") do
+				local f = {x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}
+				local n = minetest.get_node(f).name
+				local def = minetest.registered_nodes[n] or {}
+				if not def.buildable_to or minetest.is_protected(f, owner) then
+					r = r -1
+					if r <= 0 then
+						return false
+					end
+				end
+			end
+			return true
 		end,
 		on_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-			local n = minetest.get_node(f).name
+			local owner = minetest.get_meta(pos):get_string("owner")
 			local sdef = minetest.registered_nodes[stack:get_name()]
-			local def = minetest.registered_nodes[n]
-			local owner = minetest.get_meta(f):get_string("owner")
-			if sdef and def.buildable_to and not minetest.is_protected(f, owner) then
-				minetest.add_node(f,{name=stack:get_name()})
-				if sdef.sounds and sdef.sounds.place and sdef.sounds.place.name then
-					minetest.sound_play(sdef.sounds.place.name,{pos=f,max_hear_distance=10,gain=sdef.sounds.place.gain or 1})
+			if not sdef then
+				return
+			end
+			for i=1,minetest.get_meta(pos):get_int("range") do
+				local f = {x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}
+				local n = minetest.get_node(f).name
+				local def = minetest.registered_nodes[n] or {}
+				if def.buildable_to and not minetest.is_protected(f, owner) then
+					minetest.add_node(f,{name=stack:get_name()})
+					if sdef.sounds and sdef.sounds.place and sdef.sounds.place.name then
+						minetest.sound_play(sdef.sounds.place.name,{pos=f,max_hear_distance=10,gain=sdef.sounds.place.gain or 1})
+					end
+					return
 				end
 			end
 		end
