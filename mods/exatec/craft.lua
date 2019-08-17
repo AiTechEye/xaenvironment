@@ -46,6 +46,14 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="exatec:tube_filter 5",
+	recipe={
+		{"materials:diode","exatec:tube","materials:diode"},
+		{"exatec:tube","exatec:tube","exatec:tube"},
+		{"materials:diode","exatec:tube","materials:diode"},
+	},
+})
 
 minetest.register_craft({
 	output="exatec:button",

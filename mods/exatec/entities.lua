@@ -45,7 +45,7 @@ minetest.register_entity("exatec:tubeitem",{
 		local def = exatec.def(pos)
 		self.tube_activated = pos
 		if def.on_tube then
-			def.on_tube(pos,self.stack,opos)
+			def.on_tube(pos,self.stack,opos,self.object)
 		end
 	end,
 	input=function(self,pos)
@@ -80,7 +80,7 @@ minetest.register_entity("exatec:tubeitem",{
 				local def = exatec.def(ap)
 				self.tube_activated = ap
 				if def.on_tube then
-					def.on_tube(ap,self.stack,self.storage.oldpos)
+					def.on_tube(ap,self.stack,self.storage.oldpos,self.object)
 				end
 			end
 			if self:is_tube(npos) and exatec.test_input(npos,self.stack,self.storage.oldpos) then

@@ -51,7 +51,7 @@ minetest.register_node("exatec:tube_detector", {
 		on_input=function(pos,stack,opos)
 			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
 		end,
-		on_tube=function(pos,stack,opos)
+		on_tube=function(pos,stack,opos,ob)
 			exatec.send(pos)
 		end,
 	},
@@ -91,6 +91,139 @@ minetest.register_node("exatec:tube_gate", {
 			m:set_int("open",open)
 			m:set_string("infotext","Storage: " .. (open == 1 and "open" or "closed"))
 		end,
+	},
+})
+
+minetest.register_node("exatec:tube_filter", {
+	description = "Filter tube",
+	tiles = {
+		"exatec_glass.png^[colorize:#000000",
+		"exatec_glass.png^[colorize:#ffffff",
+		"exatec_glass.png^[colorize:#ff0000",
+		"exatec_glass.png^[colorize:#00ff00",
+		"exatec_glass.png^[colorize:#0000ff",
+		"exatec_glass.png^[colorize:#ffff00",
+	},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected","group:exatec_wire"},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		local b = ""
+		if inv:get_size("input1") == 0 then
+			inv:set_size("input1", 1)
+			inv:set_size("input2", 1)
+			inv:set_size("input3", 1)
+			inv:set_size("input4", 1)
+			inv:set_size("input5", 1)
+			inv:set_size("input6", 1)
+		else
+			for i=1,6 do
+			local d = m:get_string("input"..i)
+			for i2,v in pairs(d.split(d,",")) do
+				b=b.."item_image_button["..(i2-1)..","..(i-1)..";1,1;"..v..";input"..i..":"..v..";]"
+			end
+			end
+		end
+		m:set_string("formspec",
+			"size[12,10]" 
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."box[0,0;12,1;#ff0000]".."list[context;input1;11,0;1,1;]" 
+			.."box[0,1;12,1;#00ff00]".."list[context;input2;11,1;1,1;]" 
+			.."box[0,2;12,1;#0000ff]".."list[context;input3;11,2;1,1;]" 
+			.."box[0,3;12,1;#ffff00]".."list[context;input4;11,3;1,1;]"
+			.."box[0,4;12,1;#000000]".."list[context;input5;11,4;1,1;]"
+			.."box[0,5;12,1;#ffffff]".."list[context;input6;11,5;1,1;]" 
+			.."list[current_player;main;2,6.2;8,4;]" 
+			..b
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local d = m:get_string(listname)
+			local s = d.split(d,",")
+			local name = stack:get_name()
+			if #s >=10 then
+				return 0
+			end
+			for i,v in pairs(s) do
+				if v == name then
+					return 0
+				end
+			end
+			m:set_string(listname,d..name..",")
+			minetest.registered_nodes["exatec:tube_filter"].on_construct(pos)
+		end
+		return 0
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		for i,v in pairs(pressed) do
+			if i:sub(1,5) == "input" then
+				local it = i:sub(8,-1)
+				local na = i:sub(1,6)
+				local m = minetest.get_meta(pos)
+				m:set_string(na,m:get_string(na):gsub(it..",",""))
+				minetest.registered_nodes["exatec:tube_filter"].on_construct(pos)
+				return
+			end
+		end
+	end,
+	exatec={
+		test_input=function(pos,stack,opos)
+			local m = minetest.get_meta(pos)
+			local n = stack:get_name()
+			local e = false
+			for i=1,6 do
+				local d = m:get_string("input"..i)
+				if d == "" then
+					e = true
+				elseif d:find(n) then
+					return true
+				end
+			end
+			return e
+		end,
+		on_tube=function(pos,stack,opos,ob)
+			local m = minetest.get_meta(pos)
+			local n = stack:get_name()
+			local e
+			for i,v in pairs(exatec.tube_rules) do
+				local d = m:get_string("input"..i)
+				if d == "" then
+					e = v
+				elseif d:find(n) then
+					ob:set_velocity(v)
+					ob:get_luaentity().storage.dir = v
+					ob:set_pos(pos)
+					return
+				end
+			end
+			if not e then
+				local en = ob:get_luaentity()
+				local dir = en.storage.dir
+				en.storage.dir = {x=dir.x*-1,y=dir.y*-1,z=dir.z*-1,}
+				ob:set_velocity(en.storage.dir)
+				return
+			end
+			ob:set_velocity(e)
+			ob:get_luaentity().storage.dir = e
+			ob:set_pos(pos)
+		end,
+
 	},
 })
 
