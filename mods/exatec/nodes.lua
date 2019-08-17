@@ -579,24 +579,26 @@ minetest.register_node("exatec:counter", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	drawtype="nodebox",
-	node_box = {
-	type="fixed",
-	fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
-	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name())==false then
-			local meta = minetest.get_meta(pos)
-			local times=meta:get_int("times")+1
-			if times >= 10 then
-				times=1
-			end
-			meta:set_int("times",times)
-			meta:set_string("infotext","Counter: "..times.." count: "..meta:get_int("count"))
-		end
-	end,
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_int("times",1)
-		meta:set_string("infotext","Counter: 0 count: 0")
+		local m = minetest.get_meta(pos)
+		m:set_int("times",1)
+		m:set_string("infotext","Counter: 0 count: 0")
+		m:set_string("formspec","size[4,0.5]field[0,0;3,1;text;;]button_exit[3,-0.3;1,1;go;Go]")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.go then
+			local m = minetest.get_meta(pos)
+			local n = tonumber(pressed.text)
+			local t = 10000000
+			if n then
+				n = n < t and n or t
+				n = n > 0 and n or 0
+				m:set_string("formspec","size[4,0.5]field[0,0;3,1;text;;"..n.."]button_exit[3,-0.3;1,1;go;Go]")
+				m:set_int("times",n)
+				m:set_string("infotext","Counter: "..n.." count: "..m:get_int("count"))
+			end
+		end
 	end,
 	exatec={
 		on_wire = function(pos)
