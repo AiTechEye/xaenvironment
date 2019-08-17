@@ -163,3 +163,20 @@ minetest.register_craft({
 		{"default:iron_ingot","materials:gear_metal","default:iron_ingot"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:light_detector",
+	recipe={
+		{"materials:diode","exatec:tube_detector","exatec:wire"},
+		{"default:glass_tabletop","materials:plant_extracts_gas","default:tin_ingot"},
+		{"default:glass_tabletop","materials:plastic_sheet","default:glass_tabletop"},
+	},
+})
+minetest.register_craft({
+	output="exatec:destroyer",
+	recipe={
+		{"exatec:tube","materials:tube_metal","default:obsidian"},
+		{"default:glass_tabletop","default:bucket_with_lava_source","default:tin_ingot"},
+		{"default:glass_tabletop","materials:plastic_sheet","default:glass_tabletop"},
+	},
+})

@@ -871,3 +871,91 @@ minetest.register_node("exatec:placer", {
 		end
 	},
 })
+
+minetest.register_node("exatec:light_detector", {
+	description = "Light detector (Click to change level)",
+	tiles = {"default_steelblock.png^[colorize:#0000ffaa^exatec_glass.png^default_chest_top.png"},
+	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local level=meta:get_int("level") + 1
+			level = level < 14 and level or 0
+			meta:set_int("level",level)
+			meta:set_string("infotext","Level (" .. (level) ..")")
+		end
+	end,
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext","Level (0)")
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		if (minetest.get_node_light(pos) or 0) == minetest.get_meta(pos):get_int("level") then
+			exatec.send(pos)
+		end
+		return true
+	end,
+})
+
+minetest.register_node("exatec:destroyer", {
+	description = "Destroyer",
+	tiles = {"default_lava.png^default_glass.png^default_chest_top.png"},
+	sounds = default.node_sound_glass_defaults(),
+	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,igniter=1},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_string("infotext","Storage: closed")
+		m:set_string("formspec",
+			"size[8,8]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	on_metadata_inventory_put=function(pos)
+		minetest.get_node_timer(pos)
+		local t = minetest.get_node_timer(pos)
+		if not t:is_started() then
+			t:start(0.1)
+		end
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_input=function(pos,stack,opos)
+			minetest.get_node_timer(pos)
+			local t = minetest.get_node_timer(pos)
+			if not t:is_started() then
+				t:start(0.1)
+			end
+		end,
+	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		if inv:is_empty("main") then
+			return
+		end
+		for i,v in pairs(inv:get_list("main")) do
+			local n = v:get_name()
+			if n ~= "" then
+				if minetest.get_item_group(n,"flammable") > 0 then
+					inv:set_stack("main",i,nil)
+					return true
+				else
+					inv:set_stack("main",i,ItemStack(n.. " " .. (v:get_count()-1)))
+					return true
+				end
+			end
+		end
+	end
+})

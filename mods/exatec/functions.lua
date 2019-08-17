@@ -49,7 +49,8 @@ exatec.input=function(pos,stack,opos)
 			return false
 		end
 		inv:add_item(a.input_list,stack)
-	elseif a.on_input then
+	end
+	if a.on_input then
 		a.on_input(pos,stack,opos)
 	end
 	local def = exatec.getnodedefpos(pos)
@@ -67,7 +68,8 @@ exatec.output=function(pos,stack,opos)
 	if a.output_list then
 		local inv = minetest.get_meta(pos):get_inventory()
 		new_stack = inv:remove_item(a.output_list,stack)
-	elseif a.on_input then
+	end
+	if a.on_input then
 		a.on_input(f,new_stack,opos)
 	end
 	local def = exatec.getnodedefpos(pos)
