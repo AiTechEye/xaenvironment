@@ -167,7 +167,7 @@ exatec_furnace = {
 	test_input=function(pos,stack,opos)
 		local m = minetest.get_meta(pos)
 		local inv = m:get_inventory()
-		if opos.y < pos.y or opos.y > pos.y and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
+		if (opos.y < pos.y or opos.y > pos.y) and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
 			return true
 		elseif opos.y >= pos.y and inv:room_for_item("cook",stack) then
 			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
