@@ -203,3 +203,11 @@ minetest.register_craft({
 		{"group:wood","exatec:wire_gate","group:wood"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:wire_dir_gate",
+	recipe={
+		{"materials:diode","exatec:wire","materials:diode"},
+		{"","exatec:wire",""},
+	},
+})

@@ -24,10 +24,6 @@ minetest.register_craftitem("exatec:list", {
 	end
 })
 
-
-
-
-
 minetest.register_node("exatec:tube", {
 	description = "Tube",
 	tiles = {"exatec_glass.png"},
@@ -741,6 +737,38 @@ minetest.register_node("exatec:wire_gate", {
 		on_wire = function(pos,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true)
+		end,
+	}
+})
+
+
+minetest.register_node("exatec:wire_dir_gate", {
+	description = "Wire direction gate",
+	tiles={
+		"default_ironblock.png^exatec_wire.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	exatec={
+		on_wire = function(pos,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local b  = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
+			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
+			if exatec.samepos(opos,f) then
+				exatec.send(b,true)
+			elseif exatec.samepos(opos,b) then
+				exatec.send(f,true)
+			end
 		end,
 	}
 })
