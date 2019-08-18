@@ -164,22 +164,24 @@ end
 
 exatec_furnace = {
 	output_list="fried",
-	test_input=function(pos,stack,opos)
+	test_input=function(pos,stack,opos,cpos)
 		local m = minetest.get_meta(pos)
 		local inv = m:get_inventory()
-		if (opos.y < pos.y or opos.y > pos.y) and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
+		cpos = cpos  or pos
+		if (cpos.y < pos.y or cpos.y > pos.y) and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
 			return true
-		elseif opos.y >= pos.y and inv:room_for_item("cook",stack) then
+		elseif cpos.y == pos.y and inv:room_for_item("cook",stack) then
 			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
 			return result.item:get_name() ~= ""
 		end
 	end,
-	on_input=function(pos,stack,opos)
+	on_input=function(pos,stack,opos,cpos)
 		local m = minetest.get_meta(pos)
 		local inv = m:get_inventory()
-		if opos.y < pos.y and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
+		cpos = cpos  or pos
+		if (cpos.y < pos.y or cpos.y > pos.y) and default.get_fuel(stack) > 0 and inv:room_for_item("fuel",stack) then
 			inv:add_item("fuel",stack)
-		elseif opos.y >= pos.y and inv:room_for_item("cook",stack) then
+		elseif cpos.y == pos.y and inv:room_for_item("cook",stack) then
 			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
 			if result.item:get_name() ~= "" then
 				inv:add_item("cook",stack)
