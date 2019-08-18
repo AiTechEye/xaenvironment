@@ -39,7 +39,7 @@ exatec.test_output=function(pos,stack,opos)
 	end
 end
 
-exatec.input=function(pos,stack,opos)
+exatec.input=function(pos,stack,opos,cpos)
 	local a = exatec.def(pos)
 	local re
 	stack = a.input_max and stack:get_count() > a.input_max and ItemStack(stack:get_name() .." " .. a.input_max) or stack
@@ -51,7 +51,7 @@ exatec.input=function(pos,stack,opos)
 		inv:add_item(a.input_list,stack)
 	end
 	if a.on_input then
-		a.on_input(pos,stack,opos)
+		a.on_input(pos,stack,opos,cpos)
 	end
 	local def = exatec.getnodedefpos(pos)
 	if def.on_metadata_inventory_put then
