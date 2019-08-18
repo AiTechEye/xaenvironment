@@ -138,7 +138,7 @@ minetest.register_craft({
 	recipe={
 		{"default:chest","materials:tube_metal","exatec:wire"},
 		{"materials:plastic_sheet","materials:diode","materials:plastic_sheet"},
-		{"materials:plastic_sheet","materials:fanblade_plastic","materials:plastic_sheet"},
+		{"materials:plastic_sheet","materials:fanblade_metal","materials:plastic_sheet"},
 	},
 })
 

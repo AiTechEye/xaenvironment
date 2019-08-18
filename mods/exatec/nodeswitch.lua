@@ -89,6 +89,14 @@ exatec.consnodeswitch_switch=function(pos,state)
 end
 minetest.register_node("exatec:nodeswitch", {
 	description = "Node switch",
+	tiles = {
+		"default_steelblock.png",
+		"default_steelblock.png",
+		"default_steelblock.png^default_crafting_arrowright.png^exatec_wirecon.png",
+	},
+	groups = {exatec_wire_connected=1,snappy = 3},
+	sounds = default.node_sound_stone_defaults(),
+
 	after_place_node = function(pos, placer)
 		local meta=minetest.get_meta(pos)
 		local p=placer:get_player_name()
@@ -105,9 +113,6 @@ minetest.register_node("exatec:nodeswitch", {
 			end
 		end, p,id)
 	end,
-	tiles = {"default_steelblock.png"},
-	groups = {exatec_wire_connected=1,snappy = 3},
-	sounds = default.node_sound_stone_defaults(),
 	exatec={
 		on_wire=function(pos)
 			local m = minetest.get_meta(pos)

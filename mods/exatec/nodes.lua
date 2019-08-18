@@ -362,7 +362,11 @@ minetest.register_node("exatec:button", {
 
 minetest.register_node("exatec:autosender", {
 	description = "Auto sender",
-	tiles={"default_ironblock.png^materials_gear_metal.png"},
+	tiles={
+		"default_ironblock.png^materials_gear_metal.png",
+		"default_ironblock.png^materials_gear_metal.png",
+		"default_ironblock.png^materials_gear_metal.png^exatec_wirecon.png"
+	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
 	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
@@ -507,10 +511,10 @@ minetest.register_node("exatec:extraction", {
 	tiles={
 		"default_ironblock.png",
 		"default_ironblock.png",
-		"default_ironblock.png^default_crafting_arrowright.png",
-		"default_ironblock.png^default_crafting_arrowleft.png",
-		"default_ironblock.png",
-		"default_ironblock.png^materials_fanblade_metal.png^default_chest_top.png",
+		"default_ironblock.png^default_crafting_arrowright.png^exatec_wirecon.png",
+		"default_ironblock.png^default_crafting_arrowleft.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole.png^exatec_wirecon.png",
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
@@ -555,10 +559,10 @@ minetest.register_node("exatec:dump", {
 	tiles={
 		"default_ironblock.png",
 		"default_ironblock.png",
-		"default_ironblock.png^default_crafting_arrowright.png",
-		"default_ironblock.png^default_crafting_arrowleft.png",
-		"default_ironblock.png",
-		"default_ironblock.png^materials_fanblade_plastic.png^default_chest_top.png",
+		"default_ironblock.png^default_crafting_arrowright.png^exatec_wirecon.png",
+		"default_ironblock.png^default_crafting_arrowleft.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole.png^default_chest_top.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole.png^default_chest_top.png^exatec_wirecon.png",
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
@@ -598,8 +602,11 @@ minetest.register_node("exatec:dump", {
 })
 
 minetest.register_node("exatec:counter", {
-	description = "Counter (click to change count)",
-	tiles = {"default_ironblock.png^materials_gear_metal.png","default_ironblock.png"},
+	description = "Counter",
+	tiles = {	"default_ironblock.png^materials_gear_metal.png",
+		"default_ironblock.png^materials_gear_metal.png",
+		"default_ironblock.png^materials_gear_metal.png^exatec_wirecon.png"
+	},
 	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
@@ -642,7 +649,10 @@ minetest.register_node("exatec:counter", {
 })
 minetest.register_node("exatec:delayer", {
 	description = "Delayer (Click to change time)",
-	tiles = {"default_ironblock.png^clock.png^default_chest_top.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png"},
+	tiles = {
+		"default_ironblock.png^clock.png^default_chest_top.png",
+		"default_ironblock.png",
+		"default_ironblock.png^exatec_wire.png"},
 	groups = {dig_immediate = 2,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
@@ -680,7 +690,11 @@ minetest.register_node("exatec:delayer", {
 
 minetest.register_node("exatec:toggleable_storage", {
 	description = "Toggleable storage",
-	tiles={"default_wood.png^default_chest_top.png"},
+	tiles={
+		"default_wood.png^default_chest_top.png^exatec_hole.png",
+		"default_wood.png^default_chest_top.png^exatec_hole.png",
+		"default_wood.png^default_chest_top.png^exatec_hole.png^exatec_wirecon.png"
+	},
 	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
@@ -814,8 +828,12 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 })
 
 minetest.register_node("exatec:object_detector", {
-	description = "Object detector (Click to change radius)",
-	tiles = {"default_steelblock.png^exatec_glass.png^default_chest_top.png"},
+	description = "Object detector",
+	tiles = {
+		"default_steelblock.png^exatec_glass.png^default_chest_top.png",
+		"default_steelblock.png^exatec_glass.png^default_chest_top.png",
+		"default_steelblock.png^exatec_glass.png^default_chest_top.png^(default_crafting_arrowleft.png^default_crafting_arrowright.png^[colorize:#00ff00)"
+	},
 	groups = {dig_immediate = 2,exatec_wire=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
@@ -844,7 +862,11 @@ minetest.register_node("exatec:object_detector", {
 
 minetest.register_node("exatec:vacuum", {
 	description = "Vacuum",
-	tiles={"default_stone.png^default_chest_top.png"},
+	tiles={
+		"default_stone.png^exatec_hole_big.png^materials_fanblade_metal.png",
+		"default_stone.png",
+		"default_stone.png^exatec_hole.png^exatec_wirecon.png"
+	},
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
@@ -897,10 +919,10 @@ minetest.register_node("exatec:node_breaker", {
 	tiles={
 		"default_ironblock.png",
 		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png^materials_sawblade.png^default_chest_top.png",
-		"default_ironblock.png^default_chest_top.png",
+		"default_ironblock.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole_big.png^materials_sawblade.png^exatec_wirecon.png",
+		"default_ironblock.png^exatec_hole.png^exatec_wirecon.png",
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
@@ -961,12 +983,12 @@ minetest.register_node("exatec:node_breaker", {
 minetest.register_node("exatec:placer", {
 	description = "Placer",
 	tiles = {
+		"default_ironblock.png^default_crafting_arrowup.png",
 		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png^default_chest_top.png",
-		"default_ironblock.png^default_chest_top.png"
+		"default_ironblock.png^exatec_hole.png",
+		"default_ironblock.png^exatec_hole.png",
+		"default_ironblock.png^exatec_hole_big.png",
+		"default_ironblock.png^exatec_hole.png"
 	},
 	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1},
 	paramtype2 = "facedir",
@@ -1120,12 +1142,12 @@ minetest.register_node("exatec:destroyer", {
 minetest.register_node("exatec:node_detector", {
 	description = "Node detector",
 	tiles={
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png",
-		"default_ironblock.png^materials_sawblade.png^default_chest_top.png",
-		"default_ironblock.png^default_chest_top.png",
+		"default_steelblock.png",
+		"default_steelblock.png",
+		"default_steelblock.png^exatec_wirecon.png",
+		"default_steelblock.png^exatec_wirecon.png",
+		"default_steelblock.png^(exatec_hole.png^[colorize:#ff0000)^exatec_wirecon.png",
+		"default_steelblock.png^exatec_wirecon.png",
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
