@@ -12,14 +12,14 @@ exatec={
 	input_list="listname",			-- list to put in
 	output_list="listname",			-- list to stack take from
 
-	test_input=function(pos,stack,oldpos)		-- test for input
+	test_input=function(pos,stack,oldpos,curpos)		-- test for input
 		return true or false/nil
 	end,
 	test_output=function(pos,stack,oldpos)		-- test for output
 		return true or false/nil
 	end,
 
-	on_input=function(pos,stack,oldpos)		-- while input
+	on_input=function(pos,stack,oldpos,objectpos)	-- while input, note objectpos is sent by entities in tubes, and are nil in other cases
 	end,
 	on_output=function(pos,stack,oldpos)		-- while output
 	end,

@@ -49,9 +49,9 @@ minetest.register_entity("exatec:tubeitem",{
 		end
 	end,
 	input=function(self,pos)
-		if exatec.test_input(pos,self.stack,self.storage.oldpos) then
+		if exatec.test_input(pos,self.stack,self.storage.oldpos,self.storage.curpos) then
 			local ap = {x=math.floor(pos.x+0.5),y=math.floor(pos.y+0.5),z=math.floor(pos.z+0.5)}
-			exatec.input(ap,self.stack,self.storage.oldpos)
+			exatec.input(ap,self.stack,self.storage.oldpos,self.storage.curpos)
 			self.object:remove()
 			return self
 		end
@@ -86,14 +86,14 @@ minetest.register_entity("exatec:tubeitem",{
 				end
 
 			end
-			if (self:is_tube(npos) or self:is_connected(npos)) and exatec.test_input(npos,self.stack,self.storage.oldpos) then
+			if (self:is_tube(npos) or self:is_connected(npos)) and exatec.test_input(npos,self.stack,self.storage.oldpos,self.storage.curpos) then
 				self.storage.oldpos = self.storage.curpos
 				self.storage.curpos = ap
 				self.object:set_velocity(self.storage.dir)
 			else
 				for i,d in pairs(exatec.tube_rules) do
 					npos = {x=ap.x+d.x,y=ap.y+d.y,z=ap.z+d.z}
-					if (self:is_tube(npos) or self:is_connected(npos)) and exatec.test_input(npos,self.stack,self.storage.oldpos) and vector.distance(pos,ap) < 0.1 and not exatec.samepos(npos,self.storage.curpos) then
+					if (self:is_tube(npos) or self:is_connected(npos)) and exatec.test_input(npos,self.stack,self.storage.oldpos,self.storage.curpos) and vector.distance(pos,ap) < 0.1 and not exatec.samepos(npos,self.storage.curpos) then
 						self.storage.dir = d
 						self.storage.oldpos = self.storage.curpos
 						self.storage.curpos = ap

@@ -12,11 +12,11 @@ exatec.samepos=function(p1,p2)
 	return p1.x == p2.x and p1.y == p2.y and p1.z == p2.z
 end
 
-exatec.test_input=function(pos,stack,opos)
+exatec.test_input=function(pos,stack,opos,cpos)
 	local a = exatec.def(pos)
 	local def = exatec.getnodedefpos(pos)
 	if a.test_input then
-		return a.test_input(pos,stack,opos)
+		return a.test_input(pos,stack,opos,cpos)
 	--elseif def.allow_metadata_inventory_put then --mess
 	--	return ItemStack(stack:get_name() .. " " ..allow_metadata_inventory_put(pos, a.input_list,1, stack, ""))
 	elseif a.input_list then
