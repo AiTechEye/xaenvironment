@@ -187,3 +187,12 @@ minetest.register_craft({
 		{"default:glass_tabletop","materials:plastic_sheet","default:glass_tabletop"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:node_detector",
+	recipe={
+		{"default:tin_ingot","exatec:wire","materials:diode"},
+		{"group:wood","default:iron_ingot","group:wood"},
+		{"group:wood","exatec:wire_gate","group:wood"},
+	},
+})

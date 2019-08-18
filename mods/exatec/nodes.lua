@@ -863,8 +863,6 @@ minetest.register_node("exatec:node_breaker", {
 		end
 	end,
 	exatec={
-		input_list="main",
-		output_list="main",
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
@@ -1059,4 +1057,59 @@ minetest.register_node("exatec:destroyer", {
 			end
 		end
 	end
+})
+
+minetest.register_node("exatec:node_detector", {
+	description = "Node detector",
+	tiles={
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png^materials_sawblade.png^default_chest_top.png",
+		"default_ironblock.png^default_chest_top.png",
+	},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype2 = "facedir",
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("range",1)
+		local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		local n = minetest.get_node({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}).name
+		m:set_string("node",n)
+		m:set_string("formspec","size[4.2,1.1]field[0,0;3,1;range;;1]field[0,1;3,1;node;;"..n.."]button_exit[3,-0.3;1,1;go;Go]button_exit[2.5,0.7;2,1;auto;Autodetect]")
+		minetest.get_node_timer(pos):start(2)
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local node = m:get_string("node")
+		local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		for i=1,m:get_int("range") do
+			if minetest.get_node({x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}).name == node then
+				exatec.send(pos,true)
+				return true
+			end
+		end
+		return true
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.go or pressed.auto then
+			local m = minetest.get_meta(pos)
+			local n = tonumber(pressed.range) or m:get_int("range")
+			n = n < 20 and n or 20
+			n = n > 1 and n or 1
+			m:set_int("range",n)
+			local node = pressed.node or m:get_string("node")
+			if pressed.auto then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				for i=1,n do
+					node = minetest.get_node({x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}).name
+				end
+			end
+			m:set_string("node",node)
+			local err = minetest.registered_nodes[node] and "" or "box[-0.3,0.8;2.8,0.7;#ff0000]"
+			m:set_string("formspec","size[4.2,1.1]"..err.."field[0,0;3,1;range;;"..n.."]field[0,1;3,1;node;;"..node.."]button_exit[3,-0.3;1,1;go;Go]button_exit[2.5,0.7;2,1;auto;Autodetect]")
+		end
+	end,
 })
