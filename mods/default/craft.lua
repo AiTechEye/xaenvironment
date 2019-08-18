@@ -135,6 +135,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:wrench",
+	recipe={
+		{"","","default:iron_ingot"},
+		{"","default:iron_ingot",""},
+		{"default:iron_ingot","",""},
+	},
+})
+
+minetest.register_craft({
 	output="default:gold_lump",
 	recipe={
 		{"default:gold_flake","default:gold_flake","default:gold_flake"},

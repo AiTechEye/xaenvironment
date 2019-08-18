@@ -1,3 +1,31 @@
+minetest.register_tool("default:wrench", {
+	description = "Wrench",
+	groups = {treasure=1},
+	inventory_image = "default_wrench.png",
+	on_place=function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" then
+			local n = minetest.get_node(pointed_thing.under)
+			if n.param2 >= 3 then
+				n.param2 = 0
+			else
+				n.param2 = n.param2 + 1
+			end
+			minetest.swap_node(pointed_thing.under,n)
+			itemstack:add_wear(600)
+			return itemstack
+		end
+	end,
+	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" then
+			local n = minetest.get_node(pointed_thing.under)
+			n.param2 = n.param2 == 4 and 6 or 4
+			minetest.swap_node(pointed_thing.under,n)
+			itemstack:add_wear(600)
+			return itemstack
+		end
+	end
+})
+
 minetest.register_craftitem("default:gold_flake", {
 	description = "Gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
