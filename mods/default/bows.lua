@@ -446,7 +446,7 @@ bows.register_arrow("nitrogen",{
 bows.register_arrow("teleport",{
 	description="Teleport arrow",
 	texture="default_quantumblock.png",
-	groups={not_in_creative_inventory=1,not_in_craftguide=1},
+	groups={not_in_creative_inventory=1},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		local d = user:get_look_dir()
 		local p = user:get_pos()
@@ -470,7 +470,7 @@ bows.register_arrow("teleport",{
 bows.register_arrow("lightning",{
 	description="Lightning arrow",
 	texture="default_wood.png^[colorize:#FFFFFFFF",
-	groups={not_in_creative_inventory=1,not_in_craftguide=1},
+	groups={not_in_creative_inventory=1},
 	on_step=function(self)
 		local d = self.user:get_look_dir()
 		local pos1 = self.object:get_pos()
