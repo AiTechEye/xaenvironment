@@ -1,7 +1,7 @@
 minetest.register_node("nitroglycerin:timed_bomb", {
 	description = "Timed bomb",
 	tiles = {"nitroglycerin_timed_bomb.png"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2},
+	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -23,11 +23,12 @@ minetest.register_node("nitroglycerin:timed_bomb", {
 		minetest.get_node_timer(pos):start(5)
 		minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
 	end,
-	mesecons = {effector =
-		{action_on=function(pos)
-			minetest.registered_nodes["nitroglycerin:timed_bomb"].on_rightclick(pos)
+
+	exatec={
+		on_wire = function(pos)
+			minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
+			minetest.registered_nodes["nitroglycerin:timed_bomb"].on_blast(pos)
 		end
-		}
 	},
 	on_burn = function(pos)
 		minetest.registered_nodes["nitroglycerin:timed_bomb"].on_rightclick(pos)
