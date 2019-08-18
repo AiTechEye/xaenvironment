@@ -70,7 +70,7 @@ exatec.output=function(pos,stack,opos)
 		new_stack = inv:remove_item(a.output_list,stack)
 	end
 	if a.on_input then
-		a.on_input(f,new_stack,opos)
+		a.on_input(pos,new_stack,opos)
 	end
 	local def = exatec.getnodedefpos(pos)
 	if def.on_metadata_inventory_take then
