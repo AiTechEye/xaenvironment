@@ -1,4 +1,11 @@
 minetest.register_craft({
+	output="exatec:list",
+	recipe={
+		{"default:paper","exatec:wire",""},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:autocrafter",
 	recipe={
 		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},

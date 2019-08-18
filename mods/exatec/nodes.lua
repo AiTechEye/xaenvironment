@@ -1,3 +1,33 @@
+minetest.register_craftitem("exatec:list", {
+	description = "ExaTec list",
+	inventory_image = "default_paper.png",
+	groups = {flammable = 1},
+	on_use=function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		local gui = "size[8.5,12]label[0,0;List of supported items]bgcolor[#ddddddff]"
+		local x = -0.2
+		local y = 1
+		for i,v in pairs(minetest.registered_items) do
+			local g = v.groups 
+			if v.exatec or g and (g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected) then
+				gui = gui .. "item_image_button["..x..","..y..";1,1;"..i..";"..i..";]"
+				x = x + 0.7
+				if x > 8 then
+					x = -0.2
+					y = y +0.8
+				end
+			end
+		end
+		minetest.after(0.2, function(name,gui)
+			return minetest.show_formspec(name, "exaachievements",gui)
+		end, name,gui)
+	end
+})
+
+
+
+
+
 minetest.register_node("exatec:tube", {
 	description = "Tube",
 	tiles = {"exatec_glass.png"},
