@@ -345,6 +345,38 @@ minetest.register_node("exatec:wire", {
 	end,
 })
 
+minetest.register_node("exatec:datawire", {
+	description = "Data wire",
+	tiles = {{name="default_cloud.png"}},
+	wield_image="exatec_wire.png^[colorize:#fff",
+	inventory_image="exatec_wire.png^[colorize:#fff",
+	drop="exatec:datawire",
+	drawtype="nodebox",
+	paramtype = "light",
+	paramtype2="colorwallmounted",
+	palette="default_palette.png",
+	sunlight_propagates=true,
+	walkable=false,
+	node_box = {
+		type = "connected",
+		connect_back={-0.05,-0.5,0, 0.05,-0.45,0.5},
+		connect_front={-0.05,-0.5,-0.5, 0.05,-0.45,0},
+		connect_left={-0.5,-0.5,-0.05, 0.05,-0.45,0.05},
+		connect_right={0,-0.5,-0.05, 0.5,-0.45,0.05},
+		connect_top = {-0.05, -0.5, -0.05, 0.05, 0.5, 0.05},
+		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
+	},
+	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,-0.4}},
+	connects_to={"group:exatec_data_wire","group:exatec_data_wire_connected"},
+	groups = {dig_immediate = 3,exatec_data_wire=1},
+	after_place_node = function(pos, placer)
+		minetest.set_node(pos,{name="exatec:datawire",param2=120})
+	end,
+	on_timer = function(pos, elapsed)
+		minetest.swap_node(pos,{name="exatec:datawire",param2=120})
+	end,
+})
+
 minetest.register_node("exatec:button", {
 	description = "Button",
 	tiles={"default_wood.png",},
@@ -750,11 +782,10 @@ minetest.register_node("exatec:wire_gate", {
 	exatec={
 		on_wire = function(pos,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true)
+			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true,true)
 		end,
 	}
 })
-
 
 minetest.register_node("exatec:wire_dir_gate", {
 	description = "Wire direction gate",
@@ -779,9 +810,9 @@ minetest.register_node("exatec:wire_dir_gate", {
 			local b  = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 			if exatec.samepos(opos,f) then
-				exatec.send(b,true)
+				exatec.send(b,true,true)
 			elseif exatec.samepos(opos,b) then
-				exatec.send(f,true)
+				exatec.send(f,true,true)
 			end
 		end,
 	}
@@ -820,7 +851,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 				m:set_int("on",on)
 				m:set_string("infotext",on == 1 and "On" or "Off")
 			elseif m:get_int("on") == 1 then
-				exatec.send(f,true)
+				exatec.send(f,true,true)
 			end
 
 		end,
@@ -834,29 +865,84 @@ minetest.register_node("exatec:object_detector", {
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png",
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png^(default_crafting_arrowleft.png^default_crafting_arrowright.png^[colorize:#00ff00)"
 	},
-	groups = {dig_immediate = 2,exatec_wire=1},
+	groups = {dig_immediate = 2,exatec_wire=1,exatec_data_wire_connected=1,},
 	sounds = default.node_sound_wood_defaults(),
-	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name())==false then
-			local meta = minetest.get_meta(pos)
-			local radius=meta:get_int("radius")
-			radius = radius < 10 and radius or 0
-			meta:set_int("radius",radius+1)
-			meta:set_string("infotext","Radius (" .. (radius+1) ..")")
-		end
-	end,
 	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_int("radius",1)
-		meta:set_string("infotext","Radius (1)")
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
 		minetest.get_node_timer(pos):start(2)
 	end,
 	on_timer = function (pos, elapsed)
-		for _, ob in pairs(minetest.get_objects_inside_radius(pos, minetest.get_meta(pos):get_int("radius"))) do
-			exatec.send(pos,true)
-			break	
+		local obs = {}
+		local sen
+		local m = minetest.get_meta(pos)
+		local o = m:get_int("only")
+		local n = m:get_string("object")
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, m:get_int("radius"))) do
+			local en = ob:get_luaentity()
+			local name = en and en.name or ob:is_player() and ob:get_player_name()
+			if not (en and (en.exatec_item or en.name == "__builtin:item")) and (n == "" or (o == 0 and name == n) or (o == 1 and name ~= n)) then
+				if not sen then
+					sen = true
+					exatec.send(pos,true)
+				end
+				table.insert(obs,ob)
+			end
+		end
+		if sen then
+			exatec.data_send(pos,m:get_string("to_channel"),m:get_string("channel"),{objects=obs})
 		end
 		return true
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.go or pressed.auto or pressed.only and minetest.is_protected(pos, sender:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local n = tonumber(pressed.radius) or m:get_int("radius")
+			n = n <= 20 and n or 20
+			n = n >= 1 and n or 1
+			m:set_int("radius",n)
+
+			local only = m:get_int("only")
+			if pressed.only then
+				only = only == 0 and 1 or 0
+				m:set_int("only",only)
+			end
+
+			local to_channel = pressed.to_channel or m:get_string("to_channel")
+			local channel = pressed.channel or m:get_string("channel")
+
+			m:set_string("to_channel",to_channel)
+			m:set_string("channel",channel)
+
+			local object = pressed.object or m:get_string("object")
+			if pressed.auto then
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos, n)) do
+					local en = ob:get_luaentity()
+					if en and en.name ~= "__builtin:item" then
+						object = en.name
+					elseif ob:is_player() then
+						object = ob:get_player_name()
+					end
+				end
+			end
+			m:set_string("object",object)
+			local err = (minetest.player_exists(object) or minetest.registered_entities[object]) and "" or "box[-0.3,0.8;2.8,0.7;#ff0000]"
+			err = object == "" and "" or err
+
+			m:set_string("formspec","size[6,2.2]"
+			..err
+			.."field[0,0;3,1;radius;;"..n.."]"
+			.."field[0,1;3,1;object;;"..object.."]"
+			.."button_exit[3,-0.3;1,1;go;Save]"
+			.."button_exit[2.5,0.7;2,1;auto;Autodetect]"
+			.."button_exit[4.3,0.7;2,1;only;"..(only == 0 and "Only" or "Except").."]"
+			.."field[0,2;3,1;channel;;"..channel.."]"
+			.."field[3,2;3,1;to_channel;;"..to_channel.."]"
+			.."tooltip[channel;Channel]"
+			.."tooltip[to_channel;To channel]"
+			.."tooltip[object;Object/player name]"
+			.."tooltip[radius;Radius]"
+			)
+		end
 	end,
 })
 
@@ -1192,4 +1278,88 @@ minetest.register_node("exatec:node_detector", {
 			m:set_string("formspec","size[4.2,1.1]"..err.."field[0,0;3,1;range;;"..n.."]field[0,1;3,1;node;;"..node.."]button_exit[3,-0.3;1,1;go;Go]button_exit[2.5,0.7;2,1;auto;Autodetect]")
 		end
 	end,
+})
+
+minetest.register_node("exatec:bow", {
+	description = "Autobow",
+	tiles = {"default_steelblock.png"},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype="nodebox",
+	paramtype="light",
+	sunlight_propagates=true,
+	node_box = {type="fixed",fixed={-0.2,-0.2,-0.2,0.2,-0.4,0.2}},
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext","Level (0)")
+		minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_destruct = function(pos)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+			local en = ob:get_luaentity()
+			if en and en.exatec_bow then
+				ob:remove()
+			end
+		end
+	end,
+	exatec={
+		on_data_wire=function(pos,data)
+			if data.objects then
+				local bow
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+					local en = ob:get_luaentity()
+					if en and en.exatec_bow then
+						bow = en
+						break
+					end
+				end
+				if not bow then
+					bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+					bow = bow:get_luaentity()
+				end
+				for _, ob in pairs(data.objects) do
+					local en = ob:get_luaentity()
+					if not (en and en.exatec_item) then
+						bow:lookat(ob:get_pos())
+						return
+					end
+				end
+			end
+		end,
+		on_wire = function(pos)
+			local bow
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+				local en = ob:get_luaentity()
+				if en and en.exatec_bow then
+					bow = en
+					break
+				end
+			end
+			if not bow then
+				bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+				bow = bow:get_luaentity()
+			end
+		end,
+		on_input=function(pos,stack,opos)
+			if minetest.get_item_group(stack:get_name(),"arrow") > 0 then
+				local bow
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+					local en = ob:get_luaentity()
+					if en and en.exatec_bow then
+						bow = en
+						break
+					end
+				end
+				if not bow then
+					bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+					bow = bow:get_luaentity()
+				end
+				bow:shoot(stack)
+			end
+		end,
+		test_input=function(pos,stack,opos)
+			return minetest.get_item_group(stack:get_name(),"arrow") > 0
+		end,
+	},
 })

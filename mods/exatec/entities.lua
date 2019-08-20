@@ -5,6 +5,7 @@ minetest.register_entity("exatec:tubeitem",{
 	physical=false,
 	textures={"air"},
 	automatic_rotate = math.pi/3,
+	exatec_item=true,
 	get_staticdata = function(self)
 		return minetest.serialize(self.storage)
 	end,
@@ -105,4 +106,72 @@ minetest.register_entity("exatec:tubeitem",{
 			end
 		end
 	end,
+})
+
+minetest.register_entity("exatec:bow",{
+	visual="wielditem",
+	visual_size={x=0.30,y=0.30},
+	collisionbox = {0,0,0,0,0,0},
+	physical=false,
+	textures={"default:bow_iron_loaded"},
+	exatec_bow=true,
+	exatec_item=true,
+	get_staticdata = function(self)
+		return minetest.serialize(self.dir)
+	end,
+	on_activate = function(self, staticdata)
+		self.dir = minetest.deserialize(staticdata) or {x=0, y=0, z=0}
+		if minetest.get_node(self.object:get_pos()).name ~= "exatec:bow" then
+			self.object:remove()
+		end
+	end,
+	lookat=function(self,pos2)
+		if not pos2 then
+			return
+		end
+		local pos1=self.object:get_pos()
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))+(math.pi*0.7)
+		if pos1.x >= pos2.x then y = y+math.pi end
+		self.object:set_rotation({x=0,y=y,z=z})
+		local d=math.floor(vector.distance(pos1,pos2)+0.5)
+		self.dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+0.005,z=(pos1.z-pos2.z)/-d}
+	end,
+	shoot=function(self,stack)
+		local pos = apos(self.object:get_pos(),0,-1.7)
+		local user = {
+			get_look_dir=function()
+				return self.dir
+			end,
+			punch=function()
+			end,
+			get_pos=function()
+				return pos
+			end,
+			set_pos=function(pos)
+				return self.object:set_pos(pos)
+			end,
+			get_player_control=function()
+				return {}
+			end,
+			get_look_horizontal=function()
+				return self.object:get_yaw() or 0
+			end,
+			get_player_name=function()
+				return ""
+			end,
+			is_player=function()
+				return true
+			end,
+			object=self.object,
+		}
+		local item = ItemStack({
+			name="default:bow_iron_loaded",
+			metadata=minetest.serialize({arrow=stack:get_name(),shots=stack:get_count()})
+		})
+		bows.shoot(item, user,nil,function(item)
+			item:remove()
+		end)
+	end
 })

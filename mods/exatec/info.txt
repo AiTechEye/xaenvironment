@@ -27,10 +27,14 @@ exatec={
 	on_wire = function(pos)			-- while wire connected
 	end
 
+	on_data_wire = function(pos,channel,from_channel,data) -- while data wire connected
+	end
+
 	on_tube = function(pos,stack,oldpos,object)	-- stack incoming to tube
 	end
 
 },
 
 
-exatec.send(pos)		send wire signal
+exatec.send(pos,force_send,table_to_send)				-- send wire signal, force_send to send even the node are ignored
+exatec.data_send(pos,to_channel,node_channel,table_of_optional_content)	-- send data wire signal

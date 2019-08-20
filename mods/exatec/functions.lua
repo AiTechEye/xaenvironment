@@ -79,7 +79,7 @@ exatec.output=function(pos,stack,opos)
 	return new_stack					
 end
 
-exatec.send=function(pos, ignore)
+exatec.send=function(pos, ignore,forcepos)
 	local na=pos.x .."." .. pos.y .."." ..pos.z
 	if not exatec.wire_signals[na] or ignore then
 		local t=os.time()
@@ -93,6 +93,21 @@ exatec.send=function(pos, ignore)
 			end
 		end
 		exatec.wire_signals[na]={pos=pos}
+		local n=exatec.get_node(pos)
+		if forcepos then
+			if minetest.get_item_group(n,"exatec_wire") > 0 then
+				exatec.wire_signals[na]={pos=pos}
+				minetest.swap_node(pos,{name=n,param2=91})
+				minetest.get_node_timer(pos):start(0.1)
+			end
+			if minetest.get_item_group(n,"exatec_wire_connected") > 0 then
+				exatec.wire_signals[na]={pos=pos,ignore=true}
+				local e = exatec.def(pos)
+				if e.on_wire then
+					e.on_wire(pos)
+				end
+			end
+		end
 		minetest.after(0, function()
 			exatec.wire_leading()
 		end)
@@ -144,5 +159,72 @@ exatec.wire_leading=function()
 		end)
 	else
 		exatec.wire_signals={}
+	end
+end
+
+exatec.data_send=function(pos,channel,from_channel,data)
+	local na=pos.x .."." .. pos.y .."." ..pos.z
+	if not exatec.wire_data_signals[na] then
+		local t=os.time()
+		if os.difftime(t, exatec.wire_data_sends.last)>1 then
+			exatec.wire_data_sends.last=t
+			exatec.wire_data_sends.times=0
+		else
+			exatec.wire_data_sends.times=exatec.wire_data_sends.times+1
+			if exatec.wire_data_sends.times>50 then
+				return
+			end
+		end
+		data = data or {}
+		data.channel = channel
+		data.from_channel = from_channel
+		exatec.wire_data_signals[na]={jobs={[na]=pos},data=data}
+		minetest.after(0, function()
+			exatec.wire_data_leading()
+		end)
+	end
+end
+
+exatec.wire_data_leading=function()
+	local counts=0
+	for i, a in pairs(exatec.wire_data_signals) do
+		local c=0
+		for xyz, pos in pairs(a.jobs) do
+			if not pos.ignore then
+				for ii, p in pairs(exatec.wire_rules) do
+					local n={x=pos.x+p.x,y=pos.y+p.y,z=pos.z+p.z}
+					local s=n.x .. "." .. n.y .."." ..n.z
+					local na=exatec.get_node(n)
+					if not a.jobs[s] then
+						if minetest.get_item_group(na,"exatec_data_wire")>0 then
+							a.jobs[s]=n
+							c=c+1
+							minetest.swap_node(n,{name=na,param2=91})
+							minetest.get_node_timer(n):start(0.1)
+						elseif minetest.get_item_group(na,"exatec_data_wire_connected")>0 then
+							local e = exatec.def(n)
+
+							if e.on_data_wire and minetest.get_meta(n):get_string("channel") == a.data.channel then
+								e.on_data_wire(n,a.data)
+							end
+							a.jobs[s] = {ignore=true}
+							c=c+1
+						end
+					end
+				end
+			end
+		end
+		if c==0 then
+			exatec.wire_data_signals[i]=nil
+		else
+			counts=counts+c
+		end
+	end
+	if counts>0 then
+		minetest.after(0, function()
+			exatec.wire_data_leading()
+		end)
+	else
+		exatec.wire_data_signals={}
 	end
 end
