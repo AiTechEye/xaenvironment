@@ -88,6 +88,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:datawire 20",
+	recipe={
+		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
+		{"materials:plastic_sheet","materials:diode","materials:plastic_sheet"},
+		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:autosender",
 	recipe={
 		{"default:iron_ingot","exatec:button","exatec:wire"},
@@ -211,3 +220,23 @@ minetest.register_craft({
 		{"","exatec:wire",""},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:node_detector",
+	recipe={
+		{"default:tin_ingot","exatec:wire","materials:diode"},
+		{"group:wood","default:iron_ingot","group:wood"},
+		{"group:wood","exatec:wire_gate","group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output="exatec:bow",
+	recipe={
+		{"default:bow_iron","exatec:datawire","materials:diode"},
+		{"group:wood","default:iron_ingot","group:wood"},
+		{"group:wood","exatec:wire_gate","group:wood"},
+	},
+})
+
+

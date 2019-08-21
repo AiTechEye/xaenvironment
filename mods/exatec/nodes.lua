@@ -8,8 +8,8 @@ minetest.register_craftitem("exatec:list", {
 		local x = -0.2
 		local y = 1
 		for i,v in pairs(minetest.registered_items) do
-			local g = v.groups 
-			if v.exatec or g and (g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected) then
+			local g = v.groups or {}
+			if not g.not_in_creative_inventory and (v.exatec or g and (g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected or exatec_data_wire or g.exatec_data_wire_connected)) then
 				gui = gui .. "item_image_button["..x..","..y..";1,1;"..i..";"..i..";]"
 				x = x + 0.7
 				if x > 8 then
@@ -1282,7 +1282,7 @@ minetest.register_node("exatec:node_detector", {
 
 minetest.register_node("exatec:bow", {
 	description = "Autobow",
-	tiles = {"default_steelblock.png"},
+	tiles = {"default_ironblock.png"},
 	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",

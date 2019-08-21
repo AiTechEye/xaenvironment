@@ -150,7 +150,7 @@ minetest.register_entity("exatec:bow",{
 				return pos
 			end,
 			set_pos=function(pos)
-				return self.object:set_pos(pos)
+				return
 			end,
 			get_player_control=function()
 				return {}
@@ -167,7 +167,7 @@ minetest.register_entity("exatec:bow",{
 			object=self.object,
 		}
 		local item = ItemStack({
-			name="default:bow_iron_loaded",
+			name="default:bow_diamond_loaded",
 			metadata=minetest.serialize({arrow=stack:get_name(),shots=stack:get_count()})
 		})
 		bows.shoot(item, user,nil,function(item)
