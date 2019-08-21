@@ -1283,6 +1283,8 @@ minetest.register_node("exatec:node_detector", {
 minetest.register_node("exatec:bow", {
 	description = "Autobow",
 	tiles = {"default_ironblock.png"},
+	inventory_image="default_ironblock.png^default_bow_loaded.png^[makealpha:0,255,0",
+	wield_image = "default_ironblock.png^default_bow_loaded.png^[makealpha:0,255,0",
 	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",
@@ -1291,8 +1293,8 @@ minetest.register_node("exatec:bow", {
 	node_box = {type="fixed",fixed={-0.2,-0.2,-0.2,0.2,-0.4,0.2}},
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext","Level (0)")
 		minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
 		minetest.get_node_timer(pos):start(1)
 	end,
 	on_destruct = function(pos)
@@ -1301,6 +1303,18 @@ minetest.register_node("exatec:bow", {
 			if en and en.exatec_bow then
 				ob:remove()
 			end
+		end
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.go and minetest.is_protected(pos, sender:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local channel = pressed.channel or m:get_string("channel")
+			m:set_string("channel",channel)
+			m:set_string("formspec","size[3.5,0.3]"
+			.."field[0,0;3,1;channel;;"..channel.."]"
+			.."button_exit[2.5,-0.3;1,1;go;Save]"
+			.."tooltip[channel;Channel]"
+			)
 		end
 	end,
 	exatec={
