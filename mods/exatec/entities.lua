@@ -135,8 +135,8 @@ minetest.register_entity("exatec:bow",{
 		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))+(math.pi*0.7)
 		if pos1.x >= pos2.x then y = y+math.pi end
 		self.object:set_rotation({x=0,y=y,z=z})
-		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		self.dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+0.005,z=(pos1.z-pos2.z)/-d}
+		local d=vector.distance(pos1,pos2)--math.floor(+0.5)
+		self.dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-(d*2)),z=(pos1.z-pos2.z)/-d}
 	end,
 	shoot=function(self,stack)
 		local pos = apos(self.object:get_pos(),0,-1.7)
@@ -170,8 +170,6 @@ minetest.register_entity("exatec:bow",{
 			name="default:bow_diamond_loaded",
 			metadata=minetest.serialize({arrow=stack:get_name(),shots=stack:get_count()})
 		})
-		bows.shoot(item, user,nil,function(item)
-			item:remove()
-		end)
+		bows.shoot(item, user)
 	end
 })
