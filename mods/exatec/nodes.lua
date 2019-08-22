@@ -1377,3 +1377,70 @@ minetest.register_node("exatec:bow", {
 		end,
 	},
 })
+
+minetest.register_node("exatec:pcb", {
+	description = "PCB",
+	tiles = {"exatec_pcb.png"},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype="nodebox",
+	paramtype="light",
+	sunlight_propagates=true,
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+	end,
+	on_destruct = function(pos)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if (pressed.save or pressed.run) and minetest.is_protected(pos, sender:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local memory = 0
+			local user = sender:get_player_name()
+			local channel = pressed.channel or m:get_string("channel")
+			m:set_string("channel",channel)
+			local text,err,limit = pressed.text or m:get_string("text")
+			m:set_string("channel",channel)
+			m:set_string("user",user)
+			if pressed.run then
+				local mb = memory_mb()
+				err,limit = exatec.run_code(text,{pos=pos,channel=channel,user=user,id=pos.x..","..pos.y..","..pos.z})
+				memory = math.floor((memory_mb()-mb)*1000)/1000
+			end
+			err = err and err:sub(8,-1) or ""
+			m:set_string("formspec","size[12,11]"
+			.."field[2,0;3,1;channel;;"..channel.."]"
+			.."button[-0.2,-0.2;1,1;save;Save]"
+			.."button[0.7,-0.2;1,1;run;Run]"
+			.."textarea[0,1;12.5,12;text;;"..text.."]"
+			.."label[-0.2,0.5;"..err.."]"
+			.."label[4.5,-0.2;"..memory.."MB]"
+			.."label[6,-0.2;"..(limit or 0).."/10000 Events]"
+			.."tooltip[channel;Channel]"
+			)
+		end
+	end,
+	exatec={
+		on_data_wire=function(pos,data)
+
+		end,
+		on_wire = function(pos)
+			local bow
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+				local en = ob:get_luaentity()
+				if en and en.exatec_bow then
+					bow = en
+					break
+				end
+			end
+			if not bow then
+				bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
+				bow = bow:get_luaentity()
+			end
+		end,
+		on_input=function(pos,stack,opos)
+		end,
+		test_input=function(pos,stack,opos)
+		end,
+	},
+})

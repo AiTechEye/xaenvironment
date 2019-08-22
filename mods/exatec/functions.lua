@@ -228,3 +228,123 @@ exatec.wire_data_leading=function()
 		exatec.wire_data_signals={}
 	end
 end
+
+exatec.run_code=function(text,A)
+	local f,err = loadstring(text)
+	local s
+	if f then
+		A.count = 0
+		setfenv(f,exatec.create_env(A))
+		debug.sethook(
+			function()
+				A.count = A.count + 1
+				if A.count >= 10000 then
+					error("Overheated (event limit) ("..A.count.."/10000)")
+				end
+			end,"",1
+		)
+		s,err = pcall(f)
+		debug.sethook()
+	end
+	if err then
+		local e1,e2 = err:find(":")
+		if type(e2) == "number" then
+			err = err:sub(e2-1,-1)
+		end
+	end
+	return (err or ""),A.count
+end
+
+exatec.create_env=function(A)
+	return {
+		apos=apos,
+		pos=A.pos,
+		exatec = {
+			send=function()
+				exatec.send(pos)
+			end,
+			data_send=function(to_channel,data)
+				if type(to_channel) ~= "string" and type(to_channel) ~="number" then
+					return
+				elseif type(data) ~= "table" then
+					data = {data}
+				end
+				exatec.data_send(pos,to_channel,channel,data)
+			end,
+			cmd=function(a)
+				local aa = a.split(a," ")
+				if not (aa and aa[2]) then
+					aa = {a,""}
+				end
+				local c = minetest.registered_chatcommands[aa[1]]
+				if c then
+					if minetest.check_player_privs(A.user, c.privs) then
+						c.func(A.user,aa[2])
+					else
+						error("You aren't allowed to do that")
+					end
+				else
+					error("command "..(aa[1] or a).." doesn't exist")
+				end
+			end,
+		},
+		print=function(a)
+			minetest.chat_send_player(A.user,A.id..":"..a)
+			A.count = A.count + 100
+		end,
+		--dump=function(a)
+		--	print(dump(a))
+		--end,
+		tonumber=tonumber,
+		string = {
+			byte=string.byte,
+			char=string.char,
+			len=string.len,
+			lower=string.lower,
+			upper=string.upper,
+			rep=string.rep,
+			sub=string.sub,
+			find=string.find,
+			format=string.format,
+			split=function(a,b)
+				return a.split(a,b)
+			end,
+			replace=function(a,b,c)
+				return a:gsub(b,c)
+			end
+		},
+		math = {
+			abs=math.abs,
+			cos=math.cos,
+			acos=math.acos,
+			atan=math.atan,
+			atan2=math.atan2,
+			asin=math.asin,
+			ceil=math.ceil,
+			floor=math.floor,
+			deg=math.deg,
+			huge=math.huge,
+			log=math.log,
+			max=math.max,
+			min=math.min,
+			rad=math.rad,
+			pi=math.pi,
+			random=math.random,
+			sqrt=math.sqrt,
+			sin=math.sin,
+			tan=math.tan,
+		},
+		table = {
+			insert=table.insert,
+			remove=table.remove,
+			concat=table.concat,
+			maxn=table.maxn,
+			sort=table.sort,
+		},
+		os = {
+			difftime=os.difftime,
+			clock=os.clock,
+			time=os.time,
+		}
+	}
+end
