@@ -231,6 +231,7 @@ end
 
 exatec.run_code=function(text,A)
 	local f,err = loadstring(text)
+	A = A or {}
 	local s
 	if f then
 		A.count = 0
@@ -249,53 +250,43 @@ exatec.run_code=function(text,A)
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
-			err = err:sub(e2-1,-1)
+			err = err:sub(e2,-1)
 		end
 	end
 	return (err or ""),A.count
 end
 
 exatec.create_env=function(A)
+	local id = A and A.pos and (A.pos.x..",".. A.pos.y..",".. A.pos.z) or ""
 	return {
 		apos=apos,
-		pos=A.pos,
+		event=A,
 		exatec = {
-			send=function()
-				exatec.send(pos)
+			send=function(x,y,z)
+				x = x and (x == 0 or math.abs(x) == 1) and x or error("(x,y,z) x: number 0, 1 or -1 expected")
+				y = y and (y == 0 or math.abs(y) == 1) and y or error("(x,y,z) y: number 0, 1 or -1 expected")
+				z = z and (z == 0 or math.abs(z) == 1) and z or error("(x,y,z) z: number 0, 1 or -1 expected")
+				exatec.send(apos(A.pos,x,y,z))
 			end,
 			data_send=function(to_channel,data)
 				if type(to_channel) ~= "string" and type(to_channel) ~="number" then
-					return
+					error("(to_channel,data_table) string or number expected")
 				elseif type(data) ~= "table" then
 					data = {data}
 				end
 				exatec.data_send(pos,to_channel,channel,data)
 			end,
-			cmd=function(a)
-				local aa = a.split(a," ")
-				if not (aa and aa[2]) then
-					aa = {a,""}
-				end
-				local c = minetest.registered_chatcommands[aa[1]]
-				if c then
-					if minetest.check_player_privs(A.user, c.privs) then
-						c.func(A.user,aa[2])
-					else
-						error("You aren't allowed to do that")
-					end
-				else
-					error("command "..(aa[1] or a).." doesn't exist")
-				end
-			end,
 		},
 		print=function(a)
-			minetest.chat_send_player(A.user,A.id..":"..a)
+			minetest.chat_send_player(A.user,id..":"..a)
 			A.count = A.count + 100
 		end,
 		--dump=function(a)
 		--	print(dump(a))
 		--end,
 		tonumber=tonumber,
+		tostring=tostring,
+		type=type,
 		string = {
 			byte=string.byte,
 			char=string.char,
@@ -322,6 +313,7 @@ exatec.create_env=function(A)
 			asin=math.asin,
 			ceil=math.ceil,
 			floor=math.floor,
+			gsub=math.gsub,
 			deg=math.deg,
 			huge=math.huge,
 			log=math.log,
