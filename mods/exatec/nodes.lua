@@ -1403,7 +1403,7 @@ minetest.register_node("exatec:pcb", {
 			m:set_string("user",user)
 			if pressed.run then
 				local mb = memory_mb()
-				err,limit = exatec.run_code(text,{pos=pos,channel=channel,user=user})
+				err,limit =exatec.run_code(text,{pos=pos,channel=channel,user=user})
 				memory = math.floor((memory_mb()-mb)*1000)/1000
 			end
 			err = err and err:sub(8,-1) or ""
@@ -1418,7 +1418,6 @@ minetest.register_node("exatec:pcb", {
 			local preslist = pressed.list and tonumber(pressed.list:sub(5,-1)) or -1
 
 			for i,v in pairs(exatec.create_env()) do
-				--list = list ..c..minetest.colorize("0f0",i)
 				if type(v) == "table" then
 					for i2,v2 in pairs(v) do
 						list = list..c..i.."."..i2
@@ -1469,7 +1468,7 @@ minetest.register_node("exatec:pcb", {
 				m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")
 			end
 		end,
-		on_wire = function(pos)
+		on_wire = function(pos,opos)
 			local m = minetest.get_meta(pos)
 			if m:get_int("error") == 1 then
 				return
@@ -1477,7 +1476,7 @@ minetest.register_node("exatec:pcb", {
 			local text = m:get_string("text")
 			local user = m:get_string("user")
 			local channel = m:get_string("channel")
-			local err,limit = exatec.run_code(text,{on_wire=true,pos=pos,channel=channel,user=user})
+			local err,limit = exatec.run_code(text,{on_wire=true,pos=pos,opos=opos,channel=channel,user=user})
 			if err and err ~= "" then
 				m:set_int("error",1)
 				m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")

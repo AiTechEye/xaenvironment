@@ -104,7 +104,7 @@ exatec.send=function(pos, ignore,forcepos)
 				exatec.wire_signals[na]={pos=pos,ignore=true}
 				local e = exatec.def(pos)
 				if e.on_wire then
-					e.on_wire(pos)
+					e.on_wire(pos,pos)
 				end
 			end
 		end
@@ -233,6 +233,7 @@ exatec.run_code=function(text,A)
 	A = A or {}
 	local s
 	local g={count = 0}
+	local id = A.pos and minetest.pos_to_string(A.pos) or ""
 	local F=function()
 		local f,err = loadstring(text)
 		if f then
@@ -245,9 +246,10 @@ exatec.run_code=function(text,A)
 					g.count = g.count + 1
 					if g.count >= 10000 then
 						debug.sethook()
-						error("Overheated (event limit) ("..g.count.."/10000)")
+						--print(id.." Overheated (event limit) ("..g.count.."/10000)")
+						error(" Overheated (event limit) ("..g.count.."/10000)",1)
 					end
-				end,"",1
+				end,"",2
 			)
 			f()
 			debug.sethook()
@@ -260,7 +262,9 @@ exatec.run_code=function(text,A)
 		end
 		return (err or ""),g.count
 	end
+
 	local s,err = pcall(F)
+
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
@@ -291,13 +295,15 @@ exatec.create_env=function(A,g)
 				exatec.data_send(pos,to_channel,channel,data)
 			end,
 		},
-		print=function(a)
-			minetest.chat_send_player(A.user,"(PCB"..id..") "..a)
+		print=function(b)
+			b = b or ""
+			minetest.chat_send_player(A.user,"(PCB"..id..") "..b)
 			g.count = g.count + 500
 		end,
-		dump=function(a)
+		dump=function(p)
+			p = p or ""
 			minetest.chat_send_player(A.user,"(PCB"..id..") (dump) ========== ")
-			minetest.chat_send_player(A.user,dump(a))
+			minetest.chat_send_player(A.user,dump(p))
 			g.count = g.count + 4000
 		end,
 		tonumber=tonumber,
