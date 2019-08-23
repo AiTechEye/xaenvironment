@@ -32,7 +32,7 @@ minetest.register_on_craft(function(itemstack,player,old_craft_grid,craft_inv)
 end)
 
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
-	if player_style.survive_thirst and player_style.drinkable(pointed_thing.above,puncher) then
+	if player_style.survive_thirst and (player_style.drinkable(pointed_thing.above,puncher) or player_style.drinkable(pointed_thing.under,puncher)) then
 		player_style.thirst(puncher,1)
 	else
 		player_style.hunger(puncher,-0.01)
