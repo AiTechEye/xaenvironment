@@ -230,33 +230,47 @@ exatec.wire_data_leading=function()
 end
 
 exatec.run_code=function(text,A)
-	local f,err = loadstring(text)
 	A = A or {}
 	local s
-	if f then
-		A.count = 0
-		setfenv(f,exatec.create_env(A))
-		debug.sethook(
-			function()
-				A.count = A.count + 1
-				if A.count >= 10000 then
-					error("Overheated (event limit) ("..A.count.."/10000)")
-				end
-			end,"",1
-		)
-		s,err = pcall(f)
-		debug.sethook()
+	local g={count = 0}
+	local F=function()
+		local f,err = loadstring(text)
+		if f then
+			setfenv(f,exatec.create_env(A,g))
+			if rawget(_G,"jit") then
+				jit.off(f,true)
+			end
+			debug.sethook(
+				function()
+					g.count = g.count + 1
+					if g.count >= 10000 then
+						debug.sethook()
+						error("Overheated (event limit) ("..g.count.."/10000)")
+					end
+				end,"",1
+			)
+			f()
+			debug.sethook()
+		end
+		if err then
+			local e1,e2 = err:find(":")
+			if type(e2) == "number" then
+				err = err:sub(e2-1,-1)
+			end
+		end
+		return (err or ""),g.count
 	end
+	local s,err = pcall(F)
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
-			err = err:sub(e2,-1)
+			err = err:sub(e2-1,-1)
 		end
 	end
-	return (err or ""),A.count
+	return err,g.count
 end
 
-exatec.create_env=function(A)
+exatec.create_env=function(A,g)
 	local id = A and A.pos and (A.pos.x..",".. A.pos.y..",".. A.pos.z) or ""
 	return {
 		apos=apos,
@@ -278,15 +292,21 @@ exatec.create_env=function(A)
 			end,
 		},
 		print=function(a)
-			minetest.chat_send_player(A.user,id..":"..a)
-			A.count = A.count + 100
+			minetest.chat_send_player(A.user,"(PCB"..id..") "..a)
+			g.count = g.count + 500
 		end,
-		--dump=function(a)
-		--	print(dump(a))
-		--end,
+		dump=function(a)
+			minetest.chat_send_player(A.user,"(PCB"..id..") (dump) ========== ")
+			minetest.chat_send_player(A.user,dump(a))
+			g.count = g.count + 4000
+		end,
 		tonumber=tonumber,
 		tostring=tostring,
 		type=type,
+		pairs=pairs,
+		ipairs=ipairs,
+		next=next,
+		unpack=unpack,
 		string = {
 			byte=string.byte,
 			char=string.char,

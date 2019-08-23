@@ -1411,7 +1411,6 @@ minetest.register_node("exatec:pcb", {
 				m:set_int("error",0)
 			end
 
-
 			local list = "textlist[10,-0.3;2.1,11.5;list;"
 			local c = ""
 			local listn = 0
