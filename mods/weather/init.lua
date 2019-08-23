@@ -21,9 +21,7 @@ weather={
 	},
 }
 
-apos=function(pos,x,y,z)
-	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
-end
+dofile(minetest.get_modpath("weather") .. "/collect_rainwater.lua")
 
 weather.lightning=function(posA,posB)
 	local pos1,pos2
