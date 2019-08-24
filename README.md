@@ -1,8 +1,8 @@
 # xaenvironment
 
-Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
+Licenses: code: LGPL-2.1, media: CC BY-NC-SA-4.0
 
-## V6.1
+## V6.15
 
 ---
 
