@@ -1519,3 +1519,93 @@ minetest.register_node("exatec:pcb", {
 		return minetest.get_meta(pos):get_int("interval") == 1
 	end,
 })
+
+minetest.register_node("exatec:cmd", {
+	description = "CMD",
+	tiles={"exatec_cmd.png",},
+	groups = {cracky=1,exatec_wire_connected=1,exatec_data_wire_connected=1,not_in_craft_guide=1},
+	sounds = default.node_sound_stone_defaults(),
+	paramtype2 = "facedir",
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.save then
+			local m = minetest.get_meta(pos)
+			local text = pressed.text or m:get_string("text")
+			local channel = pressed.channel or m:get_string("channel")
+			m:set_string("channel",channel)
+			m:set_string("text",pressed.text)
+			m:set_string("formspec","size[12,11]"
+			.."field[2,0;3,1;channel;;"..channel.."]"
+			.."button[-0.2,-0.2;1,1;save;Save]"
+			.."button[0.7,-0.2;1,1;run;Run]"
+			.."textarea[0,1;12.5,12;text;;"..text.."]"
+			.."label[5,0;send commands by {cmd='text'}]"
+			)
+		elseif pressed.run then
+			minetest.registered_nodes["exatec:cmd"].exatec.on_wire(pos,pos)
+		end
+	end,
+	after_place_node = function(pos, placer)
+		minetest.get_meta(pos):set_string("user",placer:get_player_name())
+	end,
+	exatec={
+		on_data_wire=function(pos,data)
+			if not data.cmd or type(data.cmd) ~= "string" then return end
+			local m = minetest.get_meta(pos)
+			local user = m:get_string("user")
+			if user == "" then
+				minetest.remove_node(pos)
+				return
+			end
+			local aa = data.cmd.split(data.cmd," ")
+			if not (aa and aa[2]) then
+				aa = {data.cmd,""}
+			end
+			local c = minetest.registered_chatcommands[aa[1]]
+
+			if c then
+				if minetest.check_player_privs(user, c.privs) then
+					c.func(user,aa[2])
+				elseif c.privs then
+					minetest.chat_send_player(user,minetest.pos_to_string(pos).." You aren't allowed to do that")
+					minetest.remove_node(pos)
+					return
+				end
+			else
+				minetest.chat_send_player(user,minetest.pos_to_string(pos).." command "..(aa[1] or data.cmd).." doesn't exist")
+				return
+			end
+		end,
+		on_wire = function(pos,opos)
+			local m = minetest.get_meta(pos)
+			local text = m:get_string("text")
+			local user = m:get_string("user")
+			if user == "" then
+				minetest.remove_node(pos)
+				return
+			end
+			for i,a in pairs(text.split(text,"\n")) do
+				local aa = a.split(a," ")
+				if not (aa and aa[2]) then
+					aa = {a,""}
+				end
+				local c = minetest.registered_chatcommands[aa[1]]
+				if c then
+					if minetest.check_player_privs(user, c.privs) then
+						c.func(user,aa[2])
+					else
+						minetest.chat_send_player(user,minetest.pos_to_string(pos).." You aren't allowed to do that")
+						minetest.remove_node(pos)
+						return
+					end
+				else
+					minetest.chat_send_player(user,minetest.pos_to_string(pos).." command "..(aa[1] or a).." doesn't exist")
+					return
+				end
+			end
+		end
+	}
+})
