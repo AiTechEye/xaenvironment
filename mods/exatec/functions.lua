@@ -79,9 +79,12 @@ exatec.output=function(pos,stack,opos)
 	return new_stack					
 end
 
-exatec.send=function(pos, ignore,forcepos)
+exatec.send=function(pos, force_ignored_pos,forcepos,ignore_pos)
 	local na=pos.x .."." .. pos.y .."." ..pos.z
-	if not exatec.wire_signals[na] or ignore then
+	if ignore_pos then
+		exatec.wire_signals[ignore_pos.x .."." .. ignore_pos.y .."." ..ignore_pos.z] = {pos=pos,ignore=true}
+	end
+	if not exatec.wire_signals[na] or force_ignored_pos then
 		local t=os.time()
 		if os.difftime(t, exatec.wire_sends.last)>1 then
 			exatec.wire_sends.last=t
@@ -232,8 +235,9 @@ end
 exatec.run_code=function(text,A)
 	A = A or {}
 	local s
-	local g={count = 0}
-	local id = A.pos and minetest.pos_to_string(A.pos) or ""
+
+	local g={count = 0,pos=vector.new(A.pos),storage=minetest.deserialize(minetest.get_meta(A.pos):get_string("storage"))}
+	--local id = g.pos and minetest.pos_to_string(g.pos) or ""
 	local F=function()
 		local f,err = loadstring(text)
 		if f then
@@ -253,6 +257,10 @@ exatec.run_code=function(text,A)
 			)
 			f()
 			debug.sethook()
+
+			--minetest.serialize(minetest.get_meta(A.pos):get_string("storage")
+
+
 		end
 		if err then
 			local e1,e2 = err:find(":")
@@ -264,7 +272,7 @@ exatec.run_code=function(text,A)
 	end
 
 	local s,err = pcall(F)
-
+	debug.sethook()
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
@@ -275,7 +283,7 @@ exatec.run_code=function(text,A)
 end
 
 exatec.create_env=function(A,g)
-	local id = A and A.pos and (A.pos.x..",".. A.pos.y..",".. A.pos.z) or ""
+	local id = g and g.pos and (g.pos.x..",".. g.pos.y..",".. g.pos.z) or ""
 	return {
 		apos=apos,
 		event=A,
@@ -284,7 +292,7 @@ exatec.create_env=function(A,g)
 				x = x and (x == 0 or math.abs(x) == 1) and x or error("(x,y,z) x: number 0, 1 or -1 expected")
 				y = y and (y == 0 or math.abs(y) == 1) and y or error("(x,y,z) y: number 0, 1 or -1 expected")
 				z = z and (z == 0 or math.abs(z) == 1) and z or error("(x,y,z) z: number 0, 1 or -1 expected")
-				exatec.send(apos(A.pos,x,y,z))
+				exatec.send(apos(g.pos,x,y,z),nil,true,g.pos)
 			end,
 			data_send=function(to_channel,data)
 				if type(to_channel) ~= "string" and type(to_channel) ~="number" then
@@ -292,9 +300,27 @@ exatec.create_env=function(A,g)
 				elseif type(data) ~= "table" then
 					data = {data}
 				end
-				exatec.data_send(pos,to_channel,channel,data)
+				exatec.data_send(g.pos,to_channel,channel,data)
 			end,
 		},
+		timeout=function(n)
+			if type(n) ~="number" and n <= 0 then
+				error("Positive number value expected")
+			end
+			minetest.get_meta(g.pos):set_int("interval",0)
+			minetest.get_node_timer(g.pos):start(n)
+		end,
+		interval=function(n)
+			if type(n) ~="number" and n <= 0 then
+				error("Positive number value expected")
+			end
+			minetest.get_meta(g.pos):set_int("interval",1)
+			minetest.get_node_timer(g.pos):start(n)
+		end,
+		stop=function()
+			minetest.get_node_timer(g.pos):stop()
+			minetest.get_meta(g.pos):set_int("interval",0)
+		end,
 		print=function(b)
 			b = b or ""
 			minetest.chat_send_player(A.user,"(PCB"..id..") "..b)

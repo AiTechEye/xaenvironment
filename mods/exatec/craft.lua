@@ -32,7 +32,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="exatec:tube",
+	output="exatec:tube 8",
 	recipe={
 		{"materials:plastic_sheet","materials:plastic_sheet",""},
 		{"materials:plastic_sheet","materials:plastic_sheet",""},
@@ -239,4 +239,11 @@ minetest.register_craft({
 	},
 })
 
-
+minetest.register_craft({
+	output="exatec:pcb",
+	recipe={
+		{"materials:diode","exatec:datawire","materials:diode"},
+		{"default:copper_ingot","default:iron_ingot","materials:gear_metal"},
+		{"materials:diode","materials:plastic_sheet","materials:diode"},
+	},
+})

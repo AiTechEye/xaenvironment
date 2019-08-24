@@ -1401,12 +1401,13 @@ minetest.register_node("exatec:pcb", {
 			m:set_string("text",text)
 			m:set_string("channel",channel)
 			m:set_string("user",user)
-			if pressed.run then
+			minetest.registered_nodes["exatec:pcb"].timeout(pos)
+			if pressed.run and m:get_int("timeout") == 0 then
 				local mb = memory_mb()
-				err,limit =exatec.run_code(text,{pos=pos,channel=channel,user=user})
+				err,limit =exatec.run_code(text,{type={run=true},pos=pos,channel=channel,user=user})
 				memory = math.floor((memory_mb()-mb)*1000)/1000
 			end
-			err = err and err:sub(8,-1) or ""
+			err = err and err:sub(8,-1) or (m:get_int("timeout") == 1 and (m:get_int("timeout_count").."/100 runs/s")) or ""
 			if err == "" then
 				m:set_int("error",0)
 			end
@@ -1456,13 +1457,14 @@ minetest.register_node("exatec:pcb", {
 	exatec={
 		on_data_wire=function(pos,data)
 			local m = minetest.get_meta(pos)
-			if m:get_int("error") == 1 then
+			minetest.registered_nodes["exatec:pcb"].timeout(pos)
+			if m:get_int("error") == 1 or m:get_int("timeout") == 1 then
 				return
 			end
 			local text = m:get_string("text")
 			local user = m:get_string("user")
 			local channel = m:get_string("channel")
-			local err,limit = exatec.run_code(text,{on_data_wire=true,data=data,pos=pos,channel=channel,user=user})
+			local err,limit = exatec.run_code(text,{type={on_data_wire=true},data=data,pos=pos,channel=channel,user=user})
 			if err and err ~= "" then
 				m:set_int("error",1)
 				m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")
@@ -1470,17 +1472,48 @@ minetest.register_node("exatec:pcb", {
 		end,
 		on_wire = function(pos,opos)
 			local m = minetest.get_meta(pos)
-			if m:get_int("error") == 1 then
+			minetest.registered_nodes["exatec:pcb"].timeout(pos)
+			if m:get_int("error") == 1 or m:get_int("timeout") == 1 then
 				return
 			end
 			local text = m:get_string("text")
 			local user = m:get_string("user")
 			local channel = m:get_string("channel")
-			local err,limit = exatec.run_code(text,{on_wire=true,pos=pos,opos=opos,channel=channel,user=user})
+			local err,limit = exatec.run_code(text,{type={on_wire=true},pos=pos,opos=opos,channel=channel,user=user})
 			if err and err ~= "" then
 				m:set_int("error",1)
 				m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")
 			end
 		end,
 	},
+	timeout=function(pos)
+		local m = minetest.get_meta(pos)
+		local t = m:get_int("timeout_count")+1
+		m:set_int("timeout_count",t)
+		local d = default.date("s",m:get_int("date"))
+		if t >= 100 and d < 10 then
+			m:set_int("timeout",1)
+		elseif t == 1 then
+			m:set_int("date",default.date("get"))
+		elseif d >= 1 then
+			m:set_int("timeout",0)
+			m:set_int("timeout_count",0)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		minetest.registered_nodes["exatec:pcb"].timeout(pos)
+		if m:get_int("error") == 1 or m:get_int("timeout") == 1 then
+			return
+		end
+		local text = m:get_string("text")
+		local user = m:get_string("user")
+		local channel = m:get_string("channel")
+		local err,limit = exatec.run_code(text,{type={time=true},pos=pos,opos=opos,channel=channel,user=user})
+		if err and err ~= "" then
+			m:set_int("error",1)
+			m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")
+		end
+		return minetest.get_meta(pos):get_int("interval") == 1
+	end,
 })
