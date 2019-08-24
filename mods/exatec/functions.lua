@@ -235,8 +235,8 @@ end
 exatec.run_code=function(text,A)
 	A = A or {}
 	local s
-
-	local g={count = 0,pos=vector.new(A.pos),storage=minetest.deserialize(minetest.get_meta(A.pos):get_string("storage"))}
+	local m = minetest.get_meta(A.pos)
+	local g={count = 0,pos=vector.new(A.pos),storage=minetest.deserialize(m:get_string("storage")) or {}}
 	--local id = g.pos and minetest.pos_to_string(g.pos) or ""
 	local F=function()
 		local f,err = loadstring(text)
@@ -257,10 +257,7 @@ exatec.run_code=function(text,A)
 			)
 			f()
 			debug.sethook()
-
-			--minetest.serialize(minetest.get_meta(A.pos):get_string("storage")
-
-
+			m:set_string("storage",minetest.serialize(g.storage) or {})
 		end
 		if err then
 			local e1,e2 = err:find(":")
@@ -270,7 +267,6 @@ exatec.run_code=function(text,A)
 		end
 		return (err or ""),g.count
 	end
-
 	local s,err = pcall(F)
 	debug.sethook()
 	if err then
@@ -285,6 +281,7 @@ end
 exatec.create_env=function(A,g)
 	local id = g and g.pos and (g.pos.x..",".. g.pos.y..",".. g.pos.z) or ""
 	return {
+		storage=g and g.storage or nil,
 		apos=apos,
 		event=A,
 		exatec = {

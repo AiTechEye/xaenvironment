@@ -1440,6 +1440,8 @@ minetest.register_node("exatec:pcb", {
 
 			list = list.."]"
 
+			text = minetest.formspec_escape(text)
+
 			m:set_string("formspec","size[12,11]"
 			.."field[2,0;3,1;channel;;"..channel.."]"
 			.."button[-0.2,-0.2;1,1;save;Save]"
@@ -1509,7 +1511,7 @@ minetest.register_node("exatec:pcb", {
 		local text = m:get_string("text")
 		local user = m:get_string("user")
 		local channel = m:get_string("channel")
-		local err,limit = exatec.run_code(text,{type={time=true},pos=pos,opos=opos,channel=channel,user=user})
+		local err,limit = exatec.run_code(text,{type={time=true},pos=pos,channel=channel,user=user})
 		if err and err ~= "" then
 			m:set_int("error",1)
 			m:set_string("formspec","size[12,1]button[-0.2,-0.2;1,1;save;Clear]label[0,1;"..err.."]")
