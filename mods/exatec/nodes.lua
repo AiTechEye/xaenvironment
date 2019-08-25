@@ -1139,28 +1139,53 @@ minetest.register_node("exatec:placer", {
 
 minetest.register_node("exatec:light_detector", {
 	description = "Light detector",
-	tiles = {"default_steelblock.png^[colorize:#0000ffaa^exatec_glass.png^default_chest_top.png"},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	tiles = {
+		"default_steelblock.png^[colorize:#0000ffaa^exatec_glass.png^default_chest_top.png",
+		"default_steelblock.png^[colorize:#0000ffaa",
+		"default_steelblock.png^[colorize:#0000ffaa"
+	},
+	groups = {dig_immediate = 2,exatec_data_wire_connected=1,exatec_wire_connected=1},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",
+	paramtype="light",
+	sunlight_propagates=true,
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if minetest.is_protected(pos, player:get_player_name())==false then
 			local meta = minetest.get_meta(pos)
 			local level=meta:get_int("level") + 1
-			level = level < 14 and level or 0
+			level = level < 16 and level or 0
 			meta:set_int("level",level)
-			meta:set_string("infotext","Level (" .. (level) ..")")
+			local t = {"=","<",">","<=",">="}
+			local typ = meta:get_int("type")
+			typ = typ > 0 and typ or 1
+			meta:set_string("infotext","Level " ..t[meta:get_int("type")].." ".. meta:get_int("level"))
+		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local typ=meta:get_int("type") + 1
+			typ = typ < 6 and typ or 1
+			meta:set_int("type",typ)
+			local t = {"=","<",">","<=",">="}
+			meta:set_string("infotext","Level " ..t[typ].." ".. meta:get_int("level"))
 		end
 	end,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext","Level (0)")
-		minetest.get_node_timer(pos):start(1)
+		meta:set_string("infotext","Level = 0")
+		meta:set_int("type",1)
+		minetest.get_node_timer(pos):start(2)
 	end,
 	on_timer = function (pos, elapsed)
-		if (minetest.get_node_light(pos) or 0) == minetest.get_meta(pos):get_int("level") then
+		local m = minetest.get_meta(pos)
+		local level = m:get_int("level")
+		local t = m:get_int("type")
+		local l = minetest.get_node_light(pos) or 0
+		if (t == 1 and l == level) or (t == 2 and l < level) or (t == 3 and l > level) or (t == 4 and l <= level) or (t == 5 and l >= level) then
 			exatec.send(pos)
+			exatec.data_send(pos,m:get_string("to_channel"),m:get_string("channel"),{light=l})
 		end
 		return true
 	end,
