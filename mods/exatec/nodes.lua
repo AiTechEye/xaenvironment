@@ -366,7 +366,7 @@ minetest.register_node("exatec:datawire", {
 		connect_top = {-0.05, -0.5, -0.05, 0.05, 0.5, 0.05},
 		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
 	},
-	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,-0.4}},
+	selection_box={type="fixed",fixed={-0.5,0.5,-0.5,0.5,0.4,0.5}},
 	connects_to={"group:exatec_data_wire","group:exatec_data_wire_connected"},
 	groups = {dig_immediate = 3,exatec_data_wire=1},
 	after_place_node = function(pos, placer)
@@ -1138,7 +1138,7 @@ minetest.register_node("exatec:placer", {
 })
 
 minetest.register_node("exatec:light_detector", {
-	description = "Light detector (Click to change level)",
+	description = "Light detector",
 	tiles = {"default_steelblock.png^[colorize:#0000ffaa^exatec_glass.png^default_chest_top.png"},
 	groups = {dig_immediate = 2,exatec_wire_connected=1},
 	sounds = default.node_sound_glass_defaults(),
@@ -1523,12 +1523,11 @@ minetest.register_node("exatec:pcb", {
 minetest.register_node("exatec:cmd", {
 	description = "CMD",
 	tiles={"exatec_cmd.png",},
-	groups = {cracky=1,exatec_wire_connected=1,exatec_data_wire_connected=1,not_in_craft_guide=1},
+	groups = {cracky=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
 	sounds = default.node_sound_stone_defaults(),
 	paramtype2 = "facedir",
 	on_construct = function(pos)
-		local m = minetest.get_meta(pos)
-		m:set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.save then
@@ -1608,4 +1607,79 @@ minetest.register_node("exatec:cmd", {
 			end
 		end
 	}
+})
+
+minetest.register_node("exatec:weather_detector", {
+	description = "Weather detector",
+	tiles={
+		"default_steelblock.png^[colorize:#0000ff99^default_glass.png",
+		"default_steelblock.png^[colorize:#0000ff99^default_glass.png",
+		"default_steelblock.png^[colorize:#0000ff99^default_glass.png^exatec_wirecon.png",
+	},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_data_wire_connected=1,exatec_wire_connected=1},
+	sounds = default.node_sound_glass_defaults(),
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+	end,
+	on_timer = function (pos, elapsed,g)
+		local m = minetest.get_meta(pos)
+		local ma = m:get_int("margin")
+		local l = m:get_int("level")
+		local iswaether
+		for i, w in pairs(weather.currweather) do
+			iswaether = true
+			local d = vector.distance(pos,w.pos) <= w.size
+			if g and d then
+				return w.strength
+			elseif not g and d and w.strength >= l-ma and w.strength <= l+ma then
+				exatec.send(pos)
+				exatec.data_send(pos,m:get_string("to_channel"),m:get_string("channel"),{weather_strength=w.strength})
+				return true
+			end
+		end
+		if not g and not iswaether and l == 0 then
+			exatec.send(pos)
+			exatec.data_send(pos,m:get_string("to_channel"),m:get_string("channel"),{weather_strength=0})
+		end
+		return g and 0 or true
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.save or pressed.auto then
+			local m = minetest.get_meta(pos)
+			local level = tonumber(pressed.level) or m:get_int("level")
+			level = level < 100 and level or 100
+			level = level >= 0 and level or 0
+
+			local channel = pressed.channel or m:get_string("channel")
+			local to_channel = pressed.to_channel or m:get_string("to_channel")
+			local margin =  tonumber(pressed.margin) or m:get_int("margin")
+
+			m:set_string("channel",channel)
+			m:set_string("to_channel",to_channel)
+
+			margin = margin < 100 and margin or 100
+			margin = margin >= 0 and margin or 0
+			m:set_int("margin",margin)
+
+			if pressed.auto then
+				level = minetest.registered_nodes["exatec:weather_detector"].on_timer(pos,0,true)
+			end
+			m:set_int("level",level)
+
+			m:set_string("formspec","size[5,2]"
+			.."field[0,0;3,1;level;;"..level.."]"
+			.."field[0,0.7;3,1;margin;;"..margin.."]"
+			.."field[0,1.4;3,1;channel;;"..channel.."]"
+			.."field[0,2.1;3,1;to_channel;;"..to_channel.."]"
+			.."button_exit[4.3,-0.3;1,1;save;Save]"
+			.."button_exit[2.5,-0.3;2,1;auto;Autodetect]"
+
+			.."tooltip[level;Strength]"
+			.."tooltip[channel;Channel]"
+			.."tooltip[to_channel;Sand to channel]"
+			.."tooltip[margin;Margin]"
+			)
+			minetest.get_node_timer(pos):start(2)
+		end
+	end,
 })

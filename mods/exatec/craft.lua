@@ -247,3 +247,20 @@ minetest.register_craft({
 		{"materials:diode","materials:plastic_sheet","materials:diode"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:cmd",
+	recipe={
+		{"exatec:wire","materials:plastic_sheet","exatec:wire"},
+		{"materials:plastic_sheet","exatec:pcb","materials:plastic_sheet"},
+		{"exatec:datawire","materials:plastic_sheet","exatec:datawire"},
+	},
+})
+minetest.register_craft({
+	output="exatec:weather_detector",
+	recipe={
+		{"exatec:wire","materials:plastic_sheet","exatec:datawire"},
+		{"default:glass","exatec:pcb","default:glass"},
+		{"default:glass","default:copper_ingot","default:glass"},
+	},
+})
