@@ -320,3 +320,10 @@ minetest.register_craft({
 		{"","default:iron_ingot","default:stick"}
 	}
 })
+
+minetest.register_node("examobs:woodbox", {
+	description = "Wooden box",
+	tiles={"examobs_woodbox.png"},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1},
+	sounds = default.node_sound_wood_defaults(),
+})
