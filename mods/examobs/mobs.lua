@@ -1,4 +1,33 @@
 examobs.register_mob({
+	name = "tntbox",
+	type = "monster",
+	team = "box",
+	dmg = 1,
+	textures={"examobs_woodbox.png"},
+	mesh="examobs_tntbox.b3d",
+	spawn_on={"group:sand","group:stone"},
+	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
+	aggressivity = 2,
+	walk_speed = 2,
+	run_speed = 4,
+	lay_on_death=0,
+	spawn_chance = 300,
+	animation = {
+		walk = {x=0,y=40,speed=30,loop=false},
+		stand = {x=0,y=0,speed=0,loop=false},
+	},
+	is_food=function(self,item)
+		return false
+	end,
+	death=function(self)
+		if not self.ex then
+			self.ex = 1
+			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_fire",})
+		end
+	end
+})
+
+examobs.register_mob({
 	name = "skeleton",
 	type = "monster",
 	team="metal",
