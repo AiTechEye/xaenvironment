@@ -1552,11 +1552,14 @@ minetest.register_node("exatec:cmd", {
 	sounds = default.node_sound_stone_defaults(),
 	paramtype2 = "facedir",
 	on_construct = function(pos)
-		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+		minetest.get_meta(pos)set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.save then
 			local m = minetest.get_meta(pos)
+			if m:get_string("user") ~= sender:get_player_name() then
+				return
+			end
 			local text = pressed.text or m:get_string("text")
 			local channel = pressed.channel or m:get_string("channel")
 			m:set_string("channel",channel)
@@ -1569,7 +1572,9 @@ minetest.register_node("exatec:cmd", {
 			.."label[5,0;send commands by {cmd='text'}]"
 			)
 		elseif pressed.run then
-			minetest.registered_nodes["exatec:cmd"].exatec.on_wire(pos,pos)
+			if minetest.get_meta(pos):get_string("user") == sender:get_player_name() then
+				minetest.registered_nodes["exatec:cmd"].exatec.on_wire(pos,pos)
+			end
 		end
 	end,
 	after_place_node = function(pos, placer)
