@@ -376,3 +376,28 @@ minetest.register_entity("examobs:icecreamball",{
 		end
 	end,
 })
+
+default.register_eatable("craftitem","examobs:gingerbread_piece1",1,2,{
+	description = "Gingerbread piece",
+	inventory_image = "examobs_gingerbread_piece1.png",
+	groups={aliveai_eatable=1},
+	on_use =minetest.item_eat(1)
+})
+default.register_eatable("craftitem","examobs:gingerbread_piece2",1,2,{
+	description = "Gingerbread piece",
+	inventory_image = "examobs_gingerbread_piece2.png",
+	groups={aliveai_eatable=1},
+	on_use =minetest.item_eat(1)
+})
+default.register_eatable("craftitem","examobs:lollipop_piece",1,4,{
+	description = "Lollipop piece",
+	inventory_image = "examobs_lollipop_piece.png",
+	groups={aliveai_eatable=1},
+	on_use =minetest.item_eat(5)
+})
+default.register_eatable("craftitem","examobs:candycane_piece",1,5,{
+	description = "Candycane piece",
+	inventory_image = "examobs_candycane_piece.png",
+	groups={aliveai_eatable=5},
+	on_use =minetest.item_eat(5)
+})

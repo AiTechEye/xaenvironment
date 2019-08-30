@@ -93,6 +93,7 @@ examobs.register_mob({
 	mesh="examobs_icecreammaster.b3d",
 	spawn_on={"group:candy_ground","group:candy_underground"},
 	aggressivity = 2,
+	bottom=-1,
 	animation={
 		stand={x=40,y=80,speed=30},
 		walk={x=0,y=30,speed=30},
@@ -202,6 +203,7 @@ examobs.register_mob({
 	spawn_on={"group:candy_ground"},
 	aggressivity = 2,
 	inv={["examobs:candycane_piece"]=1},
+	bottom=-1,
 	animation={
 		stand={x=1,y=150,speed=30,loop=0},
 		walk={x=155,y=170,speed=30,loop=0},
@@ -258,6 +260,7 @@ examobs.register_mob({
 	spawn_on={"group:candy_ground","group:candy_underground"},
 	aggressivity = 2,
 	inv={["examobs:candycane_piece"]=1},
+	bottom=-1,
 	animation={
 		stand={x=20,y=360,speed=30},
 		walk={x=1,y=20,speed=30},

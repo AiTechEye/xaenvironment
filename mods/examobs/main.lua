@@ -5,7 +5,7 @@ examobs.main=function(self, dtime)
 		self.timer1 = 0
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
-	if self.timer2 < self.updatetime then return end
+	if self:on_abs_step() or self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 
 	if not self.static_save and examobs.global_lifetime > 1 and not self:on_lifedeadline() then
@@ -98,6 +98,7 @@ examobs.register_mob=function(def)
 	def.on_click =			def.on_click or			function() end
 	def.on_spawn =			def.on_spawn or			function() end
 	def.on_load =			def.on_load or			function() end
+	def.on_abs_step =			def.on_abs_step or			function() end
 	def.is_food =			def.is_food or			function() return true end
 	def.on_lifedeadline =		def.on_lifedeadline or		function() end
 	def.on_walk =			def.on_walk or			function() end
@@ -146,6 +147,7 @@ examobs.register_mob=function(def)
 		return self.object:get_pos()
 	end
 	def.on_step=examobs.on_step
+
 	def.on_rightclick=function(self, clicker)
 		if self.fight or self.dead or self.dying then
 			return
