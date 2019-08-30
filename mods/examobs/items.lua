@@ -327,3 +327,52 @@ minetest.register_node("examobs:woodbox", {
 	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1},
 	sounds = default.node_sound_wood_defaults(),
 })
+
+minetest.register_tool("examobs:icecreamball", {
+	description = "Icecream ball",
+	range = 1,
+	inventory_image = "examobs_icecreamball.png",
+	on_use = function(itemstack, user, pointed_thing)
+		local dir=user:get_look_dir()
+		local pos=user:get_pos()
+		pos.y=pos.y+1.5
+		local d={x=dir.x*15,y=dir.y*15,z=dir.z*15}
+		local e=minetest.add_entity({x=pos.x+(dir.x*3),y=pos.y+(dir.y*3),z=pos.z+(dir.z*3)}, "examobs:icecreamball")
+		e:set_velocity(d)
+		itemstack:add_wear(65536)
+		return itemstack
+	end,
+})
+
+
+minetest.register_entity("examobs:icecreamball",{
+	hp_max = 10,
+	physical =false,
+	visual = "mesh",
+	mesh="examobs_icecreamball.b3d",
+	textures ={"examobs_icecreammonstermaster.png"},
+	on_activate=function(self, staticdata)
+		self.object:set_animation({x=1,y=80,},30,0)
+		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.att={}
+	end,
+	on_step=function(self, dtime)
+		local pos=self.object:get_pos()
+		local p
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2.5)) do
+			if examobs.team(ob)~="candy" and not ob:get_attach() and examobs.visiable(self,ob:get_pos()) then
+				examobs.punch(ob,ob,10)
+				table.insert(self.att,ob)
+				ob:set_attach(self.object, "", {x=0,y=0,z=0}, {x=0,y=0,z=0})
+			end
+		end
+		if default.defpos(pos,"walkable") then
+			for _, ob in pairs(self.att) do
+				if ob then
+					ob:set_detach()
+				end
+			end
+			self.object:remove()
+		end
+	end,
+})

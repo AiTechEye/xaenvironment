@@ -1,4 +1,293 @@
 examobs.register_mob({
+	name = "ball",
+	hp=60,
+	reach=2,
+	type = "monster",
+	team = "candy",
+	dmg = 1,
+	textures={"examobs_icecreammonstermaster.png^[colorize:#ff75ec55"},
+	mesh="examobs_icecreamball.b3d",
+	visual_size={x=0.5,y=0.5},
+	spawn_on={"group:candy_ground"},
+	aggressivity = 2,
+	walk_speed = 2,
+	run_speed = 4,
+	lay_on_death=0,
+	animation={
+		stand={x=0,y=0,speed=0},
+		lay={x=0,y=0,speed=0},
+		walk={x=1,y=80,speed=40},
+		attack={x=1,y=8,speed=60},
+	},
+	collisionbox={-0.2,-0.25,-0.2,0.2,0.25,0.2},
+	death=function(self)
+		local pos=self:pos()
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=1, y=0.5, z=1},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.2,
+			maxsize = 2,
+			texture = "examobs_icecreammonstermaster.png^[colorize:#ff75ec55",
+			collisiondetection = true,
+		})
+	end,
+})
+
+examobs.register_mob({
+	name = "gingerbread",
+	hp=40,
+	type = "monster",
+	team = "candy",
+	dmg = 1,
+	textures={"examobs_gingerbread.png"},
+	mesh="examobs_gingerbread.b3d",
+	spawn_on={"group:candy_ground","group:candy_underground"},
+	aggressivity = 2,
+	walk_speed = 1.5,
+	run_speed = 3,
+	lay_on_death=0,
+	inv={["examobs:gingerbread_piece1"]=1,["examobs:gingerbread_piece2"]=1},
+	animation={
+		stand={x=31,y=35,speed=0},
+		walk={x=0,y=20,speed=60},
+		attack={x=21,y=30,speed=30},
+	},
+	collisionbox={-0.2,-0.25,-0.2,0.2,0.25,0.2},
+	death=function(self)
+		local pos=self:pos()
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=1, y=0.5, z=1},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.2,
+			maxsize = 2,
+			texture = "examobs_gingerbread_piece1.png",
+			collisiondetection = true,
+		})
+	end,
+})
+
+examobs.register_mob({
+	name = "icecreammonstermaster",
+	hp=300,
+	type = "monster",
+	team = "candy",
+	reach=5,
+	dmg = 0,
+	textures={"examobs_icecreammonstermaster.png"},
+	mesh="examobs_icecreammaster.b3d",
+	spawn_on={"group:candy_ground","group:candy_underground"},
+	aggressivity = 2,
+	animation={
+		stand={x=40,y=80,speed=30},
+		walk={x=0,y=30,speed=30},
+		run={x=0,y=30,speed=30},
+		attack={x=80,y=105,speed=90},
+		lay={x=142,y=149,speed=0},
+		throw={x=105,y=140,speed=30}
+	},
+	collisionbox={-1,-1.0,-1,1,3,1},
+	on_spawn=function(self)
+		self.inv={["examobs:icecreamball"]=9}
+	end,
+	step=function(self,dtime)
+		if not self.throwing and self.fight and self.fight:get_pos() and examobs.visiable(self,self.fight) and examobs.viewfield(self,self.fight) then
+			local pos2=self.fight:get_pos()
+			local pos1=self.object:get_pos()
+			local d=vector.distance(pos1,pos2)
+			if d>5 then
+				self.is_throwing=1
+				self.throwing=1
+				self.time=self.otime
+				examobs.stand(self)
+				examobs.lookat(self,pos2)
+				examobs.anim(self,"throw")
+				d=d*0.05
+				local p=examobs.pointat(self,4)
+				minetest.after(0.7, function(p,d,self)
+					local pos2=self.fight:get_pos()
+					local pos1=self.object:get_pos()
+					if not (pos1 and pos2 and self) then return end
+					local d={x=examobs.num((pos2.x-pos1.x)*d),y=examobs.num((pos2.y-pos1.y)*d),z=examobs.num((pos2.z-pos1.z)*d)}
+					examobs.lookat(self,pos2)
+					minetest.add_entity({x=p.x,y=p.y+3,z=p.z}, "examobs:icecreamball"):set_velocity(d)
+				end,p,d,self)
+					minetest.after(1.2, function(self)
+						if not self.object:get_pos() then return end
+						self.throwing=nil
+						examobs.stand(self)
+					end,self)
+				return self
+			end
+		elseif not self.throwing and self.is_throwing then
+			self.is_throwing=nil
+			examobs.stand(self)
+		elseif self.throwing and self.fight then
+			examobs.lookat(self,self.fight:get_pos())
+			return self
+		end
+	end,
+	on_punching=function(self,target)
+		local pos=self.object:get_pos()
+		pos.y=pos.y-0.5
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 5)) do
+			local pos2=vector.round(ob:get_pos())
+			if examobs.team(ob)~=self.team and examobs.visiable(self.object,ob) and examobs.viewfield(self.object,ob) then
+				if ob:is_player() then
+					local p2={x=pos2.x-pos.x, y=pos2.y-pos.y, z=pos2.z-pos.z}
+					local a
+					local ii1
+					local ii2
+					for i=1,10,1 do
+						ii=i+1
+						ii2=i
+						if default.defpos({x=pos.x+(p2.x*ii), y=pos.y+(p2.y*ii)+2, z=pos.z+(p2.z*ii)},"walkable") then
+							break
+						end
+					end
+					ob:set_pos({x=pos.x+(p2.x*ii2), y=pos.y+(p2.y*ii2)+2, z=pos.z+(p2.z*ii2)})
+					examobs.punch(self.object,ob,10)
+				elseif ob then
+					examobs.punch(self.object,ob,10)
+					ob:set_velocity({x=(pos2.x-pos.x)*20, y=((pos2.y-pos.y))*30, z=(pos2.z-pos.z)*20})
+				end
+			end
+		end
+	end,
+	on_punched=function(self,puncher)
+		local pos=self:pos()
+		examobs.anim(self,"throw")
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=1, y=0.5, z=1},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.5,
+			maxsize = 2,
+			texture = "examobs_icecreamball.png",
+			collisiondetection = true,
+		})
+	end
+})
+
+examobs.register_mob({
+	name = "candycane",
+	hp=40,
+	type = "monster",
+	team = "candy",
+	dmg = 1,
+	textures={"examobs_candycane.png"},
+	mesh="examobs_candycane.b3d",
+	spawn_on={"group:candy_ground"},
+	aggressivity = 2,
+	inv={["examobs:candycane_piece"]=1},
+	animation={
+		stand={x=1,y=150,speed=30,loop=0},
+		walk={x=155,y=170,speed=30,loop=0},
+		attack={x=180,y=195,speed=30,loop=0},
+		lay={x=201,y=211,speed=0,loop=0}
+	},
+	collisionbox={-0.35,-1.0,-0.35,0.35,0.8,0.35},
+	on_spawn=function(self)
+		local n=0
+		local t="0123456789ABCDEF"
+		self.storage.color=""
+  		for i=1,6,1 do
+        			n=math.random(1,16)
+       			self.storage.color=self.storage.color .. string.sub(t,n,n)
+		end
+		self.object:set_properties({textures={"default_stone.png^[colorize:#" .. self.storage.color .."ff^examobs_candycane.png"}})
+	end,
+	on_load=function(self)
+		if not self.storage.color then
+			self.spawn(self)
+			return self
+		end
+		self.object:set_properties({textures={"default_stone.png^[colorize:#" .. self.storage.color .."ff^examobs_candycane.png"}})
+	end,
+	on_punched=function(self,puncher)
+		local pos=self:pos()
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=1, y=0.5, z=1},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.2,
+			maxsize = 2,
+			texture = "examobs_candycane_piece.png^[colorize:#" .. self.storage.color .."ff^examobs_candycane.png",
+			collisiondetection = true,
+		})
+	end,
+})
+
+examobs.register_mob({
+	name = "lollipop",
+	hp=40,
+	type = "monster",
+	team = "candy",
+	dmg = 1,
+	textures={"examobs_lollipop.png"},
+	mesh="examobs_lollipop.b3d",
+	spawn_on={"group:candy_ground","group:candy_underground"},
+	aggressivity = 2,
+	inv={["examobs:candycane_piece"]=1},
+	animation={
+		stand={x=20,y=360,speed=30},
+		walk={x=1,y=20,speed=30},
+		attack={x=370,y=380,speed=30},
+		lay={x=381,y=386,speed=0}
+	},
+	collisionbox={-0.35,-1.0,-0.35,0.35,1,0.35},
+	inv={["examobs:lollipop_piece"]=1},
+	on_punched=function(self,puncher)
+		local pos=self:pos()
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-2, y=-2, z=-2},
+			maxvel = {x=1, y=0.5, z=1},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.2,
+			maxsize = 2,
+			texture = "examobs_lollipop_piece.png",
+			collisiondetection = true,
+		})
+	end,
+})
+
+examobs.register_mob({
 	name = "tntbox",
 	type = "monster",
 	team = "box",
@@ -24,7 +313,21 @@ examobs.register_mob({
 			self.ex = 1
 			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_fire",})
 		end
-	end
+	end,
+	on_spawn=function(self)
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		self.lpos = self:pos()
+	end,
+	wtimer = 0,
+	on_abs_step=function(self)
+		local d = vector.distance(self.lpos,self:pos())
+		if d > 0.5 and self.object:get_velocity().y == 0 then
+			self.lpos = self:pos()	
+			minetest.sound_play("examobs_wbox", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
 })
 
 examobs.register_mob({
