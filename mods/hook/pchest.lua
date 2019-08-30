@@ -4,7 +4,7 @@ minetest.register_craft({
 	output = "hook:pchest",
 	recipe = {
 		{"default:stick","default:stick","default:stick"},
-		{"default:stick","default:chest_locked", "default:diamondblock"},
+		{"default:stick","default:chest", "default:diamondblock"},
 		{"default:stick","default:stick","default:stick"},
 	}
 })
