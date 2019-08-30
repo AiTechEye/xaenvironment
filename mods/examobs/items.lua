@@ -324,10 +324,29 @@ minetest.register_craft({
 minetest.register_node("examobs:woodbox", {
 	description = "Wooden box",
 	tiles={"examobs_woodbox.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_string("infotext","Wooden box")
+		m:set_string("formspec",
+			"size[8,8]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
 })
-
+minetest.register_craft({
+	output = "examobs:woodbox",
+	recipe = {
+		{"group:wood","group:stick","group:wood"},
+		{"group:wood","","group:wood"},
+		{"group:wood","group:wood","group:wood"}
+	}
+})
 minetest.register_tool("examobs:icecreamball", {
 	description = "Icecream ball",
 	range = 1,

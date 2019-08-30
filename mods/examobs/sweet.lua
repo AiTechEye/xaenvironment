@@ -1,25 +1,17 @@
-
 minetest.register_biome({
 	name="candyland",
-	--node_dust="",
 	node_top="examobs:sugar_with_glaze",
 	depth_top=1,
 	node_filler="examobs:sugar",
 	depth_filler=5,
 	node_stone="examobs:sponge_cake",
-	--node_water_top="",
-	--depth_water_top=10,
 	node_water="examobs:gel2",
 	node_river_water="examobs:gel",
-	--node_riverbed="",
-	--depth_riverbed=2,
 	y_min=-50,
 	y_max=31000,
 	heat_point=60,
 	humidity_point=67,
 })
-
-
 
 minetest.register_node("examobs:sugar", {
 	description = "Sugar",
@@ -71,9 +63,6 @@ minetest.register_decoration({
 	decoration = "examobs:marzipan_rose",
 })
 
-
-
-
 local candycolor={"ff75ec","ff0000","00ff00","0000ff","00ffff","ffff00"}
 for i=1,6,1 do
 minetest.register_node("examobs:candy" .. i, {
@@ -115,8 +104,6 @@ minetest.register_node("examobs:candy" .. i, {
 	decoration = "examobs:candy" .. i,
 })
 end
-
-
 
 minetest.register_node("examobs:gel", {
 	description = "Gel",
@@ -171,7 +158,7 @@ minetest.register_node("examobs:gel_flowing", {
 minetest.register_node("examobs:gel2", {
 	description = "Gel 2",
 	drawtype = "liquid",
-	tiles = {"default_clay.png^[colorize:#00ff0055"},
+	tiles = {"default_stone.png^[colorize:#00ff0055"},
 	alpha=200,
 	paramtype = "light",
 	walkable = false,
@@ -190,14 +177,14 @@ minetest.register_node("examobs:gel2", {
 minetest.register_node("examobs:gel_flowing2", {
 	description = "Gel flowing",
 	drawtype = "flowingliquid",
-	tiles = {"default_clay.png^[colorize:#00ff0055"},
+	tiles = {"default_stone.png^[colorize:#00ff0055"},
 	special_tiles = {
 		{
-			name = "default_clay.png^[colorize:#00ff0055",
+			name = "default_stone.png^[colorize:#00ff0055",
 			backface_culling = false,
 		},
 		{
-			name = "default_clay.png^[colorize:#00ff0055",
+			name = "default_stone.png^[colorize:#00ff0055",
 			backface_culling = true,
 		},
 	},

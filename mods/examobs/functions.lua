@@ -729,6 +729,7 @@ examobs.generate_npc_house=function(pos)
 	local furn_floor = {}
 	local furn_wall = {}
 	local items = {}
+	local items2 = {}
 	local mirror = {[0]=2,[1]=3,[2]=0,[3]=1}
 	local wallmounted=function(x,z,s)
 		if z==-s+1 then
@@ -745,8 +746,12 @@ examobs.generate_npc_house=function(pos)
 	end
 
 	for i,v in pairs(minetest.registered_items) do
-		if v.groups and v.groups.treasure == 1 then
-			table.insert(items,i)
+		if v.groups then
+			if v.groups.treasure == 1 then
+				table.insert(items,i)
+			elseif v.groups.treasure == 2 then
+				table.insert(items2,i)
+			end
 		end
 	end
 
@@ -815,9 +820,18 @@ examobs.generate_npc_house=function(pos)
 			local m = minetest.get_meta(plpos):get_inventory()
 			local size = m:get_size("main")
 
-			for i=1,size do
-				if math.random(1,math.floor(size/2)) == 1 then
-					m:set_stack("main",i,items[math.random(1,size)].." ".. math.random(1,10))
+
+			if nset == "examobs:woodbox" then
+				for i=1,size do
+					if math.random(1,math.floor(size/2)) == 1 then
+						m:set_stack("main",i,items2[math.random(1,size)].." ".. math.random(1,10))
+					end
+				end
+			else
+				for i=1,size do
+					if math.random(1,math.floor(size/2)) == 1 then
+						m:set_stack("main",i,items[math.random(1,size)].." ".. math.random(1,10))
+					end
 				end
 			end
 		end
