@@ -138,3 +138,12 @@ minetest.register_craft({
 		{"default:iron_lump","default:iron_ingot","default:iron_lump"},
 	}
 })
+
+minetest.register_craft({
+	output="materials:spaceyfloor 9",
+	recipe={
+		{"default:steel_lump","default:iron_ingot","default:steel_lump"},
+		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},
+		{"default:steel_lump","default:iron_ingot","default:steel_lump"},
+	}
+})
