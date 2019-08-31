@@ -34,26 +34,36 @@ minetest.register_tool("hook:pchest", {
 		end
 		local p=minetest.dir_to_facedir(user:get_look_dir())
 		local item=itemstack:to_table()
-		local meta=minetest.deserialize(item["metadata"])
 		minetest.set_node(pointed_thing.above, {name = "hook:pchest_node",param1="",param2=p})
 		pchest.setpchest(pointed_thing.above,user)
 			
-		minetest.sound_play("default_place_node_hard", {pos=pointed_thing.above, gain = 1.0, max_hear_distance = 5,})
-		if meta==nil then
+		minetest.sound_play("default_place_node_hard", {pos=pointed_thing.above, gain = 1.0, max_hear_distance = 5})
+
+		if not (item.meta or item.metadata) then
 			itemstack:take_item()
 			return itemstack
 		end
+		if item.meta.items then
+			local its = minetest.deserialize(item.meta.items or "") or {}
+			local items = {}
+			for i,it in pairs(its) do
+				table.insert(items,ItemStack(it))
+			end
 
-		local s=meta.stuff
-		local its=meta.stuff.split(meta.stuff,",",",")
-		local nmeta=minetest.get_meta(pointed_thing.above)
-		for i,it in pairs(its) do
-			if its~="" then
-				nmeta:get_inventory():set_stack("main",i, ItemStack(it))
+			minetest.get_meta(pointed_thing.above):get_inventory():set_list("main",items)
+		elseif item.metadata ~= "" then
+			local meta=minetest.deserialize(item["metadata"])
+			local s=meta.stuff
+			local its=meta.stuff.split(meta.stuff,",",",")
+			local nmeta=minetest.get_meta(pointed_thing.above)
+			for i,it in pairs(its) do
+				if its~="" then
+					nmeta:get_inventory():set_stack("main",i, ItemStack(it))
+				end
 			end
 		end
 		itemstack:take_item()
-		return itemstack:take_item()
+		return itemstack
 	end
 })
 
@@ -77,10 +87,16 @@ minetest.register_node("hook:pchest_node", {
 	input_inventory = "main",
 	connect_sides = {left = 1, right = 1, front = 1, back = 1, top = 1, bottom = 1}},
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		local owner = minetest.get_meta(pos):get_string("owner")
-		if owner == player:get_player_name() or owner == "" then
-			if minetest.deserialize(stack:get_metadata())~=nil then
-				minetest.chat_send_player(player:get_player_name(), "Not allowed to put in items with metadata")
+		local m = minetest.get_meta(pos)
+		local owner = m:get_string("owner")
+		local inv = m:get_inventory()
+		local name = player:get_player_name()
+		if owner == name or owner == "" then
+			if stack:get_name() == "hook:pchest" then
+				minetest.chat_send_player(name, "Not allowed to put in it")
+				return 0
+			elseif not inv:room_for_item("main",stack) then
+				minetest.chat_send_player(name, "Full")
 				return 0
 			end
 			return stack:get_count()
@@ -102,32 +118,25 @@ minetest.register_node("hook:pchest_node", {
 		return 0
 	end,
 	can_dig = function(pos, player)
-		local owner = minetest.get_meta(pos):get_string("owner")
-		return (owner=="" and minetest.get_meta(pos):get_inventory():is_empty("main"))
+		local m = minetest.get_meta(pos)
+		return m:get_string("owner") == "" and m:get_inventory():is_empty("main")
 	end,
 	on_punch = function(pos, node, player, pointed_thing)
-		if minetest.is_protected(pos,player:get_player_name()) then
+		local meta=minetest.get_meta(pos)
+		local name = player:get_player_name()
+		local pinv = player:get_inventory()
+		if minetest.is_protected(pos,name) or meta:get_string("owner") ~= name or not pinv:room_for_item("main",ItemStack("hook:pchest")) then
 			return false
 		end
-		local meta=minetest.get_meta(pos)
-		if meta:get_string("owner")==player:get_player_name() then
-			local inv=meta:get_inventory()
-			local items=""
-			for i=1,32,1 do
-				if inv:get_stack("main",i):get_name()~="" then
-					items=items .. inv:get_stack("main",i):get_name() .." " .. inv:get_stack("main",i):get_count() .. " " .. inv:get_stack("main",i):get_wear() .."," 
-				else
-					items=items .. ","
-				end
-			end
-			inv:add_item("trans", ItemStack("hook:pchest"))
-			local item=inv:get_stack("trans",1):to_table()
-			local tmeta={stuff=items}
-			item.metadata=minetest.serialize(tmeta)
-			item.meta=minetest.serialize(tmeta)
-			player:get_inventory():add_item("main", ItemStack(item))
-			minetest.set_node(pos, {name = "air"})
-			minetest.sound_play("default_dig_dig_immediate", {pos=pos, gain = 1.0, max_hear_distance = 5,})
+		local inv=meta:get_inventory()
+		local items = {}
+		for i,v in pairs(inv:get_list("main")) do
+			table.insert(items,v:to_table())
 		end
+		local item = ItemStack("hook:pchest"):to_table()
+		item.meta={items=minetest.serialize(items)}
+		pinv:add_item("main", ItemStack(item))
+		minetest.set_node(pos, {name = "air"})
+		minetest.sound_play("default_dig_dig_immediate", {pos=pos, gain = 1.0, max_hear_distance = 5,})
 	end
 })
