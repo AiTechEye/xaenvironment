@@ -5,7 +5,7 @@ minetest.register_entity("hook:power",{
 	visual = "mesh",
 	mesh = "hook_hook.obj",
 	visual_size = {x=10, y=10},
-	textures = {"hook_rope.png"},
+	textures = {"default_ironblock.png"},
 	is_visible = true,
 	makes_footstep_sound = false,
 	automatic_rotate = false,
