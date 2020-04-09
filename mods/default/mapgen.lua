@@ -256,7 +256,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				gened = true
 				if sandtype == sand and den < 0.8 then
 					if heat > 85 and math.random(1,40) == 1 then
-						data[id+area.ystride] = minetest.get_content_id("coral"..math.random(1,2).."_"..math.random(1,20))
+						data[id+area.ystride] = minetest.get_content_id("plants:coral"..math.random(1,2).."_"..math.random(1,20))
 					elseif math.random(1,10) == 1 then
 						data[id+area.ystride] = minetest.get_content_id("plants:kelp"..math.random(1,4))
 					elseif math.random(1,10) == 1 then
