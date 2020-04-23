@@ -387,7 +387,7 @@ examobs.walk=function(self,run)
 		z = z
 	})
 
-	if self.on_walk(self,x,y,z) then return end
+	if self.on_walk(self,x,v.yy,z) then return end
 
 	if running then
 		examobs.anim(self,"run")
