@@ -1,6 +1,6 @@
 for i=1,20 do
 default.register_plant({
-	name="coral_" .. i,
+	name="coral1_" .. i,
 	description = "Coral",
 	tiles={"default_sand.png"},
 	special_tiles = {{name  = "plants_coral.png^" .. default.dye_texturing(i*7,{opacity=150}).."^plants_coral_alpha.png^[makealpha:0,255,0"}, tileable_vertical = true},
