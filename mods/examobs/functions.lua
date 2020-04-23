@@ -343,9 +343,10 @@ examobs.fighting=function(self)
 end
 
 examobs.stand=function(self)
+	local v = self.object:get_velocity() or {x=0,y=0,z=0}
 	self.object:set_velocity({
 		x = 0,
-		y = self.object:get_velocity().y,
+		y = v.y,
 		z = 0})
 	if not self.on_stand(self) then
 		examobs.anim(self,"stand")
@@ -377,13 +378,12 @@ examobs.walk=function(self,run)
 	local yaw=examobs.num(self.object:get_yaw())
 	local running = run
 	self.movingspeed = run and self.run_speed or self.walk_speed
+	local v = self.object:get_velocity() or {x=0,y=0,z=0}
 	local x = (math.sin(yaw) * -1) * self.movingspeed
 	local z = (math.cos(yaw) * 1) * self.movingspeed
-	local y = self.object:get_velocity().y
-
 	self.object:set_velocity({
 		x = x,
-		y = y,
+		y = v.y,
 		z = z
 	})
 
