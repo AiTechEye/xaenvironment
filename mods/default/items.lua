@@ -512,7 +512,7 @@ default.registry_mineral({
 	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
 	ingot={groups={treasure=1}},
 	ore_settings={
-		clust_scarcity= 12 * 12 * 12,
+		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
 		clust_size=7,
 		y_max=5,
