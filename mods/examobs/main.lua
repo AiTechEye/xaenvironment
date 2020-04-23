@@ -247,14 +247,14 @@ examobs.register_mob=function(def)
 				end
 			end
 		end
-
-		local v={x = dir.x*3,y = self.object:get_velocity().y,z = dir.z*3}
+		local obv = self.object:get_velocity() or {x=0,y=0,z=0}
+		local v = {x = dir.x*3,y = obv.y,z = dir.z*3}
 		self.object:set_velocity(v)
 		local r=math.random(1,99)
 		self.onpunch_r=r
 		minetest.after(0.5, function(self,v,r)
 			if self and self.onpunch_r == r and self.object and self.object:get_pos() then
-				self.object:set_velocity({x = 0,y = self.object:get_velocity().y,z = 0})
+				self.object:set_velocity({x = 0,y = obv.y,z = 0})
 			end
 		end, self,v,r)
 
