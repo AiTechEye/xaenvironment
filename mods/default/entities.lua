@@ -73,7 +73,7 @@ local item = {
 				self.object:set_velocity({x=0, y=0 , z=0})
 			elseif self.flammable == 0 then
 				local def2 = minetest.registered_items[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name]
-				local v = self.object:get_velocity()
+				local v = self.object:get_velocity() or {x=0,y=0,z=0}
 
 				if v.y == 0 and def2 and not def2.walkable then
 					v.y = -0.3
