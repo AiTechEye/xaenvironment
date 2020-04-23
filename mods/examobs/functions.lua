@@ -40,7 +40,7 @@ walkable=function(pos)
 end
 
 examobs.jump=function(self)
-	local v = self.object:get_velocity()
+	local v = self.object:get_velocity() or {x=0, y=0, z=0}
 	if v.y == 0 then
 		self.object:set_velocity({x=v.x, y=5.5, z=v.z})
 	end
@@ -387,7 +387,7 @@ examobs.walk=function(self,run)
 		z = z
 	})
 
-	if self.on_walk(self,x,v.y,z) then return end
+	if self.on_walk(self,x,v.yy,z) then return end
 
 	if running then
 		examobs.anim(self,"run")
