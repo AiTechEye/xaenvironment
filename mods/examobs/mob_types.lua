@@ -201,7 +201,7 @@ examobs.register_fish=function(def)
 				return
 			elseif examobs.distance(self.object,self.target) <= 1 then
 				local en = self.target:get_luaentity()
-				if en.examobs_fishing_target then
+				if not en or en.examobs_fishing_target then
 					en:on_trigger(self.object)
 					self.target = nil
 					return
