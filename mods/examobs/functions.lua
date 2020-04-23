@@ -175,7 +175,7 @@ examobs.environment=function(self)
 	if def.liquid_viscosity > 0 then
 		self.in_liquid = true
 		local s=1
-		local v=self.object:get_velocity()
+		local v = self.object:get_velocity() or {x=0,y=0,z=0}
 		if self.dying or self.dead then s=-1 end
 
 		if self.swiming < 1 and s == 1 then

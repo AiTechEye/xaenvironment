@@ -196,7 +196,7 @@ examobs.register_fish=function(def)
 				end
 			end
 		elseif self.target then
-			if not (self.target:get_pos() and examobs.visiable(self.object,self.target)) then
+			if not (self.target:get_pos() and examobs.visiable(self.object,self.target)) or examobs.gethp(self.target) <= 0 then
 				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.target) <= 1 then

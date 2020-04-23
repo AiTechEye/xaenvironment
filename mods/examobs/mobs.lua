@@ -314,7 +314,7 @@ examobs.register_mob({
 	death=function(self)
 		if not self.ex then
 			self.ex = 1
-			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_fire",})
+			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_flame",})
 		end
 	end,
 	on_spawn=function(self)
