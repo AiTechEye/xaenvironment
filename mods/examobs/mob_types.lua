@@ -69,7 +69,7 @@ examobs.register_bird=function(def)
 		def.on_fly(self)
 		examobs.anim(self,"fly")
 		if self.flee then
-			local v = self.object:get_velocity()
+			local v = self.object:get_velocity() or {x=0,y=0,z=0}
 			self.object:set_velocity({x=v.x,y=3,z=v.z})
 		end
 	end
@@ -201,7 +201,10 @@ examobs.register_fish=function(def)
 				return
 			elseif examobs.distance(self.object,self.target) <= 1 then
 				local en = self.target:get_luaentity()
-				if not en or en.examobs_fishing_target then
+				if not en then
+					self.target = nil
+					return
+				elseif en.examobs_fishing_target then
 					en:on_trigger(self.object)
 					self.target = nil
 					return
