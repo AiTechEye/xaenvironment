@@ -86,9 +86,9 @@ default.register_pebble=function(def)
 		place_on = ddef.place_on or {"group:soil","default:stone"},
 		sidelen = 16,
 		noise_params = {
-			offset = 0.002,
-			scale = 0.004,
-			spread = {x = 100, y = 100, z = 100},
+			offset = ddef.offset or 0.002,
+			scale = ddef.scale or 0.004,
+			spread = ddef.spread or {x = 100, y = 100, z = 100},
 			seed = ddef.seed,
 			octaves = 3,
 			persist = 0.6
