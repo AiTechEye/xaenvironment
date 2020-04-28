@@ -380,9 +380,12 @@ default.register_plant({
 		dye_colors = {palette=v},
 		alpha = 150,
 		decoration = {
-			place_on = "default:stone",
-			y_max = -100,
+			place_on = {"group:stone","group:soil","default:sand"},
+			y_max = -10,
+			y_min = -30000,
 			seed = 80*v,
+			offset = 0.0011,
+			scale = 0.0012,
 		}
 	})
 end
