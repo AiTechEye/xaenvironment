@@ -1,18 +1,3 @@
-minetest.register_biome({
-	name="candyland",
-	node_top="examobs:sugar_with_glaze",
-	depth_top=1,
-	node_filler="examobs:sugar",
-	depth_filler=5,
-	node_stone="examobs:sponge_cake",
-	node_water="examobs:gel2",
-	node_river_water="examobs:gel",
-	y_min=-50,
-	y_max=31000,
-	heat_point=60,
-	humidity_point=67,
-})
-
 minetest.register_node("examobs:sugar", {
 	description = "Sugar",
 	groups = {crumbly=3,soil=1,candy_ground=1},
@@ -46,22 +31,7 @@ minetest.register_node("examobs:marzipan_rose", {
 	on_use=minetest.item_eat(1)
 })
 
-minetest.register_decoration({
-	deco_type = "simple",
-	place_on = {"examobs:sugar_with_glaze"},
-	sidelen = 16,
-	noise_params = {
-		offset = 0,
-		scale = 0.01,
-		spread = {x = 40, y = 40, z = 40},
-		seed = 329,
-		octaves = 4,
-		persist = 0.5
-	},
-	y_min = -10,
-	y_max = 32000,
-	decoration = "examobs:marzipan_rose",
-})
+
 
 local candycolor={"ff75ec","ff0000","00ff00","0000ff","00ffff","ffff00"}
 for i=1,6,1 do
@@ -86,22 +56,6 @@ minetest.register_node("examobs:candy" .. i, {
 	},
 	on_use=minetest.item_eat(1),
 	sounds=default.node_sound_leaves_defaults(),
-})
-	minetest.register_decoration({
-		deco_type = "simple",
-		place_on = {"examobs:sugar_with_glaze"},
-		sidelen = 16,
-		noise_params = {
-			offset = 0,
-			scale = 0.01,
-			spread = {x = 20, y = 20, z = 20},
-			seed = 329,
-			octaves = 4,
-			persist = 0.5
-		},
-	y_min = -10,
-	y_max = 32000,
-	decoration = "examobs:candy" .. i,
 })
 end
 
