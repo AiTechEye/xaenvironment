@@ -57,7 +57,7 @@ minetest.register_craftitem("examobs:pelt",{
 })
 minetest.register_craftitem("examobs:tooth",{
 	description = "Tooth",
-	groups = {treasure=1},
+	groups = {treasure=1,tip=1},
 	inventory_image = "examobs_tooth.png",
 	wield_scale={x=0.3,y=0.3,z=0.4},
 })
