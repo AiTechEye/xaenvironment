@@ -379,12 +379,14 @@ minetest.register_entity("examobs:icecreamball",{
 		local pos=self.object:get_pos()
 		local p
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2.5)) do
-			if examobs.team(ob)~="candy" and not ob:get_attach() and examobs.visiable(self,ob:get_pos()) then
+			local en = ob:get_luaentity()
+			if not (en and en.name == "examobs:icecreamball") and examobs.team(ob)~="candy" and not ob:get_attach() and examobs.visiable(self,ob:get_pos()) then
 				examobs.punch(ob,ob,10)
 				table.insert(self.att,ob)
 				ob:set_attach(self.object, "", {x=0,y=0,z=0}, {x=0,y=0,z=0})
 			end
 		end
+
 		if default.defpos(pos,"walkable") then
 			for _, ob in pairs(self.att) do
 				if ob then
@@ -393,6 +395,7 @@ minetest.register_entity("examobs:icecreamball",{
 			end
 			self.object:remove()
 		end
+		return self
 	end,
 })
 
