@@ -270,7 +270,7 @@ bows.register_arrow("arrow",{
 	texture="default_wood.png",
 	damage=5,
 	craft_count=8,
-	craft={{"default:flint","group:stick","examobs:feather"},}
+	craft={{"group:tip","group:stick","examobs:feather"},}
 })
 
 bows.register_arrow("fire",{

@@ -358,7 +358,7 @@ default.registry_mineral({
 	not_ore=true,
 	not_lump=true,
 	not_ingot=true,
-	drop={inventory_image="flint"},
+	drop={inventory_image="flint",groups={tip=1}},
 	not_bow=true,
 	not_arrow=true,
 	block={
