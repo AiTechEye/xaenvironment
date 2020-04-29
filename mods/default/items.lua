@@ -664,7 +664,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	ingot={groups={treasure=3}},
 	ore_settings={
-		clust_scarcity= 20 * 20 * 20,
+		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=3,
 		clust_size=7,
 		y_max=-70,
@@ -684,7 +684,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	ingot={groups={treasure=3}},
 	ore_settings={
-		clust_scarcity= 20 * 20 * 20,
+		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=3,
 		clust_size=7,
 		y_max=-70,
@@ -703,7 +703,7 @@ default.registry_mineral({
 	not_ingot = true,
 	block={sounds=default.node_sound_stone_defaults()},
 	ore_settings={
-		clust_scarcity= 25 * 25 * 25,
+		clust_scarcity= 14 * 14 * 14,
 		clust_num_ores=2,
 		clust_size=8,
 		y_max=-90,
@@ -760,7 +760,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	lump={groups={treasure=2}},
 	ore_settings={
-		clust_scarcity= 30 * 30 * 30,
+		clust_scarcity= 15 * 15 * 15,
 		clust_num_ores=1,
 		clust_size=9,
 		y_max=-100,
@@ -799,7 +799,7 @@ default.registry_mineral({
 	name="uranium",
 	texture="default_uraniumblock.png",
 	ore_settings={
-		clust_scarcity= 32 * 32 * 32,
+		clust_scarcity= 16 * 16 * 16,
 		clust_num_ores=2,
 		clust_size=10,
 		y_max=-100,
