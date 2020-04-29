@@ -454,8 +454,10 @@ minetest.register_entity("quads:quad",{
 			self.falling = nil
 		end
 
-		if self.falling and math.abs(self.object:get_rotation().x) >=6.28 then
-			local x = self.object:get_rotation().x
+		local r = self.object:get_rotation() or {x=0,y=0,z=0}
+
+		if self.falling and math.abs(r.x) >=6.28 then
+			local x = r.x
 			if x < 0 then
 				exaachievements.customize(self.user,"Quad_frontflip_stunt")
 			elseif x > 0 then
