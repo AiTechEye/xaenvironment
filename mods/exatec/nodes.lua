@@ -1717,7 +1717,9 @@ minetest.register_node("exatec:weather_detector", {
 minetest.register_node("exatec:industrial_miner", {
 	description = "Industrial miner",
 	tiles={
-		"default_steelblock.png^[colorize:#0000ff99^default_glass.png",
+		"default_steelblock.png^materials_fanblade_metal.png",
+		"default_steelblock.png^exatec_hole.png",
+		"materials_metal_beam.png^materials_pallet_box.png"
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1}, --,exatec_tube_connected=1
 	sounds = default.node_sound_glass_defaults(),
@@ -1747,7 +1749,6 @@ minetest.register_node("exatec:industrial_miner", {
 				m:set_string("infotext","Industrial miner: -30000 [max]")
 				return
 			end
-
 			local p = {x=pos.x,y=y,z=pos.z}
 			local no = minetest.get_node(p).name
 			if no == "ignore" then
@@ -1756,9 +1757,6 @@ minetest.register_node("exatec:industrial_miner", {
 				no = minetest.get_node(p).name
 			end
 			local n = minetest.get_node_drops(no)[1]
-
-
-
 			local def = minetest.registered_nodes[n] or {}
 			if minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
 				local stack = ItemStack(n)
