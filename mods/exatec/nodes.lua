@@ -1713,3 +1713,115 @@ minetest.register_node("exatec:weather_detector", {
 		end
 	end,
 })
+
+minetest.register_node("exatec:industrial_miner", {
+	description = "Industrial miner",
+	tiles={
+		"default_steelblock.png^[colorize:#0000ff99^default_glass.png",
+	},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1}, --,exatec_tube_connected=1
+	sounds = default.node_sound_glass_defaults(),
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_int("pos",pos.y-1)
+		m:set_string("infotext","Industrial miner: "..(pos.y-1))
+		m:set_string("formspec",
+			"size[8,8]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_wire = function(pos,opos)
+			local m = minetest.get_meta(pos)
+			local y = m:get_int("pos")
+			if y <= -30000 then
+				m:set_string("infotext","Industrial miner: -30000 [max]")
+				return
+			end
+
+			local p = {x=pos.x,y=y,z=pos.z}
+			local no = minetest.get_node(p).name
+			if no == "ignore" then
+				minetest.emerge_area({x=p.x,y=p.y,z=p.z},{x=p.x,y=p.y-2,z=p.z})
+				minetest.forceload_block({x=p.x,y=p.y,z=p.z})
+				no = minetest.get_node(p).name
+			end
+			local n = minetest.get_node_drops(no)[1]
+
+
+
+			local def = minetest.registered_nodes[n] or {}
+			if minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
+				local stack = ItemStack(n)
+				local inv = m:get_inventory()
+				if n ~= "air" and def.drop ~= "" and not inv:room_for_item("main",stack) then
+					return
+				elseif n ~= "air" and def.drop ~= "" then
+					inv:add_item("main",stack)
+				end
+				m:set_int("pos",y-1)
+				m:set_string("infotext","Industrial miner: "..(y-1))
+				minetest.set_node(p,{name="exatec:vacuumtransport"})
+				minetest.get_meta(p):set_string("base",minetest.pos_to_string(pos))
+			end
+		end
+	},
+	after_destruct=function(pos)
+		local d = {x=pos.x,y=pos.y-1,z=pos.z}
+		if exatec.get_node(d) == "exatec:vacuumtransport" then
+			minetest.remove_node(d)
+		end
+	end,
+})
+
+minetest.register_node("exatec:vacuumtransport", {
+	groups = {not_in_creative_inventory=1},
+	tiles={"default_ironblock.png"},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+		node_box = {
+		type = "fixed",
+		fixed = { 
+			{-0.25, -0.5, -0.25, 0.25, 0.5, 0.25},
+		}
+	},
+	after_destruct=function(pos)
+		local u = {x=pos.x,y=pos.y+1,z=pos.z}
+		if exatec.get_node(u) == "exatec:vacuumtransport" then
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("base"))
+			if p == nil then
+				return
+			elseif minetest.get_meta(p):get_string("pos") == "" then
+				minetest.remove_node(u)
+			end
+		end
+	end,
+	on_destruct=function(pos,oldnode)
+		local d = {x=pos.x,y=pos.y-1,z=pos.z}
+		if exatec.get_node(d) == "exatec:vacuumtransport" then
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("base"))
+			if p == nil then
+				return
+			end
+			if minetest.get_meta(p):get_int("pos") == 0 then
+				minetest.remove_node(d)
+			end
+		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("base"))
+		if p == nil or minetest.get_meta(p):get_string("pos") == "" then
+			minetest.remove_node(pos)
+		end
+	end,
+})

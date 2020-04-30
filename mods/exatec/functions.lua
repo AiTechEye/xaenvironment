@@ -117,7 +117,7 @@ exatec.send=function(pos, force_ignored_pos,forcepos,ignore_pos)
 	end
 end
 
-exatec.get_node=function(pos,wire)
+exatec.get_node=function(pos)
 	local n=minetest.get_node(pos).name
 	if n=="ignore" then
 		local vox=minetest.get_voxel_manip()
