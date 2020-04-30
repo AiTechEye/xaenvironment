@@ -105,7 +105,7 @@ minetest.register_node("quads:bottle_with_oil", {
 	inventory_image = "materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png",
 	tiles = {"materials_plant_extracts_gas.png^[invert:rg^materials_plant_extracts.png"},
 	drawtype="plantlike",
-	groups = {dig_immediate = 3,treasure=1},
+	groups = {dig_immediate = 3,treasure=1,flammable=3},
 })
 
 minetest.register_node("quads:quad", {
