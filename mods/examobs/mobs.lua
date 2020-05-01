@@ -334,6 +334,66 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	name = "stoneblock",
+	type = "monster",
+	team = "box",
+	dmg = 1,
+	textures={"default_stone.png"},
+	mesh="examobs_tntbox.b3d",
+	spawn_on={"group:stone","default:gravel","default:bedrock"},
+	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
+	aggressivity = 2,
+	walk_speed = 2,
+	run_speed = 4,
+	lay_on_death=0,
+	spawn_chance = 300,
+	animation = {
+		walk = {x=0,y=40,speed=30,loop=false},
+		stand = {x=0,y=0,speed=0,loop=false},
+	},
+	is_food=function(self,item)
+		return false
+	end,
+	on_spawn=function(self)
+		local t = {
+			 {"default:stone","default_stone.png"},
+			 {"default:bedrock","default_cooledlava.png"},
+			 {"default:desert_cobble","default_desertcobble.png"},
+			 {"default:desert_stone","default_desertstone.png"},
+			 {"default:cobble","default_cobble.png"},
+			 {"default:mossycobble","default_cobble.png^default_stonemoss.png"},
+			 {"default:obsidian","default_obsidian.png"},
+		}
+		
+		local mat = t[math.random(1,7)]
+		local tex = {}
+		for i = 1,6,1 do
+			tex[i]=mat[2]
+
+		end
+		self.storage.tex = tex
+		self.inv={[mat[1]]=1}
+		self:on_load(self)
+	end,
+	mat={"default:stone","default_stone.png"},
+	on_load=function(self)
+		if self.storage.tex ~= nil then
+			self.object:set_properties({textures=self.storage.tex})
+		end
+		self.lpos = self:pos()
+	end,
+	wtimer = 0,
+	on_abs_step=function(self)
+		local d = vector.distance(self.lpos,self:pos())
+		if d > 0.5 and self.object:get_velocity().y == 0 then
+			self.lpos = self:pos()	
+			minetest.sound_play("default_place_hard", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+})
+
+
+examobs.register_mob({
 	name = "skeleton",
 	type = "monster",
 	team="metal",
@@ -358,7 +418,7 @@ examobs.register_mob({
 	walk_speed = 2,
 	run_speed = 4,
 	spawn_chance = 400,
-	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
+	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type","default:gravel","default:bedrock"},
 	light_min = 1,
 	light_max = 15,
 	is_food=function(self,item)
@@ -532,7 +592,7 @@ examobs.register_mob({
 		attack = {x=53,y=65},
 	},
 	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
-	spawn_on={"group:snowy"},
+	spawn_on={"group:snowy","default:dirt_with_snow"},
 	on_click=function(self,clicker)
 		if clicker:is_player() then
 			local item = clicker:get_wielded_item():get_name()
