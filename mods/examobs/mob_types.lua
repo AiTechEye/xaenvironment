@@ -101,7 +101,7 @@ examobs.register_bird=function(def)
 		if self.storage.fly then
 			examobs.walk(self)
 			examobs.anim(self,"float")
-			local v = self.object:get_velocity()
+			local v = self.object:get_velocity() or {x=0,y=0,z=0}
 			self.object:set_velocity({x=v.x,y=-0.5,z=v.z})
 			return 1
 		end
