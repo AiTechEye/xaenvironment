@@ -423,3 +423,39 @@ default.register_eatable("craftitem","examobs:candycane_piece",1,5,{
 	groups={aliveai_eatable=5},
 	on_use =minetest.item_eat(5)
 })
+
+minetest.register_craft({
+	output = "examobs:infection_poison",
+	recipe = {
+		{"plants:dolls_eyes_berries","plants:dolls_eyes_berries","plants:dolls_eyes_berries"},
+		{"plants:dolls_eyes_berries","materials:glass_bottle","plants:dolls_eyes_berries"},
+		{"plants:dolls_eyes_berries","plants:dolls_eyes_berries","plants:dolls_eyes_berries"}
+	}
+})
+
+minetest.register_tool("examobs:infection_poison", {
+	description = "Infection poison",
+	inventory_image = "materials_plant_extracts_gas.png^[colorize:#ff00ff^materials_plant_extracts.png",
+	tiles={"materials_plant_extracts.png"},
+	groups = {flammable=1,used_by_npc=1,treasure=1},
+	on_use = function(itemstack, user, pointed_thing)
+		local item = user:get_wielded_item()
+		if pointed_thing.type == "object" then
+			local en = pointed_thing.ref:get_luaentity()
+			if en.examob and en.storage.infected == nil then
+				en.team = "infection_poison"
+				en.aggressivity = 2
+				en.type = "monster"
+				en.storage.infected = 101
+				local i = user:get_wield_index()
+				if item:get_wear() < 60000 then
+					item:add_wear(6000)
+				else
+					item = ItemStack("materials:glass_bottle")
+				end
+				user:get_inventory():set_stack("main",i,item)
+			end
+		end
+		return item
+	end
+})

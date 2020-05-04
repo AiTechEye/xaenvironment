@@ -73,6 +73,48 @@ examobs.environment=function(self)
 	local def = examobs.defpos(pos)
 	local deff = examobs.defpos(posf)
 	local v = self.object:get_velocity()
+
+--Infected
+
+	if self.storage.infected then
+		if self.fight then
+			if examobs.team(self.fight) == self.team then 
+				self.fight = nil
+			else
+				local en = self.fight:get_luaentity()
+				if en and en.examob then
+					en.fight = nil
+					self.fight = nil
+					en.team = "infection_poison"
+					en.aggressivity = 2
+					en.type = "monster"
+					en.storage.infected = 101
+				end
+			end
+		end
+
+
+
+
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), 5)) do
+			local en = ob:get_luaentity()
+			if en and en.examob and en.team ~= self.team and en.examob ~= self.examob and examobs.visiable(self,ob) and examobs.gethp(ob) > 0 then
+				en.fight = nil
+				en.team = "infection_poison"
+				en.aggressivity = 2
+				en.type = "monster"
+				en.storage.infected = 101
+			end
+		end
+		self.storage.infected = self.storage.infected -1
+		if self.storage.infected <= 0 then
+			self:hurt(1)
+		else
+			examobs.showtext(self,"Infected ("..self.storage.infected..")","ff00ff")
+		end
+	end
+
 --jumping
 
 	if not (self.dying or self.dead or self.is_floating) then
@@ -148,7 +190,7 @@ examobs.environment=function(self)
 	if self.floating_in_group and minetest.get_item_group(def.name,self.floating_in_group) > 0 or self.floating[def.name] then
 		if not self.is_floating then
 			self.is_floating = true
-			local v = self.object:get_velocity()
+			local v = self.object:get_velocity() or {x=0, y=0, z=0}
 			self.object:set_acceleration({x =0, y=0, z =0})
 			self.object:set_velocity({x=v.x, y=0, z =v.y})
 		end
@@ -207,7 +249,7 @@ examobs.environment=function(self)
 		self.object:set_velocity({x = v.x, y =1*s - (def.liquid_viscosity*0.1), z = v.z})
 		return self
 	elseif self.in_liquid and (examobs.defpos(apos(pos,0,-1)).liquid_viscosity or 0) > 0 then
-		local v=self.object:get_velocity()
+		local v=self.object:get_velocity() or {x=0, y=0, z=0}
 		self.object:set_acceleration({x=0, y=0, z=0})
 		self.object:set_velocity({x=v.x, y=0, z=v.z})
 		if walkable(apos(posf,0,-1)) then

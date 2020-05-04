@@ -326,7 +326,8 @@ examobs.register_mob({
 	wtimer = 0,
 	on_abs_step=function(self)
 		local d = vector.distance(self.lpos,self:pos())
-		if d > 0.5 and self.object:get_velocity().y == 0 then
+		local v = self.object:get_velocity() or {x=0,y=0,z=0}
+		if d > 0.5 and v.y == 0 then
 			self.lpos = self:pos()	
 			minetest.sound_play("examobs_wbox", {object=self.object, gain = 1, max_hear_distance = 20})
 		end
@@ -1071,7 +1072,9 @@ examobs.register_bird({
 				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.item) <= 1 then
-				local item = string.split(self.item:get_luaentity().itemstring," ")
+				print("=========")
+				print(self.item:get_luaentity())
+				local item = string.split(self.item:get_luaentity().itemstring.." "," ")
 				if minetest.get_item_group(item[1],"eatable") > 0 then
 					self:eat_item(item[1])
 				elseif item[1] then
