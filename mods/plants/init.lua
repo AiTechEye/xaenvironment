@@ -395,10 +395,11 @@ default.register_plant({
 	name="lonicera_tatarica",
 	tiles={"plants_lonicera_tatarica.png"},
 	decoration={
-		biomes={"deciduous"},
+		biomes={"tropic","jungle"},
 		noise_params={
 			offset=-0.0015,
-			scale=0.003,
+			scale=0.005,
+			seed=3454365,
 		}
 	},
 	drop={max_items = 1,items = {
