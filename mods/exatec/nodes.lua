@@ -1199,7 +1199,6 @@ minetest.register_node("exatec:destroyer", {
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
-		m:set_string("infotext","Storage: closed")
 		m:set_string("formspec",
 			"size[8,8]" ..
 			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
