@@ -837,7 +837,7 @@ default.registry_mineral({
 	additional_craft={{
 		type = "cooking",
 		output = "default:uraniumactive_ingot",
-		recipe = "default:uranium_ingot",
+		recipe = "default:uranium_lump",
 		cooktime = 100
 	}}
 })
