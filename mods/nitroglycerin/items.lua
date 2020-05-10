@@ -45,10 +45,10 @@ minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
 		minetest.after(0.1, function(pos)
-			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 60)) do
 				ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=2000}})
 			end
-			nitroglycerin.explode(pos,{radius=40,set="air",blow_nodes=0})
+			nitroglycerin.explode(pos,{radius=25,set="air",drops=0})
 		end,pos)
 	end,
 	on_timer=function(pos, elapsed)
