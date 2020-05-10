@@ -61,8 +61,9 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 end,true)
 
 minetest.register_on_dieplayer(function(player)
-	if player_style.survive_black_death and not black_death_id then
-		player_style.players[player:get_player_name()].black_death_id = player:hud_add({
+	local p = player_style.players[player:get_player_name()]
+	if player_style.survive_black_death and not p.black_death_id then
+		p.black_death_id = player:hud_add({
 			hud_elem_type="image",
 			scale = {x=-100, y=-100},
 			name="black_death",
