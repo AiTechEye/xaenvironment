@@ -1551,7 +1551,7 @@ minetest.register_node("exatec:cmd", {
 	sounds = default.node_sound_stone_defaults(),
 	paramtype2 = "facedir",
 	on_construct = function(pos)
-		minetest.get_meta(pos)set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.save then
