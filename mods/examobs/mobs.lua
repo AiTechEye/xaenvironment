@@ -367,12 +367,10 @@ examobs.register_mob({
 			 {"default:mossycobble","default_cobble.png^default_stonemoss.png"},
 			 {"default:obsidian","default_obsidian.png"},
 		}
-		
 		local mat = t[math.random(1,7)]
 		local tex = {}
 		for i = 1,6,1 do
 			tex[i]=mat[2]
-
 		end
 		self.storage.tex = tex
 		self.inv={[mat[1]]=1}
@@ -395,6 +393,34 @@ examobs.register_mob({
 	end,
 })
 
+examobs.register_mob({
+	name = "underground_npc",
+	type = "monster",
+	team = "unpc",
+	dmg = 2,
+	textures={"examobs_underground_npc.png"},
+	mesh="character.b3d",
+	spawn_on={"default:stone","default:gravel","default:bedrock","default:cobble"},
+	inv={["examobs:flesh"]=1,["default:iron_ingot"]=1},
+	collisionbox = {-0.35,-0.01,-0.35,0.35,1.8,0.35},
+	aggressivity = 2,
+	walk_speed = 2,
+	run_speed = 4,
+	spawn_chance = 300,
+	light_min = 1,
+	light_max = 10,
+	bottom=1,
+	animation = {
+		stand={x=1,y=39,speed=30,loop=false},
+		walk={x=41,y=61,speed=30,loop=false},
+		run={x=80,y=99,speed=60},
+		lay={x=113,y=123,speed=0,loop=false},
+		attack={x=80,y=99,speed=60},
+	},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end
+})
 
 examobs.register_mob({
 	name = "skeleton",
