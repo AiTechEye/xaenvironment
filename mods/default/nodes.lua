@@ -1031,7 +1031,6 @@ minetest.register_node("default:cave_drops", {
 })
 
 minetest.register_node("default:stone_spike_drop", {
-	--light_source = 5,
 	description = "Stone spike drop",
 	tiles = {"default_stone.png"},
 	groups = {cracky=3,attached_node=1,on_load=1},
@@ -1068,33 +1067,15 @@ minetest.register_node("default:stone_spike_drop", {
 		minetest.get_node_timer(pos):start(math.random(1,10))
 	end,
 	on_construct = function(pos)
-		minetest.get_meta(pos):set_int("moved",1)
 		minetest.get_node_timer(pos):start(1)
 	end,
 	on_load = function(pos,node)
-		local m = minetest.get_meta(pos)
-		if m:get_int("moved") == 0 then
-			for i = 1,200, 1 do
-				local p = {x=pos.x,y=pos.y+i,z=pos.z}
-				if minetest.get_node(p).name ~= "air" then
-					local p2 = {x=p.x,y=p.y-1,z=p.z}
-					minetest.set_node(p2,{name="default:stone_spike_drop"})
-					minetest.get_meta(p2):set_int("moved",1)
-					minetest.get_node_timer(p2):start(1)
-					minetest.remove_node(pos)
-					return
-				end
-			end
-			--m:set_int("moved",1)
-			minetest.remove_node(pos)
-		end
-		--minetest.get_node_timer(pos):start(1)
+		minetest.get_node_timer(pos):start(1)
 	end
 })
 
 
 minetest.register_node("default:stone_spike", {
-	--light_source = 15,
 	description = "Stone spike",
 	tiles = {"default_stone.png"},
 	groups = {cracky=3,on_load=1},
@@ -1114,25 +1095,6 @@ minetest.register_node("default:stone_spike", {
 		}
 	},
 	sounds = default.node_sound_stone_defaults(),
-	on_construct = function(pos)
-		minetest.get_meta(pos):set_int("moved",1)
-	end,
-	on_load = function(pos,node)
-		local m = minetest.get_meta(pos)
-		if m:get_int("moved") == 0 then
-			for i = 1,200, 1 do
-				local p = {x=pos.x,y=pos.y-i,z=pos.z}
-				if minetest.get_node(p).name == "default:stone" then
-					local p2 = {x=p.x,y=p.y+1,z=p.z}
-					minetest.set_node(p2,{name="default:stone_spike"})
-					minetest.get_meta(p2):set_int("moved",1)
-					minetest.remove_node(pos)
-					return
-				end
-			end
-			minetest.remove_node(pos)
-		end
-	end
 })
 
 
