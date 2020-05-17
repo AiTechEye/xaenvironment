@@ -180,6 +180,16 @@ minetest.register_decoration({
 	flags = "all_floors",
 })
 
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:mine_shaft",
+	wherein= "default:stone",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 5,
+	y_min= -31000,
+	y_max= 0,
+})
+
 --||||||||||||||||
 -- ======================= biomes
 --||||||||||||||||

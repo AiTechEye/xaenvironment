@@ -1094,3 +1094,23 @@ minetest.register_node("default:stone_with_moss", {
 	groups = {stone=1,cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+minetest.register_node("default:mine_shaft", {
+	description = "Mine shaft",
+	drop = "default:cobble",
+	tiles={"default_stone.png"},
+	groups = {cracky=3,on_load=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		minetest.remove_node(pos)
+	end,
+	on_load = function(pos,node)
+		for i = 0,20, 1 do
+			local p = {x=pos.x,y=pos.y-i,z=pos.z}
+			if minetest.get_node(p).name == "air" then
+				return
+			end
+			minetest.remove_node(p)
+		end
+	end
+})
