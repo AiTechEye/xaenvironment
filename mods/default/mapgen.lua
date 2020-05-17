@@ -101,9 +101,9 @@ minetest.register_decoration({
 	place_on = "default:stone",
 	sidelen = 16,
 	noise_params = {
-		offset = 00.1,
-		scale = 00.2,
-		spread = {x = 100, y = 100, z = 100},
+		offset = 0.01,
+		scale = 0.02,
+		spread = {x = 500, y = 500, z = 500},
 		octaves = 3,
 		persist = 0.6
 	},
@@ -118,8 +118,8 @@ minetest.register_decoration({
 	place_on = "default:stone",
 	sidelen = 16,
 	noise_params = {
-		offset = 00.1,
-		scale = 00.2,
+		offset = 0.01,
+		scale = 0.02,
 		spread = {x = 100, y = 100, z = 100},
 		octaves = 3,
 		persist = 0.6
