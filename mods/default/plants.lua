@@ -97,6 +97,7 @@ default.register_pebble=function(def)
 		y_max = ddef.y_max or 31000,
 		decoration = mod.."pebble_" ..name,
 		spawn_by = ddef.spawn_by,
+		flags = ddef.flags or nil,
 	})
 
 	if block then
