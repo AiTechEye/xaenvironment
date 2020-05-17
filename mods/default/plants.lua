@@ -501,7 +501,6 @@ minetest.register_lbm({
 	nodenames={"group:decoration_spawner"},
 	run_at_every_load =true,
 	action=function(pos,node)
-		print(minetest.pos_to_string(pos))
 		minetest.registered_nodes[node.name].on_decoration_spawn(pos)
 	end
 

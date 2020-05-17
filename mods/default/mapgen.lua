@@ -96,6 +96,79 @@ minetest.register_ore({
 	y_max= 1,
 })
 
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = "air",
+	sidelen = 16,
+	noise_params = {
+		offset = 0.1,
+		scale = 0.2,
+		spread = {x = 100, y = 100, z = 100},
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = -30000,
+	y_max = 0,
+	decoration = "default:cave_drops",
+	spawn_by = "default:stone",
+	place_offset_y = -1,
+})
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = "air",
+	sidelen = 16,
+	noise_params = {
+		offset = 0.1,
+		scale = 0.2,
+		spread = {x = 100, y = 100, z = 100},
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = -30000,
+	y_max = 0,
+	decoration = "default:stone_spike_drop",
+	spawn_by = "default:stone",
+	place_offset_y = -1,
+})
+
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = "air",
+	sidelen = 16,
+	noise_params = {
+		offset = 0.1,
+		scale = 0.2,
+		spread = {x = 100, y = 100, z = 100},
+		octaves = 3,
+		persist = 0.6
+	},
+	y_min = -30000,
+	y_max = 0,
+	decoration = "default:stone_spike",
+	place_offset_y = 1,
+})
+
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:stone_with_red_moss",
+	wherein= "default:stone",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 15,
+	y_min= -30000,
+	y_max= 0,
+})
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "default:stone_with_moss",
+	wherein= "default:stone",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 15,
+	y_min= -30000,
+	y_max= 0,
+})
+
+
 --||||||||||||||||
 -- ======================= biomes
 --||||||||||||||||
