@@ -1038,7 +1038,6 @@ minetest.register_node("default:stone_spike_drop", {
 	sunlight_propagates = true,
 	paramtype = "light",
 	damage_per_second = 20,
-	walkable = false,
 	drawtype = "nodebox",
 	node_box = {
 		type = "fixed",
@@ -1078,8 +1077,8 @@ minetest.register_node("default:stone_spike_drop", {
 minetest.register_node("default:stone_spike", {
 	description = "Stone spike",
 	tiles = {"default_stone.png"},
-	groups = {cracky=3,on_load=1},
-	damage_per_second = 20,
+	groups = {cracky=3,stone=1},
+	damage_per_second = 1,
 	sunlight_propagates = true,
 	paramtype = "light",
 	walkable = false,
