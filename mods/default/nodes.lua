@@ -984,7 +984,6 @@ minetest.register_node("default:oil_flowing", {
 })
 
 minetest.register_node("default:cave_drops", {
-	light_source = 15,
 	description = "Cave drops",
 	drawtype = "airlike",
 	groups = {dig_immediate=3,attached_node=1,on_load=1,not_in_creative_inventory=1},
