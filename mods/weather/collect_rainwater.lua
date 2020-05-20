@@ -4,7 +4,6 @@ weather.while_rain=function(pos)
 			minetest.registered_nodes[minetest.get_node(pos).name].on_rain(pos)
 		end
 	end
-
 end
 
 minetest.register_lbm({
@@ -68,7 +67,7 @@ minetest.register_node("weather:woodenbarrel2", {
 })
 
 minetest.register_tool("weather:umbrella", {
-	description = "Umbrella",
+	description = "Umbrella (stops the weather)",
 	inventory_image = "weather_umbrella.png",
 	on_use=function(itemstack, user, pointed_thing)
 		local stops
@@ -92,5 +91,14 @@ minetest.register_craft({
 		{"group:wood","","group:wood"},
 		{"group:wood","","group:wood"},
 		{"group:wood","group:wood","group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output="weather:woodenbarrel",
+	recipe={
+		{"default:gold_ingot","default:gold_ingot","default:gold_ingot"},
+		{"","default:gold_ingot",""},
+		{"","default:gold_ingot",""},
 	},
 })
