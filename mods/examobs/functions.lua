@@ -689,7 +689,8 @@ examobs.dying=function(self,set)
 	end
 
 	if self.dying then
-		self.object:set_velocity({x=0,y=self.object:get_velocity().y,z=0})
+		local v = self.object:get_velocity() or {x=0,y=0,z=0}
+		self.object:set_velocity({x=0,y=v.y,z=0})
 		if self.hp<=self.hp_max*-1 then
 			examobs.dying(self,2)
 			return self
