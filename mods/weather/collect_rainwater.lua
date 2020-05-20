@@ -67,6 +67,25 @@ minetest.register_node("weather:woodenbarrel2", {
 	}
 })
 
+minetest.register_tool("weather:umbrella", {
+	description = "Umbrella",
+	inventory_image = "weather_umbrella.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local stops
+		local pos=user:get_pos()
+		for i, w in pairs(weather.currweather) do
+			if vector.distance(w.pos,pos)<w.size and pos.y>-20 and pos.y<120 then
+				stops = true
+				weather.currweather[i]=nil
+			end
+		end
+		if stops then
+			itemstack:add_wear(600)
+		end
+		return itemstack
+	end
+})
+
 minetest.register_craft({
 	output="weather:woodenbarrel",
 	recipe={
