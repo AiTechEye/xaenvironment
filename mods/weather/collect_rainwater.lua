@@ -95,7 +95,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="weather:woodenbarrel",
+	output="weather:umbrella",
 	recipe={
 		{"default:gold_ingot","default:gold_ingot","default:gold_ingot"},
 		{"","default:gold_ingot",""},
