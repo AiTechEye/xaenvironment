@@ -7,6 +7,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:telescopic",
+	recipe={
+		{"default:copper_ingot","default:glass_tabletop","default:copper_ingot"},
+		{"default:copper_ingot","","default:copper_ingot"},
+		{"default:copper_ingot","default:glass_tabletop","default:copper_ingot"},
+	},
+})
+
+minetest.register_craft({
 	output="default:quantum_pick",
 	recipe={
 		{"default:quantumblock","default:quantumblock","default:quantumblock"},

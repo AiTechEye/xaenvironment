@@ -26,6 +26,52 @@ minetest.register_tool("default:wrench", {
 	end
 })
 
+minetest.register_tool("default:telescopic", {
+	description = "Telescopic",
+	groups = {treasure=1},
+	inventory_image = "default_telescopic.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local z = user:get_properties().zoom_fov
+		local key=user:get_player_control()
+		if key.sneak == false then
+			if z <= 0 then
+				z = 10
+			else
+				z = z - 1	
+			end
+		else
+			if z >= 10 then
+				z = 0
+			else
+				z = z + 1	
+			end
+		end
+		user:set_properties({zoom_fov=z})
+		local name = user:get_player_name()
+		local p = minetest.get_player_privs(name)
+		if p.zoom then
+			return itemstack
+		end
+		p.zoom = true
+		minetest.get_player_privs(name,p)
+		default.telescopic_check(user,user:get_wield_index())
+	end
+})
+
+default.telescopic_check=function(user,i)
+	minetest.after(1,function(user,i)
+		if user and user:get_pos() and user:get_inventory():get_stack("main",i):get_name() ~= "default:telescopic" then
+			local name = user:get_player_name()
+			user:set_properties({zoom_fov=0})
+			local p = minetest.get_player_privs(name)
+			p.zoom = false
+			minetest.get_player_privs(name,p)
+		else
+			default.telescopic_check(user,i)
+		end
+	end,user,i)
+end
+
 minetest.register_craftitem("default:gold_flake", {
 	description = "Gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
