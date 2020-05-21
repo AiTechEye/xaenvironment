@@ -1217,7 +1217,7 @@ examobs.register_bird({
 	end,
 	before_punching=function(self)
 		local en = self.fight:get_luaentity()
-		if en and examobs.gethp(self.fight)-self.dmg <=0 then
+		if en and examobs.gethp(self.fight)-self.dmg <=0 and en.inv then
 			en.inv["examobs:feather"]=nil
 			en.inv["examobs:chickenleg"]=nil
 		end
