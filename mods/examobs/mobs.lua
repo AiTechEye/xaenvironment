@@ -121,12 +121,14 @@ examobs.register_mob({
 				d=d*0.05
 				local p=examobs.pointat(self,4)
 				minetest.after(0.7, function(p,d,self)
-					local pos2=self.fight:get_pos()
-					local pos1=self.object:get_pos()
-					if not (pos1 and pos2 and self) then return end
-					local d={x=examobs.num((pos2.x-pos1.x)*d),y=examobs.num((pos2.y-pos1.y)*d),z=examobs.num((pos2.z-pos1.z)*d)}
-					examobs.lookat(self,pos2)
-					minetest.add_entity({x=p.x,y=p.y+3,z=p.z}, "examobs:icecreamball"):set_velocity(d)
+					if self.fight then
+						local pos2=self.fight:get_pos()
+						local pos1=self.object:get_pos()
+						if not (pos1 and pos2 and self) then return end
+						local d={x=examobs.num((pos2.x-pos1.x)*d),y=examobs.num((pos2.y-pos1.y)*d),z=examobs.num((pos2.z-pos1.z)*d)}
+						examobs.lookat(self,pos2)
+						minetest.add_entity({x=p.x,y=p.y+3,z=p.z}, "examobs:icecreamball"):set_velocity(d)
+					end
 				end,p,d,self)
 					minetest.after(1.2, function(self)
 						if not self.object:get_pos() then return end
