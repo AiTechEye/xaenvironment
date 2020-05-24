@@ -297,7 +297,7 @@ exatec.create_env=function(A,g)
 				elseif type(data) ~= "table" then
 					data = {data}
 				end
-				exatec.data_send(g.pos,to_channel,"",data)
+				exatec.data_send(g.pos,to_channel,minetest.get_meta(g.pos):get_string("channel"),data)
 			end,
 		},
 		timeout=function(n)

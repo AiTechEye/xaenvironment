@@ -5,6 +5,7 @@ exatec={
 	wire_signals={},
 	wire_data_sends={last=os.time(),times=0},
 	wire_data_signals={},
+	temp = {},
 }
 
 dofile(minetest.get_modpath("exatec") .. "/functions.lua")
