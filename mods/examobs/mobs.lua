@@ -1102,8 +1102,6 @@ examobs.register_bird({
 				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.item) <= 1 then
-				print("=========")
-				print(self.item:get_luaentity())
 				local item = string.split(self.item:get_luaentity().itemstring.." "," ")
 				if minetest.get_item_group(item[1],"eatable") > 0 then
 					self:eat_item(item[1])
