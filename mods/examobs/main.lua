@@ -5,6 +5,12 @@ examobs.main=function(self, dtime)
 		self.timer1 = 0
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
+
+	if self.object:get_velocity() == nil then
+		self.object:remove()
+		return
+	end
+
 	if self:on_abs_step() or self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 
