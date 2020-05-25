@@ -6,15 +6,6 @@ weather.while_rain=function(pos)
 	end
 end
 
-minetest.register_lbm({
-	name="weather:collect_rainwater",
-	nodenames={"group:collect_rainwater"},
-	run_at_every_load = true,
-	action=function(pos,node)
-		weather.while_rain(pos)
-	end
-})
-
 minetest.register_node("weather:woodenbarrel", {
 	description = "Wooden barrel (collect rainwater)",
 	tiles={"default_wood.png","default_wood.png","default_wood.png"},
@@ -41,6 +32,7 @@ minetest.register_node("weather:woodenbarrel", {
 	end,
 	on_timer = function (pos, elapsed)
 		weather.while_rain(pos)
+		return true
 	end,
 })
 
