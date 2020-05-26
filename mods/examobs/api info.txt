@@ -27,7 +27,8 @@ examobs.register_mob({
 	floating =	 {}			-- {["default:water_source"]=1,["default:gass"]=true}
 	floating_in_group =		-- alternative to above, "water"
 	updatetime = 1			-- run/cycle time
-	spawn_chance = 100,
+	spawning = nil			-- nil/false automatic spawning, false = no spawning
+	spawn_chance = 100
 	spawn_on = {"group:dirt","group:sand"}
 	spawn_in =			-- node or group-name
 	light_min = 9

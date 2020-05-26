@@ -326,6 +326,10 @@ examobs.register_mob=function(def)
 		})
 	end
 
+	if def.spawning == false then
+		return
+	end
+
 	minetest.register_abm({
 		nodenames = def.spawn_on,
 		interval = def.spawn_interval or 30,
