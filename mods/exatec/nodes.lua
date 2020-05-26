@@ -1476,7 +1476,9 @@ minetest.register_node("exatec:pcb", {
 			.."label[-0.2,0.5;"..err.."]"
 			.."tooltip[channel;Channel]"
 			.."label[4.5,-0.2;"..memory.."MB]"
-			.."label[6,-0.2;"..(limit or 0).."/10000 Events]"
+			.."label[6.5,-0.2;"..(limit or 0).."/10000 Events]"
+			.."label[6.5,0.2;Incoming variable: event]"
+			.."label[6.5,0.6;storage variable: storage]"
 			)
 		end
 	end,

@@ -320,12 +320,15 @@ exatec.create_env=function(A,g)
 		end,
 		print=function(b)
 			b = b or ""
-			minetest.chat_send_player(A.user,"(PCB"..id..") "..b)
+			if type(b) == "table" then
+				b = dump(b)
+			end
+			minetest.chat_send_player(A.user,"(PCB "..id..") "..b)
 			g.count = g.count + 500
 		end,
 		dump=function(p)
 			p = p or ""
-			minetest.chat_send_player(A.user,"(PCB"..id..") (dump) ========== ")
+			minetest.chat_send_player(A.user,"(PCB "..id..") (dump) ========== ")
 			minetest.chat_send_player(A.user,dump(p))
 			g.count = g.count + 4000
 		end,
