@@ -257,6 +257,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:node_constructor",
+	recipe={
+		{"exatec:node_breaker","exatec:datawire","materials:diode"},
+		{"default:quantumblock","exatec:pcb","default:uraniumactive_ingot"},
+		{"default:steel_ingot","materials:plastic_sheet","default:steel_ingot"},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:cmd",
 	recipe={
 		{"exatec:wire","materials:plastic_sheet","exatec:wire"},

@@ -12,6 +12,10 @@ exatec.samepos=function(p1,p2)
 	return p1.x == p2.x and p1.y == p2.y and p1.z == p2.z
 end
 
+exatec.is_pos=function(p)
+	return type(p) == "table" and type(p.x) == "number" and type(p.y) == "number" and type(p.z) == "number"
+end
+
 exatec.test_input=function(pos,stack,opos,cpos)
 	local a = exatec.def(pos)
 	local def = exatec.getnodedefpos(pos)
@@ -49,6 +53,7 @@ exatec.input=function(pos,stack,opos,cpos)
 			return false
 		end
 		inv:add_item(a.input_list,stack)
+		re = true
 	end
 	if a.on_input then
 		a.on_input(pos,stack,opos,cpos)
@@ -76,7 +81,7 @@ exatec.output=function(pos,stack,opos)
 	if def.on_metadata_inventory_take then
 		def.on_metadata_inventory_take(pos, a.output_list, 1, stack, "")
 	end
-	return new_stack					
+	return new_stack
 end
 
 exatec.send=function(pos, force_ignored_pos,forcepos,ignore_pos)
@@ -181,6 +186,8 @@ exatec.data_send=function(pos,channel,from_channel,data)
 		data = data or {}
 		data.channel = channel
 		data.from_channel = from_channel
+		data.from_pos = pos
+		data.owner = minetest.get_meta(pos):get_string("owner")
 		exatec.wire_data_signals[na]={jobs={[na]=pos},data=data}
 		minetest.after(0, function()
 			exatec.wire_data_leading()
@@ -236,6 +243,29 @@ exatec.run_code=function(text,A)
 	A = A or {}
 	local s
 	local m = minetest.get_meta(A.pos)
+
+	local ccp = m:get_string("connected_constructor")
+	local findc = string.find(string.lower(text),"node.")
+
+	if ccp ~= "" and findc then
+		local cc = minetest.string_to_pos(ccp)
+		if minetest.get_node(cc).name == "exatec:node_constructor" then
+			local cccp = minetest.get_meta(cc):get_string("connection")
+			if cccp ~= "" and exatec.samepos(minetest.string_to_pos(cccp),A.pos) then
+				if exatec.temp.constructor then
+					return
+				end
+				exatec.temp.constructor = {constructor=cc,pcb=A.pos}
+			else
+				minetest.get_meta(cc):get_string("connection","")
+			end
+		else
+			m:set_string("connected_constructor","")
+		end
+	elseif findc then
+		return "Connect a ''Node constructor'' to use the node functions"
+	end
+
 	local g={count = 0,pos=vector.new(A.pos),storage=minetest.deserialize(m:get_string("storage")) or {}}
 	--local id = g.pos and minetest.pos_to_string(g.pos) or ""
 	local F=function()
@@ -248,10 +278,10 @@ exatec.run_code=function(text,A)
 			debug.sethook(
 				function()
 					g.count = g.count + 1
-					if g.count >= 10000 then
+					if g.count >= 100000 then
 						debug.sethook()
 						--print(id.." Overheated (event limit) ("..g.count.."/10000)")
-						error(" Overheated (event limit) ("..g.count.."/10000)",1)
+						error(" Overheated (event limit) ("..g.count.."/100000)",1)
 					end
 				end,"",2
 			)
@@ -269,6 +299,7 @@ exatec.run_code=function(text,A)
 	end
 	local s,err = pcall(F)
 	debug.sethook()
+	exatec.temp.constructor = nil
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
@@ -389,6 +420,58 @@ exatec.create_env=function(A,g)
 			difftime=os.difftime,
 			clock=os.clock,
 			time=os.time,
-		}
+		},
+		node = {
+			dig=exatec.dig_node,
+			place=exatec.place_node,
+		},
 	}
+end
+
+exatec.power_node=function(pos)
+	local p = exatec.temp.constructor.constructor
+	if minetest.is_singleplayer() == false and vector.distance(pos,p) > 50 then
+		error("Max distance is 50 in online")
+	end
+	local m = minetest.get_meta(p)
+	local power = m:get_int("power")
+	if power > 0 then
+		m:set_int("power",power-1)
+		return true
+	else
+		local a = {["default:iron_ingot"]=120,["default:bronze_ingot"]=100,["default:copper_ingot"]=70,["default:flint"]=50,["default:cloud"]=170,["default:steel_ingot"]=150,["default:diamond"]=200}
+		for i,v in pairs(a) do
+			if exatec.test_output(p,ItemStack(i),p,p) then
+				m:set_int("power",v)
+				exatec.output(p,ItemStack(i),p)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+exatec.place_node=function(pos,name)
+	if exatec.temp.constructor.constructor
+	and minetest.registered_nodes[name]
+	and not minetest.is_protected(pos, minetest.get_meta(exatec.temp.constructor.pcb):get_string("owner"))
+	and (minetest.registered_nodes[minetest.get_node(pos).name] or {}).buildable_to
+	and exatec.power_node(pos)
+	and exatec.test_output(exatec.temp.constructor.constructor,ItemStack(name),pos) then
+		minetest.add_node(pos,{name=name})
+		exatec.output(exatec.temp.constructor.constructor,ItemStack(name),pos)
+
+	end
+end
+
+exatec.dig_node=function(pos)
+	if exatec.temp.constructor.constructor
+	and minetest.get_node_drops(pos)[1] ~= ""
+	and not minetest.is_protected(pos, minetest.get_meta(exatec.temp.constructor.pcb):get_string("owner"))
+	and exatec.power_node(pos)
+	and exatec.test_input(exatec.temp.constructor.constructor,ItemStack(name),pos,pos) then
+		local name = minetest.get_node(pos).name
+		minetest.remove_node(pos)
+		exatec.input(exatec.temp.constructor.constructor,ItemStack(name),pos,pos)
+	end
 end

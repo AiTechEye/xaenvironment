@@ -1014,8 +1014,8 @@ minetest.register_node("exatec:node_breaker", {
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
 	after_place_node = function(pos, placer, itemstack)
-		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
 		local meta = minetest.get_meta(pos)
+		meta:set_string("owner",placer:get_player_name())
 		meta:set_int("range",1)
 		meta:set_string("infotext","Range (1)")
 	end,
@@ -1421,6 +1421,7 @@ minetest.register_node("exatec:pcb", {
 			local user = sender:get_player_name()
 			local channel = pressed.channel or m:get_string("channel")
 			m:set_string("channel",channel)
+			m:set_string("owner",sender:get_player_name())
 			local text,err,limit = pressed.text or m:get_string("text")
 			m:set_string("text",text)
 			m:set_string("channel",channel)
@@ -1431,7 +1432,8 @@ minetest.register_node("exatec:pcb", {
 				err,limit =exatec.run_code(text,{type={run=true},pos=pos,channel=channel,user=user})
 				memory = math.floor((memory_mb()-mb)*1000)/1000
 			end
-			err = err and err:sub(8,-1) or (m:get_int("timeout") == 1 and (m:get_int("timeout_count").."/100 runs/s")) or ""
+
+			err = err  or (m:get_int("timeout") == 1 and (m:get_int("timeout_count").."/100 runs/s")) or ""
 			if err == "" then
 				m:set_int("error",0)
 			end
@@ -1473,13 +1475,32 @@ minetest.register_node("exatec:pcb", {
 			.."textarea[0,1;10.5,12;text;;"..text.."]"
 			..list
 			.."field[2,1;3,0.1;listin;;"..listin.."]"
-			.."label[-0.2,0.5;"..err.."]"
+			.."label[0,0.5;"..err.."]"
 			.."tooltip[channel;Channel]"
 			.."label[4.5,-0.2;"..memory.."MB]"
 			.."label[6.5,-0.2;"..(limit or 0).."/10000 Events]"
 			.."label[6.5,0.2;Incoming variable: event]"
 			.."label[6.5,0.6;storage variable: storage]"
-			)
+
+			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png;info;]"
+			.."tooltip[info;"
+			.."storage variable: storage"
+			.."\nincomming event variable: event"
+			.."\napos(pos,x,y,z) add to pos/vector"
+			.."\nexatec.send(x,y,z) send signal"
+			.."\nexatec.data_send(channel,data) data can be string number and table, eg: {connect=true}"
+			.."\ntimeout(n)"
+			.."\ninterval(n)"
+			.."\nstop(n) stop interval/timeout"
+			.."\nprint(var) print to chatt"
+			.."\ndump(var) print to chatt"
+
+			.."\nto use node functions, do exatec.data_send(''channel'',{connect=true}) to a ''Node constructor'' once\n"
+
+			.."\nnode.dig(pos)"
+			.."\nnode.place(pos,name)"
+
+			.."]")
 		end
 	end,
 	exatec={
@@ -1822,5 +1843,66 @@ minetest.register_node("exatec:vacuumtransport", {
 		if p == nil or minetest.get_meta(p):get_string("pos") == "" then
 			minetest.remove_node(pos)
 		end
+	end,
+})
+
+minetest.register_node("exatec:node_constructor", {
+	description = "Node constructor",
+	tiles = {"exatec_pcb.png^[invert:bg"},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_data_wire_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype="nodebox",
+	paramtype="light",
+	sunlight_propagates=true,
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		inv:set_size("main", 48)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.save and minetest.is_protected(pos, sender:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local channel = pressed.channel or m:get_string("channel")
+			m:set_string("channel",channel)
+			m:set_string("formspec",
+				"size[8,11]" 
+				.."listcolors[#77777777;#777777aa;#000000ff]"
+				.."item_image[0,1;1,1;default:flint]"
+				.."item_image[1,1;1,1;default:copper_ingot]"
+				.."item_image[2,1;1,1;default:bronze_ingot]"
+				.."item_image[3,1;1,1;default:iron_ingot]"
+				.."item_image[4,1;1,1;default:steel_ingot]"
+				.."item_image[5,1;1,1;default:cloud]"
+				.."item_image[6,1;1,1;default:diamond]"
+
+				.."label[4,0;"..(m:get_string("connection") ~= "" and ("Connected ".. m:get_string("connection")) or "Not connected").."]" 
+				.."label[0,0.5;Storage/Fuel]" 
+				.."label[4,0.5;Power ("..m:get_int("power")..")]" 
+				.."field[0.3,0;3,1;channel;;"..channel.."]"
+				.."button_exit[3,-0.3;1,1;save;Save]"
+				.."tooltip[channel;Channel (send ''connect=true'' to connect)]"
+				.."list[context;main;0,1;8,6;]" 
+				.."list[current_player;main;0,7.3;8,4;]" 
+				.."listring[current_player;main]" 
+				.."listring[current_name;main]" 
+			)
+		end
+	end,
+	exatec={
+		input_list="main",
+		output_list="main",
+		on_data_wire=function(pos,data)
+			local m = minetest.get_meta(pos)
+			if exatec.is_pos(data.from_pos) and minetest.get_node(data.from_pos).name == "exatec:pcb" and data.connect then
+				m:set_string("connection",minetest.pos_to_string(data.from_pos))
+				minetest.get_meta(data.from_pos):set_string("connected_constructor",minetest.pos_to_string(pos))
+				minetest.get_meta(pos):set_string("formspec","size[4,1]button_exit[0,0;4,1;save;Connection successful!]")
+			end
+		end,
+	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
 	end,
 })
