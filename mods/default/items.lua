@@ -147,6 +147,23 @@ minetest.register_tool(":", {
 	}
 })
 
+minetest.register_tool("default:knuckles", {
+	description ="Knuckles",
+	inventory_image = "default_knuckles.png",
+	tool_capabilities = not default.creative and {
+		full_punch_interval = 1,
+		max_drop_level = 0,
+		groupcaps={
+			no_break = {},
+			crumbly = {times={[2]=2.5, [3]=0.5}, uses=0, maxlevel=1},
+			snappy = {times={[2]=1.7,[3]=0.5}, uses=0, maxlevel=1},
+			oddly_breakable_by_hand = {times={[1]=4,[2]=3,[3]=2}, uses=0},
+			dig_immediate={times={[1]=1.5,[2]=1,[3]=0}, uses=0}
+		},
+		damage_groups = {fleshy=4},
+	}
+})
+
 minetest.register_tool("default:admin_pickaxe", {
 	description ="Admin pickaxe",
 	range = 15,
@@ -156,6 +173,7 @@ minetest.register_tool("default:admin_pickaxe", {
 		full_punch_interval = 0.20,
 		max_drop_level = 3,
 		groupcaps = {
+			no_break = {},
 			unbreakable={times={[1]=0,[2]=0,[3]=0},uses=0,maxlevel=3},
 			fleshy={times={[1]=0,[2]=0,[3]=0},uses=0,maxlevel=3},
 			choppy={times={[1]=0,[2]=0,[3]=0},uses=0,maxlevel=3},
