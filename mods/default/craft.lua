@@ -7,6 +7,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:knuckles",
+	recipe={
+		{"default:steel_ingot","default:steel_ingot",""},
+		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
+		{"","default:steel_ingot","default:steel_ingot"},
+	},
+})
+
+minetest.register_craft({
 	output="default:telescopic",
 	recipe={
 		{"default:copper_ingot","default:glass_tabletop","default:copper_ingot"},
