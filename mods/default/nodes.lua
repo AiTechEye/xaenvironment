@@ -78,6 +78,7 @@ minetest.register_node("default:wool", {
 })
 
 minetest.register_node("default:quantumblock", {
+	description = "Quantum block",
 	tiles={"default_quantumblock.png"},
 	groups = {cracky=1,level=2,treasure=3},
 	paramtype = "light",
