@@ -1023,7 +1023,7 @@ minetest.register_node("default:stone_spike_drop", {
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
 	paramtype = "light",
-	damage_per_second = 20,
+	damage_per_second = 5,
 	drawtype = "nodebox",
 	node_box = {
 		type = "fixed",
