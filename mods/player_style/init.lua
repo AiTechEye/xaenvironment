@@ -355,6 +355,7 @@ minetest.register_globalstep(function(dtime)
 				a="walk"
 				local p = player:get_pos()
 				local pr = player_style.player_dive[name]
+				local v = player:get_player_velocity()
 
 				if pr and pr.kong then
 					if default.defpos({x=p.x,y=p.y-0.1,z=p.z},"walkable") then
@@ -375,7 +376,7 @@ minetest.register_globalstep(function(dtime)
 						hunger = -0.0005
 					end
 					if run and run.wallrun then
-						local d=player:get_look_dir()
+						local d = player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
 						local v = player:get_player_velocity()
 						hunger = -0.002
@@ -402,7 +403,7 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 				end
-				if player:get_player_velocity().y < 0 and not default.defpos(apos(p,0,-1),"walkable") then
+				if v.y < 0 and not default.defpos(apos(p,0,-1),"walkable") then
 					local d = player:get_look_dir()
 					local w = vector.add(apos(p,0),{x=d.x,y=0,z=d.z})
 					if default.defpos(apos(w,0,1),"walkable") and not default.defpos(apos(w,0,2),"walkable") then
@@ -415,7 +416,27 @@ minetest.register_globalstep(function(dtime)
 							minetest.set_node(apos(p,0,0),{name="player_style:edgehook"})
 						end
 					end
+
+				elseif key.jump and vector.distance(vector.new(),v) < 5 then--and  not (key.left or key.right) then
+
+					local ly = player:get_look_yaw()
+					local x1 =math.sin(ly) * -1
+					local z1 =math.cos(ly)
+					local x2 =math.sin(ly)
+					local z2 =math.cos(ly) * -1
+					local l = default.defpos({x=p.x+x1,y=p.y,z=p.z+z1},"walkable")
+					local r = default.defpos({x=p.x+x2,y=p.y,z=p.z+z2},"walkable")
+
+					if l then
+						local d = player:get_look_dir()
+						player:add_player_velocity({x=d.x+(x2*4),y=1,z=d.z+(z2*4)})
+					elseif r then
+						local d = player:get_look_dir()
+						player:add_player_velocity({x=d.x+(x1*4),y=1,z=d.z+(z1*4)})
+					end
 				end
+
+
 			elseif key.sneak or minetest.get_item_group(minetest.get_node(player:get_pos()).name,"liquid") > 0 then
 				a = "fly"
 				player_style.player_diveing(name,player,true)
