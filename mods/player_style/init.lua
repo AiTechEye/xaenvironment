@@ -417,7 +417,7 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 
-				elseif key.jump and vector.distance(vector.new(),v) < 5 then--and  not (key.left or key.right) then
+				elseif key.aux1 and key.jump and vector.distance(vector.new(),v) < 9 then--and  not (key.left or key.right) then
 
 					local ly = player:get_look_yaw()
 					local x1 =math.sin(ly) * -1
