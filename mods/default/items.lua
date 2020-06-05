@@ -854,6 +854,9 @@ default.registry_mineral({
 					end
 				end,target,name,user)
 			end
+			if self then
+				bows.arrow_remove(self)
+			end
 		end
 
 	},
