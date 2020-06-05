@@ -354,7 +354,16 @@ minetest.register_globalstep(function(dtime)
 				hunger = -0.0002
 				a="walk"
 				local p = player:get_pos()
-				if key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
+				local pr = player_style.player_dive[name]
+
+				if pr and pr.kong then
+					if default.defpos({x=p.x,y=p.y-0.1,z=p.z},"walkable") then
+						pr.kong = nil
+						player_style.player_diveing(name,player)
+					else
+						a="dive"
+					end
+				elseif key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
 					hunger = -0.0005
 					a="dive"
 					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
@@ -382,6 +391,14 @@ minetest.register_globalstep(function(dtime)
 							player:set_physics_override({jump=1.25})
 							run.wallrun = 1
 							hunger = -0.05
+						elseif key.up and not (key.down or key.left or key.right)
+						and default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") 
+						and default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
+						and not default.defpos({x=p.x+(d.x*2),y=p.y+1,z=p.z+(d.z*2)},"walkable") then
+							player:set_pos(apos(p,0,1,0))
+							a="dive"
+							player_style.player_diveing(name,player,true,nil,{x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)})
+							player:add_player_velocity({x=d.x*20,y=5,z=d.z*20})
 						end
 					end
 				end
@@ -476,10 +493,10 @@ player_style.player_run=function(name,player,a)
 	end
 end
 
-player_style.player_diveing=function(name,player,a,water)
+player_style.player_diveing=function(name,player,a,water,kong)
 	if a and not player_style.player_dive[name] then
 		player_style.player_run(name,player)
-		player_style.player_dive[name] = {}
+		player_style.player_dive[name] = {kong = kong}
 		player:set_properties({
 			eye_height = 0.6,
 			collisionbox = {-0.35,0,-0.35,0.35,0.49,0.35},
@@ -488,17 +505,21 @@ player_style.player_diveing=function(name,player,a,water)
 		player:set_physics_override({
 			jump= water == 0 and 0 or 1,
 		})
-	elseif not a and player_style.player_dive[name] then
-		local profile=player_style.registered_profiles[player_style.players[name].profile]
-		player_style.player_dive[name] = nil
-		player:set_properties({
-			eye_height = profile.eye_height,
-			collisionbox = profile.collisionbox,
-			stepheight = profile.stepheight,
-		})
-		player:set_physics_override({
-			jump=1,
-			speed = 1,
-		})
+	else
+		local pr =  player_style.player_dive[name]
+		local p = player:get_pos()
+		if not a and pr and (pr.kong == nil or player:get_player_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
+			local profile=player_style.registered_profiles[player_style.players[name].profile]
+			player_style.player_dive[name] = nil
+			player:set_properties({
+				eye_height = profile.eye_height,
+				collisionbox = profile.collisionbox,
+				stepheight = profile.stepheight,
+			})
+			player:set_physics_override({
+				jump=1,
+				speed = 1,
+			})
+		end
 	end
 end
