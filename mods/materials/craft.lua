@@ -31,7 +31,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:plant_extracts",
+	output="materials:plant_extracts 4",
 	recipe={
 		{"group:leaves","group:leaves","group:leaves"},
 		{"group:leaves","group:leaves","group:leaves"},
