@@ -197,6 +197,14 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:stone_spike 4",
+	recipe={
+		{"","group:stone",""},
+		{"group:stone","group:stone","group:stone"},
+	},
+})
+
+minetest.register_craft({
 	type = "cooking",
 	output="default:water_source",
 	recipe="default:ice"
