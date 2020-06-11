@@ -103,20 +103,20 @@ minetest.register_craft({
 	output="materials:fanblade_metal 10",
 	recipe={
 		{"","default:iron_ingot",""},
-		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
 		{"","default:iron_ingot",""},
+		{"default:iron_ingot","","default:iron_ingot"},
 	}
 })
 minetest.register_craft({
 	output="materials:fanblade_plastic 10",
 	recipe={
 		{"","materials:plastic_sheet",""},
-		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
 		{"","materials:plastic_sheet",""},
+		{"materials:plastic_sheet","","materials:plastic_sheet"},
 	}
 })
 minetest.register_craft({
-	output="materials:tube_metal 6",
+	output="materials:tube_metal 10",
 	recipe={
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
 		{"","",""},
@@ -131,7 +131,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:sawblade 2",
+	output="materials:sawblade 3",
 	recipe={
 		{"default:iron_lump","default:iron_ingot","default:iron_lump"},
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
@@ -140,7 +140,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:spaceyfloor 9",
+	output="materials:spaceyfloor 10",
 	recipe={
 		{"default:steel_lump","default:iron_ingot","default:steel_lump"},
 		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},
