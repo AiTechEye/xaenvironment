@@ -179,7 +179,7 @@ minetest.register_entity("air_balloons:balloon",{
 					self.rise = true
 				end
 
-				self.fuel = self.fuel -1
+				self.fuel = self.fuel -0.1
 				minetest.chat_send_player(self.owner, self.fuel .." fuel left")
 			elseif key.sneak and n == "air" then
 				self.anim(self,"off")
