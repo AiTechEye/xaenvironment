@@ -343,13 +343,12 @@ examobs.register_mob({
 	dmg = 1,
 	textures={"default_stone.png"},
 	mesh="examobs_tntbox.b3d",
-	spawn_on={"default:stone","default:gravel","default:bedrock","default:cobble"},
+	spawn_on={"group:stone","default:gravel","default:bedrock","default:cobble"},
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
 	aggressivity = 2,
 	walk_speed = 2,
 	run_speed = 4,
 	lay_on_death=0,
-	spawn_chance = 300,
 	light_min = 1,
 	light_max = 15,
 	animation = {
@@ -402,13 +401,12 @@ examobs.register_mob({
 	dmg = 2,
 	textures={"examobs_underground_npc.png"},
 	mesh="character.b3d",
-	spawn_on={"default:stone","default:gravel","default:bedrock","default:cobble"},
+	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock"},
 	inv={["examobs:flesh"]=1,["default:iron_ingot"]=1},
 	collisionbox = {-0.35,-0.01,-0.35,0.35,1.8,0.35},
 	aggressivity = 2,
 	walk_speed = 2,
 	run_speed = 4,
-	spawn_chance = 300,
 	light_min = 1,
 	light_max = 10,
 	bottom=1,
@@ -1097,7 +1095,7 @@ examobs.register_bird({
 				end
 			end
 		elseif self.item then
-			if not self.item:get_pos() or not examobs.visiable(self.object,self.item) then
+			if not self.item:get_pos() or not examobs.visiable(self.object,self.item) or not self.item:get_luaentity() then
 				self.item = nil
 				self.target = nil
 				return
