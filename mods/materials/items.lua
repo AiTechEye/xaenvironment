@@ -152,7 +152,7 @@ minetest.register_tool("materials:firethrower", {
 				itemstack:set_wear(1)
 				return itemstack
 			else
-				minetest.chat_send_player(n,"Put 'extracts gas' into the tool to load")
+				minetest.chat_send_player(n,"Put 'extracts gas' left slot of the tool to load")
 				return itemstack
 			end
 		else
@@ -165,19 +165,6 @@ minetest.register_tool("materials:firethrower", {
 				minetest.add_node(po,{name="fire:basic_flame"})
 			else
 				break
-			end
-		end
-		return itemstack
-	end,
-	on_place=function(itemstack, user, pointed_thing)
-		local wear = itemstack:get_wear()
-		if not minetest.is_protected(pointed_thing.above,user:get_player_name()) and default.defpos(pointed_thing.above,"buildable_to") then
-			if wear == 65535 then
-				minetest.add_node(pointed_thing.above,{name="materials:glass_bottle"})
-				itemstack:take_item()
-			elseif wear == 1 then
-				minetest.add_node(pointed_thing.above,{name="player_style:glass_bottle_water"})
-				itemstack:take_item()
 			end
 		end
 		return itemstack
