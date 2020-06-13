@@ -144,6 +144,24 @@ default.node_sound_glass_defaults=function(a)
 	return a
 end
 
+default.node_sound_clay_defaults=function(a)
+	a = a or {}
+	a.footstep =	a.footstep or {name = "default_clay_step", gain = 1}
+	a.dig =		a.dig or {name = "default_clay_step.2", gain = 1}
+	a.dug =		a.dug or {name = "default_clay_step.4", gain = 1}
+	a.place =		a.place or {name = "default_place", gain = 1}
+	return a
+end
+
+default.node_sound_snow_defaults=function(a)
+	a = a or {}
+	a.footstep =	a.footstep or {name = "default_snow_step", gain = 1}
+	a.dig =		a.dig or {name = "default_snow_step.1", gain = 1}
+	a.dug =		a.dug or {name = "default_snow_step.1", gain = 1}
+	a.place =		a.place or {name = "default_place", gain = 1}
+	return a
+end
+
 default.tool_breaks_defaults=function(a)
 	a = a or {}
 	a.breaks =	"default_tool_breaks"

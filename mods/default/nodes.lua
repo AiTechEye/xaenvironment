@@ -359,7 +359,7 @@ minetest.register_node("default:dirt_with_snow", {
 	drop="default:dirt",
 	tiles={"default_snow.png","default_dirt.png","default_dirt.png^default_snow_side.png"},
 	groups = {dirt=1,crumbly=3,cools_lava=1},
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_snow_defaults(),
 })
 
 minetest.register_node("default:dirt_with_dry_grass", {
@@ -600,7 +600,7 @@ minetest.register_node("default:snowblock_thin", {
 	description = "Thin snowblock",
 	tiles={"default_snow.png"},
 	groups = {snowy=1,crumbly=3,cools_lava=1},
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_snow_defaults(),
 	walkable=false,
 	buildable_to=true,
 	drowning = 1,
@@ -612,7 +612,7 @@ minetest.register_node("default:snowblock", {
 	description = "Snowblock",
 	tiles={"default_snow.png"},
 	groups = {snowy=1,crumbly=3,cools_lava=1,fall_damage_add_percent=-25,disable_jump=1,treasure=1},
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_snow_defaults(),
 })
 
 minetest.register_node("default:snow", {
