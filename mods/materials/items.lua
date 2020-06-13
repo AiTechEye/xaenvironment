@@ -133,3 +133,53 @@ minetest.register_craftitem("materials:sawblade", {
 	description = "Sawblade",
 	inventory_image = "materials_sawblade.png"
 })
+
+minetest.register_tool("materials:firethrower", {
+	description = "Firethrower",
+	inventory_image = "materials_firethrower.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local d = user:get_look_dir()
+		local p = user:get_pos()
+		local inv = user:get_inventory()
+		local index = user:get_wield_index()-1
+		local stack = inv:get_stack("main",index)
+		local n = user:get_player_name()
+
+		if itemstack:get_wear() > 60000 then
+			if stack:get_name() == "materials:plant_extracts_gas" then
+				stack:take_item()
+				inv:set_stack("main",index,stack)
+				itemstack:set_wear(1)
+				return itemstack
+			else
+				minetest.chat_send_player(n,"Put 'extracts gas' into the tool to load")
+				return itemstack
+			end
+		else
+			itemstack:set_wear(itemstack:get_wear() + (65535/12))	
+		end
+
+		for i = 2,12,1 do
+			local po = {x=p.x+(d.x*i),y=p.y+1.5+(d.y*i),z=p.z+(d.z*i)}
+			if not minetest.is_protected(po, n) and default.defpos(po,"buildable_to") then
+				minetest.add_node(po,{name="fire:basic_flame"})
+			else
+				break
+			end
+		end
+		return itemstack
+	end,
+	on_place=function(itemstack, user, pointed_thing)
+		local wear = itemstack:get_wear()
+		if not minetest.is_protected(pointed_thing.above,user:get_player_name()) and default.defpos(pointed_thing.above,"buildable_to") then
+			if wear == 65535 then
+				minetest.add_node(pointed_thing.above,{name="materials:glass_bottle"})
+				itemstack:take_item()
+			elseif wear == 1 then
+				minetest.add_node(pointed_thing.above,{name="player_style:glass_bottle_water"})
+				itemstack:take_item()
+			end
+		end
+		return itemstack
+	end
+})

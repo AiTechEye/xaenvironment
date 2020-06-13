@@ -6,6 +6,13 @@ minetest.register_craft({
 		{"group:stick","","group:stick"},
 	},
 })
+minetest.register_craft({
+	output="materials:firethrower",
+	recipe={
+		{"materials:tube_metal","materials:tube_metal","default:tankstorage"},
+		{"default:torch","default:carbon_ingot","default:iron_ingot"},
+	},
+})
 
 minetest.register_craft({
 	output="materials:metal_beam 8",
