@@ -2,21 +2,21 @@ minetest.register_node("examobs:sugar", {
 	description = "Sugar",
 	groups = {crumbly=3,soil=1,candy_ground=1},
 	tiles = {"examobs_sugar.png"},
-	sounds=default.node_sound_dirt_defaults({footstep={name="default_snow_footstep"},dug={name="default_snow_footstep"},dig={name="default_snow_footstep"}}),
+	sounds=default.node_sound_snow_defaults(),
 })
 
 minetest.register_node("examobs:sugar_with_glaze", {
 	description = "Sugar with glaze",
 	groups = {crumbly=3,spreading_dirt_type=1,candy_ground=1},
 	tiles = {"examobs_glaze.png","examobs_sugar.png","examobs_sugar.png^examobs_glaze_side.png"},
-	sounds=default.node_sound_dirt_defaults({footstep={name="default_snow_footstep"},dug={name="default_snow_footstep"},dig={name="default_snow_footstep"}}),
+	sounds=default.node_sound_clay_defaults(),
 })
 
 minetest.register_node("examobs:sponge_cake", {
 	description = "Sponge cake",
 	groups = {cracky=3,candy_underground=1},
 	tiles = {"examobs_spongecake.png"},
-	sounds=default.node_sound_wood_defaults(),
+	sounds=default.node_sound_snow_defaults(),
 })
 minetest.register_node("examobs:marzipan_rose", {
 	description = "Marzipan rose",
