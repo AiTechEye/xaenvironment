@@ -76,7 +76,10 @@ bows.load=function(itemstack, user, pointed_thing)
 	local inv=user:get_inventory()
 	local index=user:get_wield_index()-1
 	local arrow=inv:get_stack("main", index)
-	if minetest.get_item_group(arrow:get_name(), "arrow")==0 then return itemstack end
+	if minetest.get_item_group(arrow:get_name(), "arrow")==0 then
+		minetest.chat_send_player(user:get_player_name(),"Put arrows left slot of the bow to load")
+		return itemstack
+	end
 	local item=itemstack:to_table()
 	local meta=minetest.deserialize(item.metadata)
 	local shots=bows.registed_bows[item.name .. "_loaded"].shots
