@@ -601,6 +601,21 @@ examobs.register_mob({
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end,
+	step=function(self)
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
 	end
 })
 
@@ -635,6 +650,21 @@ examobs.register_mob({
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end,
+	step=function(self)
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
 	end
 })
 
@@ -669,6 +699,21 @@ examobs.register_mob({
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end,
+	step=function(self)
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
 	end
 })
 
@@ -708,6 +753,21 @@ examobs.register_mob({
 	end,
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end,
+	step=function(self)
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
 	end
 })
 
