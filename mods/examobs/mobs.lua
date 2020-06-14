@@ -1,4 +1,154 @@
 examobs.register_mob({
+	name = "brown_bear",
+	team = "bear",
+	hp = 50,
+	type = "monster",
+	textures = {"examobs_bear.png"},
+	mesh = "examobs_bear.b3d",
+	dmg = 8,
+	reach = 3,
+	aggressivity = 2,
+	run_speed = 6,
+	inv={["examobs:flesh"]=2,["examobs:tooth"]=1},
+	punch_chance=6,
+	animation = {
+		stand = {x=1,y=10},
+		walk = {x=15,y=35},
+		run = {x=15,y=35,speed=60},
+		lay = {x=11,y=12,speed=0},
+		attack = {x=36,y=44},
+	},
+	collisionbox={-1,-0.65,-1,1,0.8,1},
+	spawn_on={"default:dirt_with_coniferous_grass","default:dirt_with_grass"},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "bear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.storage.team = self.storage.team or "bear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+})
+
+examobs.register_mob({
+	name = "black_bear",
+	team = "blackbear",
+	hp = 50,
+	type = "monster",
+	textures = {"examobs_blackbear.png"},
+	mesh = "examobs_bear.b3d",
+	dmg = 8,
+	reach = 3,
+	aggressivity = 2,
+	run_speed = 6,
+	inv={["examobs:flesh"]=2,["examobs:tooth"]=1},
+	punch_chance=6,
+	animation = {
+		stand = {x=1,y=10},
+		walk = {x=15,y=35},
+		run = {x=15,y=35,speed=60},
+		lay = {x=11,y=12,speed=0},
+		attack = {x=36,y=44},
+	},
+	collisionbox={-1,-0.65,-1,1,0.8,1},
+	spawn_on={"default:dirt_with_dry_grass","default:dirt_with_jungle_grass","default:dirt_with_grass"},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "blackbear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.storage.team = self.storage.team or "blackbear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+})
+
+examobs.register_mob({
+	name = "ice_bear",
+	team = "icebear",
+	hp = 50,
+	type = "monster",
+	textures = {"examobs_icebear.png"},
+	mesh = "examobs_bear.b3d",
+	dmg = 8,
+	reach = 3,
+	aggressivity = 2,
+	run_speed = 6,
+	inv={["examobs:flesh"]=2,["examobs:tooth"]=1,["default:ice"]=1},
+	punch_chance=6,
+	animation = {
+		stand = {x=1,y=10},
+		walk = {x=15,y=35},
+		run = {x=15,y=35,speed=60},
+		lay = {x=11,y=12,speed=0},
+		attack = {x=36,y=44},
+	},
+	collisionbox={-1,-0.65,-1,1,0.8,1},
+	spawn_on={"default:ice","default:dirt_with_red_permafrost_grass","default:dirt_with_permafrost_grass","default:permafrost_dirt","default:dirt_with_snow"},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "icebear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.storage.team = self.storage.team or "icebear"..math.random(1,3)
+		self.team = self.storage.team
+	end,
+})
+
+examobs.register_mob({
+	name = "lava_bear",
+	team = "lavabear",
+	hp = 50,
+	type = "monster",
+	textures = {"default_lava.png"},
+	mesh = "examobs_bear.b3d",
+	dmg = 5,
+	reach = 3,
+	aggressivity = 2,
+	run_speed = 6,
+	inv={["default:cooledlava"]=2,["examobs:tooth"]=1,["default:diamond"]=1},
+	punch_chance=2,
+	animation = {
+		stand = {x=1,y=10},
+		walk = {x=15,y=35},
+		run = {x=15,y=35,speed=60},
+		lay = {x=11,y=12,speed=0},
+		attack = {x=36,y=44},
+	},
+	collisionbox={-1,-0.65,-1,1,0.8,1},
+	spawn_on={"default:stone","default:cobble","default:lava_source","default:cooledlava"},
+	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:basic_flame"]=1,["fire:permanent_flame"]=1},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	step=function(self,dtime)
+		local p = self:pos()
+		if minetest.get_item_group(minetest.get_node(p).name,"cools_lava") > 0 then
+
+
+			if minetest.is_protected(p, "") then
+				self:hurt(50)
+			else
+				minetest.add_node(p,{name="default:cooledlava"})
+				examobs.dropall(self)
+				self.object:remove()
+				return self
+			end
+		elseif not minetest.is_protected(p, "") then
+			minetest.add_node(p,{name="fire:basic_flame"})
+		end
+	end,
+})
+
+examobs.register_mob({
 	name = "ball",
 	hp=60,
 	reach=2,
