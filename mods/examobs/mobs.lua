@@ -1,4 +1,31 @@
 examobs.register_mob({
+	name = "mouse",
+	hp = 2,
+	textures = {"examobs_wolf.png^[combine:0x0:-15,-15=examobs_skin.png"},
+	mesh = "examobs_mouse.obj",
+	aggressivity = -2,
+	run_speed = 2,
+	--inv={["examobs:flesh"]=1},
+	collisionbox={-0.2,-0.1,-0.2,0.2,0.1,0.2},
+	spawn_on={"group:wood","group:stone","group:spreading_dirt_type"},
+	on_spawn=function(self)
+		local a = {"examobs_wolf.png","examobs_golden_wolf.png","examobs_arctic_wolf.png","examobs_bear.png","examobs_blackbear.png"}
+		self.storage.skin = a[math.random(1,5)] .. "^[combine:0x0:-15,-15=examobs_skin.png"
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			self.object:set_properties({textures={self.storage.skin}})
+		end
+	end,
+	on_punched=function(self,puncher)
+		examobs.dying(self,2)
+		local r = self.object:get_rotation()
+		self.object:set_rotation({x=r.x,y=r.y,z=math.pi})
+	end,
+})
+
+examobs.register_mob({
 	name = "brown_bear",
 	team = "bear",
 	hp = 50,
