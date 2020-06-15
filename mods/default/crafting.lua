@@ -81,7 +81,6 @@ default.workbench.set_form=function(pos,add)
 		add
 		)
 	end
-
 end
 
 local on_receive_fields=function(pos, formname, pressed, sender)
@@ -115,18 +114,35 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 
 		local but_am_w = meta:get_int("but_am_w")
 
-
 		for i,it in pairs(pressed) do
-			if  string.sub(i,1,11) == "guide_item#" then
-				local item = string.sub(i,12,-1)
+			if string.sub(i,1,11) == "guide_item#" or string.sub(i,1,18) == "guide_alternative#" then
 
+				local item
+				local itlist = ""
 				local craft
+
+				if string.sub(i,1,18) == "guide_alternative#" then
+
+					item = string.sub(i,19,-3)
+					local c = minetest.get_all_craft_recipes(item)
+					if c and #c > 1 then
+						for i,v in pairs(c) do
+							itlist = itlist .. "item_image_button[" .. (2+i) .. ",7;" .. but_size ..";".. v.output ..";guide_alternative#" ..v.output .."="..i..";]"
+						end
+						craft = c[tonumber(string.sub(i,-1,-1))]
+					else
+						item = string.sub(i,12,-1)
+						craft = minetest.get_craft_recipe(item)
+					end
+					
+				else
+					item = string.sub(i,12,-1)
+					craft = minetest.get_craft_recipe(item)
+				end
+
 				local x = x_start
 				local y = y_start_crafring
-				local itlist = ""
-
-				craft = minetest.get_craft_recipe(item)
-
+				
 				if craft.items and craft.type == "normal" then
 					local craftgl = 9
 					for i1=1, craftgl,1 do
@@ -169,6 +185,21 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 					.. "label[" .. (x+0.3) .. "," .. (y-0.4) .. ";Cooking]"
 					.. "item_image_button[" .. (x+x_add) .. "," .. y .. ";" .. but_size ..";default:furnace;guide_item#default:furnace;]"
 					..  "item_image_button[" .. (x+x_add*2) .. "," .. y .. ";" .. but_size ..";".. craft.output ..";guide_item#" .. craft.output ..";]"
+				end
+
+				local c = minetest.get_all_craft_recipes(item)
+				if c and #c > 1 then
+					for i,v in pairs(c) do
+						if i > 5 then
+							break
+						end
+						local na = v.output
+						local s =  string.find(na," ")
+						if s then
+							na = string.sub(na,1,s-1)
+						end
+						itlist = itlist .. "item_image_button[" .. (2+i) .. ",7;" .. but_size ..";".. na ..";guide_alternative#" ..na .."="..i..";]"
+					end
 				end
 
 				default.workbench.set_form(pos,itlist)
@@ -582,7 +613,7 @@ minetest.register_node("default:recycling_mill", {
 			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
 				for i,v in pairs(craft.items) do
 					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
-					if a.item and a.item:get_name() == inv:get_stack("input",1):get_name() then
+					if a.item and a.item:get_name() == inv:get_stack("input",1):get_name() or a.item:get_name() == "default:flitblock" then
 						return
 					elseif v:sub(1,6) == "group:" then
 						local g = v:sub(7,-1)
