@@ -5,7 +5,7 @@ examobs.register_mob({
 	mesh = "examobs_mouse.obj",
 	aggressivity = -2,
 	run_speed = 2,
-	--inv={["examobs:flesh"]=1},
+	inv={["examobs:flesh_piece"]=1},
 	collisionbox={-0.2,-0.1,-0.2,0.2,0.1,0.2},
 	spawn_on={"group:wood","group:stone","group:spreading_dirt_type"},
 	on_spawn=function(self)

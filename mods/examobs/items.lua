@@ -9,6 +9,18 @@ default.register_eatable("craftitem","examobs:meat",3,4,{
 	inventory_image = "examobs_meat.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
+default.register_eatable("craftitem","examobs:flesh_piece",1,2,{
+	description = "Flesh piece",
+	groups={meat=1},
+	inventory_image = "examobs_flesh.png^default_alpha_lump.png^[makealpha:0,255,0"
+})
+default.register_eatable("craftitem","examobs:meat_piece",1,2,{
+	description = "Cooked meat piece",
+	groups={meat=1},
+	inventory_image = "examobs_meat.png^default_alpha_lump.png^[makealpha:0,255,0"
+})
+
+
 minetest.register_tool("examobs:hiding_poison", {
 	description = "Hiding poison from mobs",
 	inventory_image = "materials_plant_extracts.png",
@@ -65,6 +77,75 @@ minetest.register_craft({
 	type = "cooking",
 	output = "examobs:meat",
 	recipe = "examobs:flesh",
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "examobs:meat_piece",
+	recipe = "examobs:flesh_piece",
+})
+
+minetest.register_node("examobs:meat_block", {
+	description = "Meat block",
+	tiles={"examobs_meat.png"},
+	groups = {crumbly=3,meat=2},
+	sounds = default.node_sound_clay_defaults(),
+})
+minetest.register_node("examobs:flesh_block", {
+	description = "Flesh block",
+	tiles={"examobs_flesh.png"},
+	groups = {crumbly=3,meat=2},
+	sounds = default.node_sound_clay_defaults(),
+})
+
+minetest.register_craft({
+	output = "examobs:flesh",
+	recipe = {
+		{"examobs:flesh_piece","examobs:flesh_piece"},
+	}
+})
+minetest.register_craft({
+	output = "examobs:meat",
+	recipe = {
+		{"examobs:meat_piece","examobs:meat_piece"},
+	}
+})
+
+minetest.register_craft({
+	output = "examobs:flesh_block",
+	recipe = {
+		{"examobs:flesh","examobs:flesh"},
+		{"examobs:flesh","examobs:flesh"},
+	}
+})
+
+minetest.register_craft({
+	output = "examobs:meat_block",
+	recipe = {
+		{"examobs:meat","examobs:meat"},
+		{"examobs:meat","examobs:meat"},
+	}
+})
+
+minetest.register_craft({
+	output = "examobs:flesh_block",
+	recipe = {
+		{"examobs:flesh","examobs:flesh"},
+		{"examobs:flesh","examobs:flesh"},
+	}
+})
+
+minetest.register_craft({
+	output = "examobs:meat 4",
+	recipe = {
+		{"examobs:meat_block"},
+	}
+})
+minetest.register_craft({
+	output = "examobs:flesh 4",
+	recipe = {
+		{"examobs:flesh_block"},
+	}
 })
 
 -- ================ mud ================
