@@ -399,6 +399,13 @@ minetest.register_node("default:dirt", {
 	tiles={"default_dirt.png"},
 	groups = {dirt=1,soil=1,crumbly=3},
 	sounds = default.node_sound_dirt_defaults(),
+	drop ={
+		max_items = 1,
+		items = {
+			{items = {"bones:bone"}, rarity = 10},
+			{items = {"default:dirt"}}
+		}
+	}
 })
 
 minetest.register_node("default:wet_soil", {
