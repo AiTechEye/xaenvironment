@@ -69,6 +69,22 @@ minetest.register_craftitem("bones:bone", {
 	wield_scale={x=2,y=2,z=2},
 })
 
+minetest.register_craft({
+	output = "bones:boneblock",
+	recipe = {
+		{"bones:bone","bones:bone","bones:bone"},
+		{"bones:bone","bones:bone","bones:bone"},
+		{"bones:bone","bones:bone","bones:bone"}
+	}
+})
+
+minetest.register_craft({
+	output = "bones:bone",
+	recipe = {
+		{"bones:boneblock"}
+	}
+})
+
 minetest.register_on_leaveplayer(function(player)
 	bones.corpses[player:get_player_name()] = nil
 end)
