@@ -1,5 +1,6 @@
 examobs.register_mob({
 	name = "mouse",
+	team = "mouse",
 	hp = 2,
 	textures = {"examobs_wolf.png^[combine:0x0:-15,-15=examobs_skin.png"},
 	mesh = "examobs_mouse.obj",
@@ -38,6 +39,7 @@ examobs.register_mob({
 	run_speed = 6,
 	inv={["examobs:flesh"]=2,["examobs:tooth"]=1},
 	punch_chance=6,
+	spawn_chance = 300,
 	animation = {
 		stand = {x=1,y=10},
 		walk = {x=15,y=35},
@@ -73,6 +75,7 @@ examobs.register_mob({
 	run_speed = 6,
 	inv={["examobs:flesh"]=2,["examobs:tooth"]=1},
 	punch_chance=6,
+	spawn_chance = 300,
 	animation = {
 		stand = {x=1,y=10},
 		walk = {x=15,y=35},
@@ -108,6 +111,7 @@ examobs.register_mob({
 	run_speed = 6,
 	inv={["examobs:flesh"]=2,["examobs:tooth"]=1,["default:ice"]=1},
 	punch_chance=6,
+	spawn_chance = 300,
 	animation = {
 		stand = {x=1,y=10},
 		walk = {x=15,y=35},
@@ -143,6 +147,7 @@ examobs.register_mob({
 	run_speed = 6,
 	inv={["default:cooledlava"]=2,["examobs:tooth"]=1,["default:diamond"]=1},
 	punch_chance=2,
+	spawn_chance = 200,
 	animation = {
 		stand = {x=1,y=10},
 		walk = {x=15,y=35},
