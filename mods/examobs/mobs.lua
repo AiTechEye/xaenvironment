@@ -1,4 +1,46 @@
 examobs.register_mob({
+	name = "terminator",
+	type = "monster",
+	team = "metal",
+	dmg = 10,
+	hp = 250,
+	textures={"examobs_terminator.png"},
+	mesh="character.b3d",
+	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock"},
+	inv={["default:steel_ingot"]=2},
+	collisionbox = {-0.35,-0.01,-0.35,0.35,1.8,0.35},
+	aggressivity = 2,
+	walk_speed = 4,
+	run_speed = 6,
+	bottom=1,
+	spawn_chance = 500,
+	animation = {
+		stand={x=1,y=39,speed=30,loop=false},
+		walk={x=41,y=61,speed=30,loop=false},
+		run={x=80,y=99,speed=60},
+		lay={x=113,y=123,speed=0,loop=false},
+		attack={x=80,y=99,speed=60},
+	},
+	is_food=function(self,item)
+		return false
+	end,
+	on_punching=function(self)
+		local ob = self.fight
+		if examobs.gethp(ob) > 1 then
+			local en =ob:get_luaentity()
+			local p1 = self:pos()
+			local p2 = examobs.pointat(self,50)
+			local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
+			if en then
+				ob:set_velocity(v)
+			else
+				ob:add_player_velocity(v)
+			end
+		end
+	end,
+})
+
+examobs.register_mob({
 	name = "mouse",
 	team = "mouse",
 	hp = 2,
@@ -39,7 +81,7 @@ examobs.register_mob({
 	run_speed = 6,
 	inv={["examobs:flesh"]=2,["examobs:tooth"]=1},
 	punch_chance=6,
-	spawn_chance = 300,
+	spawn_chance = 500,
 	animation = {
 		stand = {x=1,y=10},
 		walk = {x=15,y=35},
