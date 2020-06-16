@@ -61,6 +61,50 @@ multidimensions.register_dimension("candyland",{
 	}
 })
 
+multidimensions.register_dimension("spacelands",{
+	--ground_ores = table.copy(plants),
+	--stone_ores = table.copy(ores),
+	ground_limit=550,
+	stone = "default:space_stone",
+	dirt = "default:space_dust",
+	grass = "default:space_dust",
+	gravity = 0.3,
+	node={
+		description="Spacelands",
+		tiles = {"materials_spaceyfloor.png"},
+	},
+	map={
+		spread={x=30,y=30,z=30},
+		octaves=3,
+		persist=0.2,
+		lacunarity=2,
+		flags="eased",
+	},
+	terrain_density=0.2,
+	enable_water=false,
+	self={
+		blocking="multidimensions:blocking",
+		killing = "multidimensions:killing",
+	},
+	on_generate=function(self,data,id,area,x,y,z)
+		if y <= self.dirt_start-70 then
+			data[id] = self.killing
+		elseif y <= self.dirt_start-100 then
+			data[id] = self.blocking
+		elseif y <= self.dirt_start+5 then
+			data[id] = self.air
+		else
+			return
+		end
+		return data
+	end,
+	--craft = {
+		--{"default:obsidian", "default:steel_ingot", "default:obsidian"},
+		--{"examobs:sponge_cake","examobs:icecreamball","examobs:sponge_cake",},
+		--{"default:obsidian", "default:steel_ingot", "default:obsidian"},
+	--}
+})
+
 --multidimensions.register_dimension("earthlike2",{
 --	ground_ores = table.copy(plants),
 --	stone_ores = table.copy(ores),
@@ -74,43 +118,6 @@ multidimensions.register_dimension("candyland",{
 --		{"default:aspen_wood","default:mese","default:aspen_wood",},
 --		{"default:obsidianbrick", "default:steel_ingot", "default:obsidianbrick"},
 --	}
---})
-
---multidimensions.register_dimension("floatandlike",{
---	ground_ores = table.copy(plants),
---	stone_ores = table.copy(ores),
---	node={description="Alternative floatand"},
---	ground_limit=550,
---	craft = {
---		{"default:obsidianbrick", "default:steel_ingot", "default:obsidianbrick"},
---		{"default:dirt","default:mese","default:dirt",},
---		{"default:obsidianbrick", "default:steel_ingot", "default:obsidianbrick"},
---	},
---	map={
---		spread={x=30,y=30,z=30},
---		octaves=3,
---		persist=0.2,
---		lacunarity=2,
---		flags="eased",
---	},
---	terrain_density=0.2,
---	enable_water=false,
---	self={
---		blocking="multidimensions:blocking",
---		killing = "multidimensions:killing",
---	},
---	on_generate=function(self,data,id,area,x,y,z)
---		if y <= self.dirt_start-70 then
---			data[id] = self.killing
---		elseif y <= self.dirt_start-100 then
---			data[id] = self.blocking
---		elseif y <= self.dirt_start+5 then
---			data[id] = self.air
---		else
---			return
---		end
---		return data
---	end,
 --})
 
 --minetest.register_lbm({
