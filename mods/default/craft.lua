@@ -285,6 +285,22 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="default:desert_sand 3",
+	recipe={
+		{"default:desert_sandstone","default:desert_sandstone","default:desert_sandstone"},
+	},
+})
+
+minetest.register_craft({
+	output="default:desert_sandstone 3",
+	recipe={
+		{"default:desert_sand","default:desert_sand","default:desert_sand",},
+		{"default:desert_sand","default:desert_sand","default:desert_sand",},
+		{"default:desert_sand","default:desert_sand","default:desert_sand",},
+	},
+})
+
 
 --||||||||||||||||
 -- ======================= COOKING

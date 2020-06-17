@@ -571,8 +571,15 @@ minetest.register_node("default:desert_sand", {
 	drowning = 1
 })
 
+minetest.register_node("default:desert_sandstone", {
+	description = "Desert sandstone",
+	tiles={"default_desert_sandstone.png"},
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:sandstone", {
-	description = "Sand stone",
+	description = "Sandstone",
 	tiles={"default_sandstone.png"},
 	groups = {cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
