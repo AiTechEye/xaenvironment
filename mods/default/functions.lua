@@ -663,7 +663,17 @@ default.treasure=function(def)
 	def.node = def.node or "default:chest"
 	def.level = def.level or 1
 
-	if def.level > 1 then
+	if def.levels then
+		for i,v in pairs(minetest.registered_items) do
+			if v.groups and v.groups.treasure then
+				for i1,v2 in pairs(def.levels) do
+					if v.groups.treasure == v2 then
+						table.insert(items,i)
+					end
+				end
+			end
+		end
+	elseif def.level > 1 then
 		for i,v in pairs(minetest.registered_items) do
 			if v.groups and v.groups.treasure and v.groups.treasure == def.level then
 				table.insert(items,i)
