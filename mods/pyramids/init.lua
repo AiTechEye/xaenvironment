@@ -404,7 +404,7 @@ minetest.register_node("pyramids:spawner", {
 	paramtype = "light",
 	walkable = false,
 	buildable_to = true,
-	groups={on_load=1},
+	groups={on_load=1,not_in_creative_inventory=1},
 	on_construct=function(pos)
 		minetest.remove_node(pos)
 		pyramids.gen(pos)
