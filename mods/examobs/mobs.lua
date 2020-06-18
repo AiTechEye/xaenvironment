@@ -99,8 +99,7 @@ examobs.register_mob({
 		self.team = self.storage.team
 	end,
 	on_load=function(self)
-		self.storage.team = self.storage.team or "bear"..math.random(1,3)
-		self.team = self.storage.team
+		self.team = self.storage.team or self.team
 	end,
 })
 
@@ -131,12 +130,11 @@ examobs.register_mob({
 		return minetest.get_item_group(item,"meat") > 0
 	end,
 	on_spawn=function(self)
-		self.storage.team = self.storage.team or "blackbear"..math.random(1,3)
+		self.storage.team = self.storage.team or "blackbear"..math.random(1,30)
 		self.team = self.storage.team
 	end,
 	on_load=function(self)
-		self.storage.team = self.storage.team or "blackbear"..math.random(1,3)
-		self.team = self.storage.team
+		self.team = self.storage.team or self.team
 	end,
 })
 
@@ -167,12 +165,11 @@ examobs.register_mob({
 		return minetest.get_item_group(item,"meat") > 0
 	end,
 	on_spawn=function(self)
-		self.storage.team = self.storage.team or "icebear"..math.random(1,3)
+		self.storage.team = self.storage.team or "icebear"..math.random(1,30)
 		self.team = self.storage.team
 	end,
 	on_load=function(self)
-		self.storage.team = self.storage.team or "icebear"..math.random(1,3)
-		self.team = self.storage.team
+		self.team = self.storage.team or self.team
 	end,
 })
 
@@ -808,6 +805,7 @@ examobs.register_mob({
 	name = "wolf",
 	textures = {"examobs_wolf.png"},
 	mesh = "examobs_wolf.b3d",
+	type = "monster",
 	dmg = 2,
 	aggressivity = 1,
 	run_speed = 8,
@@ -850,7 +848,14 @@ examobs.register_mob({
 	end,
 	on_punching = function(self)
 		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
-	end
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "wolf"..math.random(1,5)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.team = self.storage.team or self.team
+	end,
 })
 
 examobs.register_mob({
@@ -899,7 +904,14 @@ examobs.register_mob({
 	end,
 	on_punching = function(self)
 		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
-	end
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "wolf"..math.random(1,5)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.team = self.storage.team or self.team
+	end,
 })
 
 examobs.register_mob({
@@ -948,7 +960,14 @@ examobs.register_mob({
 	end,
 	on_punching = function(self)
 		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
-	end
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "wolf"..math.random(1,5)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.team = self.storage.team or self.team
+	end,
 })
 
 examobs.register_mob({
