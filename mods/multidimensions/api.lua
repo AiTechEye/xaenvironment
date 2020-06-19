@@ -103,14 +103,12 @@ multidimensions.register_dimension=function(name,def,self)
 		node.tiles = node.tiles or			{"default_steel_block.png"}
 		node.groups = node.groups or		{cracky=2}
 		node.sounds = node.sounds or		default.node_sound_wood_defaults()
-		node.after_place_node = function(pos, placer, itemstack)
-			local meta=minetest.get_meta(pos)
-			meta:set_string("owner",placer:get_player_name())
-			meta:set_string("infotext",node.description)
+		node.on_construct = function(pos)
+			minetest.get_meta(pos):set_string("infotext",node.description)
 		end
 		node.on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+			minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			local meta=minetest.get_meta(pos)
-			local owner=meta:get_string("owner")
 			local pos2
 
 			local sp = meta:get_string("pos")
@@ -120,24 +118,19 @@ multidimensions.register_dimension=function(name,def,self)
 				pos2 = {x=pos.x,y=def.dirt_start+def.dirt_depth+2,z=pos.z}
 			end
 
-			if owner ~= "" and not minetest.is_protected(pos2, owner) then
-				local REset
-				if meta:get_int("re_set") == 0 then
-					meta:set_int("re_set",1)
-					REset = pos
-				end
-				multidimensions.move(player,pos2,REset)
+			local REset
+			if meta:get_int("re_set") == 0 then
+				meta:set_int("re_set",1)
+				REset = pos
 			end
+			multidimensions.move(player,pos2,REset)
+	
 		end
 
-		minetest.register_node("multidimensions:teleporter_" .. name, node)
-
-		if multidimensions.craftable_teleporters and craft then
-			minetest.register_craft({
-				output = "multidimensions:teleporter_" .. name,
-				recipe = craft,
-			})
-		end
+		node.name = "teleporter_" .. name
+		node.craft = craft
+		node.texture = node.tiles[1]
+		default.register_door(node)
 	end
 	if def.dim_y > 0 and def.dim_y < multidimensions.earth.above then
 		multidimensions.earth.above = def.dim_y
@@ -322,16 +315,6 @@ minetest.register_on_chat_message(function(name, message)
 end)
 end
 
-minetest.register_node("multidimensions:portalblock", {
-	description = "Portalblock",
-	tiles = {"materials_spaceyfloor.png^[invert:rgb"},
-	groups = {cracky=2},
-	is_ground_content = false,
-	sounds = default.node_sound_stone_defaults(),
-	after_place_node = function(pos, placer, itemstack)
-	end,
-})
-
 minetest.register_node("multidimensions:teleporterre", {
 	description = "Teleport back",
 	tiles = {"default_steelblock.png"},
@@ -347,15 +330,6 @@ minetest.register_node("multidimensions:teleporterre", {
 		end
 		multidimensions.move(player,minetest.string_to_pos(p),nil,true)
 	end,
-	mesecons = {effector = {
-		action_on = function (pos, node)
-		local owner=minetest.get_meta(pos):get_string("owner")
-		local pos2={x=pos.x,y=0,z=pos.z}
-		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
-			multidimensions.move(ob,pos2)
-		end
-		return false
-	end}},
 })
 
 
