@@ -46,6 +46,7 @@ multidimensions.register_dimension("moon",{
 --	ground_ores = table.copy(plants),
 --	stone_ores = table.copy(ores),
 --	sand_ores={["default:clay"]={chunk=2,chance=5000}},
+	air = "default:vacuum",
 	node={
 		description="Moon",
 		tiles = {"materials_spaceyfloor.png"},
