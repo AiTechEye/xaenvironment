@@ -477,7 +477,7 @@ minetest.register_node("default:stone", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
-minetest.register_node("default:moon_space", {
+minetest.register_node("default:space_space", {
 	description = "Space stone",
 	tiles={"default_space_stone.png"},
 	groups = {stone=1,cracky=3},

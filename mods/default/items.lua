@@ -815,6 +815,62 @@ default.registry_mineral({
 })
 
 default.registry_mineral({
+	name="titanium",
+	texture="default_steelblock.png^[colorize:#5555",
+	wherein="default:moon_space",
+	ore_settings={
+		clust_scarcity= 9 * 9 * 9,
+		clust_num_ores=8,
+		clust_size=8,
+		y_max=-90,
+	},
+	block={groups={cracky=1}},
+	pick={
+		range = 5,
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky={times={[1]=0.4,[2]=0.2,[3]=0.1},uses=60,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	shovel={
+		range = 5,
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=1,[2]=0.3,[3]=0.2},uses=35,maxlevel=3}
+		},
+		damage_groups={fleshy=2}
+	}},
+	axe={
+		range = 5,
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			choppy={times={[1]=0.3,[2]=0.3,[3]=0.2},uses=35,maxlevel=2}
+		},
+		damage_groups={fleshy=4}
+	}},
+	vineyardknife={
+		range = 5,
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 1,
+		groupcaps = {
+			snappy={times={[1]=0.4,[2]=0.2,[3]=0.1},uses=600,maxlevel=2}
+		},
+		damage_groups={fleshy=2}
+	}},
+	hoe={uses=1100},
+	arrow={damage=13},
+	bow={uses=1100,level=18},
+})
+
+default.registry_mineral({
 	name="electric",
 	texture="default_electricblock.png",
 	not_ingot=true,
