@@ -506,6 +506,7 @@ minetest.register_node("default:space_stone", {
 	description = "Space stone",
 	tiles={"default_space_stone.png"},
 	groups = {stone=1,cracky=3},
+	drowning = 1,
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -584,6 +585,7 @@ minetest.register_node("default:space_dust", {
 	description = "Space dust",
 	tiles={"default_space_dust.png"},
 	groups = {crumbly=3,falling_node=1},
+	drowning = 1,
 	sounds = default.node_sound_dirt_defaults(),
 	drowning = 1,
 })
