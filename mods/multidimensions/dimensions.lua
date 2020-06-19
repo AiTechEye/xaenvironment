@@ -43,9 +43,12 @@ multidimensions.register_dimension("candyland",{
 })
 
 multidimensions.register_dimension("moon",{
---	ground_ores = table.copy(plants),
-	stone_ores = {["default:titanium_ore"]={chunk=1,chance=5000},["default:emerald"]={chunk=1,chance=5000}},
---	sand_ores={["default:clay"]={chunk=2,chance=5000}},
+	stone_ores = {
+		["default:space_titanium_ore"]={chunk=1,chance=5000},
+		["default:emerald"]={chunk=1,chance=5000},
+		["default:space_gold_ore"]={chunk=1,chance=4000},
+		["default:space_iron_ore"]={chunk=1,chance=4500},
+	},
 	air = "default:vacuum",
 	node={
 		description="Moon",
