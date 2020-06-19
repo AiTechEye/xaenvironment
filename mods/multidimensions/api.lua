@@ -209,6 +209,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if den > 1 then
 						data[id]=stone
 					end
+				elseif data[id] ~= grass then
+					data[id] = air
 				end
 			else
 				data[id] = air
@@ -320,35 +322,15 @@ minetest.register_on_chat_message(function(name, message)
 end)
 end
 
-
---minetest.register_node("multidimensions:teleporter0", {
---	description = "Teleport to dimension earth",
---	tiles = {"default_steel_block.png","default_steel_block.png","default_mese_block.png^[colorize:#1e6600cc"},
---	groups = {choppy=2,oddly_breakable_by_hand=1},
---	is_ground_content = false,
---	sounds = default.node_sound_wood_defaults(),
---	after_place_node = function(pos, placer, itemstack)
---		local meta=minetest.get_meta(pos)
---		meta:set_string("owner",placer:get_player_name())
---		meta:set_string("infotext","Teleport to dimension earth")
---	end,
---	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
---		local owner=minetest.get_meta(pos):get_string("owner")
---		local pos2={x=pos.x,y=0,z=pos.z}
---		if minetest.is_protected(pos2, owner)==false then
---			multidimensions.move(player,pos2)
---		end
---	end,
---	mesecons = {effector = {
---		action_on = function (pos, node)
---		local owner=minetest.get_meta(pos):get_string("owner")
---		local pos2={x=pos.x,y=0,z=pos.z}
---		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
---			multidimensions.move(ob,pos2)
---		end
---		return false
---	end}},
---})
+minetest.register_node("multidimensions:portalblock", {
+	description = "Portalblock",
+	tiles = {"materials_spaceyfloor.png^[invert:rgb"},
+	groups = {cracky=2},
+	is_ground_content = false,
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos, placer, itemstack)
+	end,
+})
 
 minetest.register_node("multidimensions:teleporterre", {
 	description = "Teleport back",
