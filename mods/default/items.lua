@@ -818,13 +818,8 @@ default.registry_mineral({
 	name="titanium",
 	texture="default_steelblock.png^[colorize:#5555",
 	wherein="default:moon_space",
-	ore_settings={
-		clust_scarcity= 9 * 9 * 9,
-		clust_num_ores=8,
-		clust_size=8,
-		y_max=-90,
-	},
-	ore={tiles={"default_steelblock.png^[colorize:#5555^default_alpha_ore.png^[colorize:#fff4"}},
+	not_ore = true,
+	ore={tiles={"default_space_stone.png^(default_steelblock.png^[colorize:#5555^default_alpha_ore.png^[colorize:#fff4^default_ore_mineral.png^[makealpha:0,255,0)"}},
 	block={groups={cracky=1}},
 	pick={
 		range = 5,

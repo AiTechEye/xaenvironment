@@ -1174,12 +1174,30 @@ minetest.register_node("default:mine_shaft", {
 
 minetest.register_node("default:emerald", {
 	description = "Emerald",
-	tiles={"default_space_dust.png^[colorize:#0f06"},
+	tiles={"default_stonemoss.png^default_gas.png^[colorize:#010c"},
 	groups = {cracky=3},
 	drawtype="glasslike",
 	paramtype = "light",
 	sunlight_propagates = true,
 	drowning = 1,
-	--alpha=10,
-	--use_texture_alpha = true,
+	alpha=220,
+})
+
+minetest.register_node("default:space_gold_ore", {
+	description = "Space gold ore",
+	tiles={"default_space_stone.png^(default_goldblock.png^default_ore_mineral.png^[makealpha:0,255,0)"},
+	groups = {cracky=3},
+	drop="default:gold_lump 2",
+})
+minetest.register_node("default:space_titanium_ore", {
+	description = "Space titanium ore",
+	tiles={"default_space_stone.png^(default_steelblock.png^[colorize:#5555^default_ore_mineral.png^[makealpha:0,255,0)"},
+	groups = {cracky=3},
+	drop="default:titanium_lump",
+})
+minetest.register_node("default:space_iron_ore", {
+	description = "Space iron ore",
+	tiles={"default_space_stone.png^default_ore_iron.png"},
+	groups = {cracky=3},
+	drop="default:iron_lump 2",
 })
