@@ -75,7 +75,7 @@ default.register_door=function(def)
 				{-0.5, -0.5, 0.4, 0.5, 1.4, 0.475},
 			}
 		},
-		on_rightclick = function(pos)
+		on_rightclick = def.on_rightclick or function(pos)
 			local pp=minetest.get_node(pos).param2
 			local meta=minetest.get_meta(pos)
 			if meta:get_int("locked")==1 then return end
@@ -109,7 +109,7 @@ default.register_door=function(def)
 				minetest.get_node_timer(pos):start(0.2)
 			end
 		end,
-		on_construct=function(pos)
+		on_construct= def.on_construct or function(pos)
 			local meta=minetest.get_meta(pos)
 			meta:set_int("p",minetest.get_node(pos).param2)
 			meta:set_int("n",1)
@@ -123,16 +123,6 @@ default.register_door=function(def)
 				return itemstack
 			end
 		end,
-		mesecons = {
-			receptor = {state = "off"},
-			effector = {
-			action_on = function (pos, node)
-				minetest.get_meta(pos):set_int("locked",1)
-			end,
-			action_off = function (pos, node)
-				minetest.get_meta(pos):set_int("locked",0)
-			end,
-		}},
 	})
 
 	minetest.register_craft({
