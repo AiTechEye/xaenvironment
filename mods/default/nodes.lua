@@ -94,6 +94,7 @@ minetest.register_node("default:vacuum", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable=false,
+	pointable=false,
 	drowning = 1,
 	buildable_to = true,
 	drop = "",
