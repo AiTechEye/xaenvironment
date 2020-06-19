@@ -86,6 +86,26 @@ minetest.register_node("default:quantumblock", {
 	light_source = 13
 })
 
+minetest.register_node("default:vacuum", {
+	description = "Vacuum",
+	inventory_image = "default_air.png",
+	groups = {on_update=1,not_in_craftguide=1},
+	drawtype="airlike",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable=false,
+	drowning = 1,
+	buildable_to = true,
+	drop = "",
+	on_update = function(pos)
+		local ne = minetest.find_node_near(pos,1.5,"air")
+		if ne then
+			minetest.add_node(ne,{name="default:vacuum"})
+			default.def("default:vacuum").on_update(p)
+		end
+	end
+})
+
 minetest.register_node("default:gas", {
 	description = "Gas",
 	tiles={"default_gas.png"},
