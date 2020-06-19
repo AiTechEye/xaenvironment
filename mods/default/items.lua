@@ -824,6 +824,7 @@ default.registry_mineral({
 		clust_size=8,
 		y_max=-90,
 	},
+	ore={tiles={"default_steelblock.png^[colorize:#5555^default_alpha_ore.png^[colorize:#fff4"}},
 	block={groups={cracky=1}},
 	pick={
 		range = 5,
