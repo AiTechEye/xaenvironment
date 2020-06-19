@@ -1169,3 +1169,15 @@ minetest.register_node("default:mine_shaft", {
 		end
 	end
 })
+
+minetest.register_node("default:emerald", {
+	description = "Emerald",
+	tiles={"default_space_dust.png^[colorize:#0f06"},
+	groups = {cracky=3},
+	drawtype="glasslike",
+	paramtype = "light",
+	sunlight_propagates = true,
+	drowning = 1,
+	--alpha=10,
+	--use_texture_alpha = true,
+})
