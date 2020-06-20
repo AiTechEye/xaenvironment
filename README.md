@@ -2,7 +2,7 @@
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
-## V7.6
+## V7.7
 
 ---
 
