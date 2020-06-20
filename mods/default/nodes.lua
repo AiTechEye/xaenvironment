@@ -33,7 +33,6 @@ minetest.register_node("default:lamp_off", {
 			minetest.set_node(pos,{name="default:lamp",param2=minetest.get_node(pos).param2})
 		end
 	}
-
 })
 
 minetest.register_node("default:cloud", {
@@ -90,7 +89,9 @@ minetest.register_node("default:vacuum", {
 	description = "Vacuum",
 	inventory_image = "default_air.png",
 	groups = {on_update=1,not_in_craftguide=1},
-	drawtype="airlike",
+	tiles={"default_gas.png^[invert:rgb"},
+	drawtype = "glasslike",
+	alpha = 1,
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable=false,
