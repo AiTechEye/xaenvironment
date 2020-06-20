@@ -23,6 +23,8 @@ multidimensions.register_dimension=function(name,def,self)
 	def.flatland = def.flatland		
 	def.gravity = def.gravity or			1
 	--def.sky = def.sky
+	--def.sun = def.sun
+	--def.moon = def.moon
 
 	def.map = def.map or {}
 	def.map.offset = def.map.offset or 0

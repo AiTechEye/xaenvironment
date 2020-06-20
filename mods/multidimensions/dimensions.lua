@@ -50,6 +50,9 @@ multidimensions.register_dimension("moon",{
 		["default:space_iron_ore"]={chunk=1,chance=4500},
 	},
 	air = "default:vacuum",
+	sky = {{r=0, g=0, b=0},"skybox",{"spacestuff_sky.png","spacestuff_sky.png","spacestuff_sky.png","spacestuff_sky.png","spacestuff_sky.png","spacestuff_sky.png"}},
+	sun = {scale=5,visible=true},
+	moon = {scale=2,visible=true,texture="spacestuff_earth.png"},
 	node={
 		description="Moon",
 		tiles = {"materials_spaceyfloor.png"},

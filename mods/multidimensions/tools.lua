@@ -137,6 +137,19 @@ multidimensions.apply_dimension=function(player)
 			else
 				player:set_sky(nil,"regular",nil)
 			end
+
+			if v.sun then
+				player:set_sun(v.sun)
+			else
+				player:set_sun({visible=true,sunrise="",sunrise_visible=true,texture="",tunemap="",scale=1})
+			end
+
+			if v.moon then
+				player:set_moon(v.moon)
+			else
+				player:set_moon({visible=true,texture="",tunemap="",scale=1})
+			end
+
 			if v.on_enter then
 				v.on_enter(player)
 			end
@@ -145,6 +158,9 @@ multidimensions.apply_dimension=function(player)
 	end
 	player:set_physics_override({gravity=1})
 	player:set_sky(nil,"regular",nil)
+	player:set_sun({visible=true,sunrise="",sunrise_visible=true,texture="",tunemap="",scale=1})
+	player:set_moon({visible=true,texture="",tunemap="",scale=1})
+
 	multidimensions.player_pos[name] = {
 		y1 = multidimensions.earth.under,
 		y2 = multidimensions.earth.above,
