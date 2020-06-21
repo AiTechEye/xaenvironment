@@ -110,6 +110,7 @@ minetest.register_node("player_style:edgehook", {
 			end
 		end
 		minetest.remove_node(pos)
+		default.update_nodes(pos)
 	end
 })
 

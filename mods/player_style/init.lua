@@ -338,7 +338,7 @@ end
 
 player_style.get_airlike=function(pos)
 	local d  = default.def(minetest.get_node(pos).name)
-	return d.name == "air" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
+	return d.name == "air" or d.name == "default:vacuum" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
 end
 
 local attached_players = player_style.player_attached
