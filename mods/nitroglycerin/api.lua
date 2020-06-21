@@ -188,6 +188,7 @@ if node.blow_nodes==1 then
 	local min, max = vox:read_from_map(pos1, pos2)
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
+
 	for z = -node.radius, node.radius do
 	for y = -node.radius, node.radius do
 	for x = -node.radius, node.radius do
@@ -197,24 +198,24 @@ if node.blow_nodes==1 then
 
 		if data[v]~=air and node.radius/rad>=1 and minetest.is_protected(p, node.user_name)==false then
 
-			local no=minetest.registered_nodes[minetest.get_node(p).name]
+			local no=minetest.registered_nodes[minetest.get_node(p).name] or {}
 
-			if no and no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius then
+			if no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius then
 				no.on_blast(p,node.radius)
 			end
 
-			if node.set~="" then
+			if node.set~="" and not (no.groups and no.groups.unbreakable) then
 				data[v]=node.set
 			end
 
-			if math.random(1,node.place_chance)==1 then
+			if math.random(1,node.place_chance)==1 and not (no.groups and no.groups.unbreakable)  then
 				data[v]=nodes[math.random(1,nodes_n)]
 			end
 
 			if node.drops==1 and data[v]==air and math.random(1,4)==1 then
 				local n=minetest.get_node(p)
 
-				if no and no.walkable and math.random(1,2)==1 then
+				if no.walkable and math.random(1,2)==1 then
 					nitroglycerin.spawn_dust(p)
 				else
 					for _, item in pairs(minetest.get_node_drops(n.name, "")) do
@@ -230,6 +231,19 @@ if node.blow_nodes==1 then
 	vox:write_to_map()
 	vox:update_map()
 	vox:update_liquids()
+
+
+	for z = -node.radius, node.radius,node.radius do
+	for y = -node.radius, node.radius,node.radius do
+	for x = -node.radius, node.radius,node.radius do
+		local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
+		default.update_nodes(p)
+	end
+	end
+	end
+
+
+
 end
 if node.hurt==1 then
 	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
@@ -251,14 +265,12 @@ if node.velocity==1 then
 		local pos2=ob:get_pos()
 		local d=math.max(1,vector.distance(pos,pos2))
 		local dmg=(8/d)*node.radius
-		if ob:get_luaentity() and not ob:get_luaentity().attachplayer and not (ob:get_luaentity().nitroglycerine_dust and ob:get_luaentity().nitroglycerine_dust==2) then
+		if ob:get_luaentity() and not (ob:get_luaentity().nitroglycerine_dust and ob:get_luaentity().nitroglycerine_dust==2) then
 			ob:set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
 			if ob:get_luaentity() and ob:get_luaentity().nitroglycerine_dust then ob:get_luaentity().nitroglycerine_dust=2 end
 
 		elseif ob:is_player() then
-			nitroglycerin.new_player=ob
-			minetest.add_entity({x=pos2.x,y=pos2.y+1,z=pos2.z}, "nitroglycerin:playerp"):set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
-			nitroglycerin.new_player=nil
+			ob:add_player_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
 		end
 	end
 end
@@ -460,64 +472,6 @@ minetest.register_entity("nitroglycerin:dust",{
 	timer=2,
 	timer2=10,
 	nitroglycerine_dust=1,
-})
-
-minetest.register_entity("nitroglycerin:playerp",{
-	hp_max = 1000,
-	physical =true,
-	collisionbox = {-0.5,-0.5,-0.5,0.5,1.5,0.5},
-	visual = "sprite",
-	textures ={"default_air.png"},
-	pointable=false,
-	on_punch=function(self)
-		local v=self.object:get_velocity().y
-		if v<0.2 and v>-0.2 then
-			self.kill(self)
-		end
-	end,
-	kill=function(self,liquid)
-		if self.ob and self.ob:get_attach() then
-			self.ob:set_detach()
-			if not (liquid and liquid>0) then
-				local from=math.floor((self.y+0.5)/2)
-				local hit=math.floor((self.object:get_pos().y+0.5)/2)
-				local d=from-hit
-				if d>=0 then
-					self.ob:punch(self.ob,1,{full_punch_interval=1,damage_groups={fleshy=d}})
-				end
-			end
-		end
-		self.object:remove()
-		return self
-	end,
-	on_activate=function(self, staticdata)
-		if not nitroglycerin.new_player
-		or minetest.check_player_privs(nitroglycerin.new_player:get_player_name(), {fly=true}) then self.object:remove() return self end
-		self.ob=nitroglycerin.new_player
-		self.ob:set_attach(self.object, "",{x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-		self.object:set_acceleration({x=0,y=-10,z=0})
-		self.y=self.object:get_pos().y
-		return self
-	end,
-	on_step=function(self, dtime)
-		self.time=self.time+dtime
-		if self.time<self.timer then return self end
-		self.time=0
-		self.timer2=self.timer2-1
-		local pos=self.object:get_pos()
-
-		if pos.y>self.y then self.y=pos.y end
-
-		local u=minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name]
-		if (u and u.walkable or u.liquid_viscosity>0) or self.timer2<0 or (not self.ob or not self.ob:get_attach()) then
-			self.kill(self,u.liquid_viscosity)
-		end
-		return self
-	end,
-	time=0,
-	timer=0.5,
-	timer2=100,
-	attachplayer=1,
 })
 
 minetest.register_node("nitroglycerin:icebox", {
