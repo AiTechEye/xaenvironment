@@ -95,9 +95,6 @@ spacestuff.wieldsuit=function(user,s)
 				return
 			end
 		end
-
-		user:set_properties({textures = {"spacestuff_spacesuit2.png"}})
-
 		spacestuff.users[name] = {
 			air=100,
 			user=user,
@@ -112,6 +109,8 @@ spacestuff.wieldsuit=function(user,s)
 				alignment = {x=1, y=1},
 			})
 		}
+
+		user:set_properties({textures = {"spacestuff_spacesuit2.png"}})
 		u = spacestuff.users[name]
 	end
 
