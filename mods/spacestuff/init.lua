@@ -296,7 +296,7 @@ minetest.register_node("spacestuff:door_open_2", {
 minetest.register_node("spacestuff:airgen", {
 	description = "Air Generater 100%",
 	tiles = {"default_workbench_table.png^default_frame.png","spacestuff_gen.png"},
-	groups = {cracky=2,not_in_creative_inventory=airgen_tmpn},
+	groups = {cracky=2},
 	sounds = default.node_sound_stone_defaults(),
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local a
