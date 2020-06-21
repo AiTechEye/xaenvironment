@@ -18,6 +18,11 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 			end
 		end
 	end
+	default.update_nodes(pos)
+end)
+
+
+default.update_nodes=function(pos)
 	if minetest.find_node_near(pos,1,"group:on_update") then
 		for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"group:on_update"})) do
 			local def=default.def(minetest.get_node(p).name)
@@ -26,7 +31,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 			end
 		end
 	end
-end)
+end
 
 minetest.register_abm({
 	nodenames={"group:igniter"},
