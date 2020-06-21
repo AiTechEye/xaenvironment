@@ -64,8 +64,8 @@ minetest.register_tool("spacestuff:spacesuit", {
 	end,
 	on_place=function(itemstack, user, pointed_thing)
 		if pointed_thing.under then
-			local pos = pointed_thing.above
-			if minetest.get_node(apos(pos,0,-1)).name == "spacestuff:air_compressor" then
+			local pos = pointed_thing.under
+			if minetest.get_node(pos).name == "spacestuff:air_compressor" then
 				for i,v in pairs(spacestuff.rules) do
 					local p = {x=pos.x+v.x,y=pos.y+v.y,z=pos.z+v.z}
 					if minetest.get_node(p).name == "air" then
