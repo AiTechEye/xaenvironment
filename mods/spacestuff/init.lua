@@ -57,10 +57,25 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_tool("spacestuff:spacesuit", {
-	description = "Spacesuit",
+	description = "Spacesuit (place on 'Air compressor' to refill)",
 	inventory_image = "spacestuff_spacesuit.png",
 	on_use=function(itemstack, user, pointed_thing)
 		spacestuff.wieldsuit(user,true)
+	end,
+	on_place=function(itemstack, user, pointed_thing)
+		if pointed_thing.under then
+			local pos = pointed_thing.above
+			if minetest.get_node(apos(pos,0,-1)).name == "spacestuff:air_compressor" then
+				for i,v in pairs(spacestuff.rules) do
+					local p = {x=pos.x+v.x,y=pos.y+v.y,z=pos.z+v.z}
+					if minetest.get_node(p).name == "air" then
+						itemstack:set_wear(0)
+						minetest.sound_play("spacestuff_pff", {pos=pos, gain = 1, max_hear_distance = 8})
+						return itemstack
+					end
+				end
+			end
+		end
 	end
 })
 
@@ -313,7 +328,7 @@ minetest.register_node("spacestuff:airgen", {
 			local m = minetest.get_meta(pos)
 			local pr = m:get_int("air")-10
 			m:set_int("air",pr)
-			minetest.get_meta(pos):set_string("infotext", "Air Generater " .. pr .."%")
+			minetest.get_meta(pos):set_string("infotext", "Air Generater " .. pr .."% (place on 'Air compressor' to refill)")
 		end
 	end,
 	on_place=function(itemstack, user, pointed_thing)
@@ -323,6 +338,19 @@ minetest.register_node("spacestuff:airgen", {
 			local item2 = item1:to_table()
 			minetest.add_node(pointed_thing.above,{name="spacestuff:airgen"})
 			if item2.meta and item2.meta.air then
+				local pos = pointed_thing.above
+				if minetest.get_node(apos(pos,0,-1)).name == "spacestuff:air_compressor" then
+					for i,v in pairs(spacestuff.rules) do
+						local p = {x=pos.x+v.x,y=pos.y+v.y,z=pos.z+v.z}
+						if minetest.get_node(p).name == "air" then
+							m:set_int("air",100)
+							m:set_string("infotext", "Air Generater 100%")
+							minetest.sound_play("spacestuff_pff", {pos=pos, gain = 1, max_hear_distance = 8})
+							itemstack:take_item()
+							return itemstack
+						end
+					end
+				end
 				m:set_int("air",item2.meta.air)
 				m:set_string("infotext", "Air Generater " .. item2.meta.air .."%")
 			else
