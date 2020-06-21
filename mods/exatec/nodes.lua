@@ -1045,6 +1045,7 @@ minetest.register_node("exatec:node_breaker", {
 						minetest.add_item(b,stack)
 					end
 					minetest.remove_node(f)
+					default.update_nodes(f)
 				end
 				local inv = minetest.get_meta(pos):get_inventory()
 				for _, ob in pairs(minetest.get_objects_inside_radius(f,1)) do
