@@ -98,7 +98,6 @@ multidimensions.register_dimension=function(name,def,self)
 
 	multidimensions.registered_dimensions[name]=def
 
-
 	if def.teleporter then
 
 		node.description = node.description or		"Teleport to dimension " .. name
@@ -109,24 +108,20 @@ multidimensions.register_dimension=function(name,def,self)
 			minetest.get_meta(pos):set_string("infotext",node.description)
 		end
 		node.on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+			if multidimensions.loading_area[minetest.pos_to_string(pos)] then
+				minetest.chat_send_player(player:get_player_name(),"Loading...")
+				return
+			end
 			minetest.sound_play("default_door_open",{pos=pos,gain=1,max_hear_distance=10})
 			local meta=minetest.get_meta(pos)
-			local pos2
-
 			local sp = meta:get_string("pos")
 			if sp ~= "" then
-				pos2 = minetest.string_to_pos(sp)
+				player:set_pos(minetest.string_to_pos(sp))
+				multidimensions.apply_dimension(player)
 			else
-				pos2 = {x=pos.x,y=def.dirt_start+def.dirt_depth+2,z=pos.z}
+				local pos2 = {x=pos.x,y=def.dirt_start+def.dirt_depth+2,z=pos.z}
+				multidimensions.move(player,pos2,pos)
 			end
-
-			local REset
-			if meta:get_int("re_set") == 0 then
-				meta:set_int("re_set",1)
-				REset = pos
-			end
-			multidimensions.move(player,pos2,REset)
-	
 		end
 
 		node.name = "teleporter_" .. name
@@ -320,7 +315,7 @@ end
 minetest.register_node("multidimensions:teleporterre", {
 	description = "Teleport back",
 	tiles = {"default_steelblock.png"},
-	groups = {cracky=3},
+	groups = {unbreakable=1},
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	drop = "default:cobble",
@@ -330,10 +325,10 @@ minetest.register_node("multidimensions:teleporterre", {
 			minetest.remove_node(pos)
 			return
 		end
-		multidimensions.move(player,minetest.string_to_pos(p),nil,true)
+		player:set_pos(minetest.string_to_pos(p))
+		multidimensions.apply_dimension(player)
 	end,
 })
-
 
 if multidimensions.limeted_nametag==true and minetest.settings:get_bool("unlimited_player_transfer_distance")~=false then
 	minetest.settings:set_bool("unlimited_player_transfer_distance",false)

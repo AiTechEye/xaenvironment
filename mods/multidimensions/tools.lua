@@ -168,69 +168,59 @@ multidimensions.apply_dimension=function(player)
 	}
 end
 
-multidimensions.move=function(object,pos,set_re)
-	local move=false
-	object:set_pos(pos)
-	multidimensions.setrespawn(object,pos)
-
+multidimensions.move=function(object,pos,set_re,firstspos)
 	if set_re == nil then
 		return
 	end
 
-	minetest.set_node({x=pos.x,y=pos.y-2,z=pos.z},{name="default:cobble"})
-	minetest.after(1, function(pos,object,move,set_re)
-		for i=1,100,1 do
-			local nname=minetest.get_node(pos).name
-			if nname~="air" and nname~="ignore" and nname ~= "multidimensions:teleporterre" then
-				pos.y=pos.y+1
-				move=true
-			elseif move then
-				minetest.set_node(pos,{name="multidimensions:teleporterre"})
-				minetest.get_meta(pos):set_string("pos",minetest.pos_to_string({x=set_re.x,y=set_re.y+1,z=set_re.z}))
-				pos.y = pos.y + 1
-				minetest.get_meta(set_re):set_string("pos",minetest.pos_to_string(pos))
-				object:set_pos({x=pos.x,y=pos.y+1,z=pos.z})
-				multidimensions.setrespawn(object,{x=pos.x,y=pos.y+1,z=pos.z})
-				return
+	local la = minetest.pos_to_string(set_re)
+	if not multidimensions.loading_area[la] then
+		multidimensions.loading_area[la] = true
+		firstspos = {x=pos.x,y=pos.y,z=pos.z}
+	end
+
+	minetest.emerge_area(pos,{x=pos.x,y=pos.y+50,z=pos.z})
+	minetest.forceload_block(pos)
+	local nname=minetest.get_node(pos).name
+	local w = default.def(nname).walkable
+	local move = 0
+
+	if w and nname ~= "ignore" then
+		pos.y=pos.y+1
+		move = move + 1
+	elseif not w and nname ~= "ignore" then
+		minetest.set_node(pos,{name="multidimensions:teleporterre"})
+		minetest.get_meta(pos):set_string("pos",minetest.pos_to_string({x=set_re.x,y=set_re.y+1,z=set_re.z}))
+		pos.y = pos.y + 1
+		minetest.get_meta(set_re):set_string("pos",minetest.pos_to_string(pos))
+		if move < 5 then
+			pos.y = pos.y - 2
+			local reg = minetest.registered_nodes[minetest.get_node(pos).name]
+			if reg and reg.walkable == false or reg.name == "default:cobble" then
+				for x = -2,2,1 do
+				for z = -2,2,1 do
+					minetest.set_node({x=pos.x+x,y=pos.y,z=pos.z+z},{name="default:cobble"})
+				end
+				end
 			end
 		end
-		pos.y = pos.y - 2
-		local reg = minetest.registered_nodes[minetest.get_node(pos).name]
-		if reg == nil or reg.walkable == false or reg.name == "default:cobble" then
-			for x = -2,2,1 do
-			for z = -2,2,1 do
-				minetest.set_node({x=pos.x+x,y=pos.y,z=pos.z+z},{name="default:cobble"})
-			end
-			end
+		multidimensions.loading_area[la] = nil
+		object:set_pos({x=pos.x,y=pos.y+1,z=pos.z})
+		if object:is_player() then
+			multidimensions.apply_dimension(object)
 		end
-	end, pos,object,move,set_re)
-	minetest.after(5, function(pos,object,move,set_re)
-		for i=1,100,1 do
-			local nname=minetest.get_node(pos).name
-			if nname~="air" and nname~="ignore" and nname ~= "multidimensions:teleporterre" then
-				pos.y=pos.y+1
-				move=true
-			elseif move then
-				minetest.set_node(pos,{name="multidimensions:teleporterre"})
-				minetest.get_meta(pos):set_string("pos",minetest.pos_to_string({x=set_re.x,y=set_re.y+1,z=set_re.z}))
-				pos.y = pos.y + 1
-				minetest.get_meta(set_re):set_string("pos",minetest.pos_to_string(pos))
-				object:set_pos({x=pos.x,y=pos.y+1,z=pos.z})
-				multidimensions.setrespawn(object,{x=pos.x,y=pos.y+1,z=pos.z})
-				return
-			end
-		end
-		pos.y = pos.y - 2
-		local reg = minetest.registered_nodes[minetest.get_node(pos).name]
-		if reg == nil or reg.walkable == false or reg.name == "default:cobble" then
-			for x = -2,2,1 do
-			for z = -2,2,1 do
-				minetest.set_node({x=pos.x+x,y=pos.y,z=pos.z+z},{name="default:cobble"})
-			end
-			end
-		end
-	end, pos,object,move,set_re)
-	return true
+		return
+	end
+
+	if object:is_player() and pos.y-firstspos.y < -500 then
+		multidimensions.loading_area[la] = nil
+		minetest.chat_send_player(object:get_player_name(),"Teleporter failed, try another spot")
+		return
+	end
+	
+	minetest.after(0.01, function(pos,object,move,set_re,firstspos)
+		multidimensions.move(object,pos,set_re,firstspos)
+	end, pos,object,move,set_re,firstspos)
 end
 
 local capg = 0
