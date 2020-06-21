@@ -1780,7 +1780,7 @@ minetest.register_node("exatec:industrial_miner", {
 			end
 			local n = minetest.get_node_drops(no)[1]
 			local def = minetest.registered_nodes[n] or {}
-			if minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
+			if minetest.get_item_group(no,"unbreakable") == 0 and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
 				local stack = ItemStack(n)
 				local inv = m:get_inventory()
 				if n ~= "air" and def.drop ~= "" and not inv:room_for_item("main",stack) then
