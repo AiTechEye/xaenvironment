@@ -338,7 +338,7 @@ end
 
 player_style.get_airlike=function(pos)
 	local d  = default.def(minetest.get_node(pos).name)
-	return d.name == "air" or d.name == "default:vacuum" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
+	return d.name == "air" or d.name == "default:vacuum" or d.name == "default:gas" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
 end
 
 local attached_players = player_style.player_attached
@@ -408,15 +408,44 @@ minetest.register_globalstep(function(dtime)
 					local w = vector.add(apos(p,0),{x=d.x,y=0,z=d.z})
 					if default.defpos(apos(w,0,1),"walkable") and not default.defpos(apos(w,0,2),"walkable") then
 						if player_style.get_airlike(p) and player_style.get_airlike(apos(p,0,1)) then
-							minetest.set_node(apos(p,0,0),{name="player_style:edgehook"})
-							minetest.set_node(apos(p,0,1),{name="player_style:edgehook"})
+							if default.defpos(apos(p,0,1),"drowning") == 1 then
+								minetest.set_node(p,{name="player_style:edgehook2"})
+								minetest.set_node(apos(p,0,1),{name="player_style:edgehook2"})
+							else
+								minetest.set_node(p,{name="player_style:edgehook"})
+								minetest.set_node(apos(p,0,1),{name="player_style:edgehook"})
+							end
+
+							--local vy = math.abs(v.y)*1.5
+							--vy = vy < 3 and vy or 3
+							--player:add_player_velocity({x=0,y=vy,z=0})
 						end
 					elseif default.defpos(apos(w,0,0),"walkable") and not default.defpos(apos(w,0,1),"walkable") then
 						if player_style.get_airlike(p) then
-							minetest.set_node(apos(p,0,0),{name="player_style:edgehook"})
+
+							if default.defpos(p,"drowning") == 1 then
+								minetest.set_node(p,{name="player_style:edgehook2"})
+							else
+								minetest.set_node(p,{name="player_style:edgehook"})
+							end
+							--local vy = math.abs(v.y)*1.5
+							--vy = vy <= 3 and vy or 3
+							--local ps = player_style.players[name]
+							--if not ps.climbedge then
+							--	ps.climbedge = p
+							--	player:add_player_velocity({x=0,y=vy,z=0})
+							--else
+							--	if key.jump then
+							--		player:add_player_velocity({x=0,y=vy,z=0})
+							--	else
+							--		player:add_player_velocity({x=0,y=(p.y-ps.climbedge.y)*10,z=0})
+							--		player:set_pos(ps.climbedge)
+							--	end
+							--end
 						end
 					end
-
+				--elseif player_style.players[name].climbedge then
+					--player_style.players[name].climbedge = nil
 				elseif key.aux1 and key.jump and vector.distance(vector.new(),v) < 9 then--and  not (key.left or key.right) then
 
 					local ly = player:get_look_yaw()

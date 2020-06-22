@@ -97,16 +97,60 @@ minetest.register_node("player_style:edgehook", {
 	liquid_alternative_source="player_style:edgehook",
 	liquid_renewable = false,
 	liquid_range = 0,
-	sunlight_propagates = false,
+	paramtype = "light",
+	sunlight_propagates = true,
 	walkable = false,
 	groups = {not_in_creative_inventory=1},
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(0.5)
+		minetest.get_node_timer(pos):start(0.1)
 	end,
 	on_timer = function (pos, elapsed)
 		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1.5)) do
 			if ob:is_player() then
-				return true
+				local key=ob:get_player_control()
+				if key.jump and key.down then
+					local d = ob:get_look_dir()
+					ob:add_player_velocity({x=d.x*10,y=1,z=d.z*10})
+					break
+				else
+					return true
+				end
+			end
+		end
+		minetest.remove_node(pos)
+		default.update_nodes(pos)
+	end
+})
+
+minetest.register_node("player_style:edgehook2", {
+	drawtype = "airlike",
+	drop = "",
+	liquid_viscosity = 3,
+	pointable= false,
+	liquidtype = "source",
+	drowning = 1,
+	liquid_alternative_flowing="player_style:edgehook",
+	liquid_alternative_source="player_style:edgehook",
+	liquid_renewable = false,
+	liquid_range = 0,
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	groups = {not_in_creative_inventory=1},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.1)
+	end,
+	on_timer = function (pos, elapsed)
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 1.5)) do
+			if ob:is_player() then
+				local key=ob:get_player_control()
+				if key.jump and key.down then
+					local d = ob:get_look_dir()
+					ob:add_player_velocity({x=d.x*10,y=1,z=d.z*10})
+					break
+				else
+					return true
+				end
 			end
 		end
 		minetest.remove_node(pos)
