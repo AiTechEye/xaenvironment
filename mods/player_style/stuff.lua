@@ -100,7 +100,8 @@ minetest.register_node("player_style:edgehook", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	groups = {not_in_creative_inventory=1},
+	buildable_to = true,
+	groups = {not_in_creative_inventory=1,climbalespace=1},
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
@@ -110,7 +111,7 @@ minetest.register_node("player_style:edgehook", {
 				local key=ob:get_player_control()
 				if key.jump and key.down then
 					local d = ob:get_look_dir()
-					ob:add_player_velocity({x=d.x*10,y=1,z=d.z*10})
+					ob:add_player_velocity({x=d.x*7,y=2,z=d.z*7})
 					break
 				else
 					return true
@@ -129,14 +130,15 @@ minetest.register_node("player_style:edgehook2", {
 	pointable= false,
 	liquidtype = "source",
 	drowning = 1,
-	liquid_alternative_flowing="player_style:edgehook",
-	liquid_alternative_source="player_style:edgehook",
+	liquid_alternative_flowing="player_style:edgehook2",
+	liquid_alternative_source="player_style:edgehook2",
 	liquid_renewable = false,
 	liquid_range = 0,
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	groups = {not_in_creative_inventory=1},
+	buildable_to = true,
+	groups = {not_in_creative_inventory=1,climbalespace=1},
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
@@ -146,7 +148,7 @@ minetest.register_node("player_style:edgehook2", {
 				local key=ob:get_player_control()
 				if key.jump and key.down then
 					local d = ob:get_look_dir()
-					ob:add_player_velocity({x=d.x*10,y=1,z=d.z*10})
+					ob:add_player_velocity({x=d.x*7,y=2,z=d.z*7})
 					break
 				else
 					return true

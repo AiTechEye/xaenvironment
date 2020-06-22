@@ -337,8 +337,9 @@ player_style.set_animation=function(name,typ,n)
 end
 
 player_style.get_airlike=function(pos)
-	local d  = default.def(minetest.get_node(pos).name)
-	return d.name == "air" or d.name == "default:vacuum" or d.name == "default:gas" or d.buildable_to and d.liquid_renewable and d.drawtype == "airlike"
+	local name = minetest.get_node(pos).name
+	--local d  = default.def(minetest.get_node(pos).name)
+	return name == "air" or name == "default:vacuum" or name == "default:gas" or minetest.get_item_group(name,"climbalespace") > 0 -- and d.liquid_renewable and d.drawtype == "airlike"
 end
 
 local attached_players = player_style.player_attached
@@ -403,6 +404,7 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 				end
+
 				if v.y < 0 and not default.defpos(apos(p,0,-1),"walkable") then
 					local d = player:get_look_dir()
 					local w = vector.add(apos(p,0),{x=d.x,y=0,z=d.z})
