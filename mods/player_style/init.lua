@@ -445,8 +445,8 @@ minetest.register_globalstep(function(dtime)
 						local d = player:get_look_dir()
 						player:add_player_velocity({x=d.x+(x1*4),y=1,z=d.z+(z1*4)})
 					end
-				elseif key.left and key.right then
-
+				end
+				if key.left and key.right then
 					local ly = player:get_look_yaw()
 					local x1 =math.sin(ly) * -1
 					local z1 =math.cos(ly)
@@ -455,16 +455,17 @@ minetest.register_globalstep(function(dtime)
 					local l = default.defpos({x=p.x+x1,y=p.y,z=p.z+z1},"walkable")
 					local r = default.defpos({x=p.x+x2,y=p.y,z=p.z+z2},"walkable")
 
-					if default.defpos(apos(p,0,1),"drowning") == 1 then
-						minetest.set_node(p,{name="player_style:edgehook2"})
-						minetest.set_node(apos(p,0,1),{name="player_style:edgehook2"})
-					else
-						minetest.set_node(p,{name="player_style:edgehook"})
-						minetest.set_node(apos(p,0,1),{name="player_style:edgehook"})
+					if r and l then
+
+						if default.defpos(apos(p,0,1),"drowning") == 1 then
+							minetest.set_node(p,{name="player_style:edgehook2"})
+							minetest.set_node(apos(p,0,1),{name="player_style:edgehook2"})
+						else
+							minetest.set_node(p,{name="player_style:edgehook"})
+							minetest.set_node(apos(p,0,1),{name="player_style:edgehook"})
+						end
 					end
-
 				end
-
 
 			elseif key.sneak or minetest.get_item_group(minetest.get_node(player:get_pos()).name,"liquid") > 0 then
 				a = "fly"
