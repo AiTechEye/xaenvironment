@@ -339,7 +339,7 @@ examobs.register_mob=function(def)
 		action = function(pos)
 			local pos1 = apos(pos,0,1)
 			local pos2 = apos(pos,0,2)
-			local l=minetest.get_node_light(pos1) or -1
+			local l=minetest.get_node_light(pos1)
 			if pos1.y >= def.min_spawn_y and pos2.y <= def.max_spawn_y and examobs.global_lifetime <= 1 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
