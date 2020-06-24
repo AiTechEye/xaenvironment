@@ -625,17 +625,9 @@ minetest.register_node("default:recycling_mill", {
 
 				for i,v in pairs(craft.items) do
 					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
-
-
 					if a.item and a.item:get_name()== input_item then
-						--if same_items == false then
-						--	same_items = true
-						--else
-							return
-						--end
+						return
 					end
-
-
 
 					if a.item:get_name() == "default:flitblock" then
 						return
