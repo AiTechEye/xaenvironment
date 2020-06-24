@@ -834,3 +834,43 @@ minetest.register_craft({
 		{"plants:wheat3"},
 	},
 })
+
+default.register_plant({
+	name="cabbage",
+	tiles={"plants_cabbage.png"},
+	drawtype = "mesh",
+	inventory_image="plants_cabbage_broken.png",	
+	mesh = "plants_cabbage.obj",
+	waving =  0,
+	groups = {dig_immediate = 3,flammable=1,spreading_plant=20},
+	decoration={
+		biomes={"tropic","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.005,
+			seed=3454365,
+		}
+	}
+})
+default.register_eatable("node","plants:cabbage_broken",1,4,{
+	description = "Broke cabbage",
+	inventory_image="plants_cabbage_broken.png",	
+	name="plants_cabbage",
+	tiles={"plants_cabbage.png"},
+	drawtype = "mesh",
+	mesh = "plants_cabbage.obj",
+	groups = {dig_immediate = 3,flammable=1,spreading_plant=20},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_leaves_defaults(),
+	wet=1,
+	selection_box  = {type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}},
+
+})
+minetest.register_craft({
+	output="plants:cabbage_broken",
+	recipe={
+		{"plants:cabbage"},
+	},
+})
