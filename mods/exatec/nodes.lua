@@ -284,6 +284,9 @@ minetest.register_node("exatec:tube_filter", {
 			end
 			return e
 		end,
+		on_input=function(pos,stack,opos)
+			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+		end,
 		on_tube=function(pos,stack,opos,ob)
 			local m = minetest.get_meta(pos)
 			local n = stack:get_name()
