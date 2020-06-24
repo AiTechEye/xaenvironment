@@ -90,7 +90,7 @@ minetest.register_node("examobs:candy" .. i, {
 exaachievements.register({
 	type="dig",
 	count=10,
-	name="Candy",
+	name="Candy "..i,
 	item="examobs:candy" .. i,
 	description="Dig 5 candy",
 	skills=5,
