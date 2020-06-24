@@ -608,12 +608,36 @@ minetest.register_node("default:recycling_mill", {
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local inv = minetest.get_meta(pos):get_inventory()
+		local input_item = inv:get_stack("input",1):get_name()
 		if inv:is_empty("output") then
 			local craft = minetest.get_craft_recipe(inv:get_stack("input",1):get_name())
 			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
+				local same_items = false
+				for i,v in pairs(craft.items) do
+					if v == input_item then
+						if same_items == false then
+							same_items = true
+						else
+							return
+						end
+					end
+				end
+
 				for i,v in pairs(craft.items) do
 					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
-					if a.item and a.item:get_name() == inv:get_stack("input",1):get_name() or a.item:get_name() == "default:flitblock" then
+
+
+					if a.item and a.item:get_name()== input_item then
+						--if same_items == false then
+						--	same_items = true
+						--else
+							return
+						--end
+					end
+
+
+
+					if a.item:get_name() == "default:flitblock" then
 						return
 					elseif v:sub(1,6) == "group:" then
 						local g = v:sub(7,-1)

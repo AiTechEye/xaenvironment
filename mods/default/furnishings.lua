@@ -369,7 +369,7 @@ minetest.register_node("default:itemframe", {
 		end
 
 		local meta = minetest.get_meta(pos)
-		if meta:get_string("owner") ~= player:get_player_name() then
+		if meta:get_string("owner") ~= player:get_player_name() or itemstack:get_wear() > 0 then
 			return
 		end
 		if meta:get_string("item") ~= "" then
