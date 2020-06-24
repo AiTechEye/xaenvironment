@@ -63,7 +63,7 @@ examobs.register_mob({
 	end,
 	on_punched=function(self,puncher)
 		examobs.dying(self,2)
-		local r = self.object:get_rotation()
+		local r = self.object:get_rotation() or {{x=0,y=0,z=0}}
 		self.object:set_rotation({x=r.x,y=r.y,z=math.pi})
 	end,
 })
