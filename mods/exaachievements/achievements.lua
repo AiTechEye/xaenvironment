@@ -234,3 +234,26 @@ exaachievements.register({
 	skills=20,
 	hide_until=100,
 })
+
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Moon cleaner",
+	item="default:space_dust",
+	description="Dig 100 space dust",
+	skills=10,
+	hide_until=20,
+})
+
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Moon caveman",
+	item="default:space_stone",
+	description="Dig 100 space stone",
+	skills=10,
+	hide_until=20,
+})
+
+exaachievements.do_a({item="multidimensions:teleporter_candyland",skills=100})
+exaachievements.do_a({item="multidimensions:teleporter_moon",skills=100})
