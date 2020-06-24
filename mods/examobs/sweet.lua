@@ -12,12 +12,33 @@ minetest.register_node("examobs:sugar_with_glaze", {
 	sounds=default.node_sound_clay_defaults(),
 })
 
+exaachievements.register({
+	type="dig",
+	count=500,
+	name="Supercake",
+	item="examobs:sugar_with_glaze",
+	description="Dig 500 sugar with glaze",
+	skills=50,
+	hide_until=150,
+})
+
 minetest.register_node("examobs:sponge_cake", {
 	description = "Sponge cake",
 	groups = {cracky=3,candy_underground=1},
 	tiles = {"examobs_spongecake.png"},
 	sounds=default.node_sound_snow_defaults(),
 })
+
+exaachievements.register({
+	type="dig",
+	count=500,
+	name="Cakemine",
+	item="examobs:sponge_cake",
+	description="Dig 500 sponge cake",
+	skills=50,
+	hide_until=160,
+})
+
 minetest.register_node("examobs:marzipan_rose", {
 	description = "Marzipan rose",
 	groups = {snappy=3},
@@ -31,7 +52,15 @@ minetest.register_node("examobs:marzipan_rose", {
 	on_use=minetest.item_eat(1)
 })
 
-
+exaachievements.register({
+	type="dig",
+	count=10,
+	name="Marzipan rose",
+	item="examobs:marzipan_rose",
+	description="Dig 10 Marzipan roses",
+	skills=10,
+	hide_until=160,
+})
 
 local candycolor={"ff75ec","ff0000","00ff00","0000ff","00ffff","ffff00"}
 for i=1,6,1 do
@@ -57,6 +86,17 @@ minetest.register_node("examobs:candy" .. i, {
 	on_use=minetest.item_eat(1),
 	sounds=default.node_sound_leaves_defaults(),
 })
+
+exaachievements.register({
+	type="dig",
+	count=10,
+	name="Candy",
+	item="examobs:candy" .. i,
+	description="Dig 5 candy",
+	skills=5,
+	hide_until=160,
+})
+
 end
 
 minetest.register_node("examobs:gel", {
