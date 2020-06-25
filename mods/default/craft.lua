@@ -34,7 +34,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="default:quantumblock",
+	output="default:quantumblock 3",
 	recipe={
 		{"default:uraniumactive_ingot","default:uraniumactive_ingot","default:uraniumactive_ingot"},
 		{"default:uraniumactive_ingot","default:electric_lump","default:uraniumactive_ingot"},
