@@ -67,6 +67,9 @@ examobs.register_mob({
 		elseif not minetest.is_protected(p, "") then
 			minetest.set_node(apos(p,0,-2),{name="default:lava_flowing",param2=5})
 		end
+		if walkable(apos(examobs.pointat(self,2),0,-2)) then
+			examobs.jump(self,10)
+		end
 	end,
 	on_punching=function(self)
 		if not self.eating and examobs.gethp(self.fight) < 100 then
@@ -85,7 +88,7 @@ examobs.register_mob({
 			end
 			examobs.punch(self.object,ob,100)
 		end
-	end,
+	end
 })
 
 examobs.register_mob({
@@ -94,7 +97,7 @@ examobs.register_mob({
 	team = "titan",
 	reach = 4.5,
 	dmg = 0,
-	hp = 2000,
+	hp = 3000,
 	textures={"examobs_titan_magma.png"},
 	mesh="examobs_titan.b3d",
 	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock","default:obsidian"},
@@ -172,6 +175,9 @@ examobs.register_mob({
 		elseif not minetest.is_protected(p, "") then
 			minetest.set_node(apos(p,0,-2),{name="default:lava_flowing",param2=5})
 		end
+		if walkable(apos(examobs.pointat(self,2),0,-2)) then
+			examobs.jump(self,10)
+		end
 	end,
 	on_punching=function(self)
 		if not self.eating and examobs.gethp(self.fight) < 100 then
@@ -190,7 +196,124 @@ examobs.register_mob({
 			end
 			examobs.punch(self.object,ob,100)
 		end
+	end
+})
+
+examobs.register_mob({
+	name = "titan_stone",
+	type = "monster",
+	team = "titan",
+	reach = 9,
+	range = 40,
+	dmg = 0,
+	hp = 3000,
+	textures={"examobs_titan_stone.png"},
+	mesh="examobs_titan.b3d",
+	visual_size = {x=2,y=2,z=2},
+	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock","default:obsidian"},
+	inv={["default:stone"]=9,["default:diamond"]=1},
+	collisionbox = {-3,-5.8,-3,3,4,3},
+	aggressivity = 2,
+	walk_speed = 8,
+	run_speed = 12,
+	bottom=4,
+	breathing = 0,
+	spawn_chance = 700,
+	bottom = -5,
+	animation = {
+		stand={x=1,y=10,speed=0,loop=false},
+		walk={x=11,y=21,speed=15,loop=false},
+		run={x=22,y=31,speed=15},
+		lay={x=48,y=49,speed=0,loop=false},
+		attack={x=33,y=47,speed=15},
+	},
+	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:basic_flame"]=1,["fire:permanent_flame"]=1},
+	on_spawn=function(self)
+		self.object:set_pos(apos(self:pos(),0,3))
 	end,
+	step=function(self)
+		if self.eating then
+			self.eating = self.eating + 1
+			if self.eating >= 3 then
+				if self.fight and examobs.distance(self.object,self.fight) <= 9 then
+					self:heal(examobs.gethp(self.fight))
+					if self.fight:is_player() then
+					default.respawn_player(self.fight,true)
+					else
+						local en = self.fight:get_luaentity()
+						if en and en.examob then
+							examobs.dropall(en)
+						end
+						self.fight:remove()
+					end
+				end
+				self.eating = nil
+			end
+			return self
+		end
+		if walkable(apos(examobs.pointat(self,5),0,-6)) then
+			examobs.jump(self)
+		end
+		if self.fight and examobs.gethp(self.fight) > 0 then
+			local p1 = apos(examobs.pointat(self,2),0,5)
+			local p2 = apos(self.fight:get_pos(),math.random(-2,2),math.random(-2,2),math.random(-2,2))
+			local v = {x=(p2.x-p1.x)*2,y=(p2.y-p1.y)*2,z=(p2.z-p1.z)*2}
+	
+			local node = "default:stone_spike"
+			if math.random(1,5) == 1 then
+				node = "default:cobble_porous"
+			end
+
+			minetest.add_node(p1,{name=node})
+			minetest.spawn_falling_node(p1)
+
+			for _, ob in ipairs(minetest.get_objects_inside_radius(p1, 1)) do
+				local en =  ob:get_luaentity()
+				if en and en.name == "__builtin:falling_node" and en.itemstring == node then
+					ob:set_velocity(v)
+				end
+			end
+		end
+
+		local p = self:pos()
+
+		for y=-4,7,1 do
+		for x=-6,6,1 do
+		for z=-6,6,1 do
+			local np = {x=p.x+x,y=p.y+y,z=p.z+z}
+			local n = minetest.get_node(np).name
+			if not minetest.is_protected(np, "") and walkable(np) then
+				local r = math.random(1,5)
+				if r == 1 then
+					minetest.spawn_falling_node(np)
+				elseif r == 2 then
+					minetest.add_item(np,minetest.get_node(np).name):get_luaentity().age = 895
+				else
+					minetest.remove_node(np)
+				end
+			end
+		end
+		end
+		end
+	end,
+	on_punching=function(self)
+		if not self.eating and examobs.gethp(self.fight) < 100 then
+			self.eating = 0
+			examobs.anim(self,"attack")
+		elseif examobs.gethp(self.fight) > 0 then
+			local ob = self.fight
+			local en =ob:get_luaentity()
+			local p1 = self:pos()
+			local p2 = examobs.pointat(self,50)
+			local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
+			if en then
+				ob:set_velocity(v)
+			else
+				ob:add_player_velocity(v)
+			end
+			examobs.punch(self.object,ob,100)
+		end
+	end
 })
 
 examobs.register_mob({
