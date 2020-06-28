@@ -18,12 +18,16 @@ player_style.register_button({
 })
 end)
 minetest.register_on_respawnplayer(function(player)
+	beds.respawn(player)
+end)
+
+beds.respawn=function(player)
 	local pos = player:get_meta():get_string("beds_position")
 	if pos ~= "" then
 		player:set_pos(minetest.string_to_pos(pos))
 		return true
 	end
-end)
+end
 
 beds.lay_and_stand=function(pos,player)
 	local pname = player:get_player_name()
