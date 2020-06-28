@@ -41,6 +41,7 @@ end)
 
 default.respawn_player=function(player,drop_bones)
 	if drop_bones then
+		bones.corpses[player:get_player_name()] = nil
 		bones.drop(player)
 	end
 	player:set_hp(20)
