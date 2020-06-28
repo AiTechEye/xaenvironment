@@ -94,6 +94,9 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 minetest.register_on_dieplayer(function(player)
+	bones.drop(player)
+end)
+bones.drop=function(player)
 	if bones.enabled and not bones.creative then
 		local name = player:get_player_name()
 
@@ -169,4 +172,4 @@ minetest.register_on_dieplayer(function(player)
 			v(player)
 		end
 	end
-end)
+end
