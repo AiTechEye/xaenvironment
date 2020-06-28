@@ -75,6 +75,11 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
+	player_style.respawn(player)
+end)
+
+
+player_style.respawn=function(player)
 	local name = player:get_player_name()
 	player_style.player_attached[name] = nil
 	player_style.set_animation(name,"stand")
@@ -84,7 +89,7 @@ minetest.register_on_respawnplayer(function(player)
 		player:hud_remove(player_style.players[name].black_death_id)
 		player_style.players[name].black_death_id = nil
 	end
-end)
+end
 
 minetest.register_on_newplayer(function(player)
 	minetest.after(0,function(player)
