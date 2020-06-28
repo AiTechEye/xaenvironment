@@ -1,5 +1,6 @@
 minetest.register_on_newplayer(function(player)
 	player:get_inventory():add_item("main","default:craftguide")
+	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
 end)
 
 apos=function(pos,x,y,z)
@@ -31,6 +32,34 @@ minetest.register_on_leaveplayer(function(player)
 		default.on_player_death[name] = nil
 	end
 end)
+
+minetest.register_on_respawnplayer(function(player)
+	minetest.after(0, function(player)
+		player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
+	end,player)
+end)
+
+default.respawn_player=function(player)
+	player:set_hp(20)
+	player:set_breath(11)
+	player_style.respawn(player)
+	local p = player:get_pos()
+	beds.respawn(player)
+	if vector.distance(p,player:get_pos()) < 0.1 then
+		local ssp = minetest.settings:get("static_spawnpoint")
+		if ssp then
+			player:set_pos(minetest.string_to_pos(ssp))
+			return
+		else
+			local sp = player:get_meta():get_string("spawn_position")
+			if sp ~= "" then
+				player:set_pos(minetest.string_to_pos(sp))
+			else
+				player:set_hp(0)
+			end
+		end
+	end
+end
 
 if default.creative then
 	local ohnd = minetest.handle_node_drops
