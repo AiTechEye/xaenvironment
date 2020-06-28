@@ -39,7 +39,10 @@ minetest.register_on_respawnplayer(function(player)
 	end,player)
 end)
 
-default.respawn_player=function(player)
+default.respawn_player=function(player,drop_bones)
+	if drop_bones then
+		bones.drop(player)
+	end
 	player:set_hp(20)
 	player:set_breath(11)
 	player_style.respawn(player)
