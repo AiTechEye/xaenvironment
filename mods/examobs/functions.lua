@@ -659,7 +659,7 @@ end
 
 examobs.dying=function(self,set)
 	if self.lay_on_death ~= 1 then return end
-	if set and set==1 then
+	if set==1 then
 		examobs.anim(self,"lay")
 		self.object:set_acceleration({x=0,y=-10,z =0})
 		self.object:set_velocity({x=0,y=-3,z =0})
@@ -670,7 +670,7 @@ examobs.dying=function(self,set)
 		self.dying={step=self.hp_max+self.hp,try=self.hp+self.hp_max/2}
 		self.hp=self.hp_max/2
 		self.object:set_hp(self.hp)
-	elseif set and set==2 then
+	elseif set==2 then
 		minetest.after(0.1, function(self)
 			if self.object:get_luaentity() then
 				examobs.anim(self,"lay")
@@ -684,7 +684,7 @@ examobs.dying=function(self,set)
 		self.dead=20
 		self.death(self)
 		examobs.dropall(self)
-	elseif set and set==3 and (self.dying or self.dead) then
+	elseif set==3 and (self.dying or self.dead) then
 		self.dying={step=0,try=self.hp_max*2}
 		self.dead=nil
 	end
