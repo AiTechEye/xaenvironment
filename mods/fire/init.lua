@@ -63,7 +63,7 @@ minetest.register_node("fire:basic_flame", {
 			minetest.get_meta(pos):set_int("radius",1.5)
 			minetest.get_node_timer(pos):start(1)
 		end
-		return true
+		return tonumber(memory_mb()) < 22
 	end,
 })
 
@@ -114,7 +114,7 @@ minetest.register_node("fire:not_igniter", {
 			minetest.get_meta(pos):set_int("radius",1.5)
 			minetest.get_node_timer(pos):start(1)
 		end
-		return true
+		return tonumber(memory_mb()) < 22
 	end,
 })
 
