@@ -1,3 +1,4 @@
+fire = {}
 minetest.register_craft({
 	output="fire:flint_and_steel",
 	recipe={{"default:flint","default:steel_ingot"},},
@@ -40,6 +41,30 @@ minetest.register_node("fire:basic_flame", {
 			},
 		},
 	},
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local r = m:get_int("radius")
+		local sr
+		r = r > 0 and r or 1.5
+		for i, ob in ipairs(minetest.get_objects_inside_radius(pos,r)) do
+			local p = ob:get_pos()
+			p = {x=p.x,y=p.y+0.1,z=p.z}
+			if default.def(minetest.get_node(p).name).buildable_to then
+				minetest.add_node(p,{name="fire:not_igniter"})
+				minetest.get_meta(p):set_int("radius",3)
+				minetest.get_node_timer(p):start(0.1)
+				sr = true
+			end
+		end
+		if not sr and r > 1.5 then
+			minetest.get_meta(pos):set_int("radius",1.5)
+			minetest.get_node_timer(pos):start(1)
+		end
+		return true
+	end,
 })
 
 minetest.register_node("fire:not_igniter", {
@@ -67,6 +92,30 @@ minetest.register_node("fire:not_igniter", {
 			},
 		},
 	},
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local r = m:get_int("radius")
+		local sr
+		r = r > 0 and r or 1.5
+		for i, ob in ipairs(minetest.get_objects_inside_radius(pos,r)) do
+			local p = ob:get_pos()
+			p = {x=p.x,y=p.y+0.1,z=p.z}
+			if default.def(minetest.get_node(p).name).buildable_to then
+				minetest.add_node(p,{name="fire:not_igniter"})
+				minetest.get_meta(p):set_int("radius",3)
+				minetest.get_node_timer(p):start(0.1)
+				sr = true
+			end
+		end
+		if not sr and r > 1.5 then
+			minetest.get_meta(pos):set_int("radius",1.5)
+			minetest.get_node_timer(pos):start(1)
+		end
+		return true
+	end,
 })
 
 minetest.register_node("fire:permanent_flame", {
