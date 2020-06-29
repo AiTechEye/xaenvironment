@@ -89,7 +89,10 @@ examobs.register_mob({
 			end
 			examobs.punch(self.object,ob,100)
 		end
-	end
+	end,
+	death=function(self)
+		minetest.set_node(self:pos(),{name="examobs:titan_core"})
+	end,
 })
 
 examobs.register_mob({
@@ -198,7 +201,11 @@ examobs.register_mob({
 			end
 			examobs.punch(self.object,ob,100)
 		end
-	end
+	end,
+	death=function(self)
+		minetest.set_node(self:pos(),{name="examobs:titan_core"})
+		minetest.set_node(apos(self:pos(),0,1),{name="examobs:titan_core"})
+	end,
 })
 
 examobs.register_mob({
@@ -316,7 +323,11 @@ examobs.register_mob({
 			end
 			examobs.punch(self.object,ob,100)
 		end
-	end
+	end,
+	death=function(self)
+		minetest.set_node(self:pos(),{name="examobs:titan_core"})
+		minetest.set_node(apos(self:pos(),0,1),{name="examobs:titan_core"})
+	end,
 })
 
 examobs.register_mob({

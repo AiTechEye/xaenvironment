@@ -546,3 +546,24 @@ minetest.register_tool("examobs:infection_poison", {
 		return item
 	end
 })
+
+minetest.register_node("examobs:titan_core", {
+	description = "Titan core",
+	tiles={
+		{
+			name = "default_lava_animated.png^[invert:b",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 0.5,
+			}
+		},
+
+	},
+	groups = {igniter=2,not_in_craftguide=1,cracky = 3},
+	paramtype = "light",
+	light_source=14,
+	damage_per_second = 9,
+})
