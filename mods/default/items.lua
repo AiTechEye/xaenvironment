@@ -862,8 +862,8 @@ default.registry_mineral({
 		damage_groups={fleshy=2}
 	}},
 	hoe={uses=1100},
-	arrow={damage=13},
-	bow={uses=1100,level=18},
+	arrow={damage=13,treasure=0},
+	bow={uses=1100,level=18,treasure=0},
 })
 
 default.registry_mineral({
