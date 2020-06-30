@@ -290,9 +290,11 @@ bows.register_arrow("fire",{
 		return self
 	end,
 	on_hit_object=function(self,target,hp,user,lastpos)
-		bows.registed_arrows["default:arrow_fire"].on_hit_node(self,lastpos,user,target:get_pos())
+		local p = target:get_pos()
+		bows.registed_arrows["default:arrow_fire"].on_hit_node(self,lastpos,user,p)
 		bows.arrow_remove(self)
-
+		minetest.get_meta(p):set_int("radius",3)
+		minetest.get_node_timer(p):start(0.1)
 	end,
 	craft={
 		{"group:arrow","default:torch"},
