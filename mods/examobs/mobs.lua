@@ -98,6 +98,14 @@ examobs.register_mob({
 	death=function(self)
 		minetest.set_node(self:pos(),{name="examobs:titan_core"})
 	end,
+	walktimer = 0,
+	on_walk=function(self)
+		self.walktimer = self.walktimer + 1
+		if self.walktimer > 2 then
+			self.walktimer = 0
+			minetest.sound_play("examobs_heavy_step", {object=self.object, gain = 2, max_hear_distance = 50})
+		end
+	end,
 })
 
 examobs.register_mob({
@@ -215,6 +223,14 @@ examobs.register_mob({
 	death=function(self)
 		minetest.set_node(self:pos(),{name="examobs:titan_core"})
 		minetest.set_node(apos(self:pos(),0,1),{name="examobs:titan_core"})
+	end,
+	walktimer = 0,
+	on_walk=function(self)
+		self.walktimer = self.walktimer + 1
+		if self.walktimer > 2 then
+			self.walktimer = 0
+			minetest.sound_play("examobs_heavy_step", {object=self.object, gain = 2, max_hear_distance = 50})
+		end
 	end,
 })
 
@@ -342,6 +358,14 @@ examobs.register_mob({
 	death=function(self)
 		minetest.set_node(self:pos(),{name="examobs:titan_core"})
 		minetest.set_node(apos(self:pos(),0,1),{name="examobs:titan_core"})
+	end,
+	walktimer = 0,
+	on_walk=function(self)
+		self.walktimer = self.walktimer + 1
+		if self.walktimer > 2 then
+			self.walktimer = 0
+			minetest.sound_play("examobs_heavy_step", {object=self.object, gain = 4, max_hear_distance = 100})
+		end
 	end,
 })
 
