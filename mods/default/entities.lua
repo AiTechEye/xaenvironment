@@ -20,8 +20,8 @@ local item = {
 			collisiondetection = true,
 		})
 	end,
-	on_step = function(self,dtime)
-		builtin_item.on_step(self,dtime)
+	on_step = function(self,dtime,moveresult)
+		builtin_item.on_step(self,dtime,moveresult)
 		local pos = self.object:get_pos()
 		local n = minetest.get_node(pos).name
 		local igniter = minetest.get_item_group(n,"igniter")
