@@ -1,8 +1,8 @@
-# xaenvironment
+# xaenvironment V8.001
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
-## V8.001
+## seems to be Compatible for minetest 5.3
 
 ---
 
