@@ -23,6 +23,12 @@ local item = {
 	on_step = function(self,dtime,moveresult)
 		builtin_item.on_step(self,dtime,moveresult)
 		local pos = self.object:get_pos()
+
+		if not pos then
+			self.object:remove()
+			return self
+		end
+
 		local n = minetest.get_node(pos).name
 		local igniter = minetest.get_item_group(n,"igniter")
 		local def = minetest.registered_items[n]
@@ -97,12 +103,12 @@ node = {
 		self.itemstring = node.name
 		local def = default.def(self.itemstring)
 		local s = def.sounds or {}
-		self.damage = def.damage_per_second
+		self.damage = def.damage_per_second or 0
 		self.damage = self.damage > 0 and self.damage or nil
 		self.sound = (s.dug and s.dug.name) or (s.dig and s.dig.name) or (s.footstep and s.footstep.name) or (s.place and s.place.name)
 
 		local pos = self.object:get_pos()
-		if minetest.find_node_near(pos,1,"group:on_update") then
+		if pos and minetest.find_node_near(pos,1,"group:on_update") then
 			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"group:on_update"})) do
 				local def=default.def(minetest.get_node(p).name)
 				if def.on_update then
@@ -114,10 +120,10 @@ node = {
 	on_activate=function(self,staticdata)
 		builtin_falling_node.on_activate(self,staticdata)
 	end,
-	on_step=function(self,dtime)
-		builtin_falling_node.on_step(self,dtime)
-		if self.damage then
-			local pos = self.object:get_pos()
+	on_step=function(self,dtime,moveresult)
+		builtin_falling_node.on_step(self,dtime,moveresult)
+		local pos = self.object:get_pos()
+		if pos and self.damage then
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
 				local en = ob:get_luaentity()
 				if not (en and en.itemstring) then
