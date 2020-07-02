@@ -585,7 +585,7 @@ minetest.register_node("default:space_dust", {
 	tiles={"default_space_dust.png"},
 	groups = {crumbly=3,falling_node=1},
 	drowning = 1,
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_sand_defaults(),
 	drowning = 1,
 })
 
@@ -593,7 +593,7 @@ minetest.register_node("default:desert_sand", {
 	description = "Desert sand",
 	tiles={"default_desert_sand.png"},
 	groups = {crumbly=3,sand=1,falling_node=1,treasure=1},
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_sand_defaults(),
 	drowning = 1
 })
 
@@ -615,7 +615,7 @@ minetest.register_node("default:sand", {
 	description = "Sand",
 	tiles={"default_sand.png"},
 	groups = {crumbly=3,sand=1,falling_node=1,treasure=1},
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_sand_defaults(),
 	drowning = 1,
 	drop ={
 		max_items = 1,
