@@ -452,16 +452,11 @@ minetest.register_globalstep(function(dtime)
 					end
 				end
 				if key.left and key.right then
-					local ly = player:get_look_yaw()
-					local x1 =math.sin(ly) * -1
-					local z1 =math.cos(ly)
-					local x2 =math.sin(ly)
-					local z2 =math.cos(ly) * -1
-					local l = default.defpos({x=p.x+x1,y=p.y,z=p.z+z1},"walkable")
-					local r = default.defpos({x=p.x+x2,y=p.y,z=p.z+z2},"walkable")
-
-					if r and l then
-
+					local x1 = default.defpos({x=p.x+1,y=p.y,z=p.z},"walkable")
+					local x2 = default.defpos({x=p.x-1,y=p.y,z=p.z},"walkable")
+					local z1 = default.defpos({x=p.x,y=p.y,z=p.z+1},"walkable")
+					local z2 = default.defpos({x=p.x,y=p.y,z=p.z-1},"walkable")
+					if x1 and x2 or z1 and z2 then
 						if default.defpos(apos(p,0,1),"drowning") == 1 then
 							minetest.set_node(p,{name="player_style:edgehook2"})
 							minetest.set_node(apos(p,0,1),{name="player_style:edgehook2"})
