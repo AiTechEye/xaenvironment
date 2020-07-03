@@ -1871,7 +1871,7 @@ examobs.register_bird({
 		return true
 	end,
 	hp = 20,
-	dmg = 4,
+	dmg = 2,
 	team = "hawk",
 	type = "animal",
 	run_speed = 4,
