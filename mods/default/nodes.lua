@@ -1200,3 +1200,15 @@ minetest.register_node("default:space_iron_ore", {
 	groups = {cracky=3},
 	drop="default:iron_lump 2",
 })
+
+default.register_door({
+	name="glass_door",
+	description = "Glass door",
+	texture="default_glass.png^default_glass_with_frame.png",
+	sounds = default.node_sound_glass_defaults(),
+	craft={
+		{"default:glass","default:glass",""},
+		{"default:glass","default:glass",""},
+		{"default:glass","default:glass",""},
+	}
+})
