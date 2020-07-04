@@ -6,6 +6,7 @@ player_style={
 	player_dive = {},
 	player_running = {},
 	player_tired = {},
+	sounds = {},
 	creative = minetest.settings:get_bool("creative_mode") == true,
 	damage = minetest.settings:get_bool("enable_damage") == true,
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst") ~= false,
@@ -116,6 +117,7 @@ minetest.register_on_joinplayer(function(player)
 	player_style.players[name] = {}
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
+
 	player_style.inventory(player)
 
 	player:set_properties({
@@ -187,6 +189,22 @@ minetest.register_on_joinplayer(function(player)
 		}
 	end
 end)
+
+player_style.register_environment_sound=function(def)
+	if not def.node then
+		error("Register_environment_sound: node required")
+	elseif not def.sound then
+		error("Register_environment_sound: sound required")
+	end
+	player_style.sounds[node] = {
+		node = def.node
+		sound = def.sound
+		timeloop = def.timeloop or 1
+		gain = def.gain or 0.5
+		distance = def.distance or 10
+		play = false
+	}
+end
 
 player_style.hunger=function(player,add,reset)
 
@@ -350,8 +368,59 @@ end
 local attached_players = player_style.player_attached
 
 minetest.register_globalstep(function(dtime)
+	for i,v in pairs(player_style.sounds) do
+		v.time = v.time + dtime
+		if v.time >= v.timeloop then
+			v.time = 0
+			v.play = true
+		else
+			v.play = false
+		end
+	end
+
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name=player:get_player_name()
+
+		local nodes_s_list = {}
+		local nodes_s_list_sounds = {}
+		for i,v in pairs(player_style.sounds) do
+			if v.play then
+				table.insert(nodes_s_list,i)
+				nodes_s_list_sounds[i] = {sound=v.sound,pos=vector.new()}
+			end
+		end
+
+
+		if #nodes_s_list > 0 then
+			local p = player:get_pos()
+			local nstp = minetest.find_nodes_in_area(vector.subtract(p,10),vector.add(p,10),nodes_s_list)
+
+			if #nstp > 0 then
+				for i,v in pairs(nstp) do
+					local n = minetest.get_node(v).name
+
+
+					if nodes_s_list_sounds[n] then
+						local nsl = nodes_s_list_sounds[n]
+						local sp = nsl.pos
+						sp.x = sp.x + v.x
+						sp.y = sp.y + v.y
+						sp.z = sp.z + v.z
+						nsl.count = (nsl.count or 0) + 1
+					end
+
+				end
+
+				for i,v in pairs(nodes_s_list_sounds) do
+					if v.count then
+						local sp = player_style.sounds[i]
+						local vs = vector.divide(v.pos,v.count)
+						minetest.sound_play(v.sound, {to_player=name,pos=vs, gain = math.min(0.05 + v.count * 0.005,sp.gain), max_hear_distance = sp.distance})
+					end
+				end
+			end
+		end
+
 		if not attached_players[name] then
 			local key=player:get_player_control()
 			local a="stand"

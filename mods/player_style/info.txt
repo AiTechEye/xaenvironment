@@ -41,3 +41,11 @@ player_style.register_button({
 	action=function(user)	action
 	end
 })
+=============================
+player_style.register_environment_sound({
+	node="default:water_flowing",	node	required
+	sound="default_water_stream",	sound	required
+	gain=2,				nil,number (default: 0.5)
+	timeloop=4,			nil,number (default: 1)
+	distance = 10,			nil,number (default: 10)
+})
