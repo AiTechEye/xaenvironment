@@ -79,13 +79,17 @@ minetest.register_on_respawnplayer(function(player)
 	player_style.respawn(player)
 end)
 
-
 player_style.respawn=function(player)
 	local name = player:get_player_name()
 	player_style.player_attached[name] = nil
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
+
+	for i, v in pairs(player_style.players[name].sounds) do
+		minetest.sound_stop(v)
+	end
+
 	if player_style.players[name].black_death_id then
 		player:hud_remove(player_style.players[name].black_death_id)
 		player_style.players[name].black_death_id = nil
@@ -114,7 +118,7 @@ minetest.register_on_joinplayer(function(player)
 	local profile=player_style.registered_profiles["default"]
 	local name=player:get_player_name()
 
-	player_style.players[name] = {}
+	player_style.players[name] = {sounds={}}
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 
@@ -196,12 +200,12 @@ player_style.register_environment_sound=function(def)
 	elseif not def.sound then
 		error("Register_environment_sound: sound required")
 	end
-	player_style.sounds[node] = {
-		node = def.node
-		sound = def.sound
-		timeloop = def.timeloop or 1
-		gain = def.gain or 0.5
-		distance = def.distance or 10
+	player_style.sounds[def.node] = {
+		sound = def.sound,
+		timeloop = def.timeloop or 1,
+		time = 0,
+		gain = def.gain or 0.5,
+		distance = def.distance or 10,
 		play = false
 	}
 end
@@ -390,7 +394,6 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 
-
 		if #nodes_s_list > 0 then
 			local p = player:get_pos()
 			local nstp = minetest.find_nodes_in_area(vector.subtract(p,10),vector.add(p,10),nodes_s_list)
@@ -415,7 +418,8 @@ minetest.register_globalstep(function(dtime)
 					if v.count then
 						local sp = player_style.sounds[i]
 						local vs = vector.divide(v.pos,v.count)
-						minetest.sound_play(v.sound, {to_player=name,pos=vs, gain = math.min(0.05 + v.count * 0.005,sp.gain), max_hear_distance = sp.distance})
+						local s = minetest.sound_play(v.sound, {to_player=name,pos=vs, gain = math.min(0.05 + v.count * 0.005,sp.gain), max_hear_distance = sp.distance})
+						table.insert(player_style.players[name].sounds,s)
 					end
 				end
 			end
