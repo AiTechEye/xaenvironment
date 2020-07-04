@@ -255,6 +255,35 @@ default.register_tree=function(def)
 		recipe={{mod .. def.name .. "_tree"}},
 	})
 
+-- stair
+
+	minetest.register_node(mod .. def.name .. "_stair",{
+		description = def.wood.description  .. " stair",
+		tiles = def.wood.tiles,
+		drawtype = "nodebox",
+		paramtype = "light",
+		paramtype2 = "facedir",
+		groups = def.wood.groups,
+		sounds = def.wood.sounds,
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0},
+				{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+			}
+		},
+		on_place = minetest.rotate_node,
+
+	})
+	minetest.register_craft({
+		output=mod .. def.name .. "_stair 3",
+		recipe={
+			{"",mod .. def.name .. "_wood"},
+			{mod .. def.name .. "_wood",mod .. def.name .. "_wood"}
+		},
+	})
+
+
 -- leaves
 
 	def.leaves = def.leaves or					{}
