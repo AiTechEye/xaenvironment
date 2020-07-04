@@ -227,6 +227,10 @@ examobs.environment=function(self)
 --liquid and viscosity
 
 	if def.liquid_viscosity > 0 then
+		if not self.in_liquid and v.y <= 0 and minetest.get_item_group(def.name,"water") > 0 then
+			minetest.sound_play("default_object_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+		end
+
 		self.in_liquid = true
 		local s=1
 		local v = self.object:get_velocity() or {x=0,y=0,z=0}
@@ -491,7 +495,7 @@ examobs.find_objects=function(self)
 	local fight = self.aggressivity == 2
 	local obs = {}
 	local hungry = self.hp < self.hp_max
-	for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), self.range)) do
+	for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 		local en = ob:get_luaentity()
 		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob)

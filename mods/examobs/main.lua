@@ -152,7 +152,7 @@ examobs.register_mob=function(def)
 		end
 	end
 	def.pos=function(self)
-		return self.object:get_pos()
+		return self.object:get_pos() or {x=0,y=0,z=0}
 	end
 	def.on_step=examobs.on_step
 
