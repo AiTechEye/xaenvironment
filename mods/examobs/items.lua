@@ -175,6 +175,17 @@ minetest.register_craft({
 	recipe = "examobs:chickenleg",
 })
 
+default.register_eatable("craftitem","examobs:fried_egg",1,2,{
+	description = "Fried egg",
+	groups={meat=1},
+	inventory_image = "examobs_fried_egg.png"
+})
+minetest.register_craft({
+	type = "cooking",
+	output = "examobs:fried_egg",
+	recipe = "examobs:egg",
+})
+
 minetest.register_node("examobs:egg", {
 	description = "Egg",
 	drawtype = "plantlike",
