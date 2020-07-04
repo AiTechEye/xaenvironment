@@ -31,46 +31,35 @@ minetest.register_tool("default:telescopic", {
 	groups = {treasure=1},
 	inventory_image = "default_telescopic.png",
 	on_use=function(itemstack, user, pointed_thing)
-		local z = user:get_properties().zoom_fov
+		local z = user:get_fov()
 		local key=user:get_player_control()
-		if z == 0 then
-			z = 11
+
+		if z == 0 and key.sneak == false then
+			z = 30
+		elseif z == 0 and key.sneak then
+			z = 5
+		elseif z <= 5 and key.sneak == false then
+			z = 0
+		elseif z <= 30 and key.sneak == false then
+			z = z - 5
+		elseif z >= 30 and key.sneak then
+			z = 0
+		elseif z >= 5 and key.sneak then
+			z = z + 5
 		end
-		if key.sneak == false then
-			z = z - 1	
-			if z <= 1 then
-				z = 1	
-			end
-		else
-			z = z + 1	
-			if z >= 11 then
-				z =11	
-			end
-		end
-		user:set_properties({zoom_fov=z})
-		local name = user:get_player_name()
-		local p = minetest.get_player_privs(name)
-		if p.zoom then
-			return itemstack
-		end
-		p.zoom = true
-		minetest.get_player_privs(name,p)
-		default.telescopic_check(user,user:get_wield_index())
+		user:set_fov(z,false,0.1)
+		default.telescopic_check(user)
 	end
 })
 
-default.telescopic_check=function(user,i)
-	minetest.after(1,function(user,i)
-		if user and user:get_pos() and user:get_inventory():get_stack("main",i):get_name() ~= "default:telescopic" then
-			local name = user:get_player_name()
-			user:set_properties({zoom_fov=0})
-			local p = minetest.get_player_privs(name)
-			p.zoom = false
-			minetest.get_player_privs(name,p)
+default.telescopic_check=function(user)
+	minetest.after(0.1,function(user)
+		if user and user:get_pos() and user:get_wielded_item():get_name() ~= "default:telescopic" then
+			user:set_fov(0,false,0.01)
 		else
-			default.telescopic_check(user,i)
+			default.telescopic_check(user)
 		end
-	end,user,i)
+	end,user)
 end
 
 minetest.register_craftitem("default:gold_flake", {
