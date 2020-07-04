@@ -568,10 +568,12 @@ minetest.register_node("exatec:extraction", {
 						if exatec.test_input(f,stack,pos) and exatec.test_output(b,stack,pos) then
 							exatec.input(f,stack,pos)
 							exatec.output(b,stack,pos)
+							minetest.sound_play("default_pump_out", {pos=pos, gain = 2, max_hear_distance = 10})
 							return true
 						end
 					end
 				end
+				minetest.sound_play("default_pump_in", {pos=pos, gain = 2, max_hear_distance = 10})
 			end
 		end,
 		test_input=function(pos,stack,opos)
@@ -615,6 +617,7 @@ minetest.register_node("exatec:dump", {
 						if exatec.test_output(b,stack,pos) then
 							exatec.output(b,stack,pos)
 							minetest.add_item(f,stack)
+							minetest.sound_play("default_pump", {pos=pos, gain = 1, max_hear_distance = 10})
 							return true
 						end
 					end
@@ -1787,10 +1790,14 @@ minetest.register_node("exatec:industrial_miner", {
 			if minetest.get_item_group(no,"unbreakable") == 0 and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
 				local stack = ItemStack(n)
 				local inv = m:get_inventory()
+
 				if n ~= "air" and def.drop ~= "" and not inv:room_for_item("main",stack) then
 					return
-				elseif n ~= "air" and def.drop ~= "" then
+				elseif not n or n == "air" then
+					minetest.sound_play("default_pump_in", {pos=pos, gain = 2, max_hear_distance = 10})
+				elseif def.drop ~= "" then
 					inv:add_item("main",stack)
+					minetest.sound_play("default_pump_out", {pos=pos, gain = 2, max_hear_distance = 10})
 				end
 				m:set_int("pos",y-1)
 				m:set_string("infotext","Industrial miner: "..(y-1))
