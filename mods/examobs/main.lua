@@ -1,19 +1,24 @@
 examobs.main=function(self, dtime)
+
+	if not self:pos() then
+		print(111,self.name)
+	end
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
 		self.environment_timer2 = self.environment_timer2 + self.timer1
 		self.timer1 = 0
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
-
-	if self.object == nil or self:pos() == nil then
+	if self:on_abs_step() or self.timer2 < self.updatetime then return end
+	self.timer2 = 0
+	local p = self.object:get_pos()
+	if p then
+		self.last_pos = p
+	end
+	if self.name == nil or self.object == nil or p == nil then
 		self.object:remove()
 		return self
 	end
-
-	if self:on_abs_step() or self.timer2 < self.updatetime then return end
-	self.timer2 = 0
-
 	if not self.static_save and examobs.global_lifetime > 1 and not self:on_lifedeadline() then
 		self.object:set_properties({static_save = false})
 		self.static_save = true
@@ -22,7 +27,6 @@ examobs.main=function(self, dtime)
 		self.object:set_properties({static_save = true})
 		self.static_save = nil
 	end	
-
 	if (self.dying or self.dead) and examobs.dying(self) then
 		return
 	elseif self.step(self) or self.target then
@@ -152,7 +156,7 @@ examobs.register_mob=function(def)
 		end
 	end
 	def.pos=function(self)
-		return self.object:get_pos()
+		return self.object:get_pos() or self.last_pos
 	end
 	def.on_step=examobs.on_step
 

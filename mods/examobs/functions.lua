@@ -105,10 +105,6 @@ examobs.environment=function(self)
 			end
 		end
 
-
-
-
-
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), 5)) do
 			local en = ob:get_luaentity()
 			if en and en.examob and en.team ~= self.team and en.examob ~= self.examob and examobs.visiable(self,ob) and examobs.gethp(ob) > 0 then
@@ -463,7 +459,7 @@ examobs.lookat=function(self,pos2)
 	if not (pos2 and pos2.z) then
 		return
 	end
-	local pos1=self.object:get_pos()
+	local pos1=self:pos()
 	local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
 	local yaw = examobs.num(math.atan(vec.z/vec.x)-math.pi/2)
 	if pos1.x >= pos2.x then yaw = yaw+math.pi end
@@ -565,8 +561,11 @@ examobs.known=function(self,ob,type,get)
 	end
 end
 
-examobs.visiable=function(pos1,pos2)
-	pos1 = type(pos1) == "userdata" and pos1:get_pos() or pos1.object and pos1.object:get_pos() or pos1
+examobs.visiable=function(self,pos2)
+	if not self.object then
+		return self
+	end
+	local pos1 = self:pos()
 	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2	
 
 	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
@@ -597,9 +596,11 @@ end
 
 examobs.viewfield=function(self,ob2)
 	local ob1 = self and self.object or self
+
+	local p1 = ob1 and ob1:get_pos()
 	local p2 = ob2 and ob2:get_pos()
-	if not (ob1 and ob2 and p2) then return false end
-	local p1 = ob1:get_pos()
+	if not (ob1 and ob2 and p2 and p1) then return false end
+
 	local a = vector.normalize(vector.subtract(p2, p1))
 	local b
 	if ob1:get_luaentity() then
@@ -616,13 +617,13 @@ end
 
 examobs.faceside=function(self,ob)
 	if not (self and self.object and ob) then return false end
-	local pos1=self.object:get_pos()
+	local pos1=self:pos()
 	local pos2 = type(ob) == "userdata" and ob:get_pos() or ob
 	return examobs.distance(pos1,pos2)>examobs.distance(examobs.pointat(self,0.1),pos2)
 end
 
 examobs.pointat=function(self,d)
-	local pos=self.object:get_pos()
+	local pos=self:pos()
 	local yaw=examobs.num(self.object:get_yaw())
 	d=d or 1
 	local x =math.sin(yaw) * -d

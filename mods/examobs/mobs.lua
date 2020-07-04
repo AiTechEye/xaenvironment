@@ -746,7 +746,7 @@ examobs.register_mob({
 		pos.y=pos.y-0.5
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 5)) do
 			local pos2=vector.round(ob:get_pos())
-			if examobs.team(ob)~=self.team and examobs.visiable(self.object,ob) and examobs.viewfield(self.object,ob) then
+			if examobs.team(ob)~=self.team and examobs.visiable(self,ob) and examobs.viewfield(self.object,ob) then
 				if ob:is_player() then
 					local p2={x=pos2.x-pos.x, y=pos2.y-pos.y, z=pos2.z-pos.z}
 					local a
@@ -1124,7 +1124,7 @@ examobs.register_mob({
 				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t2}})
 			end
 			self.aim = self.aim +math.random(0.1,0.5)
-			if examobs.gethp(self.fight) == 0 or not examobs.visiable(self.object,self.fight) or examobs.distance(self.object,self.fight) > self.range then
+			if examobs.gethp(self.fight) == 0 or not examobs.visiable(self,self.fight) or examobs.distance(self.object,self.fight) > self.range then
 				self.aim = 0
 				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
 				self.fight = nil
@@ -1605,7 +1605,7 @@ examobs.register_mob({
 			local p = self:pos()
 			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass"})
 			for i,v in pairs(np) do
-				if examobs.visiable(self.object,v) then
+				if examobs.visiable(self,v) then
 					self.grass = v
 					examobs.stand(self)
 					minetest.sound_play("examobs_sheep", {object=self.object, gain = 1, max_hear_distance = 10})
@@ -1615,7 +1615,7 @@ examobs.register_mob({
 		elseif self.grass then
 			examobs.lookat(self,self.grass)
 			examobs.walk(self)
-			if not examobs.visiable(self.object,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
+			if not examobs.visiable(self,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
 				self.grass = nil
 			elseif examobs.distance(self.object,self.grass) <= 2 then
 				minetest.remove_node(self.grass)
@@ -1699,7 +1699,7 @@ examobs.register_mob({
 			local p = self:pos()
 			local np = minetest.find_nodes_in_area_under_air(apos(p,-7,-3,-7),apos(p,7,3,7),{"group:grass","group:water"})
 			for i,v in pairs(np) do
-				if examobs.visiable(self.object,v) then
+				if examobs.visiable(self,v) then
 					if minetest.get_item_group(minetest.get_node(v).name,"grass") > 0 then
 						self.grass = v
 					elseif self.lifetimer > self.lifetime/2 then
@@ -1713,7 +1713,7 @@ examobs.register_mob({
 		elseif self.water then
 			examobs.lookat(self,self.water)
 			examobs.walk(self)
-			if not examobs.visiable(self.object,self.water) or minetest.get_item_group(minetest.get_node(self.water).name,"water") == 0 then
+			if not examobs.visiable(self,self.water) or minetest.get_item_group(minetest.get_node(self.water).name,"water") == 0 then
 				self.water = nil
 			elseif examobs.distance(self.object,self.water) <= 2 then
 				self.water = nil
@@ -1723,7 +1723,7 @@ examobs.register_mob({
 		elseif self.grass then
 			examobs.lookat(self,self.grass)
 			examobs.walk(self)
-			if not examobs.visiable(self.object,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
+			if not examobs.visiable(self,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
 				self.grass = nil
 			elseif examobs.distance(self.object,self.grass) <= 2 then
 				minetest.remove_node(self.grass)
@@ -1771,14 +1771,14 @@ examobs.register_bird({
 		if not self.item and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
-				if en and en.name == "__builtin:item" and examobs.visiable(self.object,ob) then
+				if en and en.name == "__builtin:item" and examobs.visiable(self,ob) then
 					self.item = ob
 					self.target = ob
 					return
 				end
 			end
 		elseif self.item then
-			if not self.item:get_pos() or not examobs.visiable(self.object,self.item) or not self.item:get_luaentity() then
+			if not self.item:get_pos() or not examobs.visiable(self,self.item) or not self.item:get_luaentity() then
 				self.item = nil
 				self.target = nil
 				return
@@ -1890,7 +1890,7 @@ examobs.register_bird({
 	step=function(self)
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 			local en = ob:get_luaentity()
-			if en and en.bird and en.examob ~= self.examob and examobs.visiable(self.object,ob) then
+			if en and en.bird and en.examob ~= self.examob and examobs.visiable(self,ob) then
 				self.fight = ob
 				return
 			end
