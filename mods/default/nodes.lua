@@ -921,8 +921,8 @@ minetest.register_node("default:lava_source", {
 	post_effect_color = {a = 240, r = 255, g = 55, b = 0},
 })
 
-player_style.register_environment_sound({node="default:lava_source",sound="default_lava",gain=8,min_y=-31000,max_y=-50,count=5})
-player_style.register_environment_sound({node="default:lava_flowing",sound="default_lava",gain=8,min_y=-31000,max_y=-50,count=10})
+player_style.register_environment_sound({node="default:lava_source",sound="default_lava",gain=8,min_y=-31000,max_y=-50,count=5,timeloop=3})
+player_style.register_environment_sound({node="default:lava_flowing",sound="default_lava",gain=8,min_y=-31000,max_y=-50,count=10,timeloop=3})
 
 minetest.register_node("default:lava_flowing", {
 	description = "Lava flowing",
