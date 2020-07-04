@@ -634,9 +634,9 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		if minetest.get_item_group(nod,"water") > 0 and player:get_player_velocity().y < 0 then
 			local d = default.def(nod)
 			if d.drawtype and d.drawtype == "flowingliquid" then
-				minetest.sound_play("default_item_watersplash", {object=player, gain = 4})
+				minetest.sound_play("default_item_watersplash", {object=player, gain = 4,max_hear_distance = 10})
 			else
-				minetest.sound_play("default_object_watersplash", {object=player, gain = 4})
+				minetest.sound_play("default_object_watersplash", {object=player, gain = 4,max_hear_distance = 10})
 			end
 		end
 	else
