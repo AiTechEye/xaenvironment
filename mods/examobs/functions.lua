@@ -1,3 +1,14 @@
+minetest.register_on_dieplayer(function(player)
+	local e = minetest.add_item(apos(player:get_pos(),0,1),"examobs:flesh")
+	if e then
+		e:set_velocity({
+			x=math.random(-1.5,1.5),
+			y=math.random(0.5,1),
+			z=math.random(-1.5,1.5)
+		})
+	end
+end)
+
 minetest.register_globalstep(function(dtime)
 	if examobs.global_timer <= os.clock() then
 		examobs.global_lifetime = (math.floor(examobs.global_time*100) / 100) + 1
