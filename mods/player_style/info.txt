@@ -48,4 +48,7 @@ player_style.register_environment_sound({
 	gain=2,				nil,number (default: 0.5)
 	timeloop=4,			nil,number (default: 1)
 	distance = 10,			nil,number (default: 10)
+	min_y = -20,			nil,number (default: -31000)
+	max_y = 50,			nil,number (default: 31000)
+	count = 5,			nil,number (default: 1) [min count of nodes]
 })

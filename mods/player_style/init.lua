@@ -206,7 +206,10 @@ player_style.register_environment_sound=function(def)
 		time = 0,
 		gain = def.gain or 0.5,
 		distance = def.distance or 10,
-		play = false
+		play = false,
+		min_y = def.min_y or -31000,
+		max_y = def.max_y or 31000,
+		count = def.count or 1,
 	}
 end
 
@@ -384,18 +387,18 @@ minetest.register_globalstep(function(dtime)
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name=player:get_player_name()
-
+		local p = player:get_pos()
 		local nodes_s_list = {}
 		local nodes_s_list_sounds = {}
 		for i,v in pairs(player_style.sounds) do
-			if v.play then
+			if v.play and v.min_y <= p.y and v.max_y >= p.y then
 				table.insert(nodes_s_list,i)
 				nodes_s_list_sounds[i] = {sound=v.sound,pos=vector.new()}
 			end
 		end
 
 		if #nodes_s_list > 0 then
-			local p = player:get_pos()
+			
 			local nstp = minetest.find_nodes_in_area(vector.subtract(p,10),vector.add(p,10),nodes_s_list)
 
 			if #nstp > 0 then
@@ -417,9 +420,11 @@ minetest.register_globalstep(function(dtime)
 				for i,v in pairs(nodes_s_list_sounds) do
 					if v.count then
 						local sp = player_style.sounds[i]
-						local vs = vector.divide(v.pos,v.count)
-						local s = minetest.sound_play(v.sound, {to_player=name,pos=vs, gain = math.min(0.05 + v.count * 0.005,sp.gain), max_hear_distance = sp.distance})
-						table.insert(player_style.players[name].sounds,s)
+						if v.count >= sp.count then
+							local vs = vector.divide(v.pos,v.count)
+							local s = minetest.sound_play(v.sound, {to_player=name,pos=vs, gain = math.min(0.05 + v.count * 0.005,0.5)*sp.gain, max_hear_distance = sp.distance})
+							table.insert(player_style.players[name].sounds,s)
+						end
 					end
 				end
 			end
