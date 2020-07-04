@@ -118,7 +118,7 @@ minetest.register_on_joinplayer(function(player)
 	local profile=player_style.registered_profiles["default"]
 	local name=player:get_player_name()
 
-	player_style.players[name] = {sounds={}}
+	player_style.players[name] = {sounds={},dive_sound={dive=false,time=0}}
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 
@@ -388,6 +388,26 @@ minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name=player:get_player_name()
 		local p = player:get_pos()
+		ppr = player_style.players[name]
+
+-- Environment sounds ===========
+
+		if minetest.get_item_group(minetest.get_node({x=p.x,y=p.y+0.6,z=p.z}).name,"water") > 0 then
+			if not ppr.dive_sound.dive then
+				ppr.dive_sound.dive = true
+				ppr.dive_sound.time = 4
+			end
+			ppr.dive_sound.time = ppr.dive_sound.time + dtime
+			if ppr.dive_sound.time >= 4 then
+				ppr.dive_sound.time = 0
+				ppr.sounds["default_underwater"] = minetest.sound_play("default_underwater", {to_player=name, gain = 1})
+
+			end
+		elseif ppr.dive_sound.dive then
+			ppr.dive_sound.dive = false
+			minetest.sound_stop(ppr.sounds["default_underwater"])
+		end
+
 		local nodes_s_list = {}
 		local nodes_s_list_sounds = {}
 		for i,v in pairs(player_style.sounds) do
@@ -398,9 +418,7 @@ minetest.register_globalstep(function(dtime)
 		end
 
 		if #nodes_s_list > 0 then
-			
-			local nstp = minetest.find_nodes_in_area(vector.subtract(p,10),vector.add(p,10),nodes_s_list)
-
+			local nstp = minetest.find_nodes_in_area(vector.subtract(p,7),vector.add(p,7),nodes_s_list)
 			if #nstp > 0 then
 				for i,v in pairs(nstp) do
 					local n = minetest.get_node(v).name
@@ -416,7 +434,6 @@ minetest.register_globalstep(function(dtime)
 					end
 
 				end
-
 				for i,v in pairs(nodes_s_list_sounds) do
 					if v.count then
 						local sp = player_style.sounds[i]
@@ -429,6 +446,8 @@ minetest.register_globalstep(function(dtime)
 				end
 			end
 		end
+
+-- ========
 
 		if not attached_players[name] then
 			local key=player:get_player_control()
@@ -623,6 +642,7 @@ player_style.player_run=function(name,player,a)
 end
 
 player_style.player_diveing=function(name,player,a,water,kong)
+
 	if a and not player_style.player_dive[name] then
 		player_style.player_run(name,player)
 		player_style.player_dive[name] = {kong = kong}
@@ -634,8 +654,10 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		player:set_physics_override({
 			jump= water == 0 and 0 or 1,
 		})
+
 		local pos = player:get_pos()
 		local nod = minetest.get_node(pos).name
+
 		if minetest.get_item_group(nod,"water") > 0 and player:get_player_velocity().y < 0 then
 			local d = default.def(nod)
 			if d.drawtype and d.drawtype == "flowingliquid" then
@@ -644,9 +666,12 @@ player_style.player_diveing=function(name,player,a,water,kong)
 				minetest.sound_play("default_object_watersplash", {object=player, gain = 4,max_hear_distance = 10})
 			end
 		end
+
+
 	else
 		local pr =  player_style.player_dive[name]
 		local p = player:get_pos()
+
 		if not a and pr and (pr.kong == nil or player:get_player_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
 			local profile=player_style.registered_profiles[player_style.players[name].profile]
 			player_style.player_dive[name] = nil
