@@ -55,7 +55,7 @@ end
 
 beds.sleeping=function(pos,player)
 	local tim = minetest.get_timeofday()
-	if tim >= 0.8 or tim < 0.21 then
+	if tim >= 0.77 or tim < 0.21 then
 		local players = {}
 		for _, p in pairs(minetest.get_connected_players()) do
 			if p and minetest.get_item_group(minetest.get_node(p:get_pos()).name,"bed") == 0 then
