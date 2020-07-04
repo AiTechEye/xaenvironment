@@ -140,6 +140,7 @@ examobs.register_fish=function(def)
 
 	local mobname = minetest.get_current_modname() ..":" .. def2.name
 
+	def2.makes_footstep_sound = false
 	def2.textures = def.textures or {"examobs_fish.png"}
 	def2.mesh = def.mesh or "examobs_fish.obj"
 	def2.type = def.type or "animal"

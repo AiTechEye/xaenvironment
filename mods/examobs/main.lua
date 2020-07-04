@@ -6,9 +6,9 @@ examobs.main=function(self, dtime)
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
 
-	if self.object:get_velocity() == nil then
+	if self.object == nil or self:pos() == nil then
 		self.object:remove()
-		return
+		return self
 	end
 
 	if self:on_abs_step() or self.timer2 < self.updatetime then return end
@@ -45,7 +45,7 @@ examobs.register_mob=function(def)
 	def.visual =			def.visual or			"mesh"
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
-	def.makes_footstep_sound =		def.makes_footstep_sound or		def.physical ~= false
+	def.makes_footstep_sound =		def.makes_footstep_sound == nil
 
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
@@ -152,7 +152,7 @@ examobs.register_mob=function(def)
 		end
 	end
 	def.pos=function(self)
-		return self.object:get_pos() or {x=0,y=0,z=0}
+		return self.object:get_pos()
 	end
 	def.on_step=examobs.on_step
 

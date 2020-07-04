@@ -495,7 +495,9 @@ examobs.find_objects=function(self)
 	local fight = self.aggressivity == 2
 	local obs = {}
 	local hungry = self.hp < self.hp_max
-	for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
+	local p = self:pos()
+	if not p then return self end
+	for _, ob in pairs(minetest.get_objects_inside_radius(p, self.range)) do
 		local en = ob:get_luaentity()
 		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob)
@@ -595,9 +597,10 @@ end
 
 examobs.viewfield=function(self,ob2)
 	local ob1 = self and self.object or self
-	if not ob1 and ob2 then return false end
+	local p2 = ob2 and ob2:get_pos()
+	if not (ob1 and ob2 and p2) then return false end
 	local p1 = ob1:get_pos()
-	local a = vector.normalize(vector.subtract(ob2:get_pos(), p1))
+	local a = vector.normalize(vector.subtract(p2, p1))
 	local b
 	if ob1:get_luaentity() then
 		local yaw = math.floor(ob1:get_yaw()*100)/100
