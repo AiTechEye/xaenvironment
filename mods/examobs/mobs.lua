@@ -71,6 +71,9 @@ examobs.register_mob({
 		if walkable(apos(examobs.pointat(self,2),0,-2)) then
 			examobs.jump(self,10)
 		end
+		if math.random(1,50) == 1 then
+			minetest.sound_play("examobs_titan_growl", {object=self.object, gain = 2, max_hear_distance = 100})
+		end
 	end,
 	on_punching=function(self)
 		if not self.eating and examobs.gethp(self.fight) < 100 then
@@ -195,6 +198,9 @@ examobs.register_mob({
 		end
 		if walkable(apos(examobs.pointat(self,2),0,-2)) then
 			examobs.jump(self,10)
+		end
+		if math.random(1,50) == 1 then
+			minetest.sound_play("examobs_titan_growl", {object=self.object, gain = 2, max_hear_distance = 100})
 		end
 	end,
 	on_punching=function(self)
@@ -330,6 +336,9 @@ examobs.register_mob({
 			end
 		end
 		end
+		end
+		if math.random(1,50) == 1 then
+			minetest.sound_play("examobs_titan_growl", {object=self.object, gain = 4, max_hear_distance = 100})
 		end
 	end,
 	on_punching=function(self)
