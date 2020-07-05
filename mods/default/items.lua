@@ -28,7 +28,7 @@ minetest.register_tool("default:wrench", {
 
 minetest.register_tool("default:telescopic", {
 	description = "Telescopic (zoom key, sneak)",
-	groups = {treasure=1,store=40},
+	groups = {treasure=1,store=800},
 	inventory_image = "default_telescopic.png",
 	on_use=function(itemstack, user, pointed_thing)
 		local z = user:get_fov()
@@ -108,7 +108,7 @@ minetest.register_tool(":", {
 	type = "none",
 	wield_image = "wieldhand.png",
 	wield_scale={x=1,y=1,z=2},
-	groups={not_in_creative_inventory=1},
+	groups={not_in_creative_inventory=1,store=10000},
 	range = not default.creative and 4 or 15,
 	tool_capabilities = not default.creative and {
 		full_punch_interval = 1,
@@ -216,7 +216,7 @@ minetest.register_tool("default:cudgel", {
 minetest.register_craftitem("default:paper", {
 	description = "Paper",
 	inventory_image = "default_paper.png",
-	groups = {flammable = 1,treasure=1},
+	groups = {flammable = 1,treasure=1,store=50},
 })
 
 default.registry_bucket("default:water_source")
@@ -227,7 +227,7 @@ default.registry_bucket("default:oil_source")
 minetest.register_craftitem("default:bucket", {
 	description = "Bucket",
 	inventory_image = "default_bucket.png",
-	groups = {bucket=1,treasure=1},
+	groups = {bucket=1,treasure=1,store=1000},
 	liquids_pointable = true,
 	on_use = function(itemstack, user, pointed_thing)
 		local p = pointed_thing
@@ -323,7 +323,7 @@ default.registry_mineral({
 		sounds=default.node_sound_stone_defaults(),
 		drop="default:carbon_lump 3",
 	},
-	ore={groups={cracky=3}},
+	ore={groups={cracky=3,store=200}},
 	lump={groups={flammable=1,treasure=1}},
 	additional_craft={
 		{output="default:carbonblock",recipe={
@@ -378,7 +378,7 @@ default.registry_mineral({
 		sounds=default.node_sound_stone_defaults(),
 	},
 	ore={groups={cracky=3}},
-	lump={groups={flammable=1,treasure=1}},
+	lump={groups={flammable=1,treasure=1,store=100}},
 	additional_craft={
 		{
 			type = "fuel",
@@ -416,7 +416,7 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	block={
-		groups={cracky=3,stone=1,treasure=1},
+		groups={cracky=3,stone=1,treasure=1,store=500},
 		sounds=default.node_sound_stone_defaults()
 	},
 	pick={groups={not_regular_craft=0,treasure=1}},
@@ -437,7 +437,7 @@ default.registry_mineral({
 default.registry_mineral({
 	name="copper",
 	texture="default_copperblock.png",
-	ingot={groups={treasure=1}},
+	ingot={groups={treasure=1,store=500}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
@@ -496,7 +496,7 @@ default.registry_mineral({
 	not_vineyardknife=true,
 	not_bow=true,
 	not_arrow=true,
-	ingot={groups={treasure=1}},
+	ingot={groups={treasure=1,store=400}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
@@ -511,7 +511,7 @@ default.registry_mineral({
 	not_ore = true,
 	arrow={damage=4,groups={treasure=1}},
 	bow={uses=500,level=7,groups={treasure=1}},
-	ingot={groups={treasure=1}},
+	ingot={groups={treasure=1,store=500}},
 	additional_craft={{
 		output="default:bronze_lump 8",
 		recipe={
@@ -564,7 +564,7 @@ default.registry_mineral({
 	texture="default_ironblock.png",
 	lump={inventory_image="default_lump_iron.png"},
 	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
-	ingot={groups={treasure=1}},
+	ingot={groups={treasure=1,store=500}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
@@ -620,7 +620,8 @@ default.registry_mineral({
 	not_ingot=true,
 	not_block=true,
 	craftitem="default:cloud",
-	pick={	groups={treasure=2},
+	
+	pick={	groups={treasure=2}},
 		tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,
@@ -665,7 +666,7 @@ default.registry_mineral({
 	texture="default_steelblock.png",
 	not_ore = true,
 	block={groups={cracky=1}},
-	ingot={groups={treasure=2}},
+	ingot={groups={treasure=2,store=800}},
 	pick={	groups={treasure=2},
 		tool_capabilities={
 		full_punch_interval = 1,
@@ -716,7 +717,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
-	ingot={groups={treasure=3}},
+	ingot={groups={treasure=3,store=800}},
 	ore_settings={
 		clust_scarcity= 8 * 8 * 8,
 		clust_num_ores=10,
@@ -736,7 +737,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
-	ingot={groups={treasure=3}},
+	ingot={groups={treasure=3,store=700}},
 	ore_settings={
 		clust_scarcity= 8 * 8 * 8,
 		clust_num_ores=9,
@@ -751,7 +752,7 @@ default.registry_mineral({
 default.registry_mineral({
 	name="diamond",
 	texture="default_diamondblock.png",
-	drop={inventory_image="diamond",groups={treasure=3}},
+	drop={inventory_image="diamond",groups={treasure=3,store=900}},
 	block={groups={cracky=1}},
 	not_lump = true,
 	not_ingot = true,
@@ -864,7 +865,7 @@ default.registry_mineral({
 	not_shovel=true,
 	not_hoe=true,
 	not_vineyardknife=true,
-	lump={groups={treasure=2}},
+	lump={groups={treasure=2,store=900}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=7,
@@ -943,7 +944,7 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	not_vineyardknife=true,
-	ingot={groups={store=50}},
+	ingot={groups={store=1000}},
 	additional_craft={{
 		type = "cooking",
 		output = "default:uraniumactive_ingot",
