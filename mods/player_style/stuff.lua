@@ -174,3 +174,9 @@ minetest.register_craft({
 		{"examobs:pelt","examobs:pelt","examobs:pelt"},
 	},
 })
+
+minetest.register_craftitem("player_style:coin", {
+	description = "Coin",
+	inventory_image = "player_style_coin.png",
+	groups = {treasure=1,coin=1},
+})
