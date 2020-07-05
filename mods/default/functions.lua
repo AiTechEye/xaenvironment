@@ -1,5 +1,5 @@
 Coin=function(player,count)
-	local m = user:get_meta()
+	local m = player:get_meta()
 	m:set_int("coins",m:get_int("coins")+count)
 end
 
