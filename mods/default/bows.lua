@@ -273,6 +273,7 @@ bows.register_arrow("arrow",{
 	texture="default_wood.png",
 	damage=5,
 	craft_count=8,
+	groups =  {store=10},
 	craft={{"group:tip","group:stick","examobs:feather"},}
 })
 
@@ -325,6 +326,7 @@ bows.register_arrow("build",{
 	end,
 	craft_count=8,
 	damage=8,
+	groups =  {store=100},
 	craft={
 		{"group:arrow","group:arrow","group:arrow"},
 		{"group:arrow","default:obsidian","group:arrow"},
@@ -343,6 +345,7 @@ bows.register_arrow("dig",{
 	end,
 	craft_count=16,
 	damage=8,
+	groups =  {store=100},
 	craft={
 		{"group:arrow","group:arrow","group:arrow"},
 		{"group:arrow","default:steel_lump","group:arrow"},
@@ -404,7 +407,7 @@ bows.register_arrow("tetanus",{
 bows.register_arrow("exposive",{
 	description="Exposive arrow",
 	texture="default_wood.png^[colorize:#aa0000aa",
-	groups={treasure=2},
+	groups={treasure=2,store=200},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.registed_arrows["default:arrow_exposive"].on_hit_node(self,target:get_pos(),user)
 	end,
@@ -430,7 +433,7 @@ bows.register_arrow("exposive",{
 bows.register_arrow("nitrogen",{
 	description="Nitrogen arrow",
 	texture="default_wood.png^[colorize:#00c482aa",
-	groups={treasure=2},
+	groups={treasure=2,store=100},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.arrow_remove(self)
 		if target:get_hp() <= 13 then
@@ -462,7 +465,7 @@ bows.register_arrow("teleport",{
 		bows.arrow_remove(self)
 	end,
 	craft_count=99,
-	groups={treasure=2},
+	groups={treasure=2,store=1000},
 	damage=0,
 	craft={
 		{"","group:arrow",""},
@@ -503,7 +506,7 @@ bows.register_arrow("lightning",{
 	end,
 	craft_count=3,
 	damage=0,
-	groups={treasure=2},
+	groups={treasure=2,store=1000},
 	craft={
 		{"","group:arrow",""},
 		{"group:arrow","default:electric_lump",""},
