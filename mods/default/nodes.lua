@@ -1,7 +1,7 @@
 minetest.register_node("default:lamp", {
 	description = "Lamp",
 	tiles={"default_cloud.png"},
-	groups = {dig_immediate=3,exatec_wire_connected=1,wallmounted=1},
+	groups = {dig_immediate=3,exatec_wire_connected=1,wallmounted=1,store=20},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "nodebox",
 	node_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.3, 0.2}},
@@ -39,7 +39,7 @@ minetest.register_node("default:cloud", {
 	description="Cloud",
 	drawtype="glasslike",
 	tiles={"default_cloud.png"},
-	groups = {cracky=1,level=2,fall_damage_add_percent=-90,treasure=2},
+	groups = {cracky=1,level=2,fall_damage_add_percent=-90,treasure=2,store=40},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 13,
@@ -69,7 +69,7 @@ minetest.register_node("default:dye", {
 minetest.register_node("default:wool", {
 	description = "Wool",
 	tiles={"default_wool.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=3,treasure=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=3,treasure=1,store=10},
 	sounds = default.node_sound_wood_defaults(),
 	palette="default_palette.png",
 	paramtype2="color",
@@ -79,7 +79,7 @@ minetest.register_node("default:wool", {
 minetest.register_node("default:quantumblock", {
 	description = "Quantum block",
 	tiles={"default_quantumblock.png"},
-	groups = {cracky=1,level=2,treasure=3},
+	groups = {cracky=1,level=2,treasure=3,store=200},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 13
@@ -195,7 +195,7 @@ minetest.register_node("default:torch", {
 	description = "Torch",
 	tiles={"default_torch.png"},
 	wield_scale = {x=2,y=2,z=2},
-	groups = {dig_immediate=3,flammable=3,igniter=1,treasure=1},
+	groups = {dig_immediate=3,flammable=3,igniter=1,treasure=1,store=2},
 	drawtype = "mesh",
 	mesh="default_torch.obj",
 	paramtype = "light",
@@ -344,7 +344,7 @@ minetest.register_node("default:glass_tabletop", {
 minetest.register_node("default:glass", {
 	description = "Glass",
 	tiles={"default_glass_with_frame.png","default_glass.png"},
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1,store=3},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
@@ -357,7 +357,7 @@ minetest.register_node("default:glass", {
 minetest.register_node("default:glass_frosted", {
 	description = "Frosted glass",
 	tiles={"default_glass_with_frame.png","default_cloud.png"},
-	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1,store=3},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
@@ -371,7 +371,7 @@ minetest.register_node("default:glass_frosted", {
 minetest.register_node("default:obsidian_glass", {
 	description = "Obsidian glass",
 	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
-	groups = {cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1},
+	groups = {cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1,store=4},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
@@ -391,10 +391,10 @@ minetest.register_node("default:obsidian_glass", {
 --||||||||||||||||
 
 minetest.register_node("default:dirt_with_red_permafrost_grass", {
-	description = "Dirt with red permafrost  grass",
+	description = "Dirt with red permafrost grass",
 	drop="default:permafrost_dirt",
 	tiles={"default_permafrost_redgrass.png","default_permafrostdirt.png","default_permafrostdirt.png^default_permafrost_redgrass_side.png"},
-	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
+	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -402,7 +402,7 @@ minetest.register_node("default:dirt_with_permafrost_grass", {
 	description = "Dirt with permafrost grass",
 	drop="default:permafrost_dirt",
 	tiles={"default_permafrost_grass.png","default_permafrostdirt.png","default_permafrostdirt.png^default_permafrost_grass_side.png"},
-	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,},
+	groups = {dirt=1,crumbly=1,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -417,7 +417,7 @@ minetest.register_node("default:dirt_with_snow", {
 	description = "Dirt with snow",
 	drop="default:dirt",
 	tiles={"default_snow.png","default_dirt.png","default_dirt.png^default_snow_side.png"},
-	groups = {dirt=1,crumbly=3,cools_lava=1},
+	groups = {dirt=1,crumbly=3,cools_lava=1,store=2},
 	sounds = default.node_sound_snow_defaults(),
 })
 
@@ -425,7 +425,7 @@ minetest.register_node("default:dirt_with_dry_grass", {
 	description = "Dirt with dry grass",
 	drop="default:dirt",
 	tiles={"default_dry_grass.png","default_dirt.png","default_dirt.png^default_dry_grass_side.png"},
-	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -433,7 +433,7 @@ minetest.register_node("default:dirt_with_jungle_grass", {
 	description = "Dirt with jungle grass",
 	drop="default:dirt",
 	tiles={"default_jungle_grass.png","default_dirt.png","default_dirt.png^default_jungle_grass_side.png"},
-	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -441,7 +441,7 @@ minetest.register_node("default:dirt_with_coniferous_grass", {
 	description = "Dirt with coniferous grass",
 	drop="default:dirt",
 	tiles={"default_coniferous_grass.png","default_dirt.png","default_dirt.png^default_coniferous_grass_side.png"},
-	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -449,7 +449,7 @@ minetest.register_node("default:dirt_with_grass", {
 	description = "Dirt with grass",
 	drop="default:dirt",
 	tiles={"default_grass.png","default_dirt.png","default_dirt.png^default_grass_side.png"},
-	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,},
+	groups = {dirt=1,soil=1,crumbly=3,spreading_dirt_type=1,store=2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -517,7 +517,7 @@ default.register_blockdetails({
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},
-	groups = {cracky=1,level=3,treasure=2},
+	groups = {cracky=1,level=3,treasure=2,store=20},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -729,7 +729,7 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:ice", {
 	description = "Ice",
 	tiles={"default_ice.png"},
-	groups = {cracky=3,slippery=10,treasure=1},
+	groups = {cracky=3,slippery=10,treasure=1,store=5},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -937,7 +937,7 @@ minetest.register_node("default:lava_source", {
 			}
 		}
 	},
-	groups = {lava=1, liquid=1,igniter=3,not_in_craftguide=1},
+	groups = {lava=1, liquid=1,igniter=3,not_in_craftguide=1,store=30},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -1010,7 +1010,7 @@ minetest.register_node("default:lava_flowing", {
 minetest.register_node("default:oil_source", {
 	description = "Oil source",
 	tiles={"default_oil.png"},
-	groups = {oil=1, liquid=1,disable_jump=1,flammable=3,not_in_craftguide=1},
+	groups = {oil=1, liquid=1,disable_jump=1,flammable=3,not_in_craftguide=1,store=30},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,

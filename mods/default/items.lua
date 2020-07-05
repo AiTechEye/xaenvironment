@@ -28,7 +28,7 @@ minetest.register_tool("default:wrench", {
 
 minetest.register_tool("default:telescopic", {
 	description = "Telescopic (zoom key, sneak)",
-	groups = {treasure=1},
+	groups = {treasure=1,store=40},
 	inventory_image = "default_telescopic.png",
 	on_use=function(itemstack, user, pointed_thing)
 		local z = user:get_fov()
@@ -943,6 +943,7 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	not_vineyardknife=true,
+	ingot={groups={store=50}},
 	additional_craft={{
 		type = "cooking",
 		output = "default:uraniumactive_ingot",

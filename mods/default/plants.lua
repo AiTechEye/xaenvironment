@@ -315,7 +315,7 @@ default.register_tree=function(def)
 	def.sapling.paramtype = def.sapling.paramtype or			"light"
 	def.sapling.drawtype = def.sapling.drawtype or			"plantlike"
 	def.sapling.sunlight_propagates = def.sapling.sunlight_propagates or	true
-	def.sapling.groups = def.sapling.groups or			{sapling=1,dig_immediate=3,snappy=3,flammable=3}
+	def.sapling.groups = def.sapling.groups or			{sapling=1,dig_immediate=3,snappy=3,flammable=3,store=20}
 	def.sapling.sounds = def.sapling.sounds or 			default.node_sound_leaves_defaults()
 	def.sapling.attached_node = def.sapling.attached_node or		1
 	def.sapling.walkable = def.sapling.walkable or			false
