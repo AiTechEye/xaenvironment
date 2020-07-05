@@ -29,7 +29,7 @@ minetest.register_node("clock:clock" .. i, {
 	wield_image="clock.png",
 	drop="clock:clock1",
 	inventory_image="clock.png",
-	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=i == 1 and 2 or nil},
+	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=i == 1 and 2 or nil,store=7},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	node_box = {
