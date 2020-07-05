@@ -388,7 +388,7 @@ minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name=player:get_player_name()
 		local p = player:get_pos()
-		ppr = player_style.players[name]
+		local ppr = player_style.players[name]
 
 -- Environment sounds ===========
 
