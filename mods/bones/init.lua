@@ -67,6 +67,20 @@ minetest.register_craftitem("bones:bone", {
 	description = "Bone",
 	inventory_image = "bones_bone.png",
 	wield_scale={x=2,y=2,z=2},
+	groups = {frammable=2},
+})
+
+minetest.register_craft({
+	output = "bones:insurance",
+	recipe = {
+		{"default:paper","default:gold_ingot"}
+	}
+})
+
+minetest.register_craftitem("bones:insurance", {
+	description = "Insurance (carry in inventory to not drop items on death)",
+	inventory_image = "bones_insurance.png",
+	groups = {frammable=1},
 })
 
 minetest.register_craft({
@@ -99,8 +113,15 @@ end)
 bones.drop=function(player)
 	if bones.enabled and not bones.creative then
 		local name = player:get_player_name()
+		local pinv = player:get_inventory()
 
-		if bones.corpses[name] or minetest.check_player_privs(name, {bones=true}) then
+		if pinv:contains_item("main","bones:insurance") then
+			pinv:remove_item("main",ItemStack("bones:insurance"))
+			return
+		elseif pinv:contains_item("craft","bones:insurance") then
+			pinv:remove_item("craft",ItemStack("bones:insurance"))
+			return
+		elseif bones.corpses[name] or minetest.check_player_privs(name, {bones=true}) then
 			return
 		end
 		bones.corpses[name] = true
@@ -119,7 +140,7 @@ bones.drop=function(player)
 				bpos = pos
 			end
 		end
-		local pinv = player:get_inventory()
+
 		if bpos then
 			minetest.set_node(bpos,{name="bones:boneblock"})
 			local m = minetest.get_meta(bpos)
