@@ -378,7 +378,12 @@ minetest.register_node("default:obsidian_glass", {
 	paramtype = "light",
 	palette="default_palette.png",
 	paramtype2 = "color",
-	on_punch=default.dye_coloring
+	on_punch=default.dye_coloring,
+	on_blast=function(pos)
+		if math.random(1,20) > 1 then
+			return true
+		end
+	end
 })
 
 --||||||||||||||||
