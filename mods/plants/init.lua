@@ -212,7 +212,7 @@ minetest.register_node("plants:coconut", {
 	description = "Coconut",
 	drawtype = "plantlike",
 	tiles={"plants_coconut.png"},
-	groups = {choppy = 3, dig_immediate = 3,flammable=1,store=2},
+	groups = {choppy = 3, dig_immediate = 3,flammable=1,store=20},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -365,7 +365,7 @@ for i,v in pairs({132,25,32,21,118,14,49,7,105,131,124,111,63,77,98,2}) do
 default.register_plant({
 	name="daisybush" .. i,
 	description = "Daisy bush",
-	groups = {store=1},
+	groups = {store=10},
 	tiles={default.dye_texturing(v,{opacity=255}).."^plants_daisybushflower.png^[makealpha:0,255,0"},
 	decoration={noise_params={
 		offset=-0.001,
@@ -378,7 +378,7 @@ default.register_plant({
 		name = "glowing" .. i,
 		light_source = 7,
 		tiles={default.dye_texturing(v,{opacity=200})},
-		groups = {store=3},
+		groups = {store=30},
 		dye_colors = {palette=v},
 		alpha = 150,
 		decoration = {
@@ -398,7 +398,7 @@ default.register_eatable("craftitem","plants:lonicera_tatarica_berries",-2,0,{in
 default.register_plant({
 	name="lonicera_tatarica",
 	tiles={"plants_lonicera_tatarica.png"},
-	groups = {store=1},
+	groups = {store=10},
 	decoration={
 		biomes={"tropic","jungle"},
 		noise_params={
@@ -463,7 +463,7 @@ default.register_eatable("craftitem","plants:dolls_eyes_berries",2,6,{
 default.register_plant({
 	name="dolls_eyes",
 	tiles={"plants_dolls_eyes.png"},
-	groups = {store=2},
+	groups = {store=20},
 	decoration={
 		biomes={"tropic","jungle"},
 		noise_params={
@@ -504,7 +504,7 @@ default.register_plant({
 default.register_plant({
 	name="cow_parsnip_big",
 	tiles={"plants_cow_parsnip.png"},
-	groups = {store=2},
+	groups = {store=20},
 	decoration={
 		biomes={"deciduous","jungle"},
 		noise_params={
@@ -668,7 +668,7 @@ minetest.register_lbm({
 default.register_plant({
 	name="wild_cotton",
 	tiles={"plants_wildcotton.png"},
-	groups = {store=2},
+	groups = {store=20},
 	decoration={
 		biomes={"deciduous","tropic","jungle","grass_land","semi_desert"},
 		noise_params={
@@ -715,7 +715,7 @@ default.register_plant({
 	tiles={"plants_cactus.png"},
 	damage_per_second=5,
 	walkable = true,
-	groups={choppy=1,snappy=0,attached_node=0,store=4},
+	groups={choppy=1,snappy=0,attached_node=0,store=40},
 	sounds = default.node_sound_wood_defaults(),
 	buildable_to=false,
 	drawtype = "nodebox",
@@ -848,7 +848,7 @@ default.register_plant({
 	inventory_image="plants_cabbage_broken.png",	
 	mesh = "plants_cabbage.obj",
 	waving =  0,
-	groups = {dig_immediate = 3,flammable=1,spreading_plant=20,store=4},
+	groups = {dig_immediate = 3,flammable=1,spreading_plant=20,store=40},
 	decoration={
 		biomes={"tropic","jungle"},
 		noise_params={
