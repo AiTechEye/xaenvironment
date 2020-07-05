@@ -30,7 +30,7 @@ minetest.register_node("exatec:tube", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,store=5},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -58,7 +58,7 @@ minetest.register_node("exatec:tube_detector", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire=1,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire=1,exatec_wire_connected=1,store=6},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -89,7 +89,7 @@ minetest.register_node("exatec:tube_gate", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1,store=6},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -133,7 +133,7 @@ minetest.register_node("exatec:tube_dir", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1,store=6},
 	paramtype2 = "facedir",
 	node_box = {
 		type = "connected",
@@ -194,7 +194,7 @@ minetest.register_node("exatec:tube_filter", {
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
-	groups = {chappy=3,dig_immediate = 2,exatec_tube=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,store=7},
 	node_box = {
 		type = "connected",
 		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
@@ -339,7 +339,7 @@ minetest.register_node("exatec:wire", {
 	},
 	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,-0.4}},
 	connects_to={"group:exatec_wire","group:exatec_wire_connected"},
-	groups = {dig_immediate = 3,exatec_wire=1},
+	groups = {dig_immediate = 3,exatec_wire=1,store=1},
 	after_place_node = function(pos, placer)
 		minetest.set_node(pos,{name="exatec:wire",param2=98})
 	end,
@@ -371,7 +371,7 @@ minetest.register_node("exatec:datawire", {
 	},
 	selection_box={type="fixed",fixed={-0.5,0.5,-0.5,0.5,0.4,0.5}},
 	connects_to={"group:exatec_data_wire","group:exatec_data_wire_connected"},
-	groups = {dig_immediate = 3,exatec_data_wire=1},
+	groups = {dig_immediate = 3,exatec_data_wire=1,store=1},
 	after_place_node = function(pos, placer)
 		minetest.set_node(pos,{name="exatec:datawire",param2=120})
 	end,
@@ -389,7 +389,7 @@ minetest.register_node("exatec:button", {
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	sounds = default.node_sound_wood_defaults(),
-	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1,store=5},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		exatec.send(pos)
 	end,
@@ -404,7 +404,7 @@ minetest.register_node("exatec:autosender", {
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=20},
 	exatec={
 	},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
@@ -427,7 +427,7 @@ minetest.register_node("exatec:autosender", {
 minetest.register_node("exatec:autocrafter", {
 	description = "Autocrafter",
 	tiles={"default_ironblock.png^default_craftgreed.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=20},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -553,7 +553,7 @@ minetest.register_node("exatec:extraction", {
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1,store=20},
 	exatec={
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -603,7 +603,7 @@ minetest.register_node("exatec:dump", {
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1,store=20},
 	exatec={
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -645,7 +645,7 @@ minetest.register_node("exatec:counter", {
 		"default_ironblock.png^materials_gear_metal.png",
 		"default_ironblock.png^materials_gear_metal.png^exatec_wirecon.png"
 	},
-	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1,store=15},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -691,7 +691,7 @@ minetest.register_node("exatec:delayer", {
 		"default_ironblock.png^clock.png^default_chest_top.png",
 		"default_ironblock.png",
 		"default_ironblock.png^exatec_wire.png"},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=15},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -733,7 +733,7 @@ minetest.register_node("exatec:toggleable_storage", {
 		"default_wood.png^default_chest_top.png^exatec_hole.png",
 		"default_wood.png^default_chest_top.png^exatec_hole.png^exatec_wirecon.png"
 	},
-	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=20},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -778,7 +778,7 @@ minetest.register_node("exatec:wire_gate", {
 		"default_ironblock.png",
 		"default_ironblock.png",
 	},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=10},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -803,7 +803,7 @@ minetest.register_node("exatec:wire_dir_gate", {
 		"default_ironblock.png",
 		"default_ironblock.png",
 	},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=10},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -834,7 +834,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 		"default_ironblock.png",
 		"default_ironblock.png",
 	},
-	groups = {dig_immediate = 2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=12},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -871,7 +871,7 @@ minetest.register_node("exatec:object_detector", {
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png",
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png^(default_crafting_arrowleft.png^default_crafting_arrowright.png^[colorize:#00ff00)"
 	},
-	groups = {dig_immediate = 2,exatec_wire=1,exatec_data_wire_connected=1,},
+	groups = {dig_immediate = 2,exatec_wire=1,exatec_data_wire_connected=1,store=30},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
@@ -959,7 +959,7 @@ minetest.register_node("exatec:vacuum", {
 		"default_stone.png",
 		"default_stone.png^exatec_hole.png^exatec_wirecon.png"
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=30},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -1016,7 +1016,7 @@ minetest.register_node("exatec:node_breaker", {
 		"default_ironblock.png^exatec_hole_big.png^materials_sawblade.png^exatec_wirecon.png",
 		"default_ironblock.png^exatec_hole.png^exatec_wirecon.png",
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=40},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
 	after_place_node = function(pos, placer, itemstack)
@@ -1083,7 +1083,7 @@ minetest.register_node("exatec:placer", {
 		"default_ironblock.png^exatec_hole_big.png",
 		"default_ironblock.png^exatec_hole.png"
 	},
-	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,store=25},
 	paramtype2 = "facedir",
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if minetest.is_protected(pos, player:get_player_name())==false then
@@ -1151,7 +1151,7 @@ minetest.register_node("exatec:light_detector", {
 		"default_steelblock.png^[colorize:#0000ffaa",
 		"default_steelblock.png^[colorize:#0000ffaa"
 	},
-	groups = {dig_immediate = 2,exatec_data_wire_connected=1,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_data_wire_connected=1,exatec_wire_connected=1,store=25},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",
 	paramtype="light",
@@ -1202,7 +1202,7 @@ minetest.register_node("exatec:destroyer", {
 	description = "Destroyer",
 	tiles = {"default_lava.png^default_glass.png^default_chest_top.png"},
 	sounds = default.node_sound_glass_defaults(),
-	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,igniter=1},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,igniter=1,store=40},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
@@ -1266,7 +1266,7 @@ minetest.register_node("exatec:node_detector", {
 		"default_steelblock.png^(exatec_hole.png^[colorize:#ff0000)^exatec_wirecon.png",
 		"default_steelblock.png^exatec_wirecon.png",
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=30},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype2 = "facedir",
 	on_construct = function(pos)
@@ -1316,7 +1316,7 @@ minetest.register_node("exatec:bow", {
 	tiles = {"default_ironblock.png"},
 	inventory_image="default_ironblock.png^default_bow_loaded.png^[makealpha:0,255,0",
 	wield_image = "default_ironblock.png^default_bow_loaded.png^[makealpha:0,255,0",
-	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1,store=30},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",
 	paramtype="light",
@@ -1412,7 +1412,7 @@ minetest.register_node("exatec:bow", {
 minetest.register_node("exatec:pcb", {
 	description = "PCB",
 	tiles = {"exatec_pcb.png"},
-	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_wire_connected=1,exatec_data_wire_connected=1,store=15},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	paramtype="light",
@@ -1577,7 +1577,7 @@ minetest.register_node("exatec:pcb", {
 minetest.register_node("exatec:cmd", {
 	description = "CMD",
 	tiles={"exatec_cmd.png",},
-	groups = {cracky=1,exatec_wire_connected=1,exatec_data_wire_connected=1},
+	groups = {cracky=1,exatec_wire_connected=1,exatec_data_wire_connected=1,store=30},
 	sounds = default.node_sound_stone_defaults(),
 	paramtype2 = "facedir",
 	on_construct = function(pos)
@@ -1675,7 +1675,7 @@ minetest.register_node("exatec:weather_detector", {
 		"default_steelblock.png^[colorize:#0000ff99^default_glass.png",
 		"default_steelblock.png^[colorize:#0000ff99^default_glass.png^exatec_wirecon.png",
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_data_wire_connected=1,exatec_wire_connected=1},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_data_wire_connected=1,exatec_wire_connected=1,store=30},
 	sounds = default.node_sound_glass_defaults(),
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;save;Setup]")
@@ -1750,7 +1750,7 @@ minetest.register_node("exatec:industrial_miner", {
 		"default_steelblock.png^exatec_hole.png",
 		"materials_metal_beam.png^materials_pallet_box.png"
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1}, --,exatec_tube_connected=1
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=60},
 	sounds = default.node_sound_glass_defaults(),
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -1860,7 +1860,7 @@ minetest.register_node("exatec:vacuumtransport", {
 minetest.register_node("exatec:node_constructor", {
 	description = "Node constructor",
 	tiles = {"exatec_pcb.png^[invert:bg"},
-	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_data_wire_connected=1},
+	groups = {dig_immediate = 2,exatec_tube_connected=1,exatec_data_wire_connected=1,store=50},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	paramtype="light",
