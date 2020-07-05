@@ -179,4 +179,10 @@ minetest.register_craftitem("player_style:coin", {
 	description = "Coin",
 	inventory_image = "player_style_coin.png",
 	groups = {treasure=1,coin=1},
+	on_use=function(itemstack, user, pointed_thing)
+		local m = user:get_meta()
+		m:set_int("coins",m:get_int("coins")+itemstack:get_count())
+		itemstack:clear()
+		return itemstack
+	end,
 })
