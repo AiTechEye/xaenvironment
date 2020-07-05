@@ -15,7 +15,7 @@ minetest.register_privilege("bones", {
 minetest.register_node("bones:boneblock", {
 	description = "Bone block",
 	tiles={"bones_bone1.png","bones_bone3.png","bones_bone3.png","bones_bone3.png","bones_bone2.png","bones_bone3.png"},
-	groups = {dig_immediate = 3,flammable=3},
+	groups = {dig_immediate = 3,flammable=3,store=1},
 	paramtype2="facedir",
 	can_dig = function(pos, player)
 		local owner = minetest.get_meta(pos):get_string("owner")
@@ -80,7 +80,7 @@ minetest.register_craft({
 minetest.register_craftitem("bones:insurance", {
 	description = "Insurance (carry in inventory to not drop items on death)",
 	inventory_image = "bones_insurance.png",
-	groups = {frammable=1},
+	groups = {frammable=1,store=5},
 })
 
 minetest.register_craft({
