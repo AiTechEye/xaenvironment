@@ -301,6 +301,20 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="default:glass_tabletop 4",
+	recipe={
+		{"default:glass","default:glass"},
+	},
+})
+
+minetest.register_craft({
+	output="default:glass_frosted 2",
+	recipe={
+		{"default:glass","default:glass","default:shell"},
+	},
+})
+
 
 --||||||||||||||||
 -- ======================= COOKING
@@ -314,10 +328,9 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="default:glass_tabletop 4",
-	recipe={
-		{"default:glass","default:glass"},
-	},
+	type = "cooking",
+	output = "default:obsidian_glass 9",
+	recipe = "default:obsidian",
 })
 
 minetest.register_craft({

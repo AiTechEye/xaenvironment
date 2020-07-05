@@ -349,6 +349,36 @@ minetest.register_node("default:glass", {
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
 	paramtype = "light",
+	palette="default_palette.png",
+	paramtype2 = "color",
+	on_punch=default.dye_coloring
+})
+
+minetest.register_node("default:glass_frosted", {
+	description = "Frosted glass",
+	tiles={"default_glass_with_frame.png","default_cloud.png"},
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	sunlight_propagates = true,
+	paramtype = "light",
+	alpha = 50,
+	palette="default_palette.png",
+	paramtype2 = "color",
+	on_punch=default.dye_coloring
+})
+
+minetest.register_node("default:obsidian_glass", {
+	description = "Obsidian glass",
+	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
+	groups = {cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	sunlight_propagates = true,
+	paramtype = "light",
+	palette="default_palette.png",
+	paramtype2 = "color",
+	on_punch=default.dye_coloring
 })
 
 --||||||||||||||||
