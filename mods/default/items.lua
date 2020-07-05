@@ -621,7 +621,7 @@ default.registry_mineral({
 	not_block=true,
 	craftitem="default:cloud",
 	
-	pick={	groups={treasure=2}},
+	pick={	groups={treasure=2},
 		tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,
@@ -630,7 +630,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=4}
 	}},
-	shovel={	groups={treasure=2},
+	shovel={groups={treasure=2},
 		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
