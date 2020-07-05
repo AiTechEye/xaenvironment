@@ -255,8 +255,12 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 				item = item:to_table()
 				item.metadata = minetest.serialize({eat = eat})
 				item.wear = eat
-				user:get_inventory():add_item("main",item)
 				minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
+				if itemstack:get_count() > 1 then
+					user:get_inventory():add_item("main",item)
+				else
+					itemstack:replace(item)
+				end
 				on_eat(itemstack, user, pointed_thing)
 				return itemstack
 			else
