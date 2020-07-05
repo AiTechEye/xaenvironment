@@ -202,3 +202,7 @@ minetest.register_abm({
 		end
 	end
 })
+
+player_style.register_environment_sound({node="fire:basic_flame",sound="fire_fire",gain=3,timeloop=8.3})
+player_style.register_environment_sound({node="fire:permanent_flame",sound="fire_fire",gain=3,timeloop=8.3})
+player_style.register_environment_sound({node="fire:not_igniter",sound="fire_fire",gain=3,timeloop=8.3})
