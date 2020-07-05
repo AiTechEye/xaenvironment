@@ -200,16 +200,13 @@ if node.blow_nodes==1 then
 
 			local no=minetest.registered_nodes[minetest.get_node(p).name] or {}
 
-			if no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius then
-				no.on_blast(p,node.radius)
-			end
-
-			if node.set~="" and not (no.groups and no.groups.unbreakable) then
-				data[v]=node.set
-			end
-
-			if math.random(1,node.place_chance)==1 and not (no.groups and no.groups.unbreakable)  then
-				data[v]=nodes[math.random(1,nodes_n)]
+			if not (no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius and no.on_blast(p,node.radius) == true) then
+				if node.set~="" and not (no.groups and no.groups.unbreakable) then
+					data[v]=node.set
+				end
+				if math.random(1,node.place_chance)==1 and not (no.groups and no.groups.unbreakable)  then
+					data[v]=nodes[math.random(1,nodes_n)]
+				end
 			end
 
 			if node.drops==1 and data[v]==air and math.random(1,4)==1 then
