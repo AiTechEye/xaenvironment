@@ -164,7 +164,7 @@ minetest.register_tool("player_style:backpack", {
 	description = "Backpack",
 	inventory_image = "player_style_backpack.png",
 	wield_scale={x=2,y=2,z=3},
-	groups={treasure=1,backpack=2,flammable=1},
+	groups={treasure=1,backpack=2,flammable=1,store=25},
 })
 minetest.register_craft({
 	output="player_style:backpack",
@@ -178,10 +178,10 @@ minetest.register_craft({
 minetest.register_craftitem("player_style:coin", {
 	description = "Coin",
 	inventory_image = "player_style_coin.png",
-	groups = {treasure=1,coin=1},
+	groups = {treasure=1,coin=1,store=1},
 	on_use=function(itemstack, user, pointed_thing)
 		Coin(user,itemstack:get_count())
 		itemstack:clear()
 		return itemstack
-	end,
+	end
 })
