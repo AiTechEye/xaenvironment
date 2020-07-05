@@ -94,7 +94,7 @@ minetest.register_node("exatec:nodeswitch", {
 		"default_steelblock.png",
 		"default_steelblock.png^default_crafting_arrowright.png^exatec_wirecon.png",
 	},
-	groups = {exatec_wire_connected=1,snappy = 3},
+	groups = {exatec_wire_connected=1,snappy = 3,store=500},
 	sounds = default.node_sound_stone_defaults(),
 
 	after_place_node = function(pos, placer)
