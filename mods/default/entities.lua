@@ -20,6 +20,18 @@ local item = {
 			collisiondetection = true,
 		})
 	end,
+	on_punch = function(self,hitter)
+		if hitter:is_player() then
+			local c = 1
+			local stack = ItemStack(self.itemstring)
+			if minetest.get_item_group(stack:get_name(),"coin") > 0 then
+				Coin(hitter,stack:get_count())
+				self.object:remove()
+				return self
+			end
+		end
+		builtin_item.on_punch(self,hitter)
+	end,
 	on_step = function(self,dtime,moveresult)
 		builtin_item.on_step(self,dtime,moveresult)
 		local pos = self.object:get_pos()
