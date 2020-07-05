@@ -89,7 +89,7 @@ player_style.store=function(player)
 	for i=store.index,store.index+store.size do
 		local it = itemlist[i]
 		if it then
-			itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";\n\b\b\b"..player_style.store_items_cost[it].."]"
+			itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";\n"..player_style.store_items_cost[it].."]"
 			x = x + 0.8
 			if x >= 6 then
 				y = y + 0.8
