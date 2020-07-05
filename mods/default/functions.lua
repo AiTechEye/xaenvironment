@@ -1,3 +1,8 @@
+Coin=function(player,count)
+	local m = user:get_meta()
+	m:set_int("coins",m:get_int("coins")+count)
+end
+
 minetest.register_on_newplayer(function(player)
 	player:get_inventory():add_item("main","default:craftguide")
 	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
