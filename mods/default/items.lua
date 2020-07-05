@@ -89,7 +89,7 @@ default.registry_mineral({
 	not_arrow=true,
 	not_vineyardknife=true,
 	block={
-		groups={cracky=3},
+		groups={cracky=3,store=1000},
 		sounds=default.node_sound_stone_defaults(),
 	},
 	additional_craft={
@@ -108,7 +108,7 @@ minetest.register_tool(":", {
 	type = "none",
 	wield_image = "wieldhand.png",
 	wield_scale={x=1,y=1,z=2},
-	groups={not_in_creative_inventory=1,store=10000},
+	groups={not_in_creative_inventory=1},
 	range = not default.creative and 4 or 15,
 	tool_capabilities = not default.creative and {
 		full_punch_interval = 1,
@@ -279,7 +279,7 @@ minetest.register_craftitem("default:stick", {
 minetest.register_craftitem("default:unknown", {
 	description = "Unknown item",
 	inventory_image = "default_unknown.png",
-	groups = {not_in_creative_inventory=1},
+	groups = {not_in_creative_inventory=1,store=10000},
 })
 
 default.register_chest({
