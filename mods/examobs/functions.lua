@@ -668,12 +668,17 @@ examobs.dropall=function(self)
 					x=math.random(-1.5,1.5),
 					y=math.random(0.5,1),
 					z=math.random(-1.5,1.5)
-
 				})
 			end
 		end
 		self.inv[i] = nil
 	end
+
+	 minetest.add_item(pos,"player_style:coin "..self.coin):set_velocity({
+		x=math.random(-1.5,1.5),
+		y=math.random(0.5,1),
+		z=math.random(-1.5,1.5)
+	})
 end
 
 examobs.dying=function(self,set)

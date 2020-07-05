@@ -82,6 +82,7 @@ examobs.register_mob=function(def)
 	def.light_max =			def.light_max or			15
 	def.lifetime =			def.lifetime or			300
 	def.add_wear =			def.add_wear or			10000
+	def.coin = 			def.coin or			2
 
 	def.animation =			def.animation == "default" and 
 	{

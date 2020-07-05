@@ -3,6 +3,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "titan",
 	reach = 4.5,
+	coin = 100,
 	dmg = 0,
 	hp = 2000,
 	textures={"examobs_titan_lava.png"},
@@ -116,6 +117,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "titan",
 	reach = 4.5,
+	coin = 150,
 	dmg = 0,
 	hp = 3000,
 	textures={"examobs_titan_magma.png"},
@@ -244,6 +246,7 @@ examobs.register_mob({
 	name = "titan_stone",
 	type = "monster",
 	team = "titan",
+	coin = 150,
 	reach = 9,
 	range = 40,
 	dmg = 0,
@@ -383,6 +386,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "metal",
 	dmg = 10,
+	coin = 300,
 	hp = 250,
 	textures={"examobs_terminator.png"},
 	mesh="character.b3d",
@@ -424,6 +428,7 @@ examobs.register_mob({
 	name = "mouse",
 	team = "mouse",
 	hp = 2,
+	coin = 1,
 	textures = {"examobs_wolf.png^[combine:0x0:-15,-15=examobs_skin.png"},
 	mesh = "examobs_mouse.obj",
 	aggressivity = -2,
@@ -452,6 +457,7 @@ examobs.register_mob({
 	name = "brown_bear",
 	team = "bear",
 	hp = 50,
+	coin = 15,
 	type = "monster",
 	textures = {"examobs_bear.png"},
 	mesh = "examobs_bear.b3d",
@@ -487,6 +493,7 @@ examobs.register_mob({
 	name = "black_bear",
 	team = "blackbear",
 	hp = 50,
+	coin = 15,
 	type = "monster",
 	textures = {"examobs_blackbear.png"},
 	mesh = "examobs_bear.b3d",
@@ -522,6 +529,7 @@ examobs.register_mob({
 	name = "ice_bear",
 	team = "icebear",
 	hp = 50,
+	coin = 15,
 	type = "monster",
 	textures = {"examobs_icebear.png"},
 	mesh = "examobs_bear.b3d",
@@ -557,6 +565,7 @@ examobs.register_mob({
 	name = "lava_bear",
 	team = "lavabear",
 	hp = 50,
+	coin = 25,
 	type = "monster",
 	textures = {"default_lava.png"},
 	mesh = "examobs_bear.b3d",
@@ -601,6 +610,7 @@ examobs.register_mob({
 	name = "ball",
 	hp=60,
 	reach=2,
+	coin = 3,
 	type = "monster",
 	team = "candyball",
 	dmg = 1,
@@ -645,6 +655,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "gingerbread",
 	hp=40,
+	coin = 2,
 	type = "monster",
 	team = "candygingerbread",
 	dmg = 1,
@@ -688,6 +699,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "icecreammonstermaster",
 	hp=300,
+	coin = 80,
 	type = "monster",
 	team = "candyicecreammonstermaster",
 	reach=5,
@@ -802,6 +814,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "candycane",
 	hp=40,
+	coin = 5,
 	type = "monster",
 	team = "candycane",
 	dmg = 1,
@@ -861,6 +874,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "lollipop",
 	hp=40,
+	coin = 5,
 	type = "monster",
 	team = "candylollipop",
 	dmg = 1,
@@ -906,6 +920,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "box",
 	dmg = 1,
+	coin = 4,
 	textures={"examobs_woodbox.png"},
 	mesh="examobs_tntbox.b3d",
 	spawn_on={"group:sand","group:stone"},
@@ -949,6 +964,7 @@ examobs.register_mob({
 	name = "stoneblock",
 	type = "monster",
 	team = "box",
+	coin = 4,
 	dmg = 1,
 	textures={"default_stone.png"},
 	mesh="examobs_tntbox.b3d",
@@ -1008,6 +1024,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "unpc",
 	dmg = 2,
+	coin = 3,
 	textures={"examobs_underground_npc.png"},
 	mesh="character.b3d",
 	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock"},
@@ -1037,6 +1054,7 @@ examobs.register_mob({
 	team="metal",
 	dmg = 1,
 	hp= 50,
+	coin = 5,
 	textures = {"examobs_skeleton.png","default_air.png"},
 	mesh = "examobs_skeleton.b3d",
 	inv={["default:iron_ingot"]=1},
@@ -1155,6 +1173,7 @@ examobs.register_mob({
 	name = "npc",
 	type = "npc",
 	dmg = 1,
+	coin = 2,
 	aggressivity = 1,
 	walk_speed = 4,
 	run_speed = 8,
@@ -1186,6 +1205,7 @@ examobs.register_mob({
 	mesh = "examobs_wolf.b3d",
 	type = "monster",
 	dmg = 2,
+	coin = 2,
 	aggressivity = 1,
 	run_speed = 8,
 	inv={["examobs:flesh"]=1,["examobs:pelt"]=1,["examobs:tooth"]=1},
@@ -1242,6 +1262,7 @@ examobs.register_mob({
 	textures = {"examobs_arctic_wolf.png"},
 	mesh = "examobs_wolf.b3d",
 	dmg = 2,
+	coin = 2,
 	aggressivity = 1,
 	run_speed = 8,
 	punch_chance=3,
@@ -1298,6 +1319,7 @@ examobs.register_mob({
 	textures = {"examobs_golden_wolf.png"},
 	mesh = "examobs_wolf.b3d",
 	dmg = 2,
+	coin = 2,
 	aggressivity = 1,
 	run_speed = 8,
 	punch_chance=3,
@@ -1356,6 +1378,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "coal",
 	dmg = 2,
+	coin = 2,
 	hp = 30,
 	aggressivity = 2,
 	swiming = 0,
@@ -1411,6 +1434,7 @@ examobs.register_mob({
 	team = "stone",
 	dmg = 5,
 	hp = 40,
+	coin = 6,
 	swiming = 0,
 	aggressivity = 2,
 	run_speed = 6,
@@ -1436,6 +1460,7 @@ examobs.register_mob({
 	type = "monster",
 	team = "dirt",
 	dmg = 5,
+	coin = 5,
 	hp = 30,
 	swiming = 0,
 	aggressivity = 2,
@@ -1470,6 +1495,7 @@ examobs.register_mob({
 	name = "chicken",
 	bird=true,
 	swiming = 0,
+	coin = 1,
 	textures = {"examobs_chicken1.png"},
 	mesh = "examobs_chicken.b3d",
 	type = "animal",
@@ -1538,6 +1564,7 @@ examobs.register_mob({
 	mesh = "examobs_sheep.b3d",
 	type = "animal",
 	team = "sheep",
+	coin = 2,
 	punch_chance=6,
 	dmg = 1,
 	hp = 15,
@@ -1653,6 +1680,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "duck",
 	bird=true,
+	coin = 1,
 	textures = {"examobs_duck1.png"},
 	mesh = "examobs_duck.b3d",
 	type = "animal",
@@ -1752,6 +1780,7 @@ examobs.register_mob({
 examobs.register_bird({
 	visual_size= {x=0.5,y=0.5,z=0.5},
 	collisionbox={-0.2,-0.13,-0.2,0.2,0.2,0.2},
+	coin = 1,
 	on_spawn=function(self)
 		self:on_load()
 	end,
@@ -1772,6 +1801,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "magpie",
+	coin = 1,
 	textures={"examobs_magpie.png"},
 	on_click=function(self)
 		return self
@@ -1816,6 +1846,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "crow",
+	coin = 1,
 	aggressivity = -2,
 	textures={"examobs_crow.png"},
 	is_food=function(self,item)
@@ -1825,6 +1856,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "gull",
+	coin = 1,
 	textures={"examobs_gull.png"},
 	aggressivity = -2,
 	flee_from_threats_only = 1,
@@ -1842,6 +1874,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "coalcrow",
+	coin = 2,
 	aggressivity = 2,
 	is_food=function(self,item)
 		return true
@@ -1876,6 +1909,7 @@ examobs.register_bird({
 
 examobs.register_bird({
 	name = "hawk",
+	coin = 2,
 	aggressivity = 1,
 	is_food=function(self,item)
 		return true
@@ -1919,6 +1953,7 @@ examobs.register_bird({
 
 examobs.register_fish({
 	color = true,
+	coin = 1,
 	on_spawn=function(self)
 		local n
 		local c = ""
@@ -1953,6 +1988,7 @@ examobs.register_fish({
 
 examobs.register_fish({
 	name = "perch",
+	coin = 1,
 	textures = {"examobs_perch.png"},
 	on_spawn=function(self)
 		self.storage.size = math.random(0.5,2)
@@ -1966,6 +2002,7 @@ examobs.register_fish({
 examobs.register_fish({
 	name = "pike",
 	team = "pike",
+	coin = 2,
 	type = "monster",
 	hp = 10,
 	dmg = 5,
@@ -1985,6 +2022,7 @@ examobs.register_fish({
 examobs.register_fish({
 	name = "piranha",
 	team = "piranha",
+	coin = 2,
 	type = "monster",
 	hp = 10,
 	dmg = 2,
@@ -2019,6 +2057,7 @@ examobs.register_fish({
 examobs.register_mob({
 	name = "gass_man",
 	type = "npc",
+	coin = 2,
 	team = "gass",
 	textures = {"examobs_gassman.png"},
 	aggressivity = 2,
@@ -2047,6 +2086,7 @@ examobs.register_mob({
 	name = "sandmonster",
 	type = "monster",
 	dmg = 2,
+	coin = 1,
 	aggressivity = 2,
 	walk_speed = 4,
 	run_speed = 5,
