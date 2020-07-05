@@ -215,6 +215,7 @@ exaachievements.skills=function(a,num,user,item,pos)
 		if c < a.count and c + num >= a.count then
 			m:set_int("exaskills",skills+a.skills)
 			exaachievements.completed(a,user)
+			Coin(user,a.skills)
 			if a.completed then
 				a.completed(user)
 			end
