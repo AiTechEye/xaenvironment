@@ -1,4 +1,4 @@
-local count = 23
+local count = 32
 
 for i = 1,count do
 minetest.register_node("paintnings:paintning"..i, {
