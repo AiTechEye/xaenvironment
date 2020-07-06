@@ -382,7 +382,7 @@ default.registry_mineral=function(def)
 --ore
 	if not def.not_ore then
 		def.ore = def.ore or {}
-		def.ore.drop = def.drop
+		def.ore.drop = def.ore.drop or def.drop
 		def.ore.tiles =	def.ore.tiles or			{def.texture .. "^default_alpha_ore.png"}
 		def.ore.description =	def.ore.description or	uname .. " ore"
 		def.ore.sounds =	def.ore.sounds or	default.node_sound_stone_defaults()

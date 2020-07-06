@@ -308,6 +308,36 @@ default.register_chest({
 --||||||||||||||||
 
 default.registry_mineral({
+	name="clay",
+	texture="default_snow.png^[colorize:#5556",
+	not_ingot=true,
+	not_pick=true,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_vineyardknife=true,
+	not_bow=true,
+	not_arrow=true,
+	not_block=true,
+	lump={groups={treasure=1,store=100},inventory_image = "default_snow.png^[colorize:#5556^default_alpha_lump.png^[makealpha:0,255,0"},
+	ore={tiles={"default_snow.png^[colorize:#5556"},description="Clay block",groups={crumbly=3},sounds = default.node_sound_clay_defaults(),drop="default:clay_lump 4",},
+	ore_settings={
+		ore_type = "blob",
+		wherein = "default:sand",
+		clust_scarcity= 30 * 30 * 30,
+		clust_num_ores=7,
+		clust_size=9,
+		y_max=-2,
+	},
+	additional_craft={
+	{output="default:clay_ore",
+	recipe={
+		{"default:clay_lump","default:clay_lump",""},
+		{"default:clay_lump","default:clay_lump",""},
+	}}}
+})
+
+default.registry_mineral({
 	name="carbon",
 	texture="default_carbon.png",
 	not_pick=true,
