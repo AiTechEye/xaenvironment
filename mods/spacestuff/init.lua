@@ -314,6 +314,12 @@ minetest.register_node("spacestuff:airgen", {
 	sounds = default.node_sound_stone_defaults(),
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local a
+		local m = minetest.get_meta(pos)
+		local pr = m:get_int("air")-10
+		if pr <= -10 then
+			return
+		end
+
 		for i,v in pairs(spacestuff.rules) do
 			local p = {x=pos.x+v.x,y=pos.y+v.y,z=pos.z+v.z}
 			local n = minetest.get_node(p).name
@@ -325,8 +331,6 @@ minetest.register_node("spacestuff:airgen", {
 			end
 		end
 		if a then
-			local m = minetest.get_meta(pos)
-			local pr = m:get_int("air")-10
 			m:set_int("air",pr)
 			minetest.get_meta(pos):set_string("infotext", "Air Generater " .. pr .."% (place on 'Air compressor' to refill)")
 		end
