@@ -223,8 +223,12 @@ examobs.environment=function(self)
 --liquid and viscosity
 
 	if def.liquid_viscosity > 0 then
-		if not self.in_liquid and v.y <= 0 and minetest.get_item_group(def.name,"water") > 0 then
-			minetest.sound_play("default_object_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+		if not self.in_liquid and v.y <= 0 then
+			if minetest.get_item_group(def.name,"water") > 0 then
+				minetest.sound_play("default_object_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+			elseif minetest.get_item_group(def.name,"lava") > 0 then
+				minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
+			end
 		end
 
 		self.in_liquid = true
