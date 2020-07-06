@@ -76,6 +76,20 @@ minetest.register_node("default:wool", {
 	on_punch=default.dye_coloring
 })
 
+minetest.register_node("default:carpet", {
+	description = "Carpet",
+	tiles={"default_wool.png"},
+	groups = {dig_immediate=2,flammable=2,treasure=1,used_by_npc=1,store=100},
+	sounds = default.node_sound_defaults(),
+	palette="default_palette.png",
+	sunlight_propagates = true,
+	paramtype="light",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}}
+})
+
 minetest.register_node("default:quantumblock", {
 	description = "Quantum block",
 	tiles={"default_quantumblock.png"},
