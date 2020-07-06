@@ -1,6 +1,16 @@
 local builtin_item = minetest.registered_entities["__builtin:item"]
 
 local item = {
+	on_activate=function(self,staticdata,dtime_s)
+		builtin_item.on_activate(self,staticdata,dtime_s)
+		local pos = self.object:get_pos()
+		if pos then
+			local def = minetest.registered_items[minetest.get_node(pos).name]
+			if def and not self.in_viscosity and def.liquid_viscosity > 0 then
+				self.spawn_in_viscosity = true
+			end
+		end
+	end,
 	burn = function(self)
 		local pos = self.object:get_pos()
 		minetest.add_particlespawner({
@@ -73,16 +83,16 @@ local item = {
 			end
 		end
 
-		if not self.in_viscosity and def.liquid_viscosity>0 then
+		if def and not self.in_viscosity and def.liquid_viscosity>0 then
 			local s = def.liquid_viscosity
 			local v = self.object:get_velocity() or {x=0, y=0, z=0}
-
-			if minetest.get_item_group(def.name,"water") > 0 then
-				minetest.sound_play("default_item_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
-			elseif minetest.get_item_group(def.name,"lava") > 0 then
-				minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
+			if not self.spawn_in_viscosity then
+				if minetest.get_item_group(def.name,"water") > 0 then
+					minetest.sound_play("default_item_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+				elseif minetest.get_item_group(def.name,"lava") > 0 then
+					minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
+				end
 			end
-
 			if self.flammable == 0 then
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=(math.abs(v.y)*-1)*0.1, z=math.floor((v.z*0.95)*100)/100})
 				self.object:set_acceleration({x=0, y=0, z=0})
@@ -138,10 +148,28 @@ node = {
 	end,
 	on_activate=function(self,staticdata)
 		builtin_falling_node.on_activate(self,staticdata)
+		local pos = self.object:get_pos()
+		if pos then
+			local def = minetest.registered_items[minetest.get_node(pos).name]
+			if def and not self.in_viscosity and def.liquid_viscosity > 0 then
+				self.in_viscosity = true
+			end
+		end
 	end,
 	on_step=function(self,dtime,moveresult)
 		builtin_falling_node.on_step(self,dtime,moveresult)
 		local pos = self.object:get_pos()
+		if pos then
+			local def = minetest.registered_items[minetest.get_node(pos).name]
+			if def and not self.in_viscosity and def.liquid_viscosity > 0 then
+				self.in_viscosity = true
+				if minetest.get_item_group(def.name,"water") > 0 then
+					minetest.sound_play("default_item_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+				elseif minetest.get_item_group(def.name,"lava") > 0 then
+					minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
+				end
+			end	
+		end
 		if pos and self.damage then
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
 				local en = ob:get_luaentity()
