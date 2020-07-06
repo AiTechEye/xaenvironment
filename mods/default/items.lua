@@ -324,7 +324,7 @@ default.registry_mineral({
 	ore_settings={
 		ore_type = "blob",
 		wherein = "default:sand",
-		clust_scarcity= 30 * 30 * 30,
+		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=7,
 		clust_size=9,
 		y_max=-2,
