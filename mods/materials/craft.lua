@@ -1,4 +1,60 @@
 minetest.register_craft({
+	output="materials:wood_table_corner_leg1",
+	recipe={
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","","group:wood"},
+		{"group:wood","","group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output="materials:wood_table_center_leg",
+	recipe={
+		{"materials:wood_table_corner_leg1"},
+	},
+})
+minetest.register_craft({
+	output="materials:wood_table",
+	recipe={
+		{"materials:wood_table_center_leg"},
+	},
+})
+minetest.register_craft({
+	output="materials:wood_table_corner_leg1",
+	recipe={
+		{"materials:wood_table"},
+	},
+})
+
+minetest.register_craft({
+	output="materials:cup 6",
+	recipe={
+		{"default:clay_lump","default:clay_lump",""},
+		{"default:clay_lump","default:clay_lump",""},
+		{"default:clay_lump","default:clay_lump",""},
+	},
+})
+minetest.register_craft({
+	output="materials:cup_plate 2",
+	recipe={
+		{"default:clay_lump","default:clay_lump",""},
+	},
+})
+minetest.register_craft({
+	output="materials:cup_on_plate",
+	recipe={
+		{"materials:cup","",""},
+		{"materials:cup_plate","",""},
+	},
+})
+minetest.register_craft({
+	output="materials:plate 3",
+	recipe={
+		{"default:clay_lump","default:clay_lump","default:clay_lump"},
+	},
+})
+
+minetest.register_craft({
 	output="materials:pallet_box",
 	recipe={
 		{"group:stick","","group:stick"},

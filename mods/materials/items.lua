@@ -1,3 +1,218 @@
+minetest.register_node("materials:wood_table", {
+	description = "Wooden table",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5}
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring
+})
+minetest.register_node("materials:wood_table_center_leg", {
+	description = "Wooden table center leg",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5},
+			{-0.125, -0.5, -0.0625, 0.0625, 0.4375, 0.0625}
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring
+})
+
+minetest.register_node("materials:wood_table_corner_leg1", {
+	description = "Wooden table corner leg (rightclick to change in 5s)",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5},
+			{0.375, -0.5, 0.375, 0.5, 0.4375, 0.5}
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_corner_leg2"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
+})
+minetest.register_node("materials:wood_table_corner_leg2", {
+	description = "Wooden table corner leg",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5},
+			{-0.5, -0.5, 0.375, -0.375, 0.5, 0.5},
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_corner_leg3"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
+})
+minetest.register_node("materials:wood_table_corner_leg3", {
+	description = "Wooden table corner leg",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5},
+			{-0.5, -0.5, -0.5, -0.375, 0.5, -0.375}
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_corner_leg4"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
+})
+minetest.register_node("materials:wood_table_corner_leg4", {
+	description = "Wooden table corner leg",
+	tiles = {"plants_apple_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, 0.4375, -0.5, 0.5, 0.5, 0.5},
+			{0.375, -0.5, -0.5, 0.5, 0.5, -0.375}
+		}
+	},
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_corner_leg1"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
+})
+
+
+
+
+minetest.register_node("materials:cup", {
+	description = "Cup",
+	tiles={"materials_cup.png"},
+	drawtype = "plantlike",
+	sounds = default.node_sound_glass_defaults(),
+	groups = {dig_immediate = 3,treasure=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	visual_scale=0.5,
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	selection_box = {type="fixed",fixed={-0.1,-0.5,-0.1,0.1,-0.2,0.1}}
+})
+
+minetest.register_node("materials:cup_plate", {
+	description = "Cup plate",
+	tiles= {"default_snow.png^[colorize:#5556","default_snow.png^[colorize:#5556","default_air.png","default_air.png","default_air.png","default_air.png"},
+	drawtype = "nodebox",
+	sounds = default.node_sound_glass_defaults(),
+	groups = {dig_immediate = 3,treasure=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	node_box = {type="fixed",fixed={-0.2,-0.5,-0.2,0.2,-0.49,0.2}}
+})
+
+minetest.register_node("materials:plate", {
+	description = "Plate",
+	tiles= {"default_snow.png^[colorize:#5556^default_alpha_gem_round.png^[makealpha:0,255,0","default_snow.png^[colorize:#5556^default_alpha_gem_round.png^[makealpha:0,255,0","default_air.png","default_air.png","default_air.png","default_air.png"},
+	drawtype = "nodebox",
+	sounds = default.node_sound_glass_defaults(),
+	groups = {dig_immediate = 3,treasure=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}}
+})
+
+minetest.register_node("materials:cup_on_plate", {
+	description = "Cup on plate",
+	tiles={"materials_cup_on_plate.png"},
+	drawtype = "plantlike",
+	sounds = default.node_sound_glass_defaults(),
+	groups = {dig_immediate = 3,treasure=1},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	visual_scale=0.5,
+	palette="default_palette.png",
+	paramtype2="color",
+	on_punch=default.dye_coloring,
+	selection_box = {type="fixed",fixed={-0.1,-0.5,-0.1,0.1,-0.2,0.1}}
+})
 
 minetest.register_node("materials:pallet_box", {
 	description = "Pallet box",
