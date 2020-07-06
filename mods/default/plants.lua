@@ -44,9 +44,27 @@ default.register_blockdetails=function(def)
 	})
 
 	if def.item then
-		def.item.description = def.item.description or def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
-		def.item.inventory_image = def.item.inventory_image or def.node.tiles[2]
-		minetest.register_craftitem(mod..name, def.item)
+		if def.item.type == "node" then
+			def.item.description = def.item.description or def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+			def.item.inventory_image = def.item.inventory_image or def.node.tiles[2]
+			def.item.wield_image = def.item.wield_image or def.node.tiles[2]
+			def.item.tiles = def.item.tiles or {def.item.inventory_image,def.item.inventory_image,"default_air.png","default_air.png","default_air.png","default_air.png"}
+			def.item.groups = def.item.groups or {dig_immediate=3,flammable=2,used_by_npc=2}
+			def.item.sounds = def.item.sounds or default.node_sound_wood_defaults()
+			def.item.drawtype = def.item.drawtype or "nodebox"
+			def.item.node_box = def.item.node_box or {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}}
+			def.item.paramtype2 = def.item.paramtype2 or "wallmounted"
+			def.item.paramtype = def.item.paramtype or "light"
+			def.item.sunlight_propagates = def.item.sunlight_propagates==true
+			def.item.after_place_node = def.item.after_place_node or function(pos, placer, itemstack)
+				minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
+			end
+			minetest.register_node(mod..name, def.item)
+		else
+			def.item.description = def.item.description or def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+			def.item.inventory_image = def.item.inventory_image or def.node.tiles[2]
+			minetest.register_craftitem(mod..name, def.item)
+		end
 	end
 end
 

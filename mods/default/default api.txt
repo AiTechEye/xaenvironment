@@ -314,7 +314,7 @@ default.register_blockdetails({
 		block="default:sand"			--is set while dug
 		tiles = {"default_sand.png","default_stick.png"}	--the second one is the detail on the block
 	},
-	item={},						--item/drop def
+	item={},						--item/drop def ... item={type="node"} for node
 	ddef={},						--decoration def
 })
 ======================

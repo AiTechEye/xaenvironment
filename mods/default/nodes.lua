@@ -502,7 +502,7 @@ default.register_blockdetails({
 		drop="default:starfish",
 		block="default:sand",
 	},
-	item={},
+	item={type="node"},
 })
 default.register_blockdetails({
 	name="shell",
@@ -511,7 +511,7 @@ default.register_blockdetails({
 		drop="default:shell",
 		block="default:sand",
 	},
-	item={},
+	item={type="node"},
 })
 
 minetest.register_node("default:obsidian", {
