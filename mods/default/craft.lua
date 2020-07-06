@@ -245,6 +245,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="default:carpet 12",
+	recipe={
+		{"materials:piece_of_cloth","materials:piece_of_cloth"},
+	},
+})
+
+
+minetest.register_craft({
 	output="plants:cotton 4",
 	recipe={
 		{"default:wool"},
