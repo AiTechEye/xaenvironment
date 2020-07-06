@@ -659,12 +659,16 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		local pos = player:get_pos()
 		local nod = minetest.get_node(pos).name
 
-		if minetest.get_item_group(nod,"water") > 0 and player:get_player_velocity().y < 0 then
-			local d = default.def(nod)
-			if d.drawtype and d.drawtype == "flowingliquid" then
-				minetest.sound_play("default_item_watersplash", {object=player, gain = 4,max_hear_distance = 10})
-			else
-				minetest.sound_play("default_object_watersplash", {object=player, gain = 4,max_hear_distance = 10})
+		if player:get_player_velocity().y < 0 then
+			if minetest.get_item_group(nod,"water") > 0 then
+				local d = default.def(nod)
+				if d.drawtype and d.drawtype == "flowingliquid" then
+					minetest.sound_play("default_item_watersplash", {object=player, gain = 4,max_hear_distance = 10})
+				else
+					minetest.sound_play("default_object_watersplash", {object=player, gain = 4,max_hear_distance = 10})
+				end
+			elseif minetest.get_item_group(nod,"lava") > 0 then
+				minetest.sound_play("default_clay_step", {object=player, gain = 4,max_hear_distance = 10})
 			end
 		end
 
