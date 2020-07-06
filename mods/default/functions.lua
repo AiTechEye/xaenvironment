@@ -312,42 +312,6 @@ if gaps > 1 then
 end
 end
 
-
-
-
-
-
-default.drink=function(itemstack, user, pointed_thing,gaps)
-	local wear = itemstack:get_wear()
-	local max = 65535
-	gaps = gaps or 2
-	wear = wear ~= 0 and wear or max
-	if wear > 1 and pointed_thing.under and player_style.drinkable(pointed_thing.under,user) then
-		wear=math.floor(wear-(max/gaps))
-	elseif wear < max then
-		wear=math.floor(wear+(max/gaps))
-			player_style.thirst(user,1)
-	end
-	if wear > max then
-		wear = max
-	elseif wear < 1 then
-		wear = 1
-	end
-	itemstack:set_wear(wear)
-	return itemstack
-
-end
-
-default.place_drink=function(itemstack, user, pointed_thing,node)
-	local wear = itemstack:get_wear()
-	node = node or {name=itemstack:get_name()}
-	if wear <= 1 and not minetest.is_protected(pointed_thing.above,user:get_player_name()) and default.defpos(pointed_thing.above,"buildable_to") then
-		minetest.add_node(pointed_thing.above,node)
-		itemstack:take_item()
-		return itemstack
-	end
-end
-
 default.registry_mineral=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
