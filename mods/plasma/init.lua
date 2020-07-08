@@ -47,52 +47,30 @@ minetest.register_node("plasma:plasma_cannon_placeable",{
 
 --[[
 
-
-			minetest.add_particlespawner({
-				amount = 5,
-				time =0.2,
-				minpos = {x=pos.x-0.5, y=pos.y, z=pos.z-0.5},
-				maxpos = {x=pos.x+0.5, y=pos.y, z=pos.z+0.5},
-				minvel = {x=0, y=0, z=0},
-				maxvel = {x=0, y=math.random(3,6), z=0},
-				minacc = {x=0, y=2, z=0},
-				maxacc = {x=0, y=0, z=0},
-				minexptime = 1,
-				maxexptime = 3,
-				minsize = 5,
-				maxsize = 10,
-				texture = "default_item_smoke.png",
-				collisiondetection = true,
-			})
-
-
-
 			local item = clicker:get_wielded_item():to_table()
 				item.name = "quads:petrol_tank_empty"
 				clicker:set_wielded_item(item)
-
-
 
 --]]
 
 
 
 minetest.register_entity("plasma:orb",{
-	hp_max = 1,
+	hp_max = 100,
 	physical = false,
 	pointable=false,
-	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
 	visual="sprite",
 	textures={"plasma_orb1.png"},
 	visual_size = {x=1,y=1},
-	--makes_footstep_sound = true,
+	use_texture_alpha = true,
 	charging = false,
 	charging_time = 0,
 	img = 1,
 	timer = 0,
 	start_timeout = 0,
+	plasmaorb = true,
 	get_staticdata = function(self)
-		return minetest.serialize({power=self.power,user=self.user,user_name=self.user_name})
+		return minetest.serialize({power=self.power,user_name=self.user_name})
 	end,
 	anim=function(self)
 		self.img = self.img +1
@@ -103,22 +81,13 @@ minetest.register_entity("plasma:orb",{
 	end,
 	on_activate=function(self, staticdata)
 		local s = minetest.deserialize(staticdata) or {}
-		self.plasmaorb = math.random(1,9999)
 		self.power = s.power or 1
-		self.user = s.user
 		self.user_name = s.user_name
 
 		self.object:set_properties({visual_size = {x=1+self.power*0.01,y=1+self.power*0.01,z=1+self.power*0.01}})
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-
-			--	local inv = puncher:get_inventory()
-			--	if inv:room_for_item("main","quads:quad") then
-			--		inv:add_item("main","quads:quad")
-			--		self.object:remove()
-			--	end
-			--end
-
+		self:explode()
 	end,
 	explode=function(self,juststop)
 		if self.ex then
@@ -168,7 +137,7 @@ minetest.register_entity("plasma:orb",{
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power/2)) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
-				if p and not (en and en.plasmaorb == self.plasmaorb) then
+				if p and not (en and en.plasmaorb) then
 					local d = self.power-vector.distance(pos,p)
 					if d > 90 then
 						d = 1000
@@ -192,8 +161,28 @@ minetest.register_entity("plasma:orb",{
 				ob:set_properties({textures={t,t,t,t,t,t}})
 				en.on_abs_step =  function(self)
 					examobs.anim(self,"stand")
+					self.smplasmatimer = self.smplasmatimer and self.smplasmatimer + 1 or 50
+					if self.smplasmatimer >= 50 then
+						self.smplasmatimer = 0
+						local pos = self.object:get_pos()
+						minetest.add_particlespawner({
+							amount = math.random(3,7),
+							time =0.2,
+							minpos = pos,
+							maxpos = pos,
+							minvel = {x=-0.1, y=0, z=-0.1},
+							maxvel = {x=0.1, y=1, z=0.1},
+							minacc = {x=0, y=2, z=0},
+							maxacc = {x=0, y=0, z=0},
+							minexptime = 2,
+							maxexptime = 7,
+							minsize = 1,
+							maxsize = 3,
+							texture = "default_item_smoke.png",
+							collisiondetection = true,
+						})
+					end
 				end
-				
 			end
 		end
 	end,
@@ -245,6 +234,7 @@ minetest.register_entity("plasma:orb",{
 				end
 				return
 			else
+				self.charging = nil
 				if self.sound1 then
 					minetest.sound_stop(self.sound1)
 				end
@@ -257,7 +247,6 @@ minetest.register_entity("plasma:orb",{
 					local dir = self.user:get_look_dir()
 					local v = self.object:set_velocity({x=dir.x*20,y=dir.y*20,z=dir.z*20})
 					self.start_timeout = 1
-					self.charging = nil
 				end
 			end
 		end
@@ -277,18 +266,17 @@ minetest.register_entity("plasma:orb",{
 	end
 })
 
-
-
-
 minetest.register_entity("plasma:impulse",{
 	hp_max = 1000,
 	physical = false,
 	pointable=false,
 	visual="mesh",
 	mesh = "plasma_impulse.obj",
-	textures={"default_cloud.png^[colorize:#fc03e3"},
+	textures={"default_cloud.png^[colorize:#ff008caa"},
+	use_texture_alpha = true,
 	visual_size = {x=1,y=1},
 	timer = 0,
+	plasmaorb = true,
 	on_activate=function(self, staticdata)
 		self.scale = 1
 		self.end_scale = 1
@@ -305,7 +293,7 @@ minetest.register_entity("plasma:impulse",{
 		end
 		if self.scale < self.end_scale then
 			self.scale = self.scale + dtime * (self.end_scale*5)
-			self.object:set_properties({visual_size = {x=self.scale,y=self.scale,z=self.scale}})
+			self.object:set_properties({visual_size = {x=self.scale*3,y=self.scale*3,z=self.scale*3}})
 		else
 			self.object:remove()
 		end
@@ -313,14 +301,14 @@ minetest.register_entity("plasma:impulse",{
 })
 --[[
 minetest.register_craft({
-	output="plasma:plasma_cannon",
+	output="plasma:plasma_cannon_battery",
 	recipe={
-		{"m2aterials:plant_extracts_gas","default:carbon_lump","quads:petrol_tank_empty"},
-		{"player_style:bottle","quads:bottle_with_oil",""},
+		{"","",""},
+		{"","examobs:titan_core",""},
+		{"","",""},
 	},
 	replacements={
-		{"player_style:bottle","materials:glass_bottle"},
-		{"quads:bottle_with_oil","materials:glass_bottle"}
+		{"examobs:titan_core"},´
 	}
 })
 --]]
