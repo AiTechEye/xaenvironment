@@ -1,15 +1,27 @@
 plasma = {}
-minetest.register_node("plasma:plasma_cannon",{
-	stack_max= 1,
+minetest.register_tool("plasma:plasma_cannon",{
 	description = "Plasma cannon",
-	drawtype = "mesh",
-	mesh = "plasma_cannon.obj",
-	tiles = {"plasma_cannon_colors.png"},
-	groups = {dig_immediate=3},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	sunlight_propagates = true,
+	inventory_image = "plasma_cannon.png",
+	wield_scale={x=2,y=2,z=4},
 	on_use=function(itemstack, user, pointed_thing)
+		if itemstack:get_wear() > 60000 then
+			local inv = user:get_inventory()
+			if inv:contains_item("main","plasma:cannon_battery") then
+				inv:remove_item("main",ItemStack("plasma:cannon_battery"))
+				itemstack:set_wear(1)
+				itemstack:get_meta():set_int("power",100)
+				minetest.sound_play("spacestuff_pff", {pos=user:get_pos(), gain = 1, max_hear_distance = 8})
+			else
+				minetest.chat_send_player(user:get_player_name(),"Have  'Plasma cannon battery' in your inventory to reload")
+
+			end
+			return itemstack
+		end
+		local m =  itemstack:get_meta()
+		if m:get_int("power") == 0 then
+			m:set_int("power",100)
+		end
+
 		local dir = user:get_look_dir()
 		local p = user:get_pos()
 		local e = minetest.add_entity({x=p.x+(dir.x*2),y=p.y+1+(dir.y*2),z=p.z+(dir.z*2)},"plasma:orb")
@@ -17,45 +29,9 @@ minetest.register_node("plasma:plasma_cannon",{
 		en.charging = true
 		en.user = user
 		en.user_name = user:get_player_name()
-	end,
-	on_place=function(itemstack, user, pointed_thing)
-		if pointed_thing.type == "node" and default.defpos(pointed_thing.above,"buildable_to") and not minetest.is_protected(user:get_player_name(),pointed_thing.above) then
-			minetest.item_place_node(ItemStack("plasma:plasma_cannon_placeable"), user, pointed_thing)
-			itemstack:take_item()
-			return itemstack
-		end
+		return itemstack
 	end
 })
-
-minetest.register_node("plasma:plasma_cannon_placeable",{
-	stack_max= 1,
-	description = "Plasma cannon",
-	drop = "plasma:plasma_cannon",
-	drawtype = "mesh",
-	mesh = "plasma_cannon_placeable.obj",
-	tiles = {"plasma_cannon_colors.png"},
-	groups = {dig_immediate=3,not_in_creative_inventory=1},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	sunlight_propagates = true,
-	visual_scale = 0.4,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.7, -0.3, -0.2, 0.7, 0.2, 0.2}
-	}
-})
-
-
-
---[[
-
-			local item = clicker:get_wielded_item():to_table()
-				item.name = "quads:petrol_tank_empty"
-				clicker:set_wielded_item(item)
-
---]]
-
-
 
 minetest.register_entity("plasma:orb",{
 	hp_max = 100,
@@ -127,7 +103,7 @@ minetest.register_entity("plasma:orb",{
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power/2)) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
-				if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb == self.plasmaorb or en.name == "__builtin:item" )) then
+				if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
 					local d = self.power-vector.distance(pos,p)
 					if d > 90 then
 						d = 1000
@@ -153,7 +129,7 @@ minetest.register_entity("plasma:orb",{
 		local o = minetest.add_entity(pos,"plasma:impulse")
 		local en = o:get_luaentity()
 		en.end_scale = self.power
-		minetest.check_for_falling(pos)
+		minetest.check_for_falling(self.object:get_pos())
 		self.object:remove()
 	end,
 	obs=function(ob)
@@ -220,6 +196,22 @@ minetest.register_entity("plasma:orb",{
 					local v = {x = (npos.x - pos.x)*20, y = (npos.y - pos.y)*20, z = (npos.z - pos.z)*20}
 					self.object:set_velocity(v)
 				end
+
+				local stack = self.user:get_wielded_item()
+				local m = stack:get_meta()
+
+				if stack:get_name() ~= "plasma:plasma_cannon" then
+					self.charging = nil
+				elseif self.power >= m:get_int("power") then
+					if self.sound1 then
+						minetest.sound_stop(self.sound1)
+					end
+					if not self.sound2 then
+						self.sound2 = minetest.sound_play("plasma_core_loaded", {object=self.object, gain = 4,max_hear_distance = 10,loop=true})
+					end
+					return
+				end
+
 				self.power = self.power + dtime*40
 				self.charging_time = self.charging_time + dtime
 
@@ -233,12 +225,15 @@ minetest.register_entity("plasma:orb",{
 					self.object:set_properties({visual_size = {x=1+self.power*0.01,y=1+self.power*0.01,z=1+self.power*0.01}})
 				end
 
+
+
 				if self.charging_time >= 2.2 then
 					if not self.sound2 then
 						self.power = 100
 						self.sound2 = minetest.sound_play("plasma_core_loaded", {object=self.object, gain = 4,max_hear_distance = 10,loop=true})
 					end
 				end
+
 				return
 			else
 				self.charging = nil
@@ -249,6 +244,14 @@ minetest.register_entity("plasma:orb",{
 					minetest.sound_stop(self.sound2)
 				end
 				if not self.sound3 then
+					local stack = self.user:get_wielded_item()
+					local w = stack:get_wear() + math.floor((65535*(self.power*0.01)))
+
+					stack:set_wear(w < 60001 and w or 60001)
+					local m = stack:get_meta()
+					m:set_int("power",m:get_int("power") - self.power)
+
+					self.user:get_inventory():set_stack("main",self.user:get_wield_index(),stack)
 					self.sound3 = minetest.sound_play("plasma_orb", {object=self.object, gain = 4,max_hear_distance = 10,loop=true})
 					minetest.sound_play("plasma_shoot", {object=self.object, gain = 4,max_hear_distance = 10})
 					local dir = self.user:get_look_dir()
@@ -259,13 +262,13 @@ minetest.register_entity("plasma:orb",{
 		end
 
 		if default.defpos(pos,"walkable") then
-			self:explode(ob)
+			self:explode()
 			return
 		end
 
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 1+self.power*0.03)) do
 			local en = ob:get_luaentity()
-			if not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and en.plasmaorb == self.plasmaorb) then
+			if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
 				self:explode()
 				return
 			end
@@ -313,25 +316,20 @@ minetest.register_craftitem("plasma:cannon_battery", {
 	inventory_image = "plasma_battery.png",
 })
 
---[[
+
 minetest.register_craft({
 	output="plasma:plasma_cannon",
 	recipe={
 		{"default:diamondblock","default:titaniumblock","default:uraniumactive_ingot"},
 		{"default:emerald","examobs:titan_core","default:electricblock"},
-	},
-})
-
-
-minetest.register_craft({
-	output="plasma:plasma_cannon_battery",
-	recipe={
-		{"","",""},
-		{"","examobs:titan_core",""},
-		{"","",""},
-	},
-	replacements={
-		{"examobs:titan_core"},´
 	}
 })
---]]
+
+minetest.register_craft({
+	output="plasma:cannon_battery 3",
+	recipe={
+		{"default:titanium_ingot","default:iron_ingot",""},
+		{"default:emerald","default:emerald",""},
+		{"default:titanium_ingot","default:iron_ingot",""},
+	}
+})
