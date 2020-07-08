@@ -234,7 +234,14 @@ exaachievements.register({
 	skills=20,
 	hide_until=100,
 })
-
+exaachievements.register({
+	type="customize",
+	name="100% Clean",
+	count=1,
+	description="Blow a fully charged plasma orb",
+	skills=50,
+	hide_until=200,
+})
 exaachievements.register({
 	type="dig",
 	count=100,
