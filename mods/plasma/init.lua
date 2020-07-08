@@ -21,6 +21,8 @@ minetest.register_node("plasma:plasma_cannon",{
 	on_place=function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "node" and default.defpos(pointed_thing.above,"buildable_to") and not minetest.is_protected(user:get_player_name(),pointed_thing.above) then
 			minetest.item_place_node(ItemStack("plasma:plasma_cannon_placeable"), user, pointed_thing)
+			itemstack:take_item()
+			return itemstack
 		end
 	end
 })
@@ -70,6 +72,7 @@ minetest.register_entity("plasma:orb",{
 	start_timeout = 0,
 	plasmaorb = true,
 	get_staticdata = function(self)
+		self:explode(true)
 		return minetest.serialize({power=self.power,user_name=self.user_name})
 	end,
 	anim=function(self)
@@ -83,17 +86,12 @@ minetest.register_entity("plasma:orb",{
 		local s = minetest.deserialize(staticdata) or {}
 		self.power = s.power or 1
 		self.user_name = s.user_name
-
 		self.object:set_properties({visual_size = {x=1+self.power*0.01,y=1+self.power*0.01,z=1+self.power*0.01}})
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		self:explode()
 	end,
 	explode=function(self,juststop)
-		if self.ex then
-			return
-		end
-		self.ex = true
 		if self.sound1 then
 			minetest.sound_stop(self.sound1)
 		end
@@ -106,8 +104,13 @@ minetest.register_entity("plasma:orb",{
 		if juststop then
 			return
 		end
+		if self.ex then
+			return
+		end
 
-		local pos = self.object:get_pos()
+		self.ex = true
+
+		local pos = self.opos or self.object:get_pos()
 
 		if self.power > 50 then
 			minetest.sound_play("plasma_explosion", {pos=pos, gain = 9,max_hear_distance = 100})
@@ -150,6 +153,7 @@ minetest.register_entity("plasma:orb",{
 		local o = minetest.add_entity(pos,"plasma:impulse")
 		local en = o:get_luaentity()
 		en.end_scale = self.power
+		minetest.check_for_falling(pos)
 		self.object:remove()
 	end,
 	obs=function(ob)
@@ -188,7 +192,6 @@ minetest.register_entity("plasma:orb",{
 	end,
 	on_step=function(self,dtime)
 		local pos = self.object:get_pos()
-
 		if not pos then
 			self:explode(ob,true)
 			return
@@ -209,10 +212,14 @@ minetest.register_entity("plasma:orb",{
 
 				local dir = self.user:get_look_dir()
 				local p = self.user:get_pos()
-				local d = 1
-				local npos = {x=p.x+(dir.x*d), y=p.y+(dir.y*d)+1.6, z=p.z+(dir.z*d)}
-				local v = {x = (npos.x - pos.x)*20, y = (npos.y - pos.y)*20, z = (npos.z - pos.z)*20}
-				self.object:set_velocity(v)
+				local npos = {x=p.x+dir.x, y=p.y+dir.y+1.6, z=p.z+dir.z}
+				if vector.distance(npos,pos) > 1 then
+					self.object:set_velocity({x=0,y=0,z=0})
+					self.object:set_pos(npos)
+				else
+					local v = {x = (npos.x - pos.x)*20, y = (npos.y - pos.y)*20, z = (npos.z - pos.z)*20}
+					self.object:set_velocity(v)
+				end
 				self.power = self.power + dtime*40
 				self.charging_time = self.charging_time + dtime
 
@@ -263,6 +270,7 @@ minetest.register_entity("plasma:orb",{
 				return
 			end
 		end
+		self.opos = pos
 	end
 })
 
@@ -299,7 +307,22 @@ minetest.register_entity("plasma:impulse",{
 		end
 	end
 })
+
+minetest.register_craftitem("plasma:cannon_battery", {
+	description = "Plasma cannon battery",
+	inventory_image = "plasma_battery.png",
+})
+
 --[[
+minetest.register_craft({
+	output="plasma:plasma_cannon",
+	recipe={
+		{"default:diamondblock","default:titaniumblock","default:uraniumactive_ingot"},
+		{"default:emerald","examobs:titan_core","default:electricblock"},
+	},
+})
+
+
 minetest.register_craft({
 	output="plasma:plasma_cannon_battery",
 	recipe={
