@@ -1237,6 +1237,7 @@ minetest.register_node("default:emerald", {
 	sunlight_propagates = true,
 	drowning = 1,
 	alpha=220,
+	sounds = default.node_sound_glass_defaults(),
 })
 
 minetest.register_node("default:space_gold_ore", {
@@ -1244,18 +1245,21 @@ minetest.register_node("default:space_gold_ore", {
 	tiles={"default_space_stone.png^(default_goldblock.png^default_ore_mineral.png^[makealpha:0,255,0)"},
 	groups = {cracky=3},
 	drop="default:gold_lump 2",
+	sounds = default.node_sound_stone_defaults(),
 })
 minetest.register_node("default:space_titanium_ore", {
 	description = "Space titanium ore",
 	tiles={"default_space_stone.png^(default_steelblock.png^[colorize:#5555^default_ore_mineral.png^[makealpha:0,255,0)"},
 	groups = {cracky=3},
 	drop="default:titanium_lump",
+	sounds = default.node_sound_stone_defaults(),
 })
 minetest.register_node("default:space_iron_ore", {
 	description = "Space iron ore",
 	tiles={"default_space_stone.png^default_ore_iron.png"},
 	groups = {cracky=3},
 	drop="default:iron_lump 2",
+	sounds = default.node_sound_stone_defaults(),
 })
 
 default.register_door({
