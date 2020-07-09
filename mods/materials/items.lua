@@ -385,3 +385,10 @@ minetest.register_tool("materials:firethrower", {
 		return itemstack
 	end
 })
+
+minetest.register_node("materials:concrete", {
+	description = "Concrete",
+	tiles = {"materials_concrete.png"},
+	groups = {cracky=2,treasure=1},
+	sounds = default.node_sound_stone_defaults(),
+})

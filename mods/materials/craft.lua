@@ -1,4 +1,11 @@
 minetest.register_craft({
+	type = "cooking",
+	output = "materials:concrete",
+	recipe = "default:clay_lump",
+	cooktime = 5,
+})
+
+minetest.register_craft({
 	output="materials:wood_table_corner_leg1",
 	recipe={
 		{"group:wood","group:wood","group:wood"},
@@ -6,7 +13,6 @@ minetest.register_craft({
 		{"group:wood","","group:wood"},
 	},
 })
-
 minetest.register_craft({
 	output="materials:wood_table_center_leg",
 	recipe={
