@@ -480,6 +480,7 @@ minetest.register_node("default:dye_workbench", {
 			"size[8,5]" ..
 			"listcolors[#77777777;#777777aa;#000000ff]"..
 			"item_image[2,0;1,1;plants:daisybush1]" ..
+			"item_image[3,0;1,1;default:water_source]" ..
 			"item_image[3,0;1,1;default:bucket_with_water_source]" ..
 			"list[context;input;2,0;1,1;]" ..
 			"list[current_player;main;0,1.3;8,4;]" ..
@@ -490,11 +491,11 @@ minetest.register_node("default:dye_workbench", {
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		if listname=="input" and default.def(stack:get_name()).dye_colors or listname=="input_water" and minetest.get_item_group(stack:get_name(),"bucket_water") > 0 then
+		if listname=="input" and default.def(stack:get_name()).dye_colors or listname=="input_water" and (minetest.get_item_group(stack:get_name(),"bucket_water") > 0 or minetest.get_item_group(stack:get_name(),"water") > 0) then
 			local inv = minetest.get_meta(pos):get_inventory()
 			local p = inv:get_stack("input",1)
 			local b = inv:get_stack("input_water",1)
-			if (listname == "input" or p:get_count() > 0) and (minetest.get_item_group(b:get_name(),"bucket_water") > 0 or minetest.get_item_group(stack:get_name(),"bucket_water") > 0) then
+			if (listname == "input" or p:get_count() > 0) and (minetest.get_item_group(b:get_name(),"bucket_water") > 0 or minetest.get_item_group(stack:get_name(),"bucket_water") > 0 or minetest.get_item_group(stack:get_name(),"water") > 0) then
 				local color = default.def(stack:get_name()).dye_colors or default.def(p:get_name()).dye_colors
 				if color then
 					local item = ItemStack("default:dye"):to_table()
@@ -520,9 +521,21 @@ minetest.register_node("default:dye_workbench", {
 			local inv = minetest.get_meta(pos):get_inventory()
 			if listname == "output" then
 				local w = inv:get_stack("input",1)
+				local iw = inv:get_stack("input_water",1)
+				if minetest.get_item_group(iw:get_name(),"bucket_water") > 0 then
+					inv:set_stack("input_water",1,"default:bucket")
+					inv:set_stack("input",1,w)
+				else
+					iw:take_item()
+					inv:set_stack("input_water",1,iw)
+					if iw:get_count() > 0 and w:get_count()-4 > 0 then
+						minetest.after(0,function(pos, iw, player)
+							minetest.registered_nodes["default:dye_workbench"].allow_metadata_inventory_put(pos, "input_water", 1, iw, player)
+						end,pos, iw, playe)
+					end
+				end
 				w:take_item()
 				inv:set_stack("input",1,w)
-				inv:set_stack("input_water",1,"default:bucket")
 			elseif (listname == "input" and inv:get_stack("input",1):get_count()-stack:get_count() < 1) or listname == "input_water" then
 				inv:set_stack("output",1,nil)
 			end
