@@ -1,4 +1,4 @@
-# xaenvironment V8.1
+# XaEnvironment V8.2
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
