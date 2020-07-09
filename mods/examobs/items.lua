@@ -574,6 +574,7 @@ minetest.register_node("examobs:titan_core", {
 
 	},
 	groups = {igniter=2,not_in_craftguide=1,cracky = 3},
+	sounds = default.node_sound_stone_defaults(),
 	paramtype = "light",
 	light_source=14,
 	damage_per_second = 9,
