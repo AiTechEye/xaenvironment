@@ -100,7 +100,7 @@ minetest.register_entity("plasma:orb",{
 			if self.power >= 100 then
 				exaachievements.customize(self.user,"100% Clean")
 			end
-			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power/2)) do
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2+(self.power/2))) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
 				if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
@@ -113,7 +113,7 @@ minetest.register_entity("plasma:orb",{
 				end
 			end
 		else
-			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power/2)) do
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2+(self.power/2))) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
 				if p and not (en and en.plasmaorb) then
@@ -265,10 +265,9 @@ minetest.register_entity("plasma:orb",{
 			self:explode()
 			return
 		end
-
-		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 1+self.power*0.03)) do
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2+self.power*0.03)) do
 			local en = ob:get_luaentity()
-			if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
+			if not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
 				self:explode()
 				return
 			end
