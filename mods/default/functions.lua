@@ -257,11 +257,12 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
 			if not minetest.registered_tools[itemstack:get_name()] then
 				local item = ItemStack(itemstack:get_name() .."_eaten")
+				local c = itemstack:get_count()
 				item = item:to_table()
 				item.metadata = minetest.serialize({eat = eat})
 				item.wear = eat
 				minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
-				if itemstack:get_count() > 1 then
+				if c > 1 then
 					user:get_inventory():add_item("main",item)
 				else
 					itemstack:replace(item)
