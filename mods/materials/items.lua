@@ -392,3 +392,34 @@ minetest.register_node("materials:concrete", {
 	groups = {cracky=2,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+minetest.register_node("materials:concrete_stair",{
+	description = "Concrete stair",
+	tiles = {"materials_concrete.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=2,treasure=1},
+	sounds = default.node_sound_stone_defaults(),
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0},
+			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+		}
+	},
+	on_place = minetest.rotate_node,
+
+})
+
+default.register_chest({
+	name = "iron_chest",
+	description = "Iron chest",
+	texture="default_ironblock.png",
+		groups = {cracky=2,treasure=1},
+	craft={
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"}
+	}
+})

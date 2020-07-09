@@ -1,4 +1,12 @@
 minetest.register_craft({
+	output="materials:concrete_stair 3",
+	recipe={
+		{"","materials:concrete"},
+		{"materials:concrete","materials:concrete"}
+	},
+})
+
+minetest.register_craft({
 	type = "cooking",
 	output = "materials:concrete",
 	recipe = "default:clay_lump",
