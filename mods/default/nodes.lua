@@ -1273,3 +1273,16 @@ default.register_door({
 		{"default:glass","default:glass",""},
 	}
 })
+
+default.register_door({
+	name="iron_door",
+	description = "Iron door",
+	texture="default_ironblock.png",
+	sounds = default.node_sound_metal_defaults(),
+	{cracky = 2, door=1},
+	craft={
+		{"default:iron_ingot","default:iron_ingot",""},
+		{"default:iron_ingot","default:iron_ingot",""},
+		{"default:iron_ingot","default:iron_ingot",""},
+	}
+})
