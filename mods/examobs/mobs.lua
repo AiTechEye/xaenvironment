@@ -1200,6 +1200,38 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	name = "villager_npc",
+	type = "npc",
+	textures = {"examobs_villager.png"},
+	dmg = 1,
+	coin = 2,
+	aggressivity = 1,
+	walk_speed = 4,
+	run_speed = 8,
+	animation = "default",
+	spawn_chance = 1000,
+	spawning = false,
+	inv={["examobs:flesh"]=1},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_lifedeadline=function(self)
+		return self.storage.npc_generated
+	end,
+})
+
+examobs.register_mob({
 	name = "wolf",
 	textures = {"examobs_wolf.png"},
 	mesh = "examobs_wolf.b3d",
