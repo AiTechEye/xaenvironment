@@ -129,6 +129,14 @@ minetest.register_craft({
 		{"group:stick","","group:stick"},
 	},
 })
+minetest.register_craft({
+	output="default:ladder_metal 14",
+	recipe={
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+		{"default:iron_ingot","","default:iron_ingot"},
+	},
+})
 
 minetest.register_craft({
 	output="default:furnace",

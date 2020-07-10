@@ -189,6 +189,33 @@ minetest.register_node("default:ladder", {
 	walkable=false,
 })
 
+minetest.register_node("default:ladder_metal", {
+	description = "Metal ladder",
+	tiles={"default_ironblock.png"},
+	groups = {ladder=1,cracky=3,treasure=1},
+	sounds = default.node_sound_metal_defaults(),
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4375, -0.5, -0.35, 0.4375, -0.4375, -0.25},
+			{-0.4375, -0.5, -0.05, 0.4375, -0.4375, 0.05},
+			{-0.4375, -0.5, 0.25, 0.4375, -0.4375, 0.35},
+			{-0.5, -0.5, -0.5, -0.4375, -0.375, 0.5},
+			{0.4375, -0.5, -0.5, 0.5, -0.375, 0.5},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {{-0.5, -0.5, -0.5, 0.5, -0.375, 0.5}}
+	},
+	climbable = true,
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	legacy_wallmounted=true,
+	walkable=false,
+})
+
 minetest.register_node("default:stick_on_ground", {
 	description = "Stick",
 	drop="default:stick",
