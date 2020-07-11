@@ -740,7 +740,9 @@ default.treasure=function(def)
 	else
 		items = def.items
 	end
-	if def.node ~= "" then
+	if type(def.node) == "table" then
+		minetest.set_node(def.pos,def.node)
+	else
 		minetest.set_node(def.pos,{name=def.node})
 	end
 	local m = minetest.get_meta(def.pos):get_inventory()
