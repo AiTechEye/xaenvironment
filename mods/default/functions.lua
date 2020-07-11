@@ -740,7 +740,9 @@ default.treasure=function(def)
 	else
 		items = def.items
 	end
-	minetest.set_node(def.pos,{name=def.node})
+	if def.node ~= "" then
+		minetest.set_node(def.pos,{name=def.node})
+	end
 	local m = minetest.get_meta(def.pos):get_inventory()
 	local size = m:get_size("main")
 	local its = #items
