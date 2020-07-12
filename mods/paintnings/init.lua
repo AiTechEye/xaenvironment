@@ -1,4 +1,4 @@
-local count = 32
+local count = 40
 
 for i = 1,count do
 minetest.register_node("paintnings:paintning"..i, {
@@ -55,7 +55,7 @@ minetest.register_node("paintnings:frame", {
 			end
 		end
 		minetest.get_meta(pos):set_string("formspec",
-			"size[8,4]"
+			"size[8,5]"
 			.."listcolors[#77777777;#777777aa;#000000ff]"
 			..b
 		)
