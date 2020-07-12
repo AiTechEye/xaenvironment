@@ -246,6 +246,7 @@ default.register_tree=function(def)
 -- tree
 
 	def.tree = def.tree or					{}
+	def.tree.tree = def.name
 	def.tree.description = def.tree.description or			name .. " tree"
 	def.tree.tiles = def.tree.tiles or				{"default_wood.png","default_wood.png","default_tree.png"}
 	def.tree.paramtype2 = def.tree.paramtype2 or			"facedir"
@@ -256,6 +257,10 @@ default.register_tree=function(def)
 									minetest.get_meta(pos):set_int("placed",1)
 								end
 	minetest.register_node(mod .. def.name .. "_tree", def.tree)
+
+
+
+print(dump(minetest.registered_nodes[mod .. def.name .. "_tree"]))
 
 -- wood
 
