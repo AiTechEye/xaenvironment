@@ -119,7 +119,7 @@ exaachievements.customize=function(user,name)
 	local a = exaachievements.events.customize[name]
 	if a then
 		exaachievements.skills(a,1,user)
-	else
+	elseif not exaachievements.creative then
 		minetest.log("exaachievements: " ..name.."isn't registered")
 	end
 end
