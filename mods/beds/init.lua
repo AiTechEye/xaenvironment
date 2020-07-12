@@ -18,7 +18,7 @@ player_style.register_button({
 })
 end)
 minetest.register_on_respawnplayer(function(player)
-	beds.respawn(player)
+	return beds.respawn(player)
 end)
 
 beds.respawn=function(player)
