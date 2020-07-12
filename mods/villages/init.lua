@@ -5,7 +5,7 @@ villages = {
 		["villages_dubble_balcony"]={chance=15,area=10,height=6},
 		["villages_family_curbroof"]={chance=15,area=12,height=8},
 		["villages_foodbar"]={chance=15,area=9,height=7},
-		["villages_litle_house_balcony"]={chance=20,area=5,height=6},
+		["villages_litle_house_balcony"]={chance=10,area=5,height=6},
 		["villages_middle_house"]={chance=12,area=7,height=7},
 		["villages_storey"]={chance=15,area=8,height=9},
 		["villages_tiny_curbroof"]={chance=8,area=7,height=5},
