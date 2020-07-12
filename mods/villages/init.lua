@@ -5,11 +5,19 @@ villages = {
 		["villages_dubble_balcony"]={chance=15,area=10,height=6},
 		["villages_family_curbroof"]={chance=15,area=12,height=8},
 		["villages_foodbar"]={chance=15,area=9,height=7},
-		["villages_litle_house_balcony"]={chance=10,area=5,height=6},
+		["villages_litle_house_balcony"]={chance=20,area=5,height=6},
 		["villages_middle_house"]={chance=12,area=7,height=7},
 		["villages_storey"]={chance=15,area=8,height=9},
 		["villages_tiny_curbroof"]={chance=8,area=7,height=5},
 		["villages_tower"]={chance=15,area=6,height=18},
+		["villages_cabbage_farm"]={chance=18,area=10,height=2},
+		["villages_chicken_farm"]={chance=18,area=10,height=3},
+		["villages_cistern"]={chance=18,area=8,height=2},
+		["villages_cotton_farm"]={chance=18,area=10,height=2},
+		["villages_mine_shaft"]={chance=19,area=5,height=1},
+		["villages_pig_farm"]={chance=18,area=10,height=3},
+		["villages_sheep_farm"]={chance=18,area=10,height=3},
+		["villages_wheat_farm"]={chance=18,area=10,height=2},
 	},
 	nodes_reset = {
 		"default:paper_compressor",
@@ -17,12 +25,15 @@ villages = {
 		"default:workbench",
 		"default:recycling_mill",
 		"default:dye_workbench",
-		"examobs:villager_npc_spawner",
 		"default:chest",
 		"examobs:woodbox",
 		"default:furnace",
 		"plants:apple_wood_door",
 		"clock:clock1",
+		"examobs:villager_npc_spawner",
+		"examobs:chicken_spawner",
+		"examobs:sheep_spawner",
+		"examobs:pig_spawner",
 	}
 }
 
@@ -138,11 +149,19 @@ villages.set_building=function(pos,node)
 		if n.name == "examobs:villager_npc_spawner" then
 			minetest.remove_node(v)
 			minetest.add_entity(v,"examobs:villager_npc"):set_yaw(math.random(0,6.28))
+		elseif n.name == "examobs:chicken_spawner" then
+			minetest.remove_node(v)
+			minetest.add_entity(v,"examobs:chicken"):set_yaw(math.random(0,6.28))
+		elseif n.name == "examobs:sheep_spawner" then
+			minetest.remove_node(v)
+			minetest.add_entity(v,"examobs:sheep"):set_yaw(math.random(0,6.28))
+		elseif n.name == "examobs:pig_spawner" then
+			minetest.remove_node(v)
+			minetest.add_entity(v,"examobs:pig"):set_yaw(math.random(0,6.28))
 		elseif n.name == "default:chest" or n.name == "examobs:woodbox" then
 			default.treasure({pos=v,node=n})
 		else
 			minetest.set_node(v,n)
-
 		end
 	end
 
