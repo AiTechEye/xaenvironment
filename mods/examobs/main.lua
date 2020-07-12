@@ -318,15 +318,25 @@ examobs.register_mob=function(def)
 			end,
 		})
 	else
-		minetest.register_craftitem(name .."_spawner", {
+		minetest.register_node(name .."_spawner", {
 			description = def.name .." spawner",
-			groups={not_in_craftguide=1},
+			drawtype = "plantlike",
 			inventory_image = def.textures[1] .. "^examobs_alpha_egg.png^[makealpha:0,255,0",
+			tiles = {def.textures[1] .. "^examobs_alpha_egg.png^[makealpha:0,255,0"},
+			paramtype = "light",
+			sunlight_propagates = true,
+			walkable = false,
+			visual_scale = 0.3,
+			drop = "",
+			groups = {dig_immediate=3,not_in_craftguide=1},
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
 					local p = pointed_thing.above
 					minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, name):set_yaw(math.random(0,6.28))
 					itemstack:take_item()
+					minetest.after(0.5, function(p)
+						minetest.add_node(p,{name="air"})
+					end, p)
 				end
 				return itemstack
 			end
