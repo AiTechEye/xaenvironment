@@ -305,7 +305,7 @@ minetest.register_entity("quads:quad",{
 			self.object:set_hp(hp - d)
 		end
 		self:showtext(hp .. "/" .. self.hp_max,"F00")
-		local pos = self:pos()
+		local pos = self:pos() or self.oldpos
 		if minetest.get_item_group(minetest.get_node(pos).name, "igniter") > 0 then
 			minetest.add_particlespawner({
 				amount = 5,
@@ -344,7 +344,8 @@ minetest.register_entity("quads:quad",{
 	end,
 	on_step=function(self,dtime)
 		local v = self.object:get_velocity()
-
+		local p = self:pos()
+		self.oldpos = p
 		if not self.user and self.speed == 0 and v.y == 0 then
 			self:node_timer(dtime)
 			return
@@ -389,7 +390,6 @@ minetest.register_entity("quads:quad",{
 		local Z = (math.cos(yaw) * 1)
 		local x = X * self.speed
 		local z = Z * self.speed
-		local p = self:pos()
 		local ap = apos(p,X,0,Z)
 		local walku = walkable(apos(p,0,-1,0))
 
