@@ -258,10 +258,6 @@ default.register_tree=function(def)
 								end
 	minetest.register_node(mod .. def.name .. "_tree", def.tree)
 
-
-
-print(dump(minetest.registered_nodes[mod .. def.name .. "_tree"]))
-
 -- wood
 
 	def.wood = def.wood or					{}
