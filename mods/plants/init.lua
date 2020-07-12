@@ -859,7 +859,7 @@ default.register_plant({
 	}
 })
 default.register_eatable("node","plants:cabbage_broken",1,4,{
-	description = "Broke cabbage",
+	description = "Broken cabbage",
 	inventory_image="plants_cabbage_broken.png",	
 	name="plants_cabbage",
 	tiles={"plants_cabbage.png"},
