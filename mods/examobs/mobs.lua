@@ -1589,6 +1589,53 @@ examobs.register_mob({
 	end,
 })
 
+
+
+
+examobs.register_mob({
+	name = "pig",
+	textures = {"examobs_pig.png"},
+	mesh = "examobs_pig.b3d",
+	type = "animal",
+	team = "pig",
+	coin = 2,
+	dmg = 1,
+	hp = 15,
+	aggressivity = -1,
+	flee_from_threats_only = 1,
+	inv={["examobs:flesh"]=3},
+	walk_speed=2,
+	run_speed=4,
+	animation = {
+		stand = {x=1,y=10,speed=0},
+		walk = {x=20,y=40,speed=60},
+		run = {x=20,y=40,speed=100},
+		lay = {x=50,y=60,speed=0},
+		attack = {x=1,y=10},
+	},
+	collisionbox={-0.5,-0.5,-0.5,0.5,0.3,0.5},
+	spawn_on={"group:spreading_dirt_type"},
+	egg_timer = math.random(60,600),
+	on_lifedeadline=function(self)
+		if self.lifetimer < 0 and self.storage.tamed then
+			examobs.dying(self,2)
+			return true
+		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"grass") > 0
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() and minetest.get_item_group(item,"grass")> 0 then
+			self:eat_item(item,2)
+			default.take_item(clicker)
+			self.folow = clicker
+			examobs.known(self,clicker,"folow")
+			self.storage.tamed = 1
+		end
+	end
+})
+
 examobs.register_mob({
 	name = "sheep",
 	spawner_egg = true,
