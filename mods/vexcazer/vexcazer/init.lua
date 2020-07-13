@@ -540,10 +540,6 @@ vexcazer.new_user=function(user,index)
 		inv:add_item("main", ItemStack("vexcazer:controler 1 65534"))
 		minetest.chat_send_player(name,"<vexcazer> Use the controler to change modes or open the gui on the tool")
 	end
-
-	minetest.chat_send_player(name,"<vexcazer> You can craft the tool with mese-crystal / fragments to reload")
-
-
 	if vexcazer.auto_ad_mod==false then return end
 
 
