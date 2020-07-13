@@ -566,7 +566,7 @@ examobs.known=function(self,ob,type,get)
 end
 
 examobs.visiable=function(self,pos2)
-	if not self.object then
+	if not self.object or not self.pos then
 		return self
 	end
 	local pos1 = self:pos()
