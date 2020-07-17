@@ -284,6 +284,7 @@ bows.register_arrow("fire",{
 	craft_count=1,
 	groups={treasure=2},
 	on_hit_node=function(self,pos,user,lastpos)
+		lastpos = lastpos or pos
 		if not minetest.is_protected(lastpos, user:get_player_name()) and default.defpos(lastpos,"buildable_to") then
 			minetest.set_node(lastpos,{name="fire:basic_flame"})
 		end
@@ -291,11 +292,11 @@ bows.register_arrow("fire",{
 		return self
 	end,
 	on_hit_object=function(self,target,hp,user,lastpos)
-		local p = target:get_pos()
+		local p = target:get_pos() or self.object:get_pos()
 		bows.registed_arrows["default:arrow_fire"].on_hit_node(self,lastpos,user,p)
-		bows.arrow_remove(self)
 		minetest.get_meta(p):set_int("radius",3)
 		minetest.get_node_timer(p):start(0.1)
+		bows.arrow_remove(self)
 	end,
 	craft={
 		{"group:arrow","default:torch"},
