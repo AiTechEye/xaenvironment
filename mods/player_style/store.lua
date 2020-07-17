@@ -140,7 +140,7 @@ player_style.store=function(player)
 			.."tooltip[creinvright;Forward]"
 			.."tooltip[reset;Reset]"
 			.."tooltip[search;Search]"
-			.."tooltip[sell;Sell]"
+			.."tooltip[sell;"..(store.sell and "Buy" or "Sell").."]"
 
 			.."image_button[0,7;1,1;default_crafting_arrowleft.png;creinvleft;]"
 			.."image_button[0.8,7;1,1;default_crafting_arrowright.png;creinvright;]"
