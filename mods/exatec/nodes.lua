@@ -1215,7 +1215,6 @@ minetest.register_node("exatec:destroyer", {
 		)
 	end,
 	on_metadata_inventory_put=function(pos)
-		minetest.get_node_timer(pos)
 		local t = minetest.get_node_timer(pos)
 		if not t:is_started() then
 			t:start(0.1)
@@ -1916,4 +1915,75 @@ minetest.register_node("exatec:node_constructor", {
 	can_dig = function(pos, player)
 		return minetest.get_meta(pos):get_inventory():is_empty("main")
 	end,
+})
+
+minetest.register_node("exatec:trader", {
+	description = "Trader",
+	tiles={
+		"default_goldblock.png^player_style_coin.png^exatec_hole.png",
+		"default_goldblock.png^player_style_coin.png",
+		"default_goldblock.png^player_style_coin.png^exatec_wirecon.png"
+	},
+	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=200},
+	sounds = default.node_sound_wood_defaults(),
+	after_place_node = function(pos, placer)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 1)
+		m:set_string("formspec",
+			"size[8,5]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;3.5,0;8,4;]" ..
+			"list[current_player;main;0,1.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+			.."listring[current_player;main]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		return minetest.registered_nodes["exatec:trader"].can_trade(pos,stack) and stack:get_count() or 0
+	end,
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local m = minetest.get_meta(pos)
+		local t = math.floor(player_style.store_items_cost[stack:get_name()]*0.01) * stack:get_count()
+		local o = m:get_string("owner")
+		if o ~= "" then
+			local p = minetest.get_player_by_name(o)
+			if p then
+				local c = m:get_int("coins")
+				if c > 0 then
+					t = t + c
+					m:set_int("coins",0)
+					m:set_string("infotext","")
+				end
+				Coin(p,t)
+				m:get_inventory():set_stack("main",1,nil)
+				minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+				return
+			end
+		end
+		local at = m:get_int("coins")+t
+		m:set_int("coins",at)
+		m:set_string("infotext","Contains: "..at.." (break to get)")
+		m:get_inventory():set_stack("main",1,nil)
+		minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+	end,
+	on_destruct=function(pos)
+		local at = minetest.get_meta(pos):get_int("coins")
+		if at > 0 then
+			minetest.add_item(pos,ItemStack("player_style:coin "..at))
+		end
+	end,
+	can_trade=function(pos,item)
+		player_style.open_store()				
+		local i = player_style.store_items_cost[item:get_name()]
+		return (i ~= nil and i*0.01 >= 1) or item:get_count() == "player_style:coin"
+	end,
+	exatec={
+		input_list="main",
+		test_input=function(pos,stack,opos)
+			return minetest.registered_nodes["exatec:trader"].can_trade(pos,stack)
+		end
+	}
 })

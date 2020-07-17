@@ -4,6 +4,16 @@ minetest.register_craft({
 		{"default:paper","exatec:wire",""},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:trader",
+	recipe={
+		{"materials:diode","player_style:coin","materials:diode"},
+		{"player_style:coin","default:goldblock","player_style:coin"},
+		{"materials:plastic_sheet","player_style:coin","materials:plastic_sheet"},
+	},
+})
+
 minetest.register_craft({
 	output="exatec:industrial_miner",
 	recipe={
