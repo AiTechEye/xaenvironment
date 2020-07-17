@@ -5,7 +5,7 @@ default.register_eatable("craftitem","examobs:flesh",1,4,{
 })
 default.register_eatable("craftitem","examobs:meat",3,4,{
 	description = "Cooked meat",
-	groups={meat=1},
+	groups={meat=1,store=50},
 	inventory_image = "examobs_meat.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
@@ -25,7 +25,7 @@ minetest.register_tool("examobs:hiding_poison", {
 	description = "Hiding poison from mobs",
 	inventory_image = "materials_plant_extracts.png",
 	sound=default.tool_breaks_defaults(),
-	groups={treasure=1},
+	groups={treasure=1,store=250},
 	on_use=function(itemstack, user, pointed_thing)
 		local name = user:get_player_name()
 		if examobs.hiding[name] then
@@ -88,7 +88,7 @@ minetest.register_craft({
 minetest.register_node("examobs:meat_block", {
 	description = "Meat block",
 	tiles={"examobs_meat.png"},
-	groups = {crumbly=3,meat=2},
+	groups = {crumbly=3,meat=2,store=100},
 	sounds = default.node_sound_clay_defaults(),
 })
 minetest.register_node("examobs:flesh_block", {
@@ -353,7 +353,7 @@ minetest.register_craftitem("examobs:fishing_rod", {
 minetest.register_tool("examobs:fishing_rod_with_string", {
 	description = "Fishing rod with string",
 	inventory_image = "examobs_fishing_rod_with_string.png",
-	groups={flammable=3,treasure=2},
+	groups={flammable=3,treasure=2,store=500},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		local name = user:get_player_name()
@@ -377,7 +377,7 @@ minetest.register_tool("examobs:fishing_rod_with_string", {
 default.register_eatable("craftitem","examobs:fried_fish",1,3, {
 	description = "Fried fish",
 	inventory_image="examobs_fried_fish.png",
-	groups = {meat=1,fish=1},
+	groups = {meat=1,fish=1,store=100},
 })
 
 minetest.register_craft({
@@ -453,6 +453,7 @@ minetest.register_tool("examobs:icecreamball", {
 		itemstack:add_wear(65536)
 		return itemstack
 	end,
+	groups = {store=100}
 })
 
 
@@ -500,26 +501,22 @@ minetest.register_entity("examobs:icecreamball",{
 default.register_eatable("craftitem","examobs:gingerbread_piece1",1,2,{
 	description = "Gingerbread piece",
 	inventory_image = "examobs_gingerbread_piece1.png",
-	groups={aliveai_eatable=1},
-	on_use =minetest.item_eat(1)
+	groups={store=100},
 })
 default.register_eatable("craftitem","examobs:gingerbread_piece2",1,2,{
 	description = "Gingerbread piece",
 	inventory_image = "examobs_gingerbread_piece2.png",
-	groups={aliveai_eatable=1},
-	on_use =minetest.item_eat(1)
+	groups={store=100}
 })
 default.register_eatable("craftitem","examobs:lollipop_piece",1,4,{
 	description = "Lollipop piece",
 	inventory_image = "examobs_lollipop_piece.png",
-	groups={aliveai_eatable=1},
-	on_use =minetest.item_eat(5)
+	groups={store=100},
 })
 default.register_eatable("craftitem","examobs:candycane_piece",1,5,{
 	description = "Candycane piece",
 	inventory_image = "examobs_candycane_piece.png",
-	groups={aliveai_eatable=5},
-	on_use =minetest.item_eat(5)
+	groups={store=100},
 })
 
 minetest.register_craft({
@@ -535,7 +532,7 @@ minetest.register_tool("examobs:infection_poison", {
 	description = "Infection poison",
 	inventory_image = "materials_plant_extracts_gas.png^[colorize:#ff00ff^materials_plant_extracts.png",
 	tiles={"materials_plant_extracts.png"},
-	groups = {flammable=1,used_by_npc=1,treasure=1},
+	groups = {flammable=1,used_by_npc=1,treasure=1,store=500},
 	on_use = function(itemstack, user, pointed_thing)
 		local item = user:get_wielded_item()
 		if pointed_thing.type == "object" then

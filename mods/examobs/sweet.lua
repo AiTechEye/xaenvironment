@@ -115,7 +115,7 @@ minetest.register_node("examobs:gel", {
 	liquid_alternative_source = "examobs:gel",
 	liquid_viscosity = 15,
 	post_effect_color = {a=160,r=0,g=150,b=100},
-	groups = {liquid = 4,crumbly = 1, sand = 1},
+	groups = {liquid = 4,crumbly = 1, sand = 1,lava=1},
 })
 
 minetest.register_node("examobs:gel_flowing", {
@@ -146,7 +146,7 @@ minetest.register_node("examobs:gel_flowing", {
 	liquid_viscosity = 1,
 	liquid_range = 2,
 	post_effect_color = {a=160,r=0,g=150,b=100},
-	groups = {liquid = 4, not_in_creative_inventory = 1},
+	groups = {liquid = 4, not_in_creative_inventory = 1,lava=1},
 })
 
 minetest.register_node("examobs:gel2", {
@@ -165,7 +165,7 @@ minetest.register_node("examobs:gel2", {
 	liquid_alternative_source = "examobs:gel2",
 	liquid_viscosity = 15,
 	post_effect_color = {a=60,r=0,g=150,b=0},
-	groups = {liquid = 4,crumbly = 1, sand = 1},
+	groups = {liquid = 4,crumbly = 1, sand = 1,lava=1},
 })
 
 minetest.register_node("examobs:gel_flowing2", {
@@ -196,5 +196,5 @@ minetest.register_node("examobs:gel_flowing2", {
 	liquid_viscosity = 1,
 	liquid_range = 2,
 	post_effect_color = {a=60,r=0,g=150,b=0},
-	groups = {liquid = 4, not_in_creative_inventory = 1},
+	groups = {liquid = 4, not_in_creative_inventory = 1,lava=1},
 })
