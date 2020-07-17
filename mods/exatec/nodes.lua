@@ -1939,6 +1939,8 @@ minetest.register_node("exatec:trader", {
 			"listring[current_player;main]" ..
 			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 			.."listring[current_player;main]"
+			.."tooltip[showstore;Open store]"
+			.."image_button[0,0;1,1;player_style_coin.png;showstore;]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -1978,7 +1980,12 @@ minetest.register_node("exatec:trader", {
 	can_trade=function(pos,item)
 		player_style.open_store()				
 		local i = player_style.store_items_cost[item:get_name()]
-		return (i ~= nil and i*0.01 >= 1) or item:get_count() == "player_style:coin"
+		return (i ~= nil and i*0.01 >= 1)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.showstore then
+			player_style.store(sender)
+		end
 	end,
 	exatec={
 		input_list="main",
