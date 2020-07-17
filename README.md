@@ -1,8 +1,8 @@
-# XaEnvironment V8.3
+# XaEnvironment V8.31
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
-## Compatible for minetest 5.31
+## Compatible for minetest 5.3
 
 ---
 
