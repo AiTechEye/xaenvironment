@@ -60,6 +60,8 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							inv:remove_item("main",ItemStack(s.." 1"))
 							m:set_int("coins",m:get_int("coins")+math.floor(player_style.store_items_cost[t]*0.01))
 							player_style.store(player)
+							minetest.sound_play("default_coins", {to_player=name, gain = 2})
+							break
 						end
 					end
 				end
@@ -73,6 +75,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							inv:add_item("main",t.." 1")
 							m:set_int("coins",m:get_int("coins")-player_style.store_items_cost[t])
 							player_style.store(player)
+							break
 						end
 					end
 				end
@@ -94,8 +97,6 @@ player_style.open_store=function()
 		table.sort(player_style.store_items)
 	end
 end
-
-
 
 player_style.store=function(player)
 	local name = player:get_player_name()
