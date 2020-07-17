@@ -81,11 +81,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 	end
 end)
 
-player_style.store=function(player)
-	local name = player:get_player_name()
-	player_style.players[name].store = player_style.players[name].store or {size=63,index=1,sell=false}
-	local store = player_style.players[name].store
-
+player_style.open_store=function()
 	if not player_style.store_items then
 		player_style.store_items_cost={}
 		player_style.store_items={}
@@ -97,6 +93,16 @@ player_style.store=function(player)
 		end
 		table.sort(player_style.store_items)
 	end
+end
+
+
+
+player_style.store=function(player)
+	local name = player:get_player_name()
+	player_style.players[name].store = player_style.players[name].store or {size=63,index=1,sell=false}
+	local store = player_style.players[name].store
+
+	player_style.open_store()
 		
 	store.search = store.search and store.search.text ~= "" and store.search or nil
 
