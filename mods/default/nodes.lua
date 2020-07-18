@@ -1322,7 +1322,7 @@ local qblock = function(def)
 			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=default_qblock.png)",
 			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,0=default_qblock.png)",
 		},
-		groups = {dig_immediate = 2,not_in_creative_inventory=1,store=10000},
+		groups = {dig_immediate = 2,not_in_creative_inventory=1,store=1000},
 		sounds = default.node_sound_wood_defaults(),
 	})
 end
