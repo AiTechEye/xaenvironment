@@ -1,5 +1,5 @@
 minetest.register_node("materials:wood_table", {
-	description = "Wooden table",
+	description = "Wooden table (rightclick to change in 5s)",
 	tiles = {"plants_apple_wood.png"},
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
 	drawtype = "nodebox",
@@ -12,7 +12,20 @@ minetest.register_node("materials:wood_table", {
 	},
 	palette="default_palette.png",
 	paramtype2="color",
-	on_punch=default.dye_coloring
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_center_leg"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
+
 })
 minetest.register_node("materials:wood_table_center_leg", {
 	description = "Wooden table center leg",
@@ -20,6 +33,7 @@ minetest.register_node("materials:wood_table_center_leg", {
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3},
 	drawtype = "nodebox",
 	paramtype = "light",
+	drop = "materials:wood_table",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -29,15 +43,28 @@ minetest.register_node("materials:wood_table_center_leg", {
 	},
 	palette="default_palette.png",
 	paramtype2="color",
-	on_punch=default.dye_coloring
+	on_punch=default.dye_coloring,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.get_meta(pos):get_int("timeout") == 0 then
+			minetest.swap_node(pos,{name="materials:wood_table_corner_leg1"})
+			minetest.get_node_timer(pos):start(5)
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("timeout",1)
+	end,
 })
 
 minetest.register_node("materials:wood_table_corner_leg1", {
-	description = "Wooden table corner leg (rightclick to change in 5s)",
+	description = "Wooden table corner leg",
 	tiles = {"plants_apple_wood.png"},
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1},
 	drawtype = "nodebox",
 	paramtype = "light",
+	drop = "materials:wood_table",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -67,6 +94,7 @@ minetest.register_node("materials:wood_table_corner_leg2", {
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
 	drawtype = "nodebox",
 	paramtype = "light",
+	drop = "materials:wood_table",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -96,6 +124,7 @@ minetest.register_node("materials:wood_table_corner_leg3", {
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
 	drawtype = "nodebox",
 	paramtype = "light",
+	drop = "materials:wood_table",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -125,6 +154,7 @@ minetest.register_node("materials:wood_table_corner_leg4", {
 	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,not_in_creative_inventory=1},
 	drawtype = "nodebox",
 	paramtype = "light",
+	drop = "materials:wood_table",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -140,7 +170,7 @@ minetest.register_node("materials:wood_table_corner_leg4", {
 	end,
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if minetest.get_meta(pos):get_int("timeout") == 0 then
-			minetest.swap_node(pos,{name="materials:wood_table_corner_leg1"})
+			minetest.swap_node(pos,{name="materials:wood_table"})
 			minetest.get_node_timer(pos):start(5)
 		end
 	end,
@@ -148,9 +178,6 @@ minetest.register_node("materials:wood_table_corner_leg4", {
 		minetest.get_meta(pos):set_int("timeout",1)
 	end,
 })
-
-
-
 
 minetest.register_node("materials:cup", {
 	description = "Cup",

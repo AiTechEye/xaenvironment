@@ -14,29 +14,11 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:wood_table_corner_leg1",
+	output="materials:wood_table 4",
 	recipe={
 		{"group:wood","group:wood","group:wood"},
-		{"group:wood","","group:wood"},
-		{"group:wood","","group:wood"},
-	},
-})
-minetest.register_craft({
-	output="materials:wood_table_center_leg",
-	recipe={
-		{"materials:wood_table_corner_leg1"},
-	},
-})
-minetest.register_craft({
-	output="materials:wood_table",
-	recipe={
-		{"materials:wood_table_center_leg"},
-	},
-})
-minetest.register_craft({
-	output="materials:wood_table_corner_leg1",
-	recipe={
-		{"materials:wood_table"},
+		{"group:stick","","group:stick"},
+		{"group:stick","","group:stick"},
 	},
 })
 
