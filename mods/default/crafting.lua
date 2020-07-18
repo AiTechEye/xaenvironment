@@ -573,6 +573,8 @@ minetest.register_node("default:dye_workbench", {
 	}
 })
 
+local recycling_mill_items = {}
+
 minetest.register_node("default:recycling_mill", {
 	description = "Recycling mill",
 	tiles={"default_ironblock.png^synth_repeat.png"},
@@ -599,9 +601,16 @@ minetest.register_node("default:recycling_mill", {
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		local inv = minetest.get_meta(pos):get_inventory()
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
 		if listname == "input" and inv:is_empty("output") and inv:is_empty("input") and stack:get_wear() == 0 then
-			return 1
+			local i = stack:get_name()
+
+			if m:get_int(i) == 1 or minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, listname, index, stack, player,stack) then
+				--recycling_mill_items[i] = true
+				m:set_int(i,1)
+				return 1
+			end
 		end
 		return 0
 	end,
@@ -619,13 +628,18 @@ minetest.register_node("default:recycling_mill", {
 			inv:set_list("output",{})
 		end
 	end,
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+	on_metadata_inventory_put = function(pos, listname, index, stack, player,test)
 		local inv = minetest.get_meta(pos):get_inventory()
-		local input_item = inv:get_stack("input",1):get_name()
+		local input_item = test and test:get_name() or inv:get_stack("input",1):get_name()
+
 		if inv:is_empty("output") then
-			local craft = minetest.get_craft_recipe(inv:get_stack("input",1):get_name())
+
+			local craft = minetest.get_craft_recipe(input_item)
+
+
 			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
 				local same_items = false
+
 				for i,v in pairs(craft.items) do
 					if v == input_item then
 						if same_items == false then
@@ -661,7 +675,12 @@ minetest.register_node("default:recycling_mill", {
 						craft.items[i] = ""
 					end
 				end
-				inv:set_list("output",craft.items)	
+
+				if test then
+					return true
+				else
+					inv:set_list("output",craft.items)
+				end
 			end
 		end
 	end,
@@ -675,7 +694,7 @@ minetest.register_node("default:recycling_mill", {
 		output_list="output",
 		test_input=function(pos,stack)
 			local inv = minetest.get_meta(pos):get_inventory()
-			return inv:is_empty("input") and inv:is_empty("output")
+			return inv:is_empty("input") and inv:is_empty("output") and minetest.registered_nodes["default:recycling_mill"].allow_metadata_inventory_put(pos, "input", 1, stack,stack) == 1
 		end,
 	},
 })
