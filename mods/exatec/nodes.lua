@@ -158,6 +158,8 @@ minetest.register_node("exatec:tube_dir", {
 			m:set_int("on",on)
 			m:set_string("infotext","Direction: " .. (on == 1 and "On" or "Off"))
 		end,
+
+
 		test_input=function(pos,stack,opos)
 			return true
 		end,
@@ -169,13 +171,15 @@ minetest.register_node("exatec:tube_dir", {
 			en.storage.dir = d
 			ob:set_velocity(d)
 		end,
-		on_tube = function(pos,stack,opos,ob)
 
+		on_tube = function(pos,stack,opos,ob)
 			if minetest.get_meta(pos):get_int("on") == 1 then
 				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-				ob:get_luaentity().storage.dir = d
-				ob:set_velocity(d)
-				ob:set_pos(pos)
+				if exatec.test_input(apos(pos,d.x,d.y,d.z),stack,pos) then
+					ob:get_luaentity().storage.dir = d
+					ob:set_velocity(d)
+					ob:set_pos(pos)
+				end
 			end
 		end,
 	},
