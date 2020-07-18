@@ -446,7 +446,7 @@ default.registry_mineral({
 	not_bow=true,
 	not_arrow=true,
 	block={
-		groups={cracky=3,stone=1,treasure=1,store=500},
+		groups={cracky=3,treasure=1,store=500},
 		sounds=default.node_sound_stone_defaults()
 	},
 	pick={groups={not_regular_craft=0,treasure=1}},
@@ -839,6 +839,7 @@ default.registry_mineral({
 	texture="default_steelblock.png^[colorize:#5555",
 	wherein="default:moon_space",
 	not_ore = true,
+	ingot={groups={store=900}},
 	ore={tiles={"default_space_stone.png^(default_steelblock.png^[colorize:#5555^default_alpha_ore.png^[colorize:#fff4^default_ore_mineral.png^[makealpha:0,255,0)"}},
 	block={groups={cracky=1}},
 	pick={

@@ -1313,3 +1313,22 @@ default.register_door({
 		{"default:iron_ingot","default:iron_ingot",""},
 	}
 })
+
+local qblock = function(def)
+	minetest.register_node(minetest.get_current_modname() ..":qblock_".. (def.name or def.color), {
+		description = "!",
+		tiles={
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=default_qblock.png)",
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=default_qblock.png)",
+			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,0=default_qblock.png)",
+		},
+		groups = {dig_immediate = 2,not_in_creative_inventory=1,store=10000},
+		sounds = default.node_sound_wood_defaults(),
+	})
+end
+
+qblock({color="FF0000"})
+qblock({color="0000FF"})
+qblock({color="1c7800"})
+qblock({color="e29f00"})
+qblock({color="800080"})
