@@ -430,6 +430,9 @@ minetest.register_node("examobs:woodbox", {
 			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 		)
 	end,
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
 })
 minetest.register_craft({
 	output = "examobs:woodbox",
