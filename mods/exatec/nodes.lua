@@ -1928,7 +1928,7 @@ minetest.register_node("exatec:trader", {
 		"default_goldblock.png^player_style_coin.png",
 		"default_goldblock.png^player_style_coin.png^exatec_wirecon.png"
 	},
-	groups = {choppy=3,flammable=2,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=200},
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=200,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 	after_place_node = function(pos, placer)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
