@@ -1012,7 +1012,8 @@ examobs.register_mob({
 	wtimer = 0,
 	on_abs_step=function(self)
 		local d = vector.distance(self.lpos,self:pos())
-		if d > 0.5 and self.object:get_velocity().y == 0 then
+		local v =  self.object:get_velocity()
+		if d > 0.5 and v and v.y == 0 then
 			self.lpos = self:pos()	
 			minetest.sound_play("default_place_hard", {object=self.object, gain = 1, max_hear_distance = 20})
 		end
