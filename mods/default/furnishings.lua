@@ -296,6 +296,7 @@ default.register_chest=function(def)
 				minetest.after(0.1, function(pname,pos)
 					return minetest.show_formspec(pname, "default.chest",
 						"size[8,8]" ..
+						"listcolors[#77777777;#777777aa;#000000ff]" ..
 						"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
 						"list[current_player;main;0,4.2;8,4;]" ..
 						"listring[current_player;main]" ..
