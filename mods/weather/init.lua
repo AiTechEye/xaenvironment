@@ -218,7 +218,7 @@ weather.ac=function()
 					if not weather.players[name] or weather.players[name].bio~=w.bio or weather.currweather[i].change_strength then
 						local s=(w.strength*0.01)*1.2
 						local sound
-						if w.strength>30 then
+						if w.strength >= 15 then
 							sound=minetest.sound_play("weather_rain", {to_player = name,gain = 6,loop=true})
 						end
 						if t>6 and t<19 then
