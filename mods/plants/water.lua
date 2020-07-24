@@ -170,3 +170,32 @@ default.register_plant({
 		spawn_by = "default:salt_water_source",
 	},
 })
+
+default.register_plant({
+	name="lily_pad",
+	tiles={"plants_lily_pad.png"},
+	drawtype = "nodebox",
+	inventory_image="plants_lily_pad.png",
+	wield_image="plants_lily_pad.png",	
+	waving =  0,
+	paramtype2="facedir",
+	walkable = true,
+	liquids_pointable = true,
+	node_box = {type = "fixed",fixed={-0.5, -0.5, -0.5, 0.5, -0.49, 0.5}},
+	selection_box = {type = "fixed",fixed={-0.5, -0.5, -0.5, 0.5, -0.49, 0.5}},
+	on_place = function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" then
+			local n = user:get_player_name()
+			if minetest.get_node(pointed_thing.above).name == "air" and not minetest.is_protected(n,pointed_thing.above) then
+				minetest.set_node(pointed_thing.above,{name="plants:lily_pad",param2=math.random(0,3)})
+				itemstack:take_item()
+				return itemstack
+			end
+		end
+	end,
+	groups = {dig_immediate = 3,flammable=1,spreading_plant=20},
+	decoration={
+		biomes={},
+		noise_params={},
+	}
+})
