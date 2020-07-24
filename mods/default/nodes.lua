@@ -799,7 +799,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	alpha =165,
-	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1},
+	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1,on_load=1},
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -814,6 +814,14 @@ minetest.register_node("default:water_source", {
 	liquid_viscosity = 1,
 	post_effect_color = {a = 110, r = 42, g = 128, b = 231},
 	sounds = default.node_sound_water_defaults(),
+	on_load=function(pos)
+		if pos.y >= 0 and math.random(1,20) == 1 and minetest.get_node(apos(pos,0,1)).name == "air" then
+			local a = minetest.find_nodes_in_area_under_air(vector.subtract(pos,5),vector.add(pos,5),{"plants:lily_pad"})
+			if #a <= 11 then
+				minetest.set_node(apos(pos,0,1),{name="plants:lily_pad",param2=math.random(0,3)})
+			end
+		end
+	end
 })
 
 minetest.register_node("default:water_flowing", {
