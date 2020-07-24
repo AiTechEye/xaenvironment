@@ -6,6 +6,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:fuel_dir_filter",
+	recipe={
+		{"","materials:diode",""},
+		{"","exatec:tube",""},
+		{"","materials:gear_metal",""},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:trader",
 	recipe={
 		{"materials:diode","player_style:coin","materials:diode"},
@@ -87,7 +96,6 @@ minetest.register_craft({
 		{"","materials:fanblade_plastic",""},
 	},
 })
-
 
 minetest.register_craft({
 	output="exatec:button",
