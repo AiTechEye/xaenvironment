@@ -177,12 +177,12 @@ default.register_plant({
 	drawtype = "nodebox",
 	inventory_image="plants_lily_pad.png",
 	wield_image="plants_lily_pad.png",	
-	waving =  0,
+	waving = 1,
 	paramtype2="facedir",
 	walkable = true,
 	liquids_pointable = true,
-	node_box = {type = "fixed",fixed={-0.5, -0.5, -0.5, 0.5, -0.49, 0.5}},
-	selection_box = {type = "fixed",fixed={-0.5, -0.5, -0.5, 0.5, -0.49, 0.5}},
+	node_box = {type = "fixed",fixed={-0.5, -0.51, -0.5, 0.5, -0.49, 0.5}},
+	selection_box = {type = "fixed",fixed={-0.5, -0.51, -0.5, 0.5, -0.49, 0.5}},
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "node" then
 			local n = user:get_player_name()
@@ -193,9 +193,8 @@ default.register_plant({
 			end
 		end
 	end,
-	groups = {dig_immediate = 3,flammable=1,spreading_plant=20},
+	groups = {dig_immediate = 3,flammable=1,spreading_plant=20,attached_node=0},
 	decoration={
-		biomes={},
-		noise_params={},
+		place_on = {"default:water_source"}
 	}
 })
