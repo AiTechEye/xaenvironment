@@ -184,7 +184,7 @@ minetest.register_node("exatec:tube_dir", {
 })
 
 minetest.register_node("exatec:fuel_dir_filter", {
-	description = "Fuel filter & direction tube",
+	description = "Fuel filter direction tube",
 	tiles = {
 		"exatec_glass.png^[colorize:#555555cc^default_crafting_arrowup.png",
 		"exatec_glass.png^[colorize:#555555cc",
@@ -221,9 +221,7 @@ minetest.register_node("exatec:fuel_dir_filter", {
 			en.storage.dir = d
 			ob:set_velocity(d)
 		end,
-
 		on_tube = function(pos,stack,opos,ob)
-
 			if default.get_fuel(stack) > 0 then
 				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 				if exatec.test_input(apos(pos,d.x,d.y,d.z),stack,pos) then
@@ -233,7 +231,60 @@ minetest.register_node("exatec:fuel_dir_filter", {
 				end
 			end
 		end
+	}
+})
+
+minetest.register_node("exatec:cookable_dir_filter", {
+	description = "Cookable filter direction tube",
+	tiles = {
+		"exatec_glass.png^[colorize:#ff6600cc^default_crafting_arrowup.png",
+		"exatec_glass.png^[colorize:#ff6600cc",
+		"exatec_glass.png^[colorize:#ff6600cc",
+		"exatec_glass.png^[colorize:#ff6600cc",
+		"exatec_glass.png^[colorize:#ff6600cc",
+		"exatec_glass.png^[colorize:#ff6600cc",
 	},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,store=600},
+	paramtype2 = "facedir",
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
+	exatec={
+		test_input=function(pos,stack,opos)
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
+			return result.item:get_name() ~= ""
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local ob = minetest.add_entity(pos,"exatec:tubeitem")
+			local en = ob:get_luaentity()
+			en:new_item(stack,opos)
+			en.storage.dir = d
+			ob:set_velocity(d)
+		end,
+		on_tube = function(pos,stack,opos,ob)
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
+			if result.item:get_name() ~= "" then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				if exatec.test_input(apos(pos,d.x,d.y,d.z),stack,pos) then
+					ob:get_luaentity().storage.dir = d
+					ob:set_velocity(d)
+					ob:set_pos(pos)
+				end
+			end
+		end
+	}
 })
 
 minetest.register_node("exatec:tube_filter", {

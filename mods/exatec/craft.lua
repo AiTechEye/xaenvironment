@@ -6,6 +6,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:cookable_dir_filter",
+	recipe={
+		{"","materials:diode",""},
+		{"","exatec:tube",""},
+		{"","default:steel_ingot",""},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:fuel_dir_filter",
 	recipe={
 		{"","materials:diode",""},
