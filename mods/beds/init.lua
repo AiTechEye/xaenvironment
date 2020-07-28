@@ -129,6 +129,7 @@ minetest.register_node("beds:blocking", {
 	sunlight_propagetes = true,
 	pointable = false,
 	walkable = false,
+	groups={not_in_creative_inventory=1},
 })
 
 minetest.register_node("beds:tent", {
