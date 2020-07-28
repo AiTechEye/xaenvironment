@@ -343,6 +343,7 @@ minetest.register_node("default:lightsource", {
 	sunlight_propagates = true,
 	walkable = false,
 	light_source = 10,
+	groups={not_in_creative_inventory=1},
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.5)
 	end,
