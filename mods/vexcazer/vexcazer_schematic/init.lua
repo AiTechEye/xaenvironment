@@ -110,7 +110,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			return
 		end
 		vexcazer_schematic.user[n].name = pressed.text
-		local f = minetest.get_worldpath().."/schematic/"..pressed.text..".mts"
+		local f = minetest.get_worldpath().."/schematics/"..pressed.text..".mts"
 		if pressed.save then
 			local o=io.open(f, "r")
 			if o then
@@ -119,9 +119,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				return
 			end
 		end
-		minetest.mkdir(minetest.get_worldpath().."/schematic")
+		minetest.mkdir(minetest.get_worldpath().."/schematics")
 		minetest.create_schematic(u.pos1,u.pos2,nil,f)
-		vexcazer_schematic.b(player,pressed.text,nil,".../schematic/"..pressed.text..".mts")
+		vexcazer_schematic.b(player,pressed.text,nil,".../schematics/"..pressed.text..".mts")
 	elseif form=="vexcazer_schematic_place" then
 		local n = player:get_player_name()
 		local u = vexcazer_schematic.user[n]
@@ -172,10 +172,16 @@ vexcazer.registry_mode({
 	hide_mode_default=true,
 	hide_mode_mod=true,
 	on_place=function(itemstack, user, pointed_thing,input)
-		minetest.place_schematic(pointed_thing.above, minetest.get_modpath("plants").."/schematics/plants_apple_tree.mts", "random", nil, false)
+		if not input.world then
+			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
+		else
+			vexcazer_schematic.a(itemstack, user, pointed_thing,input,2)
+		end
 	end,
 	on_use=function(itemstack, user, pointed_thing,input)
-		if pointed_thing.type == "node" then
+		if not input.world then
+			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
+		elseif pointed_thing.type == "node" then
 			vexcazer_schematic.a(itemstack, user, pointed_thing,input,1)
 		else
 			vexcazer_schematic.a(itemstack, user, pointed_thing,input,0)
@@ -194,7 +200,9 @@ vexcazer.registry_mode({
 	on_place=function(itemstack, user, pointed_thing,input)
 		local n = user:get_player_name()
 		local u = vexcazer_schematic.user[n]
-		if not u or not u.path or u.path == "" then
+		if not input.world then
+			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
+		elseif not u or not u.path or u.path == "" then
 			vexcazer_schematic.place(user)
 		else
 			minetest.place_schematic(pointed_thing.above, u.path,"random",nil,false,"place_center_x,place_center_z")
@@ -203,7 +211,9 @@ vexcazer.registry_mode({
 	on_use=function(itemstack, user, pointed_thing,input)
 		local n = user:get_player_name()
 		local u = vexcazer_schematic.user[n]
-		if not u or not u.path or u.path == "" or user:get_player_control().jump then
+		if not input.world then
+			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
+		elseif not u or not u.path or u.path == "" or user:get_player_control().jump then
 			vexcazer_schematic.place(user)
 		else
 			if pointed_thing.type == "node" then
