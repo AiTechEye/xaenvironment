@@ -362,6 +362,7 @@ default.register_tree({
 	chair = true,
 	door = true,
 	fence = true,
+	test=true,
 	mapgen={biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"}},
 	fruit={
 		hp=1,
@@ -378,8 +379,12 @@ default.register_tree({
 	leaves={tiles={"plants_oak_leaves.png"}},
 	schematic=minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
 	sapling_place_schematic=function(pos)
-		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts", "random", nil, false)
+		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_oak_tree"..math.random(1,2)..".mts", "random", nil, false,"place_center_x,place_center_z")
 	end,
+	schematics={
+		minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_oak_tree2.mts",
+	},
 })
 
 
