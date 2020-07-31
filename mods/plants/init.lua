@@ -355,6 +355,32 @@ default.register_tree({
 		visual_scale=0.2,
 	},
 })
+-- ===================== Oak
+
+default.register_tree({
+	name="oak",
+	chair = true,
+	door = true,
+	fence = true,
+	mapgen={biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"}},
+	fruit={
+		hp=1,
+		gaps=1,
+		wet=0,
+		description = "Oak",
+		tiles={"plants_oak_nut.png"},
+		inventory_image="plants_oak_nut.png",
+		dye_colors = {palette=4}
+	},
+	tree={tiles={"plants_oak_tree_top.png","plants_oak_tree_top.png","plants_oak_tree.png"}},
+	sapling={tiles={"plants_oak_nut.png^[colorize:#0505"}},
+	wood={tiles={"plants_oak_wood.png"}},
+	leaves={tiles={"plants_oak_leaves.png"}},
+	schematic=minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
+	sapling_place_schematic=function(pos)
+		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts", "random", nil, false)
+	end,
+})
 
 
 --||||||||||||||||
