@@ -4,7 +4,7 @@ minetest.register_on_leaveplayer(function(player)
 	vexcazer_schematic.user[player:get_player_name()] = nil
 end)
 
-vexcazer_schematic.a=function(itemstack, user, pointed_thing,input,num)
+vexcazer_schematic.a=function(itemstack, user, pointed_thing,input,typ)
 	if not vexcazer_schematic.user[input.user_name] then
 		vexcazer_schematic.user[input.user_name] = {}
 	end
@@ -12,15 +12,16 @@ vexcazer_schematic.a=function(itemstack, user, pointed_thing,input,num)
 	local pos
 	local jump = user:get_player_control().jump
 	if not jump then
-		if num == 0 then
-			u.p = u.p == 1 and 2 or 1
-		else
-			u.p = num
-		end
-		if num == 1 or num == 2 then
+		if typ == "change" then
 			pos = pointed_thing.under
-			u["pos"..num] = pos
+			u.p = u.p == 1 and 2 or 1
+			return itemstack
+		elseif typ == "node" then
+			u.p = u.p or 1
+			pos = pointed_thing.under
+			u["pos"..u.p] = pos
 		else
+			u.p = u.p or 1
 			local up = user:get_pos()
 			up.y = up.y +1
 			pos = vector.floor(up)
@@ -167,7 +168,7 @@ vexcazer.registry_mode({
 	wear_on_use=1,
 	wear_on_place=1,
 	name="Create schematic",
-	info="USE to set pos1\nPLACE to set pos2\nUSE somewhere else to switch pos\nUSE and JUMP to create schematic",
+	info="USE to set pos\nPLACE to change pos1/pos2\nUSE somewhere else to switch pos in air\nUSE and JUMP to create schematic",
 	disallow_damage_on_use=true,
 	hide_mode_default=true,
 	hide_mode_mod=true,
@@ -175,16 +176,16 @@ vexcazer.registry_mode({
 		if not input.world then
 			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
 		else
-			vexcazer_schematic.a(itemstack, user, pointed_thing,input,2)
+			vexcazer_schematic.a(itemstack, user, pointed_thing,input,"change")
 		end
 	end,
 	on_use=function(itemstack, user, pointed_thing,input)
 		if not input.world then
 			minetest.chat_send_player(input.user_name,"<vexcazer> schematic only able with admin world for safety")
 		elseif pointed_thing.type == "node" then
-			vexcazer_schematic.a(itemstack, user, pointed_thing,input,1)
+			vexcazer_schematic.a(itemstack, user, pointed_thing,input,"node")
 		else
-			vexcazer_schematic.a(itemstack, user, pointed_thing,input,0)
+			vexcazer_schematic.a(itemstack, user, pointed_thing,input,"air")
 		end
 	end
 })
