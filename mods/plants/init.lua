@@ -362,7 +362,6 @@ default.register_tree({
 	chair = true,
 	door = true,
 	fence = true,
-	test=true,
 	mapgen={biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"}},
 	fruit={
 		hp=1,
