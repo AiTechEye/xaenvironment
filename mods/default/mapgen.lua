@@ -297,7 +297,7 @@ default.register_bio({"coniferous_foggy",	40,80,grass="default:dirt_with_conifer
 default.register_bio({"cold_coniferous",	20,20,grass="default:dirt_with_snow",beach=true})
 default.register_bio({"cold_grassland",		20,80,grass="default:dirt_with_snow",beach=true})
 
-default.register_bio({"tundra_green",		0,80,grass="default:dirt_with_red_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true})
+default.register_bio({"tundra_green",		0,80,grass="default:dirt_with_green_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true})
 default.register_bio({"snowy",		10,50,grass="default:dirt_with_snow",depth_filler=0})
 default.register_bio({"tundra_red",		0,20,grass="default:dirt_with_red_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true})
 default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",dirt="default:ice"})
