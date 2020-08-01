@@ -362,7 +362,14 @@ default.register_tree({
 	chair = true,
 	door = true,
 	fence = true,
-	mapgen={biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"}},
+	mapgen={
+		biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"},
+		noise_params={
+			offset=0.001,
+			scale=0.0004,
+		},
+		place_on={"default:dirt_with_coniferous_grass","default:dirt_with_grass","plants:grass1"},
+	},
 	fruit={
 		hp=1,
 		gaps=1,
@@ -373,7 +380,10 @@ default.register_tree({
 		dye_colors = {palette=4}
 	},
 	tree={tiles={"plants_oak_tree_top.png","plants_oak_tree_top.png","plants_oak_tree.png"}},
-	sapling={tiles={"plants_oak_nut.png^[colorize:#0505"}},
+	sapling={
+		visual_scale=0.1,
+		tiles={"plants_oak_nut.png^[colorize:#0505"}
+	},
 	wood={tiles={"plants_oak_wood.png"}},
 	leaves={tiles={"plants_oak_leaves.png"}},
 	schematic=minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
@@ -672,6 +682,34 @@ default.register_plant({
 		return true
 	end,
 	dye_colors = {palette=132},
+})
+
+default.register_plant({
+	name="long_grassgrass" .. i,
+	description = "Long grass",
+	tiles={"plants_longgrass.png"},
+	drop="long_grassgrass3",
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+	visual_scale=1.2+(i*0.2),
+	decoration={
+		biomes={"grass_land","deciduous","deciduous_grassland","tropic","grass_land","coniferous","coniferous_foggy"},
+		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
+		noise_params={
+			offset=0.2,
+			scale=0.01,
+			spread={x=3,y=3,z=3},
+			seed=0,
+		},
+	},
+	groups={grass=1,spreading_plant=7,dig_immediate=3,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	after_place_node=function(pos, placer)
+		minetest.set_node(pos,{name="plants:long_grassgrass"..math.random(1,5)})
+	end,
+	on_plant_spreading=function(pos)
+		minetest.set_node(pos,{name="plants:long_grassgrass"..math.random(1,5)})
+		return true
+	end,
+	dye_colors = {palette=87},
 })
 end
 
