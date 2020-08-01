@@ -4,6 +4,8 @@ default.register_bush=function(def)
 	local nname = mod .. def.name .. "_bush_leaves"
 	local max = def.max or 5
 	local min = def.min or 3
+	local mapgen = def.mapgen and table.copy(def.mapgen) or {}
+	def.mapgen = nil
 	def.max = nil
 	def.min = nil
 
@@ -48,29 +50,28 @@ default.register_bush=function(def)
 		end
 	})
 
-	def.mapgen = def.mapgen or						{}
-	def.mapgen.noise_params = def.mapgen.noise_params or			{}
-	def.mapgen.noise_params.offset = def.mapgen.noise_params.offset or	0.006
-	def.mapgen.noise_params.scale = def.mapgen.noise_params.scale or		0.002
-	def.mapgen.noise_params.spread = def.mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
-	def.mapgen.noise_params.seed = def.mapgen.noise_params.seed or		2
-	def.mapgen.noise_params.octaves = def.mapgen.noise_params.octaves or	3
-	def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
+	mapgen.noise_params = mapgen.noise_params or			{}
+	mapgen.noise_params.offset = mapgen.noise_params.offset or	0.0001
+	mapgen.noise_params.scale = mapgen.noise_params.scale or		0.00004
+	mapgen.noise_params.spread = mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
+	mapgen.noise_params.seed = mapgen.noise_params.seed or		2
+	mapgen.noise_params.octaves = mapgen.noise_params.octaves or	3
+	mapgen.noise_params.persist = mapgen.noise_params.persist or	0.66
 
-	if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
-		def.mapgen.biomes = default.registered_bios_list
+	if mapgen.biomes and mapgen.biomes[1] == "all" then
+		mapgen.biomes = default.registered_bios_list
 	end
 
 	minetest.register_decoration({
-		decoration = name .. "_decoration_spawner"	,
-		deco_type = def.mapgen.deco_type or		"simple",
-		place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
-		sidelen = def.mapgen.sidelen or		16,
-		noise_params = def.mapgen.noise_params,
-		biomes = def.mapgen.biomes or		{"grass_land"},
-		y_min = def.mapgen.y_min or		1,
-		y_max = def.mapgen.y_max or		31000,
-		flags = def.mapgen.flags or			"place_center_x, place_center_z",
+		decoration = nname.."_spawner"	,
+		deco_type = mapgen.deco_type or		"simple",
+		place_on = mapgen.place_on or		{"default:dirt_with_grass"},
+		sidelen = mapgen.sidelen or		16,
+		noise_params = mapgen.noise_params,
+		biomes = mapgen.biomes or		{"grass_land"},
+		y_min = mapgen.y_min or		1,
+		y_max = mapgen.y_max or		31000,
+		flags = mapgen.flags or			"place_center_x, place_center_z",
 	})
 
 end
