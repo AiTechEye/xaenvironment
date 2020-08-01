@@ -600,31 +600,6 @@ default.register_plant({
 })
 
 default.register_plant({
-	name="jungle_grass",
-	drawtype="firelike",
-	tiles={"plants_junglegrass.png"},
-	visual_scale=2,
-	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
-	liquidtype = "source",
-	liquid_alternative_flowing="plants:jungle_grass",
-	liquid_alternative_source="plants:jungle_grass",
-	liquid_renewable = false,
-	liquid_range = 0,
-	liquid_viscosity = 15,
-	decoration={
-		biomes={"swamp","jungle"},
-		place_on={"default:dirt_with_jungle_grass"},
-		noise_params={
-			offset=0.5,
-			scale=0.03,
-			spread={x=3,y=3,z=3},
-			seed=0,
-		},
-	},
-	dye_colors = {palette=93},
-})
-
-default.register_plant({
 	name="dry_plant",
 	tiles={"plants_dry_plant.png"},
 	groups={dig_immediate=3},
@@ -685,33 +660,81 @@ default.register_plant({
 })
 
 default.register_plant({
-	name="long_grassgrass" .. i,
+	name="long_grass" .. i,
 	description = "Long grass",
 	tiles={"plants_longgrass.png"},
-	drop="long_grassgrass3",
+	drop="plants:long_grass3",
 	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
 	visual_scale=1.2+(i*0.2),
 	decoration={
-		biomes={"grass_land","deciduous","deciduous_grassland","tropic","grass_land","coniferous","coniferous_foggy"},
+		biomes={"deciduous","deciduous_grassland","tropic","coniferous","coniferous_foggy"},
 		place_on={"default:dirt_with_grass","default:dirt_with_coniferous_grass"},
 		noise_params={
-			offset=0.2,
+			offset=0.02,
 			scale=0.01,
 			spread={x=3,y=3,z=3},
-			seed=0,
+			seed=232,
 		},
 	},
 	groups={grass=1,spreading_plant=7,dig_immediate=3,not_in_creative_inventory = i ~= 3 and 3 or nil},
 	after_place_node=function(pos, placer)
-		minetest.set_node(pos,{name="plants:long_grassgrass"..math.random(1,5)})
+		minetest.set_node(pos,{name="plants:long_grass"..math.random(1,5)})
 	end,
 	on_plant_spreading=function(pos)
-		minetest.set_node(pos,{name="plants:long_grassgrass"..math.random(1,5)})
+		minetest.set_node(pos,{name="plants:long_grass"..math.random(1,5)})
+		return true
+	end,
+	dye_colors = {palette=87},
+})
+
+default.register_plant({
+	name="jungle_grass" .. i,
+	description = "Jungle grass",
+	tiles={"plants_longgrass.png^[colorize:#8ab81811"},
+	drop="plants:jungle_grass3",
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+	visual_scale=1.4+(i*0.2),
+	decoration={
+		biomes={"swamp","jungle"},
+		place_on={"default:dirt_with_jungle_grass"},
+		noise_params={
+			offset=0.2,
+			scale=0.1,
+			spread={x=3,y=3,z=3},
+		},
+	},
+	groups={grass=1,spreading_plant=7,dig_immediate=3,not_in_creative_inventory = i ~= 3 and 3 or nil},
+	after_place_node=function(pos, placer)
+		minetest.set_node(pos,{name="plants:jungle_grass"..math.random(1,5)})
+	end,
+	on_plant_spreading=function(pos)
+		minetest.set_node(pos,{name="plants:jungle_grass"..math.random(1,5)})
 		return true
 	end,
 	dye_colors = {palette=87},
 })
 end
+
+
+default.register_plant({
+	name="jungle_grass",
+	drawtype="firelike",
+	tiles={"plants_junglegrass.png"},
+	visual_scale=2,
+	selection_box ={type="fixed",fixed={-0.4,-0.5,-0.4,0.4,-0.4,0.4}},
+	decoration={
+		biomes={"swamp","jungle"},
+		place_on={"default:dirt_with_jungle_grass"},
+		noise_params={
+			offset=0.05,
+			scale=0.03,
+			spread={x=3,y=3,z=3},
+			seed=0,
+		},
+	},
+	dye_colors = {palette=87},
+})
+
 
 minetest.register_lbm({
 	name="plants:spreading_plant",
