@@ -1,3 +1,80 @@
+default.register_bush=function(def)
+	local mod = minetest.get_current_modname() ..":"
+	local name = def.name
+	local nname = mod .. def.name .. "_bush_leaves"
+	local max = def.max or 5
+	local min = def.min or 3
+	def.max = nil
+	def.min = nil
+
+	def.description = def.description or			name .. " bush leaves"
+	def.tiles = def.tiles or				{"default_leaves.png"}
+	def.paramtype = def.paramtype or			"light"
+	def.walkable = def.walkable or			false
+	def.waving = def.waving or				1
+	def.drawtype = def.drawtype or			"allfaces_optional"
+	def.sunlight_propagates = def.sunlight_propagates or	true
+	def.groups = def.groups or				{leaves=1,snappy=3,flammable=2}
+	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
+	def.drop = def.drop or 				{max_items = 1,items = {{items = {"default:stick"}, rarity = 10},{items = {nname}}}}
+	minetest.register_node(nname, def)
+
+	minetest.register_node(nname.."_spawner",{
+		groups = {on_load=1,not_in_craftguide=1,not_in_creative_inventory=1},
+		drawtype = "airlike",
+		paramtype = "light",
+		sunlight_propagates = true,
+		walkable=false,
+		pointable=false,
+		buildable_to = true,
+		drop = "",
+		on_construct=function(pos)
+			minetest.registered_nodes[nname.."_spawner"].on_load(pos)
+		end,
+		on_load = function(pos)
+			minetest.remove_node(pos)
+			local rad = math.random(min,max)
+			for y=-rad,rad,1 do
+			for x=-rad,rad,1 do
+			for z=-rad,rad,1 do
+				local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
+				local cc=vector.length(vector.new({x=x,y=y,z=z}))/rad
+				if cc<=1 and default.defpos(p,"buildable_to") then
+					minetest.set_node(p,{name=nname})
+				end
+			end
+			end
+			end
+		end
+	})
+
+	def.mapgen = def.mapgen or						{}
+	def.mapgen.noise_params = def.mapgen.noise_params or			{}
+	def.mapgen.noise_params.offset = def.mapgen.noise_params.offset or	0.006
+	def.mapgen.noise_params.scale = def.mapgen.noise_params.scale or		0.002
+	def.mapgen.noise_params.spread = def.mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
+	def.mapgen.noise_params.seed = def.mapgen.noise_params.seed or		2
+	def.mapgen.noise_params.octaves = def.mapgen.noise_params.octaves or	3
+	def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
+
+	if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
+		def.mapgen.biomes = default.registered_bios_list
+	end
+
+	minetest.register_decoration({
+		decoration = name .. "_decoration_spawner"	,
+		deco_type = def.mapgen.deco_type or		"simple",
+		place_on = def.mapgen.place_on or		{"default:dirt_with_grass"},
+		sidelen = def.mapgen.sidelen or		16,
+		noise_params = def.mapgen.noise_params,
+		biomes = def.mapgen.biomes or		{"grass_land"},
+		y_min = def.mapgen.y_min or		1,
+		y_max = def.mapgen.y_max or		31000,
+		flags = def.mapgen.flags or			"place_center_x, place_center_z",
+	})
+
+end
+
 default.register_blockdetails=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local name = def.name
@@ -486,9 +563,6 @@ default.register_tree=function(def)
 			})
 		end
 	end
-
-
-
 
 	if def.door then
 		default.register_door({
