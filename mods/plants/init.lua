@@ -1,5 +1,16 @@
 dofile(minetest.get_modpath("plants") .. "/water.lua")
 
+
+--||||||||||||||||
+-- ======================= bush
+--||||||||||||||||
+
+default.register_bush({name="unknown1",tiles={"plants_leaves1.png"}})
+default.register_bush({name="unknown2",tiles={"plants_leaves2.png"}})
+default.register_bush({name="unknown3",tiles={"plants_leaves3.png"}})
+default.register_bush({name="unknown4",tiles={"plants_leaves4.png"}})
+default.register_bush({name="unknown5",tiles={"plants_leaves5.png"}})
+
 --||||||||||||||||
 -- ======================= trees
 --||||||||||||||||
