@@ -6,6 +6,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:tube_teleport",
+	recipe={
+		{"","materials:diode",""},
+		{"","exatec:tube",""},
+		{"","default:uraniumactive_ingot",""},
+	}
+})
+
+minetest.register_craft({
 	output="exatec:recycling_dir_filter",
 	recipe={
 		{"","materials:diode",""},

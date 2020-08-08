@@ -1,3 +1,28 @@
+minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
+	if exatec.temp.teleport_tube then
+		local n = puncher:get_player_name()
+		local d = exatec.temp.teleport_tube[n]
+		if d then
+			if exatec.test_input(pos,ItemStack("default:unknown"),d,d) then
+				minetest.registered_nodes["exatec:tube_teleport"].on_teleporttube_set(d,pos)
+			end
+			exatec.temp.teleport_tube[n] = nil
+			if #exatec.temp.teleport_tube <= 0 then
+				exatec.temp.teleport_tube = nil
+			end
+		end
+	end
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	local n = player:get_player_name()
+	exatec.temp.teleport_tube[n] = nil
+	if #exatec.temp.teleport_tube <= 0 then
+		exatec.temp.teleport_tube = nil
+	end
+end)
+
+
 exatec.def=function(pos)
 	local def = minetest.registered_nodes[minetest.get_node(pos).name]
 	return def and def.exatec or {}

@@ -120,6 +120,71 @@ minetest.register_node("exatec:tube_gate", {
 	},
 })
 
+
+minetest.register_node("exatec:tube_teleport", {
+	description = "Teleport tube",
+	tiles = {
+		"exatec_glass.png^[colorize:#00e1ffcc"
+	},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,exatec_wire_connected=1,store=600},
+	paramtype2 = "facedir",
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
+	on_construct = function(pos)
+		minetest.registered_nodes["exatec:tube_teleport"].on_teleporttube_set(pos)
+	end,
+	after_place_node = function(pos, placer)
+		exatec.temp.teleport_tube = exatec.temp.teleport_tube or {}
+		exatec.temp.teleport_tube[placer:get_player_name()] = pos
+	end,
+	on_teleporttube_set= function(pos,set_pos)
+		local p = "No position set"
+		local t = "Punch a input node,\ne.g tube, chest, or unit"
+		minetest.forceload_block(pos)
+		local m = minetest.get_meta(pos)
+		if set_pos then
+			p = minetest.pos_to_string(set_pos)
+			t = ""
+			m:set_string("pos",p)
+		end
+		m:set_string("formspec","size[4,1]label[0,-0.1;"..p.."]label[0,0.5;"..t.."]")
+	end,
+	exatec={
+		test_input=function(pos,stack,opos)
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("pos"))
+			minetest.forceload_block(p or pos)
+			return p and exatec.test_input(p,stack,p)
+		end,
+		on_input=function(pos,stack,opos)
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("pos"))
+			if not (p and exatec.test_input(p,stack,pos)) then
+				p = pos
+			end
+			minetest.forceload_block(p)
+			minetest.add_entity(p,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+		end,
+		on_tube = function(pos,stack,opos,ob)
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("pos"))
+			if p and exatec.test_input(p,stack,pos) then
+				minetest.forceload_block(p)
+				ob:set_pos(p)
+			end
+		end,
+	},
+})
+
 minetest.register_node("exatec:tube_dir", {
 	description = "Direction tube",
 	tiles = {
