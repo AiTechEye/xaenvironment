@@ -37,6 +37,16 @@ bows.register_arrow=function(name,def)
 	end
 end
 
+bows.automode=function(itemstack, user, pointed_thing)
+	local item=itemstack:to_table()
+	local meta = minetest.deserialize(item.metadata) or {}
+	meta.automode = meta.automode == false
+	minetest.chat_send_player(user:get_player_name(), "Auto find arrow "..(meta.automode == false and "disabled" or "enabled"))
+	item.metadata = minetest.serialize(meta)
+	itemstack:replace(item)
+	return itemstack
+end
+
 bows.register_bow=function(name,def)
 	if name==nil or name=="" then return false end
 
@@ -56,6 +66,7 @@ bows.register_bow=function(name,def)
 		description = def.description or name,
 		inventory_image = def.texture .. "^default_bow.png^[makealpha:0,255,0",
 		on_use =bows.load,
+		on_place = bows.automode,
 		groups = def.groups,
 		wield_scale={x=2,y=2,z=1}
 	})
@@ -63,6 +74,7 @@ bows.register_bow=function(name,def)
 		description = def.description or name,
 		inventory_image = def.texture .. (def.shots == 1 and "^default_bow_loaded.png" or "^default_bow_loaded_multi.png") .. "^[makealpha:0,255,0",
 		on_use =bows.shoot,
+		on_place = bows.automode,
 		groups = {bow=1,not_in_creative_inventory=1},
 		wield_scale={x=2,y=2,z=1}
 	})
@@ -74,16 +86,33 @@ end
 
 bows.load=function(itemstack, user, pointed_thing)
 	local inv=user:get_inventory()
-	local index=user:get_wield_index()-1
-	local arrow=inv:get_stack("main", index)
-	if minetest.get_item_group(arrow:get_name(), "arrow")==0 then
-		minetest.chat_send_player(user:get_player_name(),"Put arrows left slot of the bow to load")
-		return itemstack
-	end
 	local item=itemstack:to_table()
-	local meta=minetest.deserialize(item.metadata)
-	local shots=bows.registed_bows[item.name .. "_loaded"].shots
-	if bows.creative==false then
+	local meta = minetest.deserialize(item.metadata) or {}
+	local shots = bows.registed_bows[item.name .. "_loaded"].shots
+	local index
+	local arrow
+
+	if meta.automode == true then
+		for i,v in pairs(inv:get_list("main")) do
+			if minetest.get_item_group(v:get_name(), "arrow") > 0 then
+				index = i
+				break
+			end
+		end
+		if not index then
+			return itemstack
+		else
+			arrow = inv:get_stack("main", index)
+		end
+	else
+		index = user:get_wield_index()-1
+		arrow = inv:get_stack("main", index)
+		if minetest.get_item_group(arrow:get_name(), "arrow") == 0 then
+			return itemstack
+		end
+	end
+
+	if bows.creative == false then
 		local c=arrow:get_count()-shots
 		if c<0 then
 			shots=arrow:get_count()
@@ -91,8 +120,11 @@ bows.load=function(itemstack, user, pointed_thing)
 		end
 		inv:set_stack("main",index,ItemStack(arrow:get_name() .. " " .. c))
 	end
-	meta={arrow=arrow:get_name(),shots=shots}
-	item.metadata=minetest.serialize(meta)
+
+	meta.arrow = arrow:get_name()
+	meta.shots = shots
+
+	item.metadata = minetest.serialize(meta)
 	item.name=item.name .. "_loaded"
 	itemstack:replace(item)
 	return itemstack
@@ -273,8 +305,7 @@ bows.register_arrow("arrow",{
 	texture="default_wood.png",
 	damage=5,
 	craft_count=8,
-	groups =  {store=10},
-	craft={{"group:tip","group:stick","examobs:feather"},}
+	craft={{"default:flint","group:stick","examobs:feather"},}
 })
 
 bows.register_arrow("fire",{
@@ -284,7 +315,6 @@ bows.register_arrow("fire",{
 	craft_count=1,
 	groups={treasure=2},
 	on_hit_node=function(self,pos,user,lastpos)
-		lastpos = lastpos or pos
 		if not minetest.is_protected(lastpos, user:get_player_name()) and default.defpos(lastpos,"buildable_to") then
 			minetest.set_node(lastpos,{name="fire:basic_flame"})
 		end
@@ -292,11 +322,9 @@ bows.register_arrow("fire",{
 		return self
 	end,
 	on_hit_object=function(self,target,hp,user,lastpos)
-		local p = target:get_pos() or self.object:get_pos()
-		bows.registed_arrows["default:arrow_fire"].on_hit_node(self,lastpos,user,p)
-		minetest.get_meta(p):set_int("radius",3)
-		minetest.get_node_timer(p):start(0.1)
+		bows.registed_arrows["default:arrow_fire"].on_hit_node(self,lastpos,user,target:get_pos())
 		bows.arrow_remove(self)
+
 	end,
 	craft={
 		{"group:arrow","default:torch"},
@@ -327,7 +355,6 @@ bows.register_arrow("build",{
 	end,
 	craft_count=8,
 	damage=8,
-	groups =  {store=100},
 	craft={
 		{"group:arrow","group:arrow","group:arrow"},
 		{"group:arrow","default:obsidian","group:arrow"},
@@ -346,7 +373,6 @@ bows.register_arrow("dig",{
 	end,
 	craft_count=16,
 	damage=8,
-	groups =  {store=100},
 	craft={
 		{"group:arrow","group:arrow","group:arrow"},
 		{"group:arrow","default:steel_lump","group:arrow"},
@@ -408,7 +434,7 @@ bows.register_arrow("tetanus",{
 bows.register_arrow("exposive",{
 	description="Exposive arrow",
 	texture="default_wood.png^[colorize:#aa0000aa",
-	groups={treasure=2,store=200},
+	groups={treasure=2},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.registed_arrows["default:arrow_exposive"].on_hit_node(self,target:get_pos(),user)
 	end,
@@ -434,7 +460,7 @@ bows.register_arrow("exposive",{
 bows.register_arrow("nitrogen",{
 	description="Nitrogen arrow",
 	texture="default_wood.png^[colorize:#00c482aa",
-	groups={treasure=2,store=100},
+	groups={treasure=2},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.arrow_remove(self)
 		if target:get_hp() <= 13 then
@@ -466,7 +492,7 @@ bows.register_arrow("teleport",{
 		bows.arrow_remove(self)
 	end,
 	craft_count=99,
-	groups={treasure=2,store=1000},
+	groups={treasure=2},
 	damage=0,
 	craft={
 		{"","group:arrow",""},
@@ -507,7 +533,7 @@ bows.register_arrow("lightning",{
 	end,
 	craft_count=3,
 	damage=0,
-	groups={treasure=2,store=1000},
+	groups={treasure=2},
 	craft={
 		{"","group:arrow",""},
 		{"group:arrow","default:electric_lump",""},
