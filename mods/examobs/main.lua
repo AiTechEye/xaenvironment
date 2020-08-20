@@ -53,6 +53,7 @@ examobs.register_mob=function(def)
 
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
+	def.jump =			def.jump
 	def.lay_on_death =			def.lay_on_death or		1
 	def.textures =			def.textures or			{"character.png"}
 	def.type =			def.type or			"npc"

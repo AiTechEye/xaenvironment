@@ -53,8 +53,8 @@ end
 examobs.jump=function(self,y)
 	local v = self.object:get_velocity() or {x=0, y=0, z=0}
 	if v.y == 0 then
-		y = y or 5.5
-		self.object:set_velocity({x=v.x, y=5.5, z=v.z})
+		y = y or self.jump or 5.5
+		self.object:set_velocity({x=v.x, y=y, z=v.z})
 	end
 end
 

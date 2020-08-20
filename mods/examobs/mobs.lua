@@ -1,4 +1,58 @@
 examobs.register_mob({
+	name = "crab",
+	team = "crab",
+	hp = 4,
+	coin = 1,
+	breathing = 0,
+	textures = {"examobs_crab1.png"},
+	mesh = "examobs_crab.b3d",
+	aggressivity = -2,
+	walk_speed = 2,
+	run_speed = 4,
+	animation = {
+		stand={x=1,y=10,speed=0,loop=false},
+		walk={x=15,y=25,speed=15,loop=false},
+		run={x=15,y=25,speed=30},
+		lay={x=31,y=35,speed=2,loop=false},
+		run={x=15,y=25,speed=30},
+	},
+	--inv={["examobs:flesh_piece"]=1},
+	collisionbox={-0.2,-0.05,-0.2,0.2,0.15,0.2},
+	spawn_on={"group:sand"},
+	step=function(self,time)
+		local p = self:pos()
+		if minetest.get_item_group(minetest.get_node(p).name,"water") > 0 then
+			self.object:set_acceleration({x =0, y=-1, z =0})
+		elseif not self.hidejtimer and self.flee and not walkable(p) and minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"sand") > 0 then
+			self.object:set_pos(apos(p,0,-0.5))
+			self.jump = 0
+			self.hide_in_sand = self.flee
+			self.hidejtimer = 10
+		elseif self.hidejtimer then
+			if self.flee or self.hide_in_sand and examobs.distance(self.object,self.hide_in_sand) <= 5 then
+				self.hidejtimer = 10
+			else
+				self.hidejtimer = self.hidejtimer - 1
+				if self.hidejtimer < 0 then
+					self.hidejtimer = nil
+					self.hide_in_sand = nil
+					self.jump = nil
+				end
+			end
+		end
+	end,
+	on_spawn=function(self)
+		self.storage.skin = math.random(1,6)
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			self.object:set_properties({textures={"examobs_crab"..self.storage.skin..".png"}})
+		end
+	end
+})
+
+examobs.register_mob({
 	name = "titan_lava",
 	type = "monster",
 	team = "titan",
