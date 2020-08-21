@@ -11,6 +11,7 @@ examobs.register_mob({
 	aggressivity = -2,
 	walk_speed = 1,
 	run_speed = 4,
+	spawn_chance = 50,
 	animation = {
 		stand={x=1,y=10,speed=0,loop=false},
 		walk={x=15,y=25,speed=30},
