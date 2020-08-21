@@ -4,33 +4,52 @@ examobs.register_mob({
 	hp = 4,
 	coin = 1,
 	breathing = 0,
+	swiming = 0,
+	range = 5,
 	textures = {"examobs_crab1.png"},
 	mesh = "examobs_crab.b3d",
 	aggressivity = -2,
-	walk_speed = 2,
+	walk_speed = 1,
 	run_speed = 4,
 	animation = {
 		stand={x=1,y=10,speed=0,loop=false},
-		walk={x=15,y=25,speed=15,loop=false},
-		run={x=15,y=25,speed=30},
+		walk={x=15,y=25,speed=30},
+		run={x=15,y=25,speed=60},
 		lay={x=31,y=35,speed=2,loop=false},
 		run={x=15,y=25,speed=30},
 	},
-	--inv={["examobs:flesh_piece"]=1},
+	inv={["examobs:crab_claw"]=2},
 	collisionbox={-0.2,-0.05,-0.2,0.2,0.15,0.2},
 	spawn_on={"group:sand"},
 	step=function(self,time)
 		local p = self:pos()
-		if minetest.get_item_group(minetest.get_node(p).name,"water") > 0 then
-			self.object:set_acceleration({x =0, y=-1, z =0})
-		elseif not self.hidejtimer and self.flee and not walkable(p) and minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"sand") > 0 then
-			self.object:set_pos(apos(p,0,-0.5))
-			self.jump = 0
-			self.hide_in_sand = self.flee
-			self.hidejtimer = 10
+		if not self.hidejtimer and self.flee then
+			local obs = {}
+			for _, ob in pairs(minetest.get_objects_inside_radius(p, 10)) do
+				local en = ob:get_luaentity()
+				if en and en.examob and en.examob ~= self.examob and examobs.team(ob) == "crab" and examobs.gethp(ob) > 0 and examobs.visiable(self,ob) then
+					table.insert(obs,ob)
+				end
+			end
+			if #obs > 4 then
+				for i,ob in pairs(obs) do
+					local en = ob:get_luaentity()
+					en.fight = self.flee
+					en.flee = nil
+					examobs.lookat(en,self.flee)
+				end
+				self.fight = self.flee
+				self.flee = nil
+			end
+			if not walkable(p) and minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"sand") > 0 then
+				self.object:set_pos(apos(p,0,-0.5))
+				self.jump = 0
+				self.hide_in_sand = self.flee
+				self.hidejtimer = 10
+			end
 		elseif self.hidejtimer then
 			if self.flee or self.hide_in_sand and examobs.distance(self.object,self.hide_in_sand) <= 5 then
-				self.hidejtimer = 10
+				self.hidejtimer = 3
 			else
 				self.hidejtimer = self.hidejtimer - 1
 				if self.hidejtimer < 0 then

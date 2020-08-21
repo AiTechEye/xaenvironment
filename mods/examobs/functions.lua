@@ -234,9 +234,10 @@ examobs.environment=function(self)
 		self.in_liquid = true
 		local s=1
 		local v = self.object:get_velocity() or {x=0,y=0,z=0}
-		if self.dying or self.dead then s=-1 end
+		if self.dying or self.dead or self.swiming < 1 then s=-1 end
 
-		if self.swiming < 1 and s == 1 then
+		if self.swiming < 1 and self.breathing > 0 and s == 1 then
+
 			s = -1
 			self:hurt(1)
 			if not (self.dying or self.dead) then
