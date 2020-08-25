@@ -4,7 +4,7 @@ minetest.register_craft({
 	output = "hook:pchest",
 	recipe = {
 		{"default:stick","default:stick","default:stick"},
-		{"default:stick","default:chest", "default:diamondblock"},
+		{"default:stick","default:chest", "group:tree"},
 		{"default:stick","default:stick","default:stick"},
 	}
 })
@@ -26,7 +26,7 @@ pchest.setpchest=function(pos,user)
 end
 
 minetest.register_tool("hook:pchest", {
-	description = "Portable locked chest",
+	description = "Portable locked chest (place on e.g a chest to move it over)",
 	inventory_image = "hook_extras_chest3.png",
 	on_place = function(itemstack, user, pointed_thing)
 		if minetest.is_protected(pointed_thing.above,user:get_player_name()) or hook.slingshot_def(pointed_thing.above,"walkable") then
@@ -63,6 +63,22 @@ minetest.register_tool("hook:pchest", {
 			end
 		end
 		itemstack:take_item()
+
+		local p = pointed_thing.under
+		local ab = pointed_thing.above
+		local s = ItemStack("default:unknown")
+		local sinv = minetest.get_meta(pointed_thing.under):get_inventory()
+		if minetest.get_item_group(minetest.get_node(p).name,"exatec_tube_connected") > 0 and sinv then
+			local out = exatec.def(p).output_list
+			if out then
+				for i,v in pairs(sinv:get_list(out)) do
+					if exatec.test_output(p,v,p) and exatec.test_input(ab,v,ab) then
+						exatec.input(ab,v,ab,ab)
+						exatec.output(p,v,p)
+					end
+				end
+			end
+		end
 		return itemstack
 	end
 })
@@ -70,22 +86,13 @@ minetest.register_tool("hook:pchest", {
 minetest.register_node("hook:pchest_node", {
 	description = "Portable locked chest",
 	tiles = {"hook_extras_chest2.png","hook_extras_chest2.png","hook_extras_chest1.png","hook_extras_chest1.png","hook_extras_chest1.png","hook_extras_chest3.png"},
-	groups = {dig_immediate = 2, not_in_creative_inventory=1,tubedevice = 1, tubedevice_receiver = 1},
+	groups = {dig_immediate = 2, not_in_creative_inventory=1,exatec_tube_connected=1},
 	drop="hook:pchest",
 	paramtype2 = "facedir",
-	tube = {insert_object = function(pos, node, stack, direction)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		local added = inv:add_item("main", stack)
-		return added
-	end,
-	can_insert = function(pos, node, stack, direction)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		return inv:room_for_item("main", stack)
-	end,
-	input_inventory = "main",
-	connect_sides = {left = 1, right = 1, front = 1, back = 1, top = 1, bottom = 1}},
+	exatec={
+		input_list="main",
+		output_list="main",
+	},
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
 		local owner = m:get_string("owner")
