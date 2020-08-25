@@ -421,8 +421,12 @@ minetest.register_craft({
 minetest.register_node("examobs:woodbox", {
 	description = "Wooden box",
 	tiles={"examobs_woodbox.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1,used_by_npc=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=1,treasure=1,used_by_npc=1,exatec_tube_connected=1},
 	sounds = default.node_sound_wood_defaults(),
+	exatec={
+		input_list="main",
+		output_list="main",
+	},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
