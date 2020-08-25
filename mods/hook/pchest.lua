@@ -28,6 +28,12 @@ end
 minetest.register_tool("hook:pchest", {
 	description = "Portable locked chest (place on e.g a chest to move it over)",
 	inventory_image = "hook_extras_chest3.png",
+	on_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" then
+			minetest.registered_tools["hook:pchest"].on_place(itemstack, user, pointed_thing)
+		end
+		return itemstack
+	end,
 	on_place = function(itemstack, user, pointed_thing)
 		if minetest.is_protected(pointed_thing.above,user:get_player_name()) or hook.slingshot_def(pointed_thing.above,"walkable") then
 			return itemstack
@@ -72,7 +78,7 @@ minetest.register_tool("hook:pchest", {
 			local out = exatec.def(p).output_list
 			if out then
 				for i,v in pairs(sinv:get_list(out)) do
-					if exatec.test_output(p,v,p) and exatec.test_input(ab,v,ab) then
+					if v:get_name() ~="hook:pchest" and exatec.test_output(p,v,p) and exatec.test_input(ab,v,ab) then
 						exatec.input(ab,v,ab,ab)
 						exatec.output(p,v,p)
 					end
