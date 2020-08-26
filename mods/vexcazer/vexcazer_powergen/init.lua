@@ -9,6 +9,17 @@ minetest.register_craft({
 minetest.register_node("vexcazer_powergen:gen", {
 	description = "Power generator",
 	paramtype2 = "facedir",
+	exatec={
+		input_list="burn",
+		test_input=function(pos,stack,opos)
+			local name=stack:get_name()
+			if name~="vexcazer:default" and name~="vexcazer:mod" and name~="vexcazer:admin" then
+				minetest.get_node_timer(pos):start(0.1)
+				return true
+			end
+			return false
+		end,
+	},
 	tiles = {
 		"vexcazer_powergen_top.png",
 		"vexcazer_powergen_side.png",
@@ -16,7 +27,7 @@ minetest.register_node("vexcazer_powergen:gen", {
 		"vexcazer_powergen_side.png",
 		"vexcazer_powergen_side.png",
 		"vexcazer_powergen_panel.png"},
-	groups = {dig_immediate = 3},
+	groups = {dig_immediate = 3,exatec_tube_connected=1},
 	sounds = default.node_sound_stone_defaults(),
 after_place_node = function(pos, placer, itemstack)
 		local meta = minetest.get_meta(pos)
@@ -45,7 +56,7 @@ allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 			return 1
 		end
 		local name=stack:get_name()
-		if listname=="burn" and (name~="vexcazer:default" and name~="vexcazer:mod" and name~="vexcazer:admin" and name~="default:mese") then
+		if listname=="burn" and name~="vexcazer:default" and name~="vexcazer:mod" and name~="vexcazer:admin" then
 			minetest.get_node_timer(pos):start(0.1)
 			return stack:get_count()
 		end
