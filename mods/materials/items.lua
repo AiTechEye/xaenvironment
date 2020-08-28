@@ -291,7 +291,7 @@ minetest.register_node("materials:glass_bottle", {
 	inventory_image = "materials_plant_extracts.png",
 	drawtype = "plantlike",
 	tiles={"materials_plant_extracts.png"},
-	groups = {dig_immediate = 3,flammable=1,used_by_npc=1,treasure=1},
+	groups = {dig_immediate = 3,used_by_npc=1,treasure=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
