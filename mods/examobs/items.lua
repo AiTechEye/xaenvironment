@@ -382,7 +382,7 @@ minetest.register_tool("examobs:fishing_rod_with_string", {
 default.register_eatable("craftitem","examobs:fried_fish",1,3, {
 	description = "Fried fish",
 	inventory_image="examobs_fried_fish.png",
-	groups = {meat=1,fish=1,store=100},
+	groups = {meat=1,store=100},
 })
 
 minetest.register_craft({
