@@ -189,7 +189,7 @@ minetest.register_on_mods_loaded(function()
 				type="dig",
 				item=i,
 				completed=function(user)
-					exaachievements.customize(user,"Travler")
+					exaachievements.customize(user,"Traveler")
 				end
 			})
 			traveler=traveler+1
