@@ -510,7 +510,10 @@ examobs.find_objects=function(self)
 				self.lifetimer = self.lifetime
 				local invtool = examobs.hiding[ob:get_player_name()]
 				local inv = ob:get_inventory()
-				if invtool and inv:get_stack("main",invtool):get_name() == "examobs:hiding_poison" then
+
+				if ob:get_meta():get_int("hide_for_mobs") == 1 then
+					hiding = true
+				elseif invtool and inv:get_stack("main",invtool):get_name() == "examobs:hiding_poison" then
 					local item = inv:get_stack("main",invtool)
 					local w = item:get_wear()
 					if w >= 60000 then
