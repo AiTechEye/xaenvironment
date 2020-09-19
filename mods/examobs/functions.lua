@@ -510,9 +510,6 @@ examobs.find_objects=function(self)
 				self.lifetimer = self.lifetime
 				local invtool = examobs.hiding[ob:get_player_name()]
 				local inv = ob:get_inventory()
-
-print(invtool)
-
 				if invtool == "" then
 					hiding = true
 				elseif invtool and inv:get_stack("main",invtool):get_name() == "examobs:hiding_poison" then
