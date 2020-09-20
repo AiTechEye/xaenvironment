@@ -1,7 +1,6 @@
 exa2d={
-	timer=0,
-	user={},		--users data
-	attach={},	--attached objects (pushing them)
+	storage = minetest.get_mod_storage(),
+	user={},
 	playeranim={
 		stand={x=1,y=39,speed=30},
 		walk={x=41,y=61,speed=30},
@@ -17,6 +16,10 @@ exa2d={
 
 dofile(minetest.get_modpath("exa2d") .. "/nodes_items.lua")
 dofile(minetest.get_modpath("exa2d").."/entities.lua")
+
+minetest.register_on_mods_loaded(function()
+	exa2d.active_map = minetest.deserialize(exa2d.storage:get_string("active_map")) or {}
+end)
 
 minetest.register_privilege("ability2d", {
 	description = "Enter to 2D (hold right mouse button/place on a wall in 1 second with hand)",
@@ -34,6 +37,7 @@ exa2d.is_item=function(pos)
 end
 
 exa2d.mapgen=function(pos,dir,fdir)
+	local save
 	local p = {
 		x=math.floor(pos.x*0.1)*10,
 		y=math.floor(pos.y*0.1)*10,
@@ -42,26 +46,19 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 -- activate items
 
-	if dir.z ~= 0 then
-		for x=5,-5,-1 do
-		for y=5,-5,-1 do
-			local mp = {x=pos.x+x,y=pos.y+y,z=pos.z-(dir.z*0.5)}
-			if minetest.get_node(mp).name == "exa2d:inactive_item" then
-				exa2d.activate_item(mp)
-			end
+	for xz=5,-5,-1 do
+	for y=5,-5,-1 do
+		local mp
+		if dir.z ~= 0 then
+			mp = {x=pos.x+xz,y=pos.y+y,z=pos.z-(dir.z*0.5)}
+		else
+			mp = {x=pos.x-(dir.x*0.5),y=pos.y+y,z=pos.z+xz}
 		end
+		local n = minetest.get_node(mp)
+		if n.name == "exa2d:inactive_item" and n.param2 == fdir then
+			exa2d.activate_item(mp)
 		end
-
-
-	else
-		for z=5,-5,-1 do
-		for y=5,-5,-1 do
-			local mp = {x=pos.x-(dir.x*0.5),y=pos.y+y,z=pos.z+z}
-			if minetest.get_node(mp).name == "exa2d:inactive_item" then
-				exa2d.activate_item(mp)
-			end
-		end
-		end
+	end
 	end
 
 --time map to generate items
@@ -69,11 +66,12 @@ exa2d.mapgen=function(pos,dir,fdir)
 	for i,v in pairs(exa2d.active_map) do
 		if default.date("d",v.date) >= 1 then
 			table.remove(exa2d.active_map,i)
+			save = true
 		elseif v.fdir == fdir and vector.distance(p,v.pos) <= 10 then
 			return
 		end
 	end
-	table.insert(exa2d.active_map,{pos=p, date=default.date("get"),fdir=fdir,r=math.random(1,1000)})
+	table.insert(exa2d.active_map,{pos=p, date=default.date("get"),fdir=fdir})
 
 --generate items
 
@@ -105,6 +103,7 @@ exa2d.mapgen=function(pos,dir,fdir)
 			and default.defpos(apos(mp,0,-3),"walkable") then
 				minetest.set_node(mp,{name="exa2d:block",param2=fdir})
 				blockset = true
+				save = true
 			end
 
 --coin
@@ -113,12 +112,17 @@ exa2d.mapgen=function(pos,dir,fdir)
 			and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
 			and default.defpos(apos(mp,0,-1),"walkable") then
 				minetest.set_node(mp,{name="exa2d:coin",param2=fdir})
+				save = true
 				if math.random(1,5) == 1 then
-					return
+					break
 				end
 			end
 		end
 		end
+	end
+
+	if save then
+		exa2d.storage:set_string("active_map",minetest.serialize(exa2d.active_map))
 	end
 end
 
@@ -356,77 +360,9 @@ exa2d.leave=function(player)
 	examobs.hiding[name] = nil
 end
 
---minetest.register_on_respawnplayer(function(player)
---	minetest.after(0, function(player)
---		local pos=player:get_pos()
---		player:set_pos({x=pos.x,y=pos.y,z=5})
---	end,player)
---	minetest.after(1, function(player)
---		exa2d.join(player)
---	end,player)
---end)
-
---[[
-minetest.register_on_dieplayer(function(player)
-	player:set_detach()
-	minetest.after(0.1, function(player)
-		local bones_pos=minetest.find_node_near(player:get_pos(), 2, {"bones:bones"})
-		if bones_pos then
-			local bones=minetest.get_node(bones_pos)
-			local name=player:get_player_name()
-			for i, replace_pos in pairs(exa2d.get_nodes_radius(bones_pos,15)) do
-				local replace=minetest.get_node(replace_pos).name
-				if (minetest.registered_nodes[replace] and minetest.registered_nodes[replace].buildable_to) then
-					minetest.set_node(replace_pos,bones)
-					minetest.get_meta(replace_pos):from_table(minetest.get_meta(bones_pos):to_table())
-					minetest.set_node(bones_pos,{name="air"})
-					return
-				end
-			end
-			local replace_pos={x=bones_pos.x,y=bones_pos.y,z=0}
-			local replace=minetest.get_node(replace_pos).name
-
-			if minetest.is_protected(replace_pos, name)==false and
-			(minetest.get_item_group(replace,"stone")>0
-			or minetest.get_item_group(replace,"soil")>0
-			or minetest.get_item_group(replace,"sand")>0) then
-				minetest.set_node(replace_pos,bones)
-				minetest.get_meta(replace_pos):from_table(minetest.get_meta(bones_pos):to_table())
-				minetest.get_meta(replace_pos):get_inventory():add_item("main",{name=replace})
-				minetest.set_node(bones_pos,{name="air"})
-				return
-			end
-
-		end
-	end,player)
-end)
---]]
 minetest.register_on_leaveplayer(function(player)
-	player:set_detach()
-	exa2d.user[player:get_player_name()]=nil
+	exa2d.leave(player)
 end)
-
-exa2d.pointable=function(p1,user)
-	local dir=user:get_look_dir()
-	local p2=user:get_pos()
-	p2={x=p2.x+(dir.x*5),y=p2.y+1.6+(dir.y*5),z=p2.z+(dir.z*5)}
-	p1.y=p1.y+0.6
-	local v = {x = p1.x - p2.x, y = p1.y - p2.y, z = p1.z - p2.z}
-	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5
-	local d=math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y) + (p1.z-p2.z)*(p1.z-p2.z))
-	v.x = (v.x  / amount)*-1
-	v.y = (v.y  / amount)*-1
-	v.z = (v.z  / amount)*-1
-	local hit
-	for i=1,d,0.5 do
-		local node=minetest.get_node({x=p1.x+(v.x*i),y=p1.y+(v.y*i),z=p1.z+(v.z*i)})
-		if hit and minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].walkable then
-			return false
-		end
-		hit=true
-	end
-	return true
-end
 
 exa2d.player_anim=function(self,typ)
 	if typ==self.anim then
@@ -501,90 +437,3 @@ minetest.spawn_item=function(pos, item)
 	return e
 end
 --]]
---[[
-minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-	local ppos=placer:get_pos()
-
-	if pos.x==math.floor(ppos.x+0.5) and (pos.y==math.floor(ppos.y) or pos.y==math.floor(ppos.y+1)) then
-		minetest.set_node(pos,oldnode)
-		return true
-	end
-	for x=-1,1,1 do
-	for y=-1,1,1 do
-		if x+y~=0 and minetest.get_node({x=pos.x+x,y=pos.y+y,z=0}).name~="air" then
-			return
-		end
-	end
-	end
-	minetest.set_node(pos,oldnode)
-	return true
-end)
---]]
-exa2d.get_nodes_radius=function(pos,rad)
-	rad=rad or 2
-	local nodes={}
-	local p
-	for r=0,rad,1.5 do
-	for a=-r,r,0.5 do
-		p={	x=pos.x+(math.cos(a)*r)*0.5,
-			y=pos.y+(math.sin(a)*r)*0.5,
-			z=0
-		}
-		nodes[minetest.pos_to_string(p)]=p
-	end
-	end
-	return nodes
-end
-
-exa2d.set_attach=function(name,object,object_to_attach,pos)
-	pos=pos or {}
-	pos={x=pos.x or 0,y=pos.y or 0,z=pos.z or 0}
-	exa2d.attach[name]={
-		name=name,
-		id=exa2d.user[name].id,
-		ob1=object,
-		ob2=object_to_attach,
-		pos=pos or {x=0,y=0,z=0}
-	}
-end
-
-exa2d.get_attach=function(name)
-	return exa2d.attach[name]
-end
-
-exa2d.set_detach=function(name)
-	if exa2d.attach[name] then
-		exa2d.attach[name]=nil
-	end
-end
-
-exa2d.path_iremove=function(path,index)
-	path[minetest.pos_to_string(path[index])]=nil
-	table.remove(path,index)
-	return path
-end
-
-exa2d.path=function(pos,l,dir,group)
-	local c={}
-	local lastpos={x=math.floor(pos.x),y=math.floor(pos.y),z=0}
-	for i=dir,l*dir,dir do
-		c,lastpos=exa2d.path_add(dir,c,lastpos,group)
-		if not lastpos then
-			break
-		end
-	end
-	return c
-end
-
-exa2d.path_add=function(d,c,lp,group)
-	for i, r in pairs({{x=0,y=0},{x=d,y=0},{x=0,y=1},{x=0,y=-1},{x=-d,y=0}}) do
-		local p={x=lp.x+r.x,y=lp.y+r.y,z=0}
-		local ps=minetest.pos_to_string(p)
-		if not c[ps] and minetest.get_item_group(minetest.get_node(p).name,group)>0 then
-			c[ps]=p
-			table.insert(c,p)
-			return c,p
-		end
-	end
-	return c
-end

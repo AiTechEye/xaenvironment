@@ -3,9 +3,6 @@ minetest.register_entity("exa2d:cam",{
 	collisionbox = {0,0,0,0,0,0},
 	visual =  "sprite",
 	textures = {"default_air.png"},
-	--on_activate=function(self, staticdata)
-	--	return self
-	--end,
 	on_step=function(self, dtime)
 		if not (self.user and exa2d.user[self.username] and exa2d.user[self.username].id==self.id ) then
 			self.object:remove()
@@ -88,7 +85,7 @@ minetest.register_entity("exa2d:cam",{
 			minetest.set_node({x=pos2.x,y=pos2.y+1,z=pos2.z},{name="exa2d:block_empty",param2=above.param2})
 			Coin(self.user,1)
 			local cef = apos(pos2,0,2)
-			if default.defpos(cef,"buildable_to") and not minetest.is_protected(cef, "") then
+			if default.defpos(cef,"buildable_to") and not minetest.is_protected(cef, "") and not exa2d.is_item(cef) then
 				minetest.set_node(cef,{name="exa2d:coin_effect",param2=above.param2})
 			end
 			self.user:hud_change(exa2d.user[self.username].ui_coins,"text",self.user:get_meta():get_int("coins"))
@@ -158,23 +155,9 @@ minetest.register_entity("exa2d:cam",{
 
 --input & anim
 
-		if key.RMB and not self.prevexit or not default.defpos(apos(pos2,self.dir.x,0,self.dir.z),"walkable") and not default.defpos(apos(pos2,self.dir.x,1,self.dir.z),"walkable") then
+		if key.RMB and not self.prevexit or self.user:get_hp() <= 0 or not default.defpos(apos(pos2,self.dir.x,0,self.dir.z),"walkable") and not default.defpos(apos(pos2,self.dir.x,1,self.dir.z),"walkable") then
 			exa2d.leave(self.user)
 			return
-		end
-
-		if self.ob:get_luaentity().dead or exa2d.attach[self.username] then
-			self.object:set_velocity({x=((pos2.x-pos.x)*10),y=(-0.5+(pos2.y-pos.y))*10,z=(5-(pos.z-pos2.z))*10})
-			return self
-		elseif self.laying then
-			v={x=0,y=0,z=0}
-			self.ob:set_acceleration({x=0,y=0,z=0})
-			exa2d.player_anim(self,"lay")
-			if key.up or key.left or key.right or self.wakeup then
-				self.laying=nil
-				self.wakeup=nil
-				self.ob:set_acceleration({x=0,y=-20,z=0})
-			end
 		elseif key.sneak then
 			exa2d.player_anim(self,"sit")
 			if not self.sit then
@@ -329,10 +312,6 @@ minetest.register_entity("exa2d:player",{
 		elseif not (exa2d.user[self.username] and exa2d.user[self.username].id==self.id) then
 			self.object:remove()
 			return self
-		elseif self.user:get_hp()<=0 then
-			self.ob=self.object
-			self.ob:get_luaentity().dead=true
-			exa2d.player_anim(self,"lay")
 		end
 	end,
 	id=0,
