@@ -589,7 +589,7 @@ minetest.register_globalstep(function(dtime)
 							else
 								local tl =math.floor(ppr.ability2d.time*10)*0.1
 								if tl ~= ppr.ability2d.time then
-									minetest.chat_send_player(name,"Hold for "..(1-tl).."s more")
+									minetest.chat_send_player(name,"Stand close to the wall and Hold for "..(1-tl).."s more")
 								end
 							end
 							f = true
@@ -597,7 +597,6 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 					if not f then
-						minetest.chat_send_player(name,"Stand close to a wall")
 						ppr.ability2d.time = 0
 					end
 				end
