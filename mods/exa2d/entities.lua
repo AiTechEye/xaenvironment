@@ -74,18 +74,35 @@ minetest.register_entity("exa2d:cam",{
 		local n1 = minetest.get_node({x=pos2.x,y=pos2.y-1,z=pos2.z})
 		local node=minetest.registered_nodes[n1.name]
 		local node2=minetest.registered_nodes[minetest.get_node({x=pos2.x,y=pos2.y+1,z=pos2.z}).name]
+		local above = minetest.get_node({x=pos2.x,y=pos2.y+1,z=pos2.z})
 		local cp
 --coin
 		if n1.name == "exa2d:coin" and not self.sit then
 			cp = {x=pos2.x,y=pos2.y-1,z=pos2.z}
 		elseif minetest.get_node(pos2).name == "exa2d:coin" then
 			cp = pos2
+		elseif not self.block_hit and v.y ~= 0 and above.name == "exa2d:block" then
+			self.block_hit = true
+			minetest.sound_play("exa2d_blockhit",{pos=pos2,gain=1,max_hear_distance=10})
+			minetest.sound_play("exa2d_coin",{pos=pos2,gain=0.1,max_hear_distance=10})
+			minetest.set_node({x=pos2.x,y=pos2.y+1,z=pos2.z},{name="exa2d:block_empty",param2=above.param2})
+			Coin(self.user,1)
+			local cef = apos(pos2,0,2)
+			if default.defpos(cef,"buildable_to") and not minetest.is_protected(cef, "") then
+				minetest.set_node(cef,{name="exa2d:coin_effect",param2=above.param2})
+			end
+			self.user:hud_change(exa2d.user[self.username].ui_coins,"text",self.user:get_meta():get_int("coins"))
+		elseif not self.block_hit and v.y ~= 0 and above.name == "exa2d:block_empty" then
+			self.block_hit = true
+			minetest.sound_play("exa2d_blockhit",{pos=pos2,gain=1,max_hear_distance=10})
 		end
 		if cp then
 			minetest.sound_play("exa2d_coin",{pos=pos2,gain=0.1,max_hear_distance=10})
 			Coin(self.user,1)
 			self.user:hud_change(exa2d.user[self.username].ui_coins,"text",self.user:get_meta():get_int("coins"))
 			minetest.remove_node(cp)
+		elseif self.block_hit and self.jump_timer <= 0 then
+			self.block_hit = false
 		end
 
 		if not (node and node2) then return end
@@ -273,7 +290,8 @@ minetest.register_entity("exa2d:cam",{
 		end
 		return self
 	end,
-	jump_timer = 0,
+	jump_timer = 0.5,
+	block_hit = true,
 	timer = 2,
 	dmgtimer = 0,
 	breath = 11,

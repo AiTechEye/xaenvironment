@@ -3,12 +3,19 @@ minetest.register_node("exa2d:inactive_item", {
 	drawtype="airlike",
 	paramtype="light",
 	paramtype2="facedir",
-	groups = {not_in_creative_inventory=0,attached_node=1},
+	groups = {not_in_creative_inventory=0,attached_node=1,on_load=1},
 	drop = "",
 	floodable = true,
 	buildable_to = true,
 	walkable = false,
+	sunlight_propagates = true,
 	tiles = {"default_air.png"},
+	on_load=function(pos)
+		local d = minetest.get_meta(pos):get_int("date")
+		if default.date("d",d) > 1 then
+			minetest.remove_node(pos)
+		end
+	end
 })
 
 minetest.register_node("exa2d:coin", {
@@ -22,6 +29,7 @@ minetest.register_node("exa2d:coin", {
 	floodable = true,
 	buildable_to = true,
 	walkable = false,
+	sunlight_propagates = true,
 	tiles = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","player_style_coin.png"},
 	node_box = {
 		type="fixed",
@@ -36,12 +44,38 @@ minetest.register_node("exa2d:coin", {
 	end,
 })
 
+minetest.register_node("exa2d:coin_effect", {
+	description = "Coin effect",
+	pointable=false,
+	drawtype="nodebox",
+	paramtype="light",
+	paramtype2="facedir",
+	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
+	drop = "",
+	floodable = true,
+	buildable_to = true,
+	walkable = false,
+	sunlight_propagates = true,
+	tiles = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","player_style_coin.png"},
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,0.498,0.5,0.5,0.5}
+	},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.25)
+	end,
+	on_timer = function(pos, elapsed)
+		minetest.remove_node(pos)
+	end,
+})
+
 minetest.register_node("exa2d:block", {
 	description = "?",
 	pointable=false,
 	drawtype="nodebox",
 	paramtype="light",
 	paramtype2="facedir",
+	sunlight_propagates = true,
 	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
 	drop = "",
 	floodable = true,
@@ -67,8 +101,7 @@ minetest.register_node("exa2d:block", {
 				aspect_h = 8,
 				length = 1,
 			}
-		},
-	
+		}
 	}
 })
 
@@ -78,6 +111,7 @@ minetest.register_node("exa2d:block_empty", {
 	drawtype="nodebox",
 	paramtype="light",
 	paramtype2="facedir",
+	sunlight_propagates = true,
 	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
 	drop = "",
 	tiles={"exa2d_block_empty.png"},
@@ -95,35 +129,6 @@ minetest.register_node("exa2d:block_empty", {
 		return true
 	end
 })
-
-exa2d.activate_item=function(pos)
-	local p2 = minetest.get_node(pos).param2
-	local m = minetest.get_meta(pos)
-	local name = m:get_string("exa2d_item")
-	if name ~= "" then
-		minetest.swap_node(pos, {name=name, param2=p2})
-		minetest.get_node_timer(pos):start(1)
-	else
-		minetest.remove_node(pos)
-	end
-end
-	
-exa2d.inactivate_item=function(pos)
-	local n = minetest.get_node(pos)
-	local p2 = n.param2
-	for i,v in pairs(exa2d.user) do
-		if v.object and v.fdir == p2 then
-			local p = v.object:get_pos()
-			if p and vector.distance(p,pos) <= 10 then
-				return true
-			end
-		end
-	end
-	minetest.get_meta(pos):set_string("exa2d_item",n.name)
-	minetest.swap_node(pos, {name="exa2d:inactive_item", param2=p2})
-end
-
-
 
 --[[
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)

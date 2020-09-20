@@ -77,7 +77,8 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 --generate items
 
-	if math.random(1,5) == 1 then
+	if math.random(1,3) == 1 then
+		local blockset
 		local dxz = dir.z ~= 0 and (-dir.z*0.5) or (-dir.x*0.5)
 		local dx = 0
 		local dz = 0
@@ -86,7 +87,6 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 		for xz=5,-5,-1 do
 		for y=5,-5,-1 do
-
 			if dir.z ~= 0 then
 				x = xz
 				dz = dxz
@@ -94,9 +94,24 @@ exa2d.mapgen=function(pos,dir,fdir)
 				z = xz
 				dx = dxz
 			end
-
 			local mp = {x=pos.x+x+dx,y=pos.y+y,z=pos.z+z+dz}
-			if not exa2d.is_item(pos) and default.defpos(mp,"buildable_to") and default.defpos(apos(mp,dir.x,0,dir.z),"walkable") and default.defpos(apos(mp,0,-1),"walkable") then
+
+--? block
+
+			if not blockset and not exa2d.is_item(mp) and not minetest.is_protected(mp, "")
+			and default.defpos(mp,"buildable_to") and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+			and default.defpos(apos(mp,0,-1),"buildable_to") and default.defpos(apos(mp,dir.x,-1,dir.z),"walkable")
+			and default.defpos(apos(mp,0,-2),"buildable_to") and default.defpos(apos(mp,dir.x,-2,dir.z),"walkable")
+			and default.defpos(apos(mp,0,-3),"walkable") then
+				minetest.set_node(mp,{name="exa2d:block",param2=fdir})
+				blockset = true
+			end
+
+--coin
+
+			if not exa2d.is_item(mp) and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
+			and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+			and default.defpos(apos(mp,0,-1),"walkable") then
 				minetest.set_node(mp,{name="exa2d:coin",param2=fdir})
 				if math.random(1,5) == 1 then
 					return
@@ -105,6 +120,35 @@ exa2d.mapgen=function(pos,dir,fdir)
 		end
 		end
 	end
+end
+
+exa2d.activate_item=function(pos)
+	local p2 = minetest.get_node(pos).param2
+	local m = minetest.get_meta(pos)
+	local name = m:get_string("exa2d_item")
+	if name ~= "" then
+		minetest.swap_node(pos, {name=name, param2=p2})
+		minetest.get_node_timer(pos):start(1)
+	else
+		minetest.remove_node(pos)
+	end
+end
+	
+exa2d.inactivate_item=function(pos)
+	local n = minetest.get_node(pos)
+	local p2 = n.param2
+	for i,v in pairs(exa2d.user) do
+		if v.object and v.fdir == p2 then
+			local p = v.object:get_pos()
+			if p and vector.distance(p,pos) <= 10 then
+				return true
+			end
+		end
+	end
+	local m = minetest.get_meta(pos)
+	m:set_string("exa2d_item",n.name)
+	m:set_int("date",default.date("get"))
+	minetest.swap_node(pos, {name="exa2d:inactive_item", param2=p2})
 end
 
 --[[
