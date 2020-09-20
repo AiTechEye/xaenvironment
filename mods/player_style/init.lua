@@ -123,6 +123,10 @@ minetest.register_on_joinplayer(function(player)
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 
+	if minetest.check_player_privs(name,{ability2d=true}) then
+		player_style.players[name].ability2d = {joining=0}
+	end
+
 	player_style.inventory(player)
 
 	player:set_properties({
@@ -564,12 +568,37 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 				end
-
 			elseif key.sneak or minetest.get_item_group(minetest.get_node(player:get_pos()).name,"liquid") > 0 then
 				a = "fly"
 				player_style.player_diveing(name,player,true)
 			elseif key.LMB or key.RMB then
 				a="mine"
+				if key.RMB and ppr.ability2d and not exa2d.user[name] then
+					local d = player:get_look_dir()
+
+					local p1 = {x=p.x+(d.x*5),y=p.y+2+(d.y*5),z=p.z+(d.z*5)}
+					local p2 = {x=p.x,y=p.y+2,z=p.z}
+					local f
+					for v in minetest.raycast(p1,p2) do
+						if v.type == "node" and (v.intersection_normal.x ~=0 or v.intersection_normal.y ~=0 or v.intersection_normal.z ~= 0) and default.defpos(v.under,"walkable") then
+							ppr.ability2d.joining = true
+							ppr.ability2d.time = ppr.ability2d.time +dtime
+							if ppr.ability2d.time > 1 then
+								ppr.ability2d.joining = nil
+								ppr.ability2d.time = 0
+								exa2d.join(player,{x=v.above.x-v.intersection_normal.x*2,y=v.above.y-v.intersection_normal.y*2,z=v.above.z-v.intersection_normal.z*2})
+							end
+							f = true
+							break
+						end
+					end
+					if not f then
+						ppr.ability2d.time = 0
+					end
+				end
+			elseif ppr.ability2d and ppr.ability2d.joining then
+				ppr.ability2d.joining = nil
+				ppr.ability2d.time = 0
 			elseif player:get_hp()<=0 then
 				a="lay"
 			end
