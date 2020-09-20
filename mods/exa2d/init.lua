@@ -233,8 +233,10 @@ exa2d.join=function(player,pos)
 	local dir = minetest.facedir_to_dir(fdir)
 
 	if not default.defpos(apos(pos,dir.x,0,dir.z),"walkable") or not default.defpos(apos(pos,dir.x,1,dir.z),"walkable") then
-		minetest.chat_send_player(name,"Use on a wall, sneak to exit")
+		minetest.chat_send_player(name,"Place on a wall")
 		return
+	else
+		minetest.chat_send_player(name,"Place again to to exit")
 	end
 
 	player:set_pos(pos)

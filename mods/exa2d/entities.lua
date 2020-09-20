@@ -161,10 +161,12 @@ minetest.register_entity("exa2d:cam",{
 		elseif key.sneak then
 			exa2d.player_anim(self,"sit")
 			if not self.sit then
+				v.x=0
+				v.z=0
 				self.sit = true
 				local cb = self.ob:get_properties().collisionbox
 				cb[2] = -0.65
-				cb[5] = 0.5
+				cb[5] = 0.45
 				self.ob:set_properties({collisionbox = cb})
 			end
 
@@ -214,7 +216,7 @@ minetest.register_entity("exa2d:cam",{
 				cb[2] = -1
 				cb[5] = 0.8
 				self.ob:set_properties({collisionbox = cb})
-				v.y=5
+				v.y=6
 			end
 			exa2d.player_anim(self,"stand")
 			v={x=0,y=v.y,z=0}
@@ -318,8 +320,6 @@ minetest.register_entity("exa2d:player",{
 	id=0,
 	username="",
 	start=0.1,
-	type="npc",
-	team="default",
 	timer=0,
 })
 

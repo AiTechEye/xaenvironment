@@ -32,8 +32,68 @@ minetest.register_node("exa2d:coin", {
 	end,
 	on_timer = function(pos, elapsed)
 		exa2d.inactivate_item(pos)
-		return 1
+		return true
 	end,
+})
+
+minetest.register_node("exa2d:block", {
+	description = "?",
+	pointable=false,
+	drawtype="nodebox",
+	paramtype="light",
+	paramtype2="facedir",
+	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
+	drop = "",
+	floodable = true,
+	buildable_to = true,
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,0.45,0.5,0.5,0.5}
+	},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function(pos, elapsed)
+		exa2d.inactivate_item(pos)
+		return true
+	end,
+	tiles={
+		{
+			name = "exa2d_block.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1,
+			}
+		},
+	
+	}
+})
+
+minetest.register_node("exa2d:block_empty", {
+	description = "?",
+	pointable=false,
+	drawtype="nodebox",
+	paramtype="light",
+	paramtype2="facedir",
+	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
+	drop = "",
+	tiles={"exa2d_block_empty.png"},
+	floodable = true,
+	buildable_to = true,
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,0.45,0.5,0.5,0.5}
+	},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function(pos, elapsed)
+		exa2d.inactivate_item(pos)
+		return true
+	end
 })
 
 exa2d.activate_item=function(pos)
