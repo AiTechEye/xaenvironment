@@ -575,7 +575,7 @@ minetest.register_globalstep(function(dtime)
 				a="mine"
 				if key.RMB and ppr.ability2d and not exa2d.user[name] and player:get_wielded_item():get_name() == "" then
 					local d = player:get_look_dir()
-					local p1 = {x=p.x+(d.x*5),y=p.y+2+(d.y*5),z=p.z+(d.z*5)}
+					local p1 = {x=p.x+(d.x*2),y=p.y+2+(d.y*2),z=p.z+(d.z*2)}
 					local p2 = {x=p.x,y=p.y+2,z=p.z}
 					local f
 					for v in minetest.raycast(p1,p2) do
@@ -586,12 +586,18 @@ minetest.register_globalstep(function(dtime)
 								ppr.ability2d.joining = nil
 								ppr.ability2d.time = 0
 								exa2d.join(player,{x=v.above.x-v.intersection_normal.x*2,y=v.above.y-v.intersection_normal.y*2,z=v.above.z-v.intersection_normal.z*2})
+							else
+								local tl =math.floor(ppr.ability2d.time*10)*0.1
+								if tl ~= ppr.ability2d.time then
+									minetest.chat_send_player(name,"Hold for "..(1-tl).."s more")
+								end
 							end
 							f = true
 							break
 						end
 					end
 					if not f then
+						minetest.chat_send_player(name,"Stand close to a wall")
 						ppr.ability2d.time = 0
 					end
 				end
