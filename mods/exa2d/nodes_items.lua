@@ -11,7 +11,7 @@ minetest.register_node("exa2d:inactive_item", {
 	sunlight_propagates = true,
 	on_load=function(pos)
 		local d = minetest.get_meta(pos):get_int("date")
-		if default.date("d",d) > 1 then
+		if default.date("m",d) > 1 then
 			minetest.remove_node(pos)
 		end
 	end

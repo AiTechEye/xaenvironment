@@ -75,13 +75,15 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 --generate items
 
-	if math.random(1,3) == 1 then
+	if math.random(1,2) == 1 then
 		local blockset
 		local dxz = dir.z ~= 0 and (-dir.z*0.5) or (-dir.x*0.5)
 		local dx = 0
 		local dz = 0
 		local x = 0
 		local z = 0
+
+		local enemyset = math.random(0,3)
 
 		for xz=5,-5,-1 do
 		for y=5,-5,-1 do
@@ -93,6 +95,18 @@ exa2d.mapgen=function(pos,dir,fdir)
 				dx = dxz
 			end
 			local mp = {x=pos.x+x+dx,y=pos.y+y,z=pos.z+z+dz}
+
+--enemy
+
+
+			if enemyset > 0 and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
+			and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+			and default.defpos(apos(mp,0,-1),"walkable") then
+				enemyset = enemyset -1
+				local ob = minetest.add_entity(apos(mp,dir.x*0.49,1,dir.z*0.49),"exa2d:enemy")
+				ob:get_luaentity().dir = dir
+				ob:get_luaentity().fdir = fdir
+			end
 
 --? block
 
@@ -131,14 +145,40 @@ exa2d.activate_item=function(pos)
 	local m = minetest.get_meta(pos)
 	local name = m:get_string("exa2d_item")
 	if name ~= "" then
-		minetest.swap_node(pos, {name=name, param2=p2})
-		minetest.get_node_timer(pos):start(1)
+		local m = minetest.get_meta(pos)
+		if m:get_int("object") == 1 then
+			local ob = minetest.add_entity(minetest.string_to_pos(m:get_string("pos")),m:get_string("exa2d_item"))
+			local en = ob:get_luaentity()
+			en.dir = minetest.string_to_pos(m:get_string("dir"))
+			en.fdir = m:get_int("fdir")
+			minetest.remove_node(pos)
+		else
+			minetest.swap_node(pos, {name=name, param2=p2})
+			minetest.get_node_timer(pos):start(1)
+		end
 	else
 		minetest.remove_node(pos)
 	end
 end
 	
-exa2d.inactivate_item=function(pos)
+exa2d.inactivate_item=function(pos,en)
+	if en then
+		if not exa2d.is_item(pos) and not minetest.is_protected(pos, "") and default.defpos(pos,"buildable_to") then
+			minetest.set_node(pos, {name="exa2d:inactive_item", param2=en.fdir})
+			local m = minetest.get_meta(pos)
+			m:set_string("exa2d_item",en.name)
+			m:set_int("object",1)
+			m:set_string("dir",minetest.pos_to_string(en.dir))
+			m:set_int("fdir",en.fdir)
+			m:set_string("pos",minetest.pos_to_string(pos))
+			m:set_int("date",default.date("get"))
+			return true
+		end
+		return
+	end
+
+
+
 	local n = minetest.get_node(pos)
 	local p2 = n.param2
 	for i,v in pairs(exa2d.user) do

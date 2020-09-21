@@ -306,7 +306,7 @@ minetest.register_entity("exa2d:player",{
 	end,
 	on_step=function(self, dtime)
 		self.timer=self.timer+dtime
-		if self.start>0 then
+		if self.start > 0 then
 			self.start=self.start-dtime
 			return self
 		elseif not (exa2d.user[self.username] and exa2d.user[self.username].id==self.id) then
@@ -320,29 +320,130 @@ minetest.register_entity("exa2d:player",{
 	timer=0,
 })
 
-exa2d.dot=function(pos,v)
-	v=v or "008"
-	local a=""
-	for i=1,3,1 do
-		local n=tonumber(v:sub(i,i))
-		if not n or n==0 or n>8 then n=1 end
-		a=a .. string.sub("13579bdf",n,n):rep(2)
-	end
-	minetest.add_entity(pos, "exa2d:dot"):set_properties({textures = {"bubble.png^[colorize:#"..a}})
-end
-
-minetest.register_entity("exa2d:dot",{
-	hp_max = 1,
-	physical = false,
-	collisionbox = {0,0,0,0,0,0},
-	visual = "sprite",
-	visual_size = {x=0.2, y=0.2},
-	textures = {"bubble.png"},
-	makes_footstep_sound = false,
-	on_step = function(self, dtime)
-		self.timer=self.timer+dtime
-		if self.timer<0.1 then return self end
-		self.object:remove()
+minetest.register_entity("exa2d:enemy",{
+	hp_max = 20,
+	physical = true,
+	collisionbox = {-0.6,-0.8,-0.01,0.6,0.3,0.01},
+	visual_size = {x=0.01,y=1,z=1},
+	visual =  "mesh",
+	mesh = "examobs_wolf.b3d",
+	textures = {"examobs_wolf.png"},
+	is_visible = true,
+	makes_footstep_sound = true,
+	on_activate=function(self, staticdata)
+		self.object:set_acceleration({x=0,y=-20,z =0})
+		self.object:set_animation({x=11, y=32, },30,0)
+		self.face = math.random(1,2)
+		self.rot = 0
+		self.move_dir = {
+			[1]={
+				["1 0"]={x=0,z=2,r=0},
+				["-1 0"]={x=0,z=-2,r=3.14},
+				["0 1"]={x=-2,z=0,r=1.57},
+				["0 -1"]={x=2,z=0,r=4.71},
+			},
+			[2]={
+				["1 0"]={x=0,z=-2,r=3.14},
+				["-1 0"]={x=0,z=2,r=0},
+				["0 1"]={x=2,z=0,r=4.71},
+				["0 -1"]={x=-2,z=0,r=1.57},
+			}
+		}
+		return self
 	end,
-	timer=0,
+	walk=function(self)
+		local v = self.object:get_velocity()
+
+		if v.x+v.z == 0 then
+			self.face = self.face == 2 and 1 or 2
+			local d = self.move_dir[self.face][self.dir.x.." "..self.dir.z]
+			v.x = d.x
+			v.z = d.z
+			self.object:set_yaw(d.r)
+			self.object:set_velocity(v)
+			self.rot = d.r
+		end
+	end,
+	on_step=function(self, dtime)
+		if not self.dir or self.del and self.del < 0 then
+			self.object:remove()
+			return self
+		elseif self.del then
+			self.del = self.del -dtime
+			return self
+		end
+		if self.hittimer < 0.5 then
+			self.hittimer = self.hittimer + dtime
+		end
+
+		if not self.start then
+			self.start = true
+			if self.dir.x ~= 0 then
+				self.object:set_properties({collisionbox = {-0.01,-0.8,-0.6,0.01,0.3,0.6}})
+			end
+		end
+
+		self:walk()
+		local pos = self.object:get_pos()
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos,2.5)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "exa2d:player" then
+				local p = ob:get_pos()
+				local pf = vector.floor(p)
+				local opf = vector.floor(pos)
+				local d = vector.distance(p,pos)
+				if p.y-1 > pos.y and d <=1.5 then
+					local cb = self.object:get_properties().collisionbox
+					cb[2] = -0.1
+					cb[5] = 0.1
+					self.object:set_properties({collisionbox = cb,visual_size = {x=0.01,y=0.15,z=1}})
+					self.object:set_velocity({x=0,y=self.object:get_velocity().y,z=0})
+					self.del = 0.5
+					minetest.sound_play("exa2d_blockhit",{pos=pos,gain=1,max_hear_distance=10})
+					minetest.sound_play("exa2d_coin",{pos=pos,gain=0.1,max_hear_distance=10})
+					Coin(en.user,1)
+					local cef = apos(pos,0,1)
+					if default.defpos(cef,"buildable_to") and not minetest.is_protected(cef, "") and not exa2d.is_item(cef) then
+						minetest.set_node(cef,{name="exa2d:coin_effect",param2=self.fdir})
+					end
+					break
+				elseif pf.y == opf.y and vector.distance(pf,opf) < 1.5 and self.hittimer >= 0.5 then
+					self.hittimer = 0
+					exa2d.punch(ob,self.object,2)
+				end
+			end
+		end
+
+		if not default.defpos(apos(pos,self.dir.x,0,self.dir.z),"walkable") and not default.defpos(apos(pos,self.dir.x,1,self.dir.z),"walkable") then
+			local ob = minetest.add_entity(apos(pos,self.dir.x*-0.5,1,-self.dir.z*0.5),"examobs:wolf")
+			ob:set_yaw(self.rot)
+			ob:set_velocity(self.object:get_velocity())
+			examobs.anim(ob:get_luaentity(),"walk")
+			self.object:remove()
+			return self
+		end
+		if self.checktimer > 0 then
+			self.checktimer = self.checktimer -dtime
+		else
+			self.checktimer = 0.1
+			local f
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "exa2d:player" then
+					f = true
+					break
+				end
+			end
+			if not f then
+				if exa2d.inactivate_item(pos,self) then
+					self.object:remove()
+					return self
+				end
+			end
+		end
+		return self
+	end,
+	hittimer = 0.5,
+	checktimer = 0,
 })
