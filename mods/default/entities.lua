@@ -59,7 +59,6 @@ local item = {
 		elseif not self.just_spawned then
 			self.just_spawned = true
 			for _,v in pairs(default.registered_item_drops) do
-				print(pos,self.itemstring,self.object,self.dropped_by)
 				v(pos,self.itemstring,self.object,self.dropped_by)
 			end
 		end
