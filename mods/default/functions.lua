@@ -3,6 +3,11 @@ Coin=function(player,count)
 	m:set_int("coins",m:get_int("coins")+count)
 end
 
+default.register_on_item_drop=function(f)
+	--pos, itemstring, object, dropper
+	table.insert(default.registered_item_drops,f)
+end
+
 minetest.register_on_newplayer(function(player)
 	player:get_inventory():add_item("main","default:craftguide")
 	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
