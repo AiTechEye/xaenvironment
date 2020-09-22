@@ -318,8 +318,12 @@ exa2d.player_anim=function(self,typ)
 	end
 	self.anim=typ
 	self.ob:set_animation({x=exa2d.playeranim[typ].x, y=exa2d.playeranim[typ].y, },exa2d.playeranim[typ].speed,0)
+	exa2d.update_wielded_item(self)
+	return self
+end
 
-	if self.user and self.user:get_wielded_item()~=self.wielditem then
+exa2d.update_wielded_item=function(self)
+	if self.user and self.user:get_wielded_item() ~= self.wielditem then
 		self.wielditem=self.user:get_wielded_item():get_name()
 		local t="default_air.png"
 
@@ -332,7 +336,6 @@ exa2d.player_anim=function(self,typ)
 		end
 		self.ob:set_properties({textures={t,exa2d.user[self.username].texture}})
 	end
-	return self
 end
 
 exa2d.punch=function(ob1,ob2,hp)
@@ -358,5 +361,6 @@ default.register_on_item_drop(function(pos, itemstring, object, dropper)
 			z = math.cos(y) * 4
 		})
 		object:remove()
+		exa2d.update_wielded_item(p.cam:get_luaentity())
 	end
 end)

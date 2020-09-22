@@ -1,8 +1,7 @@
 minetest.register_entity("exa2d:cam",{
-	hp_max = 99999,
-	collisionbox = {0,0,0,0,0,0},
 	visual =  "sprite",
 	textures = {"default_air.png"},
+	pointable = false,
 	on_step=function(self, dtime)
 		if not (self.user and exa2d.user[self.username] and exa2d.user[self.username].id==self.id ) then
 			self.object:remove()
@@ -282,6 +281,7 @@ minetest.register_entity("exa2d:cam",{
 		self.timer = self.timer + dtime
 		if self.timer > 1 then
 			self.timer = 0
+			exa2d.update_wielded_item(self)
 			exa2d.mapgen(pos2,self.dir,self.fdir)
 		end
 		return self
@@ -297,6 +297,7 @@ minetest.register_entity("exa2d:cam",{
 minetest.register_entity("exa2d:player",{
 	hp_max = 20,
 	physical = true,
+	pointable = false,
 	collisionbox = {-0.35,-1,-0.01,0.35,0.8,0.01},
 	visual =  "mesh",
 	mesh = "mt2d_character.b3d",
@@ -336,6 +337,7 @@ minetest.register_entity("exa2d:player",{
 minetest.register_entity("exa2d:enemy",{
 	hp_max = 20,
 	physical = true,
+	pointable = false,
 	collisionbox = {-0.6,-0.8,-0.01,0.6,0.3,0.01},
 	visual_size = {x=0.01,y=1,z=1},
 	visual =  "mesh",
@@ -471,13 +473,17 @@ minetest.register_entity("exa2d:item",{
 	is_visible = true,
 	on_activate=function(self, staticdata)
 		self.object:set_acceleration({x=0,y=-20,z =0})
+		self.id = math.random(1,9999)
 		return self
 	end,
 	on_step=function(self, dtime)
 		local pos = self.object:get_pos()
 
 		if default.defpos(apos(pos,0,-0.5),"walkable") then
-			self.object:set_velocity({x=0,y=self.object:get_velocity().y,z=0})
+			local n = minetest.get_node(pos).name
+			if n ~= "exa2d:inactive_item" and minetest.get_item_group(n,"exa2d_item") == 0 then
+				self.object:set_velocity({x=0,y=self.object:get_velocity().y,z=0})
+			end
 		end
 
 		if not self.item then
@@ -485,6 +491,7 @@ minetest.register_entity("exa2d:item",{
 			return self
 		elseif not self.start then
 			self.start = 0
+			self.tool_item = minetest.registered_items[self.item:get_name()].type == "tool"
 			self.object:set_yaw(self.face[self.dir.x.." "..self.dir.z])
 			self.object:set_properties({textures={self.item:get_name()}})
 			if self.dir.x ~= 0 then
@@ -507,6 +514,18 @@ minetest.register_entity("exa2d:item",{
 					self.object:remove()
 					return self
 				end
+			elseif not self.tool_item and en and en.name == "exa2d:item" and en.id ~= self.id then
+				local n = en.item:get_name()
+				if n == self.item:get_name() then
+					local r = minetest.registered_items[n]
+					local c1 = self.item:get_count()
+					local c2 = en.item:get_count()
+					if r.stack_max >= c1+c2 then
+						en.item:set_count(c1+c2)
+						self.object:remove()
+						return self
+					end
+				end
 			end
 		end
 
@@ -519,7 +538,7 @@ minetest.register_entity("exa2d:item",{
 		if self.checktimer > 0 then
 			self.checktimer = self.checktimer -dtime
 		else
-			self.checktimer = 0.1
+			self.checktimer = self.reset_checktimer
 			local f
 			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
 				local en = ob:get_luaentity()
@@ -529,6 +548,19 @@ minetest.register_entity("exa2d:item",{
 				end
 			end
 			if not f then
+				local n = minetest.get_node(pos).name
+				if n == "exa2d:inactive_item" or minetest.get_item_group(n,"exa2d_item") > 0 then
+					local v = {x=0,y=math.random(-10,10),z=0}
+					if self.dir.x ~= 0 then
+						v.z = math.random(-5,5)
+					else
+						v.x = math.random(-5,5)
+					end
+					self.object:set_velocity(v)
+					--self.object:set_acceleration({x=0,y=0,z =0})
+					self.reset_checktimer = 0.1
+					return
+				end
 				if exa2d.inactivate_item(pos,self) then
 					self.object:remove()
 					return self
@@ -538,10 +570,11 @@ minetest.register_entity("exa2d:item",{
 		return self
 	end,
 	face = {
-		["1 0"] = 1.57,
-		["-1 0"] = 4.71,
-		["0 1"] = 0,
-		["0 -1"] = 3.14,
+		["1 0"] = 4.71,
+		["-1 0"] = 1.57,
+		["0 1"] = 3.14,
+		["0 -1"] = 0,
 	},
+	reset_checktimer = 0.5,
 	checktimer = 0,
 })
