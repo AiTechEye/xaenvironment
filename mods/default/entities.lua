@@ -1,6 +1,12 @@
 local builtin_item = minetest.registered_entities["__builtin:item"]
 
 local item = {
+	get_staticdata = function(self)
+		local s1 = builtin_item.get_staticdata(self) or ""
+		local s2 = minetest.deserialize(s1)
+		s2.just_spawned = self.just_spawned
+		return minetest.serialize(s2)
+	end,
 	on_activate=function(self,staticdata,dtime_s)
 		builtin_item.on_activate(self,staticdata,dtime_s)
 		local pos = self.object:get_pos()
@@ -10,6 +16,8 @@ local item = {
 				self.spawn_in_viscosity = true
 			end
 		end
+		local d = minetest.deserialize(staticdata) or {}
+		self.just_spawned = d.just_spawned
 	end,
 	burn = function(self)
 		local pos = self.object:get_pos()
@@ -45,7 +53,6 @@ local item = {
 	on_step = function(self,dtime,moveresult)
 		builtin_item.on_step(self,dtime,moveresult)
 		local pos = self.object:get_pos()
-
 		if not pos then
 			self.object:remove()
 			return self
@@ -56,7 +63,6 @@ local item = {
 				v(pos,self.itemstring,self.object,self.dropped_by)
 			end
 		end
-
 		local n = minetest.get_node(pos).name
 		local igniter = minetest.get_item_group(n,"igniter")
 		local def = minetest.registered_items[n]
