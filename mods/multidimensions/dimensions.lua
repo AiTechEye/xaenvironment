@@ -1,31 +1,6 @@
---local ores={
---	["default:stone_with_coal"]=200,
---	["default:stone_with_iron"]=400,
---	["default:stone_with_copper"]=500,
---	["default:stone_with_gold"]=2000,
---	["default:stone_with_mese"]=10000,
---	["default:stone_with_diamond"]=20000,
---	["default:mese"]=40000,
---	["default:gravel"]={chance=3000,chunk=2,}
---}
-
---minetest.register_node("multidimensions:tree", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
---minetest.register_node("multidimensions:pine_tree", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
---minetest.register_node("multidimensions:pine_treesnow", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
---minetest.register_node("multidimensions:jungle_tree", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
---minetest.register_node("multidimensions:aspen_tree", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
---minetest.register_node("multidimensions:acacia_tree", {drawtype="airlike",groups = {multidimensions_tree=1,not_in_creative_inventory=1},})
-
 multidimensions.register_dimension("candyland",{
 	ground_ores = {["examobs:marzipan_rose"] = 100,["examobs:candy1"] = 100,["examobs:candy2"] = 100,["examobs:candy3"] = 100,["examobs:candy4"] = 1000,["examobs:candy5"] = 100,["examobs:candy6"] = 100},
-
-	--stone_ores = table.copy(ores),
-	--sand_ores={["default:clay"]={chunk=2,chance=5000}},
-	--grass_ores={
-	--	["default:dirt_with_snow"]={chance=1,max_heat=20},
-	--},
 	water_ores={["examobs:gel"]={chance=500,max_heat=20},},
-
 	stone = "examobs:sponge_cake",
 	dirt = "examobs:sugar",
 	grass = "examobs:sugar_with_glaze",
