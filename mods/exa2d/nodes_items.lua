@@ -10,8 +10,8 @@ minetest.register_node("exa2d:inactive_item", {
 	walkable = false,
 	sunlight_propagates = true,
 	on_load=function(pos)
-		local d = minetest.get_meta(pos):get_int("date")
-		if default.date("m",d) > 1 then
+		local m = minetest.get_meta(pos)
+		if m:get_string("item") == "" and default.date("m",m:get_int("date")) > 1 then
 			minetest.remove_node(pos)
 		end
 	end

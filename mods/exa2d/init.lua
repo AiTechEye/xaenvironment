@@ -22,10 +22,11 @@ minetest.register_on_mods_loaded(function()
 end)
 
 minetest.register_privilege("ability2d", {
-	description = "Enter to 2D (hold right mouse button/place on a wall in 1 second with hand)",
+	description = "Enter to 2D (Stand close to a wall and hold right mouse button/place on a wall in 1 second with empty hand)",
 	give_to_singleplayer= false,
 	on_grant=function(name)
 		player_style.players[name].ability2d = {time=0}
+		minetest.chat_send_player(name,"Stand close to a wall and hold right mouse button/place on a wall in 1 second with empty hand")
 	end,
 	on_revoke=function(name)
 		player_style.players[name].ability2d = nil
@@ -196,8 +197,6 @@ exa2d.inactivate_item=function(pos,en)
 		end
 		return
 	end
-
-
 
 	local n = minetest.get_node(pos)
 	local p2 = n.param2
