@@ -442,7 +442,12 @@ minetest.register_entity("exa2d:enemy",{
 		if self.checktimer > 0 then
 			self.checktimer = self.checktimer -dtime
 		else
-			self.checktimer = 0.1
+			self.checktimer = self.reset_checktimer
+			if minetest.get_item_group(minetest.get_node(pos).name,"igniter") > 0 then
+				self.object:remove()
+				return self
+			end
+
 			local f
 			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
 				local en = ob:get_luaentity()
@@ -452,6 +457,17 @@ minetest.register_entity("exa2d:enemy",{
 				end
 			end
 			if not f then
+				if n == "exa2d:inactive_item" or minetest.get_item_group(n,"exa2d_item") > 0 then
+					local v = {x=0,y=math.random(-10,10),z=0}
+					if self.dir.x ~= 0 then
+						v.z = math.random(-5,5)
+					else
+						v.x = math.random(-5,5)
+					end
+					self.object:set_velocity(v)
+					self.reset_checktimer = 0.1
+					return
+				end
 				if exa2d.inactivate_item(pos,self) then
 					self.object:remove()
 					return self
@@ -462,6 +478,7 @@ minetest.register_entity("exa2d:enemy",{
 	end,
 	hittimer = 0.5,
 	checktimer = 0,
+	reset_checktimer = 0.5,
 })
 
 minetest.register_entity("exa2d:item",{
@@ -556,8 +573,15 @@ minetest.register_entity("exa2d:item",{
 					break
 				end
 			end
+
+			local n = minetest.get_node(pos).name
+
+			if minetest.get_item_group(n,"igniter") > 0 then
+				self.object:remove()
+				return
+			end
+
 			if not f then
-				local n = minetest.get_node(pos).name
 				if n == "exa2d:inactive_item" or minetest.get_item_group(n,"exa2d_item") > 0 then
 					local v = {x=0,y=math.random(-10,10),z=0}
 					if self.dir.x ~= 0 then
@@ -571,7 +595,7 @@ minetest.register_entity("exa2d:item",{
 				end
 				if exa2d.inactivate_item(pos,self) then
 					self.object:remove()
-					return self
+					return
 				end
 			end
 		end
