@@ -1325,19 +1325,33 @@ default.register_door({
 
 local qblock = function(def)
 	minetest.register_node(minetest.get_current_modname() ..":qblock_".. (def.name or def.color), {
-		description = "!",
+		description = def.description or "!",
+		after_place_node = def.after_place_node,
 		tiles={
 			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=default_qblock.png)",
 			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,-21=default_qblock.png)",
 			"[combine:1x1:0,0=default_cloud.png^[colorize:#"..def.color.."FF^[resize:21x21^([combine:21x21:0,0=default_qblock.png)",
 		},
-		groups = {dig_immediate = 2,not_in_creative_inventory=1,store=10000},
+		groups = {dig_immediate = 2,not_in_creative_inventory=1, store=def.store},
 		sounds = default.node_sound_wood_defaults(),
 	})
 end
 
-qblock({color="FF0000"})
-qblock({color="0000FF"})
-qblock({color="1c7800"})
-qblock({color="e29f00"})
-qblock({color="800080"})
+qblock({color="FF0000",store=10000})
+
+qblock({color="1c7800",store=10000})
+qblock({color="e29f00",store=10000})
+qblock({color="800080",store=10000})
+
+qblock({color="0000FF",store=10000,description = "2D ability",
+	after_place_node = function(pos, placer)
+		local n = placer:get_player_name()
+		local p = minetest.get_player_privs(n)
+		p.ability2d = true
+		minetest.set_player_privs(n,p)
+		minetest.chat_send_player(n,"To enter the to 2D:\nStand close to a wall and hold right mouse button/place on a wall in 1 second with empty hand")
+		minetest.set_node(pos,{name="default:qblock_0000FF_used"})
+		minetest.get_meta(pos):set_string("infotext","To enter the to 2D:\nStand close to a wall and hold right mouse button/place on a wall in 1 second with empty hand\nThis block does nothing anymore")
+	end,
+})
+qblock({color="0000FF",name = "0000FF_used",description="!"})
