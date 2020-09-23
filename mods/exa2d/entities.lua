@@ -93,6 +93,7 @@ minetest.register_entity("exa2d:cam",{
 
 				local spitem = items[math.random(1,#items)]
 				exa2d.spawn_item(pf,self.dir,self.fdir,spitem,true)
+				minetest.sound_play("exa2d_item_popup",{pos=pos2,gain=0.2,max_hear_distance=10})
 			else
 
 				minetest.sound_play("exa2d_coin",{pos=pos2,gain=0.1,max_hear_distance=10})
@@ -471,9 +472,16 @@ minetest.register_entity("exa2d:item",{
 	visual =  "wielditem",
 	textures = {"default:vacuum"},
 	is_visible = true,
+	get_staticdata = function(self)
+		return minetest.serialize({dir=self.dir, fdir=self.fdir, item=self.item:to_table()})
+	end,
 	on_activate=function(self, staticdata)
 		self.object:set_acceleration({x=0,y=-20,z =0})
 		self.id = math.random(1,9999)
+		local d = minetest.deserialize(staticdata) or {}
+		self.dir = d.dir
+		self.fdir = d.fdir
+		self.item = ItemStack(d.item or "")
 		return self
 	end,
 	on_step=function(self, dtime)
@@ -512,6 +520,7 @@ minetest.register_entity("exa2d:item",{
 				if inv:room_for_item("main",self.item) then
 					inv:add_item("main",self.item)
 					self.object:remove()
+					minetest.sound_play("exa2d_item_pickup",{pos=pos,gain=0.2,max_hear_distance=10})
 					return self
 				end
 			elseif not self.tool_item and en and en.name == "exa2d:item" and en.id ~= self.id then
@@ -557,7 +566,6 @@ minetest.register_entity("exa2d:item",{
 						v.x = math.random(-5,5)
 					end
 					self.object:set_velocity(v)
-					--self.object:set_acceleration({x=0,y=0,z =0})
 					self.reset_checktimer = 0.1
 					return
 				end
