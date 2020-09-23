@@ -130,7 +130,7 @@ spacestuff.wieldsuit=function(user,s)
 	end
 
 	local stack = user:get_inventory():get_stack("main",u.index)
-	
+
 	if stack:get_name() ~= "spacestuff:spacesuit" then
 		spacestuff.wieldsuit(user,true)
 		return
@@ -141,7 +141,7 @@ spacestuff.wieldsuit=function(user,s)
 		if inv:contains_item("main","spacestuff:air_gassbotte") then
 			inv:remove_item("main",ItemStack("spacestuff:air_gassbotte"))
 			stack:set_wear(0)
-			minetest.sound_play("spacestuff_pff", {pos=pos, gain = 1, max_hear_distance = 8}) 
+			minetest.sound_play("spacestuff_pff", {pos=user:get_pos(), gain = 1, max_hear_distance = 8}) 
 			user:get_inventory():add_item("main","spacestuff:air_gassbotte_empty")
 		else
 			minetest.chat_send_player(name,"Have 'Air gassbottes' in your inventory to reload")
