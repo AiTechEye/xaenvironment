@@ -24,6 +24,10 @@ minetest.register_entity("exa2d:cam",{
 
 			self.ob:set_pos(apos(pos2,self.dir.x*0.46,0,self.dir.z*0.46))
 
+			if pos.y > 3000 and pos.y < 4000 then
+				self.jump_v = 7
+			end
+
 			self.ob:set_properties({
 				textures={"character.png",exa2d.user[self.username].texture},
 				nametag=self.username,
@@ -31,7 +35,7 @@ minetest.register_entity("exa2d:cam",{
 			})
 
 			self.user:set_properties({
-				textures="default_air.png",
+				textures={"default_air.png"},
 				nametag="",
 			})
 
@@ -190,7 +194,7 @@ minetest.register_entity("exa2d:cam",{
 			v.y=4
 		elseif key.up and v.y==0 and self.jump_timer <= 0 then
 			self.jump_timer = 0.05
-			v.y=10
+			v.y = self.jump_v
 			minetest.sound_play("exa2d_jump",{pos=pos2,gain=1,max_hear_distance=10})
 		elseif key.left then
 			exa2d.player_anim(self,"walk")
@@ -287,6 +291,7 @@ minetest.register_entity("exa2d:cam",{
 		end
 		return self
 	end,
+	jump_v = 10,
 	jump_timer = 0.5,
 	block_hit = true,
 	timer = 2,
@@ -308,7 +313,12 @@ minetest.register_entity("exa2d:player",{
 	on_activate=function(self, staticdata)
 		local rndlook={4.71,1.57}
 		self.object:set_yaw(rndlook[math.random(1,2)])
-		self.object:set_acceleration({x=0,y=-20,z =0})
+		local p = self.object:get_pos()
+		if p and p.y > 3000 and p.y < 4000 then
+			self.object:set_acceleration({x=0,y=-6,z =0})
+		else
+			self.object:set_acceleration({x=0,y=-20,z =0})
+		end
 		return self
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)

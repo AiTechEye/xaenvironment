@@ -230,9 +230,15 @@ exa2d.join=function(player,pos)
 	if not default.defpos(apos(pos,dir.x,0,dir.z),"walkable") or not default.defpos(apos(pos,dir.x,1,dir.z),"walkable") then
 		minetest.chat_send_player(name,"Place on a wall")
 		return
+	elseif default.defpos(pos,"walkable") then
+		minetest.chat_send_player(name,"Error, try again")
+		return
 	else
 		minetest.chat_send_player(name,"Place again to to exit")
 	end
+
+
+
 
 	player:set_pos(pos)
 	local id=math.random(1,9999)
@@ -242,7 +248,7 @@ exa2d.join=function(player,pos)
 	cam:get_luaentity().id=id
 	cam:get_luaentity().dir=dir
 	cam:get_luaentity().fdir=fdir
-	exa2d.user[name]={fdir=fdir,dir=dir,id=id,cam=cam,texture="character.png"}
+	exa2d.user[name]={fdir=fdir,dir=dir,id=id,cam=cam,texture=player:get_properties().textures[1]}
 	player:set_attach(cam, "",{x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
 	player:hud_set_flags({wielditem=false})
 	player:set_nametag_attributes({color={a=0,r=255,g=255,b=255}})
