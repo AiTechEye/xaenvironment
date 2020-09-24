@@ -81,13 +81,14 @@ minetest.register_entity("exa2d:cam",{
 			minetest.sound_play("exa2d_blockhit",{pos=pos2,gain=1,max_hear_distance=10})
 			minetest.set_node({x=pos2.x,y=pos2.y+1,z=pos2.z},{name="exa2d:block_empty",param2=above.param2})
 
-			if math.random(1,5) == 1 then
-				local pf = {
-					x=self.dir.z ~= 0 and math.floor(pos2.x+0.5) or pos2.x,
-					y=math.floor(pos2.y+2),
-					z=self.dir.x ~= 0 and math.floor(pos2.z+0.5) or pos2.z
-				}
+			local r = math.random(1,5)
 
+			local pf = {
+				x=self.dir.z ~= 0 and math.floor(pos2.x+0.5) or pos2.x,
+				y=math.floor(pos2.y+2),
+				z=self.dir.x ~= 0 and math.floor(pos2.z+0.5) or pos2.z
+			}
+			if r == 1 then
 				local items = {}
 				for i,v in pairs(minetest.registered_items) do
 					if v.groups and v.groups.treasure then
@@ -98,6 +99,9 @@ minetest.register_entity("exa2d:cam",{
 				local spitem = items[math.random(1,#items)]
 				exa2d.spawn_item(pf,self.dir,self.fdir,spitem,true)
 				minetest.sound_play("exa2d_item_popup",{pos=pos2,gain=0.2,max_hear_distance=10})
+			elseif r == 2 then
+				minetest.sound_play("exa2d_item_popup",{pos=pos2,gain=0.2,max_hear_distance=10})
+				exa2d.spawn_super_coconut(pf,self.dir,self.fdir)
 			else
 
 				minetest.sound_play("exa2d_coin",{pos=pos2,gain=0.1,max_hear_distance=10})
@@ -618,5 +622,95 @@ minetest.register_entity("exa2d:item",{
 		["0 -1"] = 0,
 	},
 	reset_checktimer = 0.5,
+	checktimer = 0,
+})
+
+minetest.register_entity("exa2d:super_coconut",{
+	physical = true,
+	--pointable = false,
+	collisionbox = {-0.49,-0.49,-0.01,0.49,0.49,0.01},
+	visual_size = {x=0.01,y=1,z=1},
+	visual =  "cube",
+	textures = {"default_air.png","default_air.png","exa2d_coconut.png","exa2d_coconut.png","default_air.png","default_air.png"},
+	is_visible = true,
+	--makes_footstep_sound = true,
+	on_activate=function(self, staticdata)
+		self.object:set_acceleration({x=0,y=-20,z =0})
+		self.face = 0
+		self.move_dir = {
+			x = {x=-2,r=0},
+			z = {x=-2,r=1.57},
+		}
+		return self
+	end,
+	walk=function(self)
+		local v = self.object:get_velocity()
+		if v.x+v.z == 0 then
+			v.x = 0
+			v.z = 0
+			if self.dir.x ~= 0 then
+				self.object:set_yaw(0)
+				v.z = math.random(-1,1)*2
+			else
+				self.object:set_yaw(1.57)
+				v.x = math.random(-1,1)*2
+			end
+			self.object:set_velocity(v)
+		end
+	end,
+	on_step=function(self, dtime)
+		if not self.dir then
+			self.object:remove()
+			return self
+		end
+		if not self.start then
+			if not self.start and self.dir.x ~= 0 then
+				self.object:set_properties({collisionbox = {-0.01,-0.49,-0.49,0.01,0.49,0.49}})
+				--self:walk()
+			end
+			self.start =true
+			--return
+		end
+
+		self:walk()
+		local pos = self.object:get_pos()
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos,1.5)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "exa2d:player" then
+				minetest.sound_play("exa2d_refill",{pos=pos,gain=1,max_hear_distance=10})
+				player_style.hunger(en.user,0,true)
+				player_style.thirst(en.user,0,true)
+				en.user:set_hp(1000)
+				en.user:set_breath(1000)
+				self.object:remove()
+				return self
+			end
+		end
+
+		if not default.defpos(apos(pos,self.dir.x,0,self.dir.z),"walkable") and not default.defpos(apos(pos,self.dir.x,1,self.dir.z),"walkable") then
+			local ob = minetest.add_item(apos(pos,self.dir.x*-0.5,1,-self.dir.z*0.5),"plants:coconut")
+			ob:set_velocity(self.object:get_velocity())
+			self.object:remove()
+			return self
+		end
+		if self.checktimer > 0 then
+			self.checktimer = self.checktimer -dtime
+		else
+			self.checktimer = 0.5
+			if minetest.get_item_group(minetest.get_node(pos).name,"igniter") > 0 then
+				self.object:remove()
+				return self
+			end
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "exa2d:player" then
+					return
+				end
+			end
+			self.object:remove()
+		end
+		return self
+	end,
 	checktimer = 0,
 })

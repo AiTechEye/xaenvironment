@@ -37,6 +37,15 @@ exa2d.is_item=function(pos)
 	return minetest.get_item_group(minetest.get_node(pos).name,"exa2d_item") > 0
 end
 
+exa2d.spawn_super_coconut=function(pos,dir,fdir)
+	local ob = minetest.add_entity(apos(pos),"exa2d:super_coconut")
+	ob:get_luaentity().dir = dir
+	ob:get_luaentity().fdir = fdir
+	minetest.after(0, function(ob)
+		ob:set_velocity({x=0,y=8,z =0})
+	end,ob)
+end
+
 exa2d.spawn_item=function(pos,dir,fdir,item,popup)
 	local ob = minetest.add_entity(apos(pos),"exa2d:item")
 	ob:get_luaentity().dir = dir
