@@ -243,11 +243,8 @@ exa2d.join=function(player,pos)
 		minetest.chat_send_player(name,"Error, try again")
 		return
 	else
-		minetest.chat_send_player(name,"Place again to to exit")
+		minetest.chat_send_player(name,"Punch to to exit")
 	end
-
-
-
 
 	player:set_pos(pos)
 	local id=math.random(1,9999)
