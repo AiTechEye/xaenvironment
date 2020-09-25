@@ -663,13 +663,13 @@ minetest.register_entity("exa2d:super_coconut",{
 			self.object:remove()
 			return self
 		end
-		if not self.start then
+		if not self.start or self.start < 0.25 then
 			if not self.start and self.dir.x ~= 0 then
 				self.object:set_properties({collisionbox = {-0.01,-0.49,-0.49,0.01,0.49,0.49}})
-				--self:walk()
+				self:walk()
 			end
-			self.start =true
-			--return
+			self.start = (self.start or 0) + dtime
+			return
 		end
 
 		self:walk()
