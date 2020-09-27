@@ -52,6 +52,17 @@ minetest.register_entity("exa2d:cam",{
 				self.r = 4.71
 				self.ob:set_properties({collisionbox = {-0.01,-1,-0.35,0.01,0.8,0.35}})
 			end
+		elseif self.timeout then
+			self.timeout = self.timeout -dtime
+			if self.timeout < 0 then
+				local u = self.user
+				self.object:remove()
+				exa2d.leave(u)
+				minetest.after(0.1, function(u)
+					default.respawn_player(u)
+				end,u)
+			end
+			return self
 		end
 
 		local pos=self.object:get_pos()
@@ -124,6 +135,13 @@ minetest.register_entity("exa2d:cam",{
 			minetest.remove_node(cp)
 		elseif self.block_hit and self.jump_timer <= 0 then
 			self.block_hit = false
+		elseif minetest.get_node({x=pos2.x,y=pos2.y-0.5,z=pos2.z}).name == "exa2d:hole" then
+			minetest.sound_play("exa2d_falldown",{pos=pos2,gain=1,max_hear_distance=10})
+			self.ob:set_velocity({x=0,y=0,z=0})
+			self.object:set_velocity({x=0,y=0,z=0})
+			self.ob:set_properties({physical = false})
+			self.timeout = 1
+			return
 		end
 
 		if not (node and node2) then return end
@@ -395,6 +413,7 @@ minetest.register_entity("exa2d:enemy",{
 		end
 	end,
 	on_step=function(self, dtime)
+		local pos = self.object:get_pos()
 		if not self.dir or self.del and self.del < 0 then
 			self.object:remove()
 			return self
@@ -411,10 +430,20 @@ minetest.register_entity("exa2d:enemy",{
 			if self.dir.x ~= 0 then
 				self.object:set_properties({collisionbox = {-0.01,-0.8,-0.6,0.01,0.3,0.6}})
 			end
+		elseif self.timeout then
+			self.timeout = self.timeout -dtime
+			if self.timeout < 0 then
+				self.object:remove()
+			end
+			return self
+		elseif minetest.get_node(pos).name == "exa2d:hole" then
+			self.object:set_velocity({x=0,y=0,z=0})
+			self.object:set_properties({physical = false})
+			self.timeout = 1
+			return
 		end
 
 		self:walk()
-		local pos = self.object:get_pos()
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos,2.5)) do
 			local en = ob:get_luaentity()
@@ -463,7 +492,7 @@ minetest.register_entity("exa2d:enemy",{
 			end
 
 			local f
-			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,20)) do
 				local en = ob:get_luaentity()
 				if en and en.name == "exa2d:player" then
 					f = true
@@ -471,7 +500,7 @@ minetest.register_entity("exa2d:enemy",{
 				end
 			end
 			if not f then
-				if n == "exa2d:inactive_item" or minetest.get_item_group(n,"exa2d_item") > 0 then
+				if n == "exa2d:inactive_item" or minetest.get_item_group(minetest.get_node(pos).name,"exa2d_item") > 0 then
 					local v = {x=0,y=math.random(-10,10),z=0}
 					if self.dir.x ~= 0 then
 						v.z = math.random(-5,5)
@@ -542,7 +571,19 @@ minetest.register_entity("exa2d:item",{
 		elseif self.start < 0.5 then
 			self.start = self.start + dtime
 			return
+		elseif self.timeout then
+			self.timeout = self.timeout -dtime
+			if self.timeout < 0 then
+				self.object:remove()
+			end
+			return self
+		elseif minetest.get_node(pos).name == "exa2d:hole" then
+			self.object:set_velocity({x=0,y=0,z=0})
+			self.object:set_properties({physical = false})
+			self.timeout = 1
+			return
 		end
+
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos,1.5)) do
 			local en = ob:get_luaentity()
@@ -580,7 +621,7 @@ minetest.register_entity("exa2d:item",{
 		else
 			self.checktimer = self.reset_checktimer
 			local f
-			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,20)) do
 				local en = ob:get_luaentity()
 				if en and en.name == "exa2d:player" then
 					f = true
@@ -627,13 +668,11 @@ minetest.register_entity("exa2d:item",{
 
 minetest.register_entity("exa2d:super_coconut",{
 	physical = true,
-	--pointable = false,
 	collisionbox = {-0.49,-0.49,-0.01,0.49,0.49,0.01},
 	visual_size = {x=0.01,y=1,z=1},
 	visual =  "cube",
 	textures = {"default_air.png","default_air.png","exa2d_coconut.png","exa2d_coconut.png","default_air.png","default_air.png"},
 	is_visible = true,
-	--makes_footstep_sound = true,
 	on_activate=function(self, staticdata)
 		self.object:set_acceleration({x=0,y=-20,z =0})
 		self.face = 0
@@ -670,6 +709,12 @@ minetest.register_entity("exa2d:super_coconut",{
 			end
 			self.start = (self.start or 0) + dtime
 			return
+		elseif self.timeout then
+			self.timeout = self.timeout -dtime
+			if self.timeout < 0 then
+				self.object:remove()
+			end
+			return self
 		end
 
 		self:walk()
@@ -693,7 +738,13 @@ minetest.register_entity("exa2d:super_coconut",{
 			ob:set_velocity(self.object:get_velocity())
 			self.object:remove()
 			return self
+		elseif minetest.get_node(pos).name == "exa2d:hole" then
+			self.object:set_velocity({x=0,y=0,z=0})
+			self.object:set_properties({physical = false})
+			self.timeout = 1
+			return
 		end
+
 		if self.checktimer > 0 then
 			self.checktimer = self.checktimer -dtime
 		else
@@ -702,7 +753,7 @@ minetest.register_entity("exa2d:super_coconut",{
 				self.object:remove()
 				return self
 			end
-			for _, ob in pairs(minetest.get_objects_inside_radius(pos,10)) do
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,20)) do
 				local en = ob:get_luaentity()
 				if en and en.name == "exa2d:player" then
 					return

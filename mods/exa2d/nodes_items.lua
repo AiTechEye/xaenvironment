@@ -129,6 +129,32 @@ minetest.register_node("exa2d:block_empty", {
 	end
 })
 
+minetest.register_node("exa2d:hole", {
+	description = "Hole",
+	pointable=false,
+	drawtype="nodebox",
+	paramtype="light",
+	walkable=false,
+	paramtype2="facedir",
+	sunlight_propagates = true,
+	groups = {not_in_creative_inventory=1,attached_node=1,exa2d_item=1},
+	drop = "",
+	tiles={"default_stone.png^[colorize:#000"},
+	floodable = true,
+	buildable_to = true,
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,0.45,0.5,-0.2,0.5}
+	},
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function(pos, elapsed)
+		exa2d.inactivate_item(pos)
+		return true
+	end
+})
+
 minetest.register_craft({
 	output="exa2d:2d",
 	recipe={

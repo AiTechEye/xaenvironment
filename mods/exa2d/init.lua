@@ -64,10 +64,9 @@ exa2d.mapgen=function(pos,dir,fdir)
 		y=math.floor(pos.y*0.1)*10,
 		z=math.floor(pos.z*0.1)*10
 	}
-
 -- activate items
 
-	for xz=5,-5,-1 do
+	for xz=20,-20,-1 do
 	for y=5,-5,-1 do
 		local mp
 		if dir.z ~= 0 then
@@ -88,7 +87,7 @@ exa2d.mapgen=function(pos,dir,fdir)
 		if default.date("h",v.date) >= 1 then
 			table.remove(exa2d.active_map,i)
 			save = true
-		elseif v.fdir == fdir and vector.distance(p,v.pos) <= 10 then
+		elseif v.fdir == fdir and vector.distance(p,v.pos) <= 20 then
 			return
 		end
 	end
@@ -96,65 +95,75 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 --generate items
 
-	if math.random(1,2) == 1 then
-		local blockset
-		local dxz = dir.z ~= 0 and (-dir.z*0.5) or (-dir.x*0.5)
-		local dx = 0
-		local dz = 0
-		local x = 0
-		local z = 0
+	local blockset
+	local dxz = dir.z ~= 0 and (-dir.z*0.5) or (-dir.x*0.5)
+	local dx = 0
+	local dz = 0
+	local x = 0
+	local z = 0
+	local coinset = math.random(0,10)
+	local enemyset = math.random(0,3)
+	local blockset = math.random(0,3)
 
-		local enemyset = math.random(0,3)
-
-		for xz=5,-5,-1 do
-		for y=5,-5,-1 do
-			if dir.z ~= 0 then
-				x = xz
-				dz = dxz
-			else
-				z = xz
-				dx = dxz
-			end
-			local mp = {x=pos.x+x+dx,y=pos.y+y,z=pos.z+z+dz}
+	for xz=20,-20,-1 do
+	if xz <= 2 and xz >= 0 -2 then
+		goto continue
+	end
+	for y=5,-5,-1 do
+		if dir.z ~= 0 then
+			x = xz
+			dz = dxz
+		else
+			z = xz
+			dx = dxz
+		end
+		local mp = {x=pos.x+x+dx,y=pos.y+y,z=pos.z+z+dz}
 
 --enemy
 
-			if enemyset > 0 and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
-			and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
-			and default.defpos(apos(mp,0,-1),"walkable") then
-				enemyset = enemyset -1
-				local ob = minetest.add_entity(apos(mp,dir.x*0.49,1,dir.z*0.49),"exa2d:enemy")
-				ob:get_luaentity().dir = dir
-				ob:get_luaentity().fdir = fdir
-			end
+		if enemyset > 0 and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
+		and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-1),"walkable") then
+			enemyset = enemyset -1
+			local ob = minetest.add_entity(apos(mp,dir.x*0.49,1,dir.z*0.49),"exa2d:enemy")
+			ob:get_luaentity().dir = dir
+			ob:get_luaentity().fdir = fdir
+		end
 
 --? block
 
-			if not blockset and not exa2d.is_item(mp) and not minetest.is_protected(mp, "")
-			and default.defpos(mp,"buildable_to") and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
-			and default.defpos(apos(mp,0,-1),"buildable_to") and default.defpos(apos(mp,dir.x,-1,dir.z),"walkable")
-			and default.defpos(apos(mp,0,-2),"buildable_to") and default.defpos(apos(mp,dir.x,-2,dir.z),"walkable")
-			and default.defpos(apos(mp,0,-3),"walkable") then
-				minetest.set_node(mp,{name="exa2d:block",param2=fdir})
-				blockset = true
-				save = true
-			end
+		if blockset > 0 and not exa2d.is_item(mp) and not minetest.is_protected(mp, "")
+		and default.defpos(mp,"buildable_to") and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-1),"buildable_to") and default.defpos(apos(mp,dir.x,-1,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-2),"buildable_to") and default.defpos(apos(mp,dir.x,-2,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-3),"walkable") then
+			blockset = blockset -1
+			minetest.set_node(mp,{name="exa2d:block",param2=fdir})
+		end
+
+--hole
+
+		if math.random(0,2) == 1 and not exa2d.is_item(mp) and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
+		and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-1),"walkable") then
+			minetest.set_node(mp,{name="exa2d:hole",param2=fdir})
+		end
 
 --coin
 
-			if not exa2d.is_item(mp) and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
-			and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
-			and default.defpos(apos(mp,0,-1),"walkable") then
-				minetest.set_node(mp,{name="exa2d:coin",param2=fdir})
-				save = true
-				if math.random(1,5) == 1 then
-					break
-				end
+		if coinset > 0 and not exa2d.is_item(mp) and default.defpos(mp,"buildable_to") and not minetest.is_protected(mp, "")
+		and default.defpos(apos(mp,dir.x,0,dir.z),"walkable")
+		and default.defpos(apos(mp,0,-1),"walkable") then
+			coinset = coinset -1
+			minetest.set_node(mp,{name="exa2d:coin",param2=fdir})
+			if math.random(1,2) == 1 then
+				brcoin = true
 			end
 		end
 		end
+		::continue::
+		end
 	end
-
 	if save then
 		exa2d.storage:set_string("active_map",minetest.serialize(exa2d.active_map))
 	end
@@ -212,7 +221,7 @@ exa2d.inactivate_item=function(pos,en)
 	for i,v in pairs(exa2d.user) do
 		if v.object and v.fdir == p2 then
 			local p = v.object:get_pos()
-			if p and vector.distance(p,pos) <= 10 then
+			if p and vector.distance(p,pos) <= 20 then
 				return true
 			end
 		end
