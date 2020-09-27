@@ -128,3 +128,59 @@ minetest.register_node("exa2d:block_empty", {
 		return true
 	end
 })
+
+minetest.register_craft({
+	output="exa2d:2d",
+	recipe={
+		{"default:gold_lump","default:gold_ingot","default:gold_lump"},
+		{"default:gold_ingot","default:goldblock","default:gold_ingot"},
+		{"default:gold_lump","default:gold_ingot","default:gold_lump"},
+	},
+})
+
+minetest.register_node("exa2d:2d", {
+	description = "2D ability",
+	groups = {cracky=3,store=1000},
+	sounds = default.node_sound_metal_defaults(),
+	tiles={
+		{
+			name = "exa2d_block.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1,
+			}
+		}
+	},
+	after_place_node = function(pos, placer)
+		local n = placer:get_player_name()
+		local p = minetest.get_player_privs(n)
+		minetest.set_node(pos,{name="exa2d:q"})
+		if not p.ability2d then
+			p.ability2d = true
+			minetest.set_player_privs(n,p)
+			minetest.get_meta(pos):set_string("infotext","To enter the to 2D:\nStand close to a wall and hold right mouse button/place on a wall in 1 second with empty hand\nThis block does nothing anymore")
+		end
+	end,
+})
+
+minetest.register_node("exa2d:q", {
+	description = "?",
+	drawtype="nodebox",
+	groups = {cracky=3,not_in_creative_inventory=1},
+	sounds = default.node_sound_metal_defaults(),
+	tiles={
+		{
+			name = "exa2d_block.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1,
+			}
+		}
+	}
+})
