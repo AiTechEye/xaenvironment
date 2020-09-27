@@ -168,7 +168,6 @@ minetest.register_node("exa2d:2d", {
 
 minetest.register_node("exa2d:q", {
 	description = "?",
-	drawtype="nodebox",
 	groups = {cracky=3,not_in_creative_inventory=1},
 	sounds = default.node_sound_metal_defaults(),
 	tiles={
