@@ -179,21 +179,6 @@ examobs.register_mob=function(def)
 		return minetest.serialize(self.storage)
 	end
 	def.on_activate=function(self, staticdata)
-		local c = {}
-		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), 20)) do
-			local en = ob:get_luaentity()
-			if en and en.name == self.name and en.storage and en.storage.self_spawned then
-				table.insert(c,ob)
-			end
-		end
-		if #c >= 50 then
-			print(#c.." "..self.name.." spawned in an area of 20 at "..minetest.pos_to_string(self:pos()).." removing all of them")
-			for _, ob in pairs(c) do
-				ob:remove()
-			end
-			return
-		end
-
 		self.storage = minetest.deserialize(staticdata) or {}
 		self.examob = math.random(1,9999)
 
@@ -375,6 +360,18 @@ examobs.register_mob=function(def)
 			if pos1.y >= def.min_spawn_y and pos2.y <= def.max_spawn_y and examobs.global_lifetime <= 1 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
+					local c = 0
+					for _, ob in pairs(minetest.get_objects_inside_radius(pos, 20)) do
+						local en = ob:get_luaentity()
+						if en and en.name ==name and en.storage and en.storage.self_spawned then
+							c = c +1
+							if c >= 5 then
+
+								return
+							end
+						end
+					end
+
 					local ob = minetest.add_entity(apos(pos1,0,bottom), name)
 					ob:set_yaw(math.random(0,6.28))
 					ob:get_luaentity().storage.self_spawned = true
