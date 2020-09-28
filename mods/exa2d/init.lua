@@ -160,10 +160,11 @@ exa2d.mapgen=function(pos,dir,fdir)
 				brcoin = true
 			end
 		end
-		end
-		::continue::
-		end
+
 	end
+		::continue::
+	end
+
 	if save then
 		exa2d.storage:set_string("active_map",minetest.serialize(exa2d.active_map))
 	end
