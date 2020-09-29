@@ -1,3 +1,41 @@
+minetest.register_node("default:sign", {
+	description = "Sign",
+	tiles={"default_wood.png"},
+	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3},
+	sounds =  default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4, -0.5, -0.3, 0.4, -0.45, 0.3},
+		}
+	},
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_string("formspec","size[12,11]"
+		.."button_exit[-0.2,-0.2;1,1;save;Save]"
+		.."textarea[0,1;12.5,12;text;;]"
+		)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if not sender then
+			return
+		end
+		local name = sender:get_player_name()
+		if pressed.save and sender and not minetest.is_protected(pos, name) then
+			local m = minetest.get_meta(pos)
+			m:set_string("infotext",pressed.text .." - " ..name)
+			m:set_string("formspec","size[12,11]"
+			.."button_exit[-0.2,-0.2;1,1;save;Save]"
+			.."textarea[0,1;12.5,12;text;;"..pressed.text.."]"
+			)
+		end
+	end,
+})
+
 minetest.register_node("default:lamp", {
 	description = "Lamp",
 	tiles={"default_cloud.png"},

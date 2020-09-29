@@ -61,6 +61,16 @@ minetest.register_craft({
 
 
 minetest.register_craft({
+	output="default:sign 3",
+	recipe={
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","group:wood","group:wood"},
+		{"","group:stick",""},
+	},
+})
+
+
+minetest.register_craft({
 	output="default:recycling_mill",
 	recipe={
 		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},
