@@ -16,9 +16,11 @@ end)
 
 minetest.register_on_leaveplayer(function(player)
 	local n = player:get_player_name()
-	exatec.temp.teleport_tube[n] = nil
-	if #exatec.temp.teleport_tube <= 0 then
-		exatec.temp.teleport_tube = nil
+	if exatec.temp.teleport_tube then
+		exatec.temp.teleport_tube[n] = nil
+		if exatec.temp.teleport_tube and #exatec.temp.teleport_tube <= 0 then
+			exatec.temp.teleport_tube = nil
+		end
 	end
 end)
 
