@@ -2218,3 +2218,43 @@ minetest.register_node("exatec:trader", {
 		end
 	}
 })
+
+minetest.register_node("exatec:object_magnet", {
+	description = "Object magnet",
+	tiles = {
+		"default_silverblock.png^default_craftgreed.png^default_chest_top.png"
+	},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=300},
+	sounds = default.node_sound_stone_defaults(),
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local st = m:get_int("st") -1
+		m:set_int("st",st)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos,minetest.get_meta(pos):get_int("radius"))) do
+			local en = ob:get_luaentity()
+			if en and (en.name == "__builtin:item" or en.examob) then
+				local p = ob:get_pos()
+				ob:set_velocity({x=(pos.x-p.x)*5,y=(pos.y-p.y)*5,z=(pos.z-p.z)*5})
+			end
+		end
+		return st > 0
+	end,
+	on_construct=function(pos)
+		minetest.get_meta(pos):set_string("infotext","Radius (1)")
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local radius = m:get_int("radius")
+			radius = radius < 20 and radius or 0
+			m:set_int("radius",radius+1)
+			m:set_string("infotext","Radius (" .. (radius+1) ..")")
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos):set_int("st",10)
+			minetest.get_node_timer(pos):start(0.1)
+		end,
+	}
+})

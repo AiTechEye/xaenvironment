@@ -1,3 +1,13 @@
+
+minetest.register_craft({
+	output="exatec:object_magnet",
+	recipe={
+		{"default:gold_ingot","exatec:wire","default:gold_ingot"},
+		{"default:copper_ingot","default:silverblock","materials:diode"},
+		{"default:gold_ingot","default:uraniumactive_ingot","default:gold_ingot"},
+	}
+})
+
 minetest.register_craft({
 	output="exatec:list",
 	recipe={
