@@ -1250,7 +1250,7 @@ minetest.register_node("exatec:node_breaker", {
 		meta:set_string("infotext","Range (1)")
 	end,
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name())==false then
+		if minetest.is_protected(pos, player:get_player_name()) == false then
 			local meta = minetest.get_meta(pos)
 			local range=meta:get_int("range")
 			range = range < 10 and range or 0
@@ -1266,8 +1266,10 @@ minetest.register_node("exatec:node_breaker", {
 				local f = {x=pos.x+(d.x*i),y=pos.y+(d.y*i),z=pos.z+(d.z*i)}
 				local n = minetest.get_node(f).name
 				local def = minetest.registered_nodes[n] or {}
-				local owner = minetest.get_meta(f):get_string("owner")
-				if n ~= "air" and def.drop ~= "" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, {get_player_name=function() return owner end}) ==  false) and not minetest.is_protected(f, owner) then
+				local fowner = minetest.get_meta(f):get_string("owner")
+				local owner = minetest.get_meta(pos):get_string("owner")
+
+				if n ~= "air" and def.drop ~= "" and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(f, {get_player_name=function() return owner end}) ==  false) and fowner == "" and not minetest.is_protected(f, owner) then
 					local stack = ItemStack(n)
 					if exatec.test_input(b,stack,pos) then
 						exatec.input(b,stack,pos)
