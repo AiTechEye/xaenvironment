@@ -129,6 +129,7 @@ multidimensions.register_dimension=function(name,def,self)
 		node.texture = node.tiles[1]
 		default.register_door(node)
 	end
+
 	if def.dim_y > 0 and def.dim_y < multidimensions.earth.above then
 		multidimensions.earth.above = def.dim_y
 	elseif def.dim_y < 0 and def.dim_y+def.dim_height > multidimensions.earth.under then
@@ -298,19 +299,19 @@ minetest.register_node("multidimensions:killing", {
 })
 
 
-if multidimensions.limited_chat then
-minetest.register_on_chat_message(function(name, message)
-	local msger = minetest.get_player_by_name(name)
-	local pos1 = msger:get_pos()
-	for _,player in ipairs(minetest.get_connected_players()) do
-		local pos2 = player:get_pos()
-		if player:get_player_name()~=name and vector.distance(pos1,pos2)<multidimensions.max_distance_chatt then
-			minetest.chat_send_player(player:get_player_name(), "<"..name.."> "..message)
-		end
-	end
-	return true
-end)
-end
+--if multidimensions.limited_chat then
+--minetest.register_on_chat_message(function(name, message)
+--	local msger = minetest.get_player_by_name(name)
+--	local pos1 = msger:get_pos()
+--	for _,player in ipairs(minetest.get_connected_players()) do
+--		local pos2 = player:get_pos()
+--		if player:get_player_name()~=name and vector.distance(pos1,pos2)<multidimensions.max_distance_chatt then
+--			minetest.chat_send_player(player:get_player_name(), "<"..name.."> "..message)
+--		end
+--	end
+--	return true
+--end)
+--end
 
 minetest.register_node("multidimensions:teleporterre", {
 	description = "Teleport back",
