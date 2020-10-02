@@ -2178,6 +2178,11 @@ minetest.register_node("exatec:trader", {
 		local o = m:get_string("owner")
 		if o ~= "" then
 			local p = minetest.get_player_by_name(o)
+
+			if stack:get_name() == "player_style:coin" then
+				t = stack:get_count()
+			end
+
 			if p then
 				local c = m:get_int("coins")
 				if c > 0 then
@@ -2204,9 +2209,10 @@ minetest.register_node("exatec:trader", {
 		end
 	end,
 	can_trade=function(pos,item)
-		player_style.open_store()				
-		local i = player_style.store_items_cost[item:get_name()]
-		return (i ~= nil and i*0.01 >= 1)
+		player_style.open_store()
+		local it = item:get_name()
+		local i = player_style.store_items_cost[it]
+		return (i ~= nil and i*0.01 >= 1 or it == "player_style:coin")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.showstore then
