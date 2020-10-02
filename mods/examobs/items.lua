@@ -1,7 +1,8 @@
 default.register_eatable("craftitem","examobs:crab_claw",1,2,{
 	description = "Crab claw",
-	groups={meat=1,wet = 0.5},
-	inventory_image = "examobs_crab_claw.png"
+	groups={meat=1,store=100},
+	inventory_image = "examobs_crab_claw.png",
+	wet = 0.5
 })
 default.register_eatable("craftitem","examobs:flesh",1,4,{
 	description = "Flesh",
