@@ -103,7 +103,6 @@ examobs.register_mob=function(def)
 		end
 	end
 
-
 	def.on_dying =			def.on_dying or			function() end
 	def.death =			def.death or			function() end
 	def.on_punched =			def.on_punched or			function() end
@@ -118,6 +117,9 @@ examobs.register_mob=function(def)
 	def.on_walk =			def.on_walk or			function() end
 	def.on_fly =			def.on_fly or			function() end
 	def.on_stand =			def.on_stand or			function() end
+	def.before_spawn =		def.before_spawn or		function(pos)
+		return examobs.get_interacts(pos) < 5
+	end
 
 	def.timer1 = 0
 	def.timer2 = 0
@@ -366,12 +368,14 @@ examobs.register_mob=function(def)
 						if en and en.name ==name and en.storage and en.storage.self_spawned then
 							c = c +1
 							if c >= 5 then
-
 								return
 							end
 						end
 					end
-
+					local bp = apos(pos1,0,bottom)
+					if not minetest.registered_entities[name].before_spawn(bp) then
+						return
+					end
 					local ob = minetest.add_entity(apos(pos1,0,bottom), name)
 					ob:set_yaw(math.random(0,6.28))
 					ob:get_luaentity().storage.self_spawned = true

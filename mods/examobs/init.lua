@@ -3,6 +3,9 @@ examobs={
 	global_time=0,
 	global_lifetime=0,
 	hiding={},
+	storage = minetest.get_mod_storage(),
+--	interact_map = {},
+	interact_map_timer = -60,
 }
 
 dofile(minetest.get_modpath("examobs") .. "/main.lua")

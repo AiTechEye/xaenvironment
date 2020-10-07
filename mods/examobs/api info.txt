@@ -44,6 +44,7 @@ examobs.register_mob({
 	on_punched = function(self,puncher)
 	on_punching = function(self)
 	before_punching = function(self)
+	before_spawn = function(pos)
 	on_spawn = function(self)
 	on_load = function(self)
 	is_food = function(self,item_string)	-- return true to use item as food
@@ -52,6 +53,7 @@ examobs.register_mob({
 	on_fly = function(self,x,y,z)
 	on_stand = function(self)
 	on_click = function(self,clicker)
+
 })
 
 examobs.register_bird(def)		-- as to above, adapted for birds

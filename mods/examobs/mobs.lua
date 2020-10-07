@@ -1289,6 +1289,7 @@ examobs.register_mob({
 	animation = "default",
 	spawn_chance = 1000,
 	inv={["examobs:flesh"]=1},
+	spawn_on={"group:wood"},
 	on_click=function(self,clicker)
 		if clicker:is_player() then
 			local item = clicker:get_wielded_item():get_name()

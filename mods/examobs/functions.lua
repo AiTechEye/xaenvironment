@@ -1,3 +1,56 @@
+minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
+	if minetest.get_item_group(node.name,"dirt") == 0 and minetest.get_item_group(node.name,"sand") == 0 then
+		examobs.register_interact(pos)
+	end
+end)
+--minetest.register_on_dignode(function(pos,oldnode,node,placer) -- wont work very well
+--	examobs.register_interact(pos)
+--end)
+
+examobs.register_interact_timeout=function()
+	local save
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+
+	for i,v in pairs(examobs.interact_map) do
+		if default.date("d",v.date) >= 3 then
+			examobs.interact_map[i] = nil
+			save = true
+		end
+	end
+
+	if save then
+		examobs.storage:set_string("interact_map",minetest.serialize(examobs.interact_map))
+	end
+end
+
+examobs.get_interacts=function(pos)
+	local p = {
+		x=math.floor(pos.x*0.1)*10,
+		y=math.floor(pos.y*0.1)*10,
+		z=math.floor(pos.z*0.1)*10
+	}
+	local r = minetest.pos_to_string(p)
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+	local r = examobs.interact_map[r]
+	return r and r.amount or 0
+end
+
+examobs.register_interact=function(pos)
+	local p = {
+		x=math.floor(pos.x*0.1)*10,
+		y=math.floor(pos.y*0.1)*10,
+		z=math.floor(pos.z*0.1)*10
+	}
+	local r = minetest.pos_to_string(p)
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+	examobs.interact_map[r] = examobs.interact_map[r] or {}
+	local reg = examobs.interact_map[r]
+	reg.amount = (reg.amount or 0) +1
+	reg.date = default.date("get")
+	examobs.storage:set_string("interact_map",minetest.serialize(examobs.interact_map))
+end
+
+
 minetest.register_on_dieplayer(function(player)
 	local e = minetest.add_item(apos(player:get_pos(),0,1),"examobs:flesh")
 	if e then
@@ -15,6 +68,12 @@ minetest.register_globalstep(function(dtime)
 		examobs.global_lifetime = examobs.global_lifetime <= 1.1 and examobs.global_lifetime or examobs.global_lifetime * 10
 		examobs.global_timer = os.clock() + 1
 		examobs.global_time = 0
+
+		examobs.interact_map_timer = examobs.interact_map_timer +1
+		if examobs.interact_map_timer >= 10 then
+			examobs.interact_map_timer = 0
+			examobs.register_interact_timeout()
+		end
 	end
 end)
 
