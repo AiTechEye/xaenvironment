@@ -1319,10 +1319,10 @@ examobs.register_mob({
 	run_speed = 6,
 	animation = "default",
 	textures = {"examobs_tomato_npc.png"},
-	spawn_chance = 100,
+	spawn_chance = 50,
 	lay_on_death = 0,
 	inv={["plants:tomato"]=1},
-	spawn_on={"plants:tomato_plant1","plants:tomato_plant2","plants:tomato_plant3","plants:tomato_plant4"},
+	spawn_on={"group:tomato_plant"},
 	on_click=function(self,clicker)
 		if clicker:is_player() then
 			local item = clicker:get_wielded_item():get_name()
@@ -1358,6 +1358,9 @@ examobs.register_mob({
 		})
 	end,
 	tomtimer = 0,
+	on_spawn=function(self)
+		self.storage.planttomato_fail = 8
+	end,
 	step=function(self)
 		if self.walkto then
 			local pos = self:pos()
@@ -1378,27 +1381,72 @@ examobs.register_mob({
 			if math.random(1,4) == 1 then
 				examobs.jump(self)
 			end
-		elseif self.tomtimer >= 3 and not self.fight and not self.flee then
+		elseif self.tomtimer >= 5 and not self.fight and not self.flee then
 			self.tomtimer = 0
 			local pos = self:pos()
 			if pos then
-				local dis = 100
-				local d2 = 100
-				for i,v in pairs(minetest.find_nodes_in_area(apos(pos,-20,-1,-20),apos(pos,20,5,20),{"plants:tomato_plant1","plants:tomato_plant2","plants:tomato_plant3","plants:tomato_plant4"})) do
-					local d = vector.distance(pos,v)
-					if d > 4 and d < dis then
-						dis = d
-						self.walkto = v
-						self.target = self.object
-					end
-					if d < d2 then
-						d2 = d
+
+				local dis = self.storage.lasttomato and vector.distance(pos,self.storage.lasttomato) or 100
+				local d2 = self.storage.lasttomato and vector.distance(pos,self.storage.lasttomato) or 100
+
+				if not self.storage.lasttomato or not minetest.find_node_near(pos,5,{"group:tomato_plant"}) then
+					dis = 100
+					d2 = 100
+					self.storage.lasttomato = nil
+					for i,v in pairs(minetest.find_nodes_in_area(apos(pos,-20,-1,-20),apos(pos,20,5,20),{"group:tomato_plant"})) do
+						local d = vector.distance(pos,v)
+						if d > 4 and d < dis then
+							dis = d
+							self.walkto = v
+							self.target = self.object
+							self.storage.lasttomato = v
+						end
+						if d < d2 then
+							d2 = d
+						end
 					end
 				end
 				if d2 > 30 then
 					self:hurt(1)
-				elseif d2 < 5 and self.hp < self.hp_max then
-					self:heal(1)
+					if not self.walkto then
+						self.walkto = self.storage.lasttomato
+					end
+				else
+					if self.hp < self.hp_max then
+						self:heal(1)
+					end
+					local dp = apos(pos,0,-0.5)
+					local n = minetest.get_node(dp).name
+					local light = (minetest.get_node_light(pos) or 0) >= 13
+					local wet = minetest.get_item_group(n,"wet_soil") > 0
+					local test = (light and minetest.get_item_group(n,"soil") > 0 and not minetest.is_protected(dp, "") and not minetest.is_protected(pos,"")) == true
+					local water = minetest.find_node_near(pos,7,{"group:water"}) ~= nil
+
+					if self.storage.planttomato_fail > 10 and test and not water then
+						minetest.set_node(dp,{name="default:water_source"})
+						self.storage.planttomato_fail = 0
+
+					end
+					if d2 < 5 then
+						if test and water and not wet then
+							self.storage.planttomato_fail = 0
+							minetest.set_node(dp,{name="default:wet_soil"})
+							wet = true
+						else
+							self.storage.planttomato_fail = self.storage.planttomato_fail + 1
+						end
+
+						if test and water and wet then
+							local n2 = minetest.get_node(pos).name
+							if minetest.get_item_group(n2,"tomato_plant") == 0 then
+								if n2 ~= "air" then
+									minetest.add_item(pos,n2)
+									minetest.remove_node(pos)
+								end
+								minetest.set_node(pos,{name="plants:tomato_seed"})
+							end
+						end
+					end
 				end
 			end
 		else
