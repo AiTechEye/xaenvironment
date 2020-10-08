@@ -1048,7 +1048,7 @@ minetest.register_node("plants:tomato_seed", {
 	on_timer = function (pos, elapsed)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
 			minetest.remove_node(pos)
-			minetest.add_item(pos,"plants:wheat_seed")
+			minetest.add_item(pos,"plants:tomato_seed")
 		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 1 and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
 			minetest.set_node(pos,{name="plants:tomato_plant1"})
 			minetest.get_meta(pos):set_int("date",default.date("get"))
