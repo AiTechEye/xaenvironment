@@ -994,7 +994,7 @@ default.register_eatable("node","plants:tomato",1,2,{
 	tiles={"plants_tomato.png"},
 	drawtype = "mesh",
 	mesh = "plants_tomato.obj",
-	groups = {dig_immediate = 3,flammable=1,store=10},
+	groups = {dig_immediate = 3,flammable=1,store=10,tomato=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -1007,6 +1007,7 @@ for i=1,4 do
 default.register_plant({
 	name="tomato_plant"..i,
 	tiles={"plants_tomato_plant"..i..".png"},
+	groups = {tomato_plant=1},
 	drop= i == 4 and {max_items = 5,items={{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=2},{items = {"plants:tomato"}}}} or "plants:tomato_plant"..i,
 	on_timer = i <= 3 and function(pos, elapsed)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
@@ -1034,7 +1035,7 @@ minetest.register_node("plants:tomato_seed", {
 	description = "Tomato seed",
 	drawtype = "raillike",
 	tiles={"plants_wheat_seed.png"},
-	groups = {dig_immediate = 3,flammable=1},
+	groups = {dig_immediate = 3,flammable=1,tomato_plant=1},
 	sunlight_propagates = true,
 	paramtype = "light",
 	walkable=false,
