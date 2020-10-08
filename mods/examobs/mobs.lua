@@ -1310,6 +1310,107 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	name = "tomato_npc",
+	type = "npc",
+	dmg = 1,
+	coin = 2,
+	aggressivity = 1,
+	walk_speed = 3,
+	run_speed = 6,
+	animation = "default",
+	textures = {"examobs_tomato_npc.png"},
+	spawn_chance = 100,
+	lay_on_death = 0,
+	inv={["plants:tomato"]=1},
+	spawn_on={"plants:tomato_plant1","plants:tomato_plant2","plants:tomato_plant3","plants:tomato_plant4"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if item == "plants:tomato" then
+				self:eat_item(item)
+				default.take_item(clicker)
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return item == "plants:tomato"
+	end,
+	on_lifedeadline=function(self)
+		return self.storage.npc_generated
+	end,
+	death=function(self)
+		local pos=apos(self:pos(),0,1.5)
+		minetest.add_particlespawner({
+			amount = 100,
+			time =0.1,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-4, y=-4, z=-4},
+			maxvel = {x=4, y=8, z=4},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.1,
+			maxsize = 2,
+			texture = "examobs_flesh.png",
+			collisiondetection = true,
+		})
+	end,
+	tomtimer = 0,
+	step=function(self)
+		if self.walkto then
+			local pos = self:pos()
+			local d = 5
+			if pos then
+				d = vector.distance(pos,self.walkto)
+			end
+
+			if d <= 2 then
+				self.walkto = nil
+				self.target = nil
+				examobs.stand(self)
+				return
+			end
+
+			examobs.lookat(self,self.walkto)
+			examobs.walk(self)
+			if math.random(1,4) == 1 then
+				examobs.jump(self)
+			end
+		elseif self.tomtimer >= 3 and not self.fight and not self.flee then
+			self.tomtimer = 0
+			local pos = self:pos()
+			if pos then
+				local dis = 100
+				local d2 = 100
+				for i,v in pairs(minetest.find_nodes_in_area(apos(pos,-20,-1,-20),apos(pos,20,5,20),{"plants:tomato_plant1","plants:tomato_plant2","plants:tomato_plant3","plants:tomato_plant4"})) do
+					local d = vector.distance(pos,v)
+					if d > 4 and d < dis then
+						dis = d
+						self.walkto = v
+						self.target = self.object
+					end
+					if d < d2 then
+						d2 = d
+					end
+				end
+				if d2 > 30 then
+					self:hurt(1)
+				elseif d2 < 5 and self.hp < self.hp_max then
+					self:heal(1)
+				end
+			end
+		else
+			self.tomtimer = self.tomtimer +1
+		end
+	end,
+	before_spawn=function(pos)
+		return true
+	end,
+})
+
+examobs.register_mob({
 	name = "wolf",
 	textures = {"examobs_wolf.png"},
 	mesh = "examobs_wolf.b3d",
