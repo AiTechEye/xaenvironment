@@ -969,7 +969,7 @@ default.register_eatable("node","plants:cabbage_broken",1,4,{
 	tiles={"plants_cabbage.png"},
 	drawtype = "mesh",
 	mesh = "plants_cabbage.obj",
-	groups = {dig_immediate = 3,flammable=1,spreading_plant=20},
+	groups = {dig_immediate = 3,flammable=1},
 	sunlight_propagates = true,
 	walkable = false,
 	paramtype = "light",
@@ -982,5 +982,86 @@ minetest.register_craft({
 	output="plants:cabbage_broken",
 	recipe={
 		{"plants:cabbage"},
+	},
+})
+
+-- ==================== Tomato
+
+default.register_eatable("node","plants:tomato",1,2,{
+	description = "Tomato",
+	inventory_image="plants_tomato.png",	
+	name="plants_tomato",
+	tiles={"plants_tomato.png"},
+	drawtype = "mesh",
+	mesh = "plants_tomato.obj",
+	groups = {dig_immediate = 3,flammable=1,store=10},
+	sunlight_propagates = true,
+	walkable = false,
+	paramtype = "light",
+	sounds = default.node_sound_leaves_defaults(),
+	wet=1,
+	selection_box  = {type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}},
+})
+
+for i=1,4 do
+default.register_plant({
+	name="tomato_plant"..i,
+	tiles={"plants_tomato_plant"..i..".png"},
+	drop= i == 4 and {max_items = 5,items={{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=3},{items = {"plants:tomato"},rarity=2},{items = {"plants:tomato"}}}} or "plants:tomato_plant"..i,
+	on_timer = i <= 3 and function(pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
+			minetest.set_node(pos,{name="plants:dry_plant"})
+		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 20 and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
+			minetest.set_node(pos,{name="plants:tomato_plant"..i+1})
+			minetest.get_meta(pos):set_int("date",default.date("get"))
+			minetest.get_node_timer(pos):start(1)
+		else
+			return true
+		end
+	end or nil,
+	decoration={
+		biomes={"deciduous","tropic","jungle","grass_land","semi_desert","savanna"},
+		noise_params={
+			offset=-0.15,
+			scale=0.5,
+			seed=37*i,
+		}
+	},
+})
+end
+
+minetest.register_node("plants:tomato_seed", {
+	description = "Tomato seed",
+	drawtype = "raillike",
+	tiles={"plants_wheat_seed.png"},
+	groups = {dig_immediate = 3,flammable=1},
+	sunlight_propagates = true,
+	paramtype = "light",
+	walkable=false,
+	inventory_image="plants_wheat_seed.png",
+	wield_image="plants_wheat_seed.png",
+	selection_box ={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.45,0.5}},
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_int("date",default.date("get"))
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
+			minetest.remove_node(pos)
+			minetest.add_item(pos,"plants:wheat_seed")
+		elseif default.date("m",minetest.get_meta(pos):get_int("date")) >= 1 and (minetest.get_node_light(pos,0.5) or 0) >= 13 then
+			minetest.set_node(pos,{name="plants:tomato_plant1"})
+			minetest.get_meta(pos):set_int("date",default.date("get"))
+			minetest.get_node_timer(pos):start(1)
+		else
+			return true
+		end
+	end
+})
+
+minetest.register_craft({
+	output="plants:tomato_seed",
+	recipe={
+		{"plants:tomato"},
 	},
 })
