@@ -67,7 +67,7 @@ minetest.register_craftitem("bones:bone", {
 	description = "Bone",
 	inventory_image = "bones_bone.png",
 	wield_scale={x=2,y=2,z=2},
-	groups = {frammable=2},
+	groups = {flammable=2},
 })
 
 minetest.register_craft({
