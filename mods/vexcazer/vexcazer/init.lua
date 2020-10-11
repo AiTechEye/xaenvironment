@@ -86,6 +86,8 @@ vexcazer.use=function(itemstack, user, pointed_thing,input)
 		user:set_properties({hp_max=100,breath_max=51})
 		user:set_hp(100)
 		user:set_breath(51)
+		player_style.hunger(user,0,true)
+		player_style.thirst(user,0,true)
 	end
 
 	if input.mod then
