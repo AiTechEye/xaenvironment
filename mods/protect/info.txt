@@ -1,7 +1,7 @@
 /protect 1		select position 1
 /protect 2		select position 2
 /protect <name>		protect
-/protect			abort
+/protect		abort
 /remove_area <number>	remove area
 
 You can also punch a block to move the last selected, punch a marker to abort.
