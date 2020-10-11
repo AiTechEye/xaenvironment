@@ -2270,7 +2270,7 @@ minetest.register_node("exatec:object_magnet", {
 minetest.register_node("exatec:codelock", {
 	description = "Codelock panel",
 	tiles = {"default_steelblock.png","exatec_codelock.png"},
-	groups = {snappy = 3,exatec_data_wire_connected=1,store=300},
+	groups = {snappy = 3,exatec_wire_connected=1,store=300},
 	sounds = default.node_sound_wood_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		local meta=minetest.get_meta(pos)
@@ -2347,4 +2347,37 @@ minetest.register_node("exatec:codelock", {
 			{-0.1875, -0.4375, 0.375, 0.1875, 0.0625, 0.5},
 		}
 	}
+})
+
+minetest.register_node("exatec:burner", {
+	description = "Burner",
+	tiles = {"default_lava.png^default_craftgreed.png^default_chest_top.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png","default_ironblock.png"},
+	sounds = default.node_sound_metal_defaults(),
+	groups = {cracky = 2,exatec_wire_connected=1,store=400},
+	exatec={
+		on_wire = function(pos)
+			local t = minetest.get_node_timer(pos)
+			if t:is_started() then
+				t:stop()
+				local up = apos(pos,0,1)
+				if minetest.get_item_group(minetest.get_node(up).name,"fire") > 0 then
+					minetest.remove_node(up)
+				end
+			else
+				t:start(0.5)
+			end
+		end,
+	},
+	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
+	on_timer = function (pos, elapsed)
+		local owner = minetest.get_meta(pos):get_string("owner")
+		local up = apos(pos,0,1)
+
+		if default.defpos(up,"buildable_to") and not minetest.is_protected(up, minetest.get_meta(up):get_string("owner")) then
+			minetest.set_node(up,{name="fire:basic_flame"})
+		end
+		return true
+	end
 })

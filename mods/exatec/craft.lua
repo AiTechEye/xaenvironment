@@ -1,3 +1,12 @@
+
+minetest.register_craft({
+	output = "exatec:burner",
+	recipe = {{"default:copper_ingot","materials:tube_metal","default:copper_ingot"},
+		{"default:iron_ingot","materials:fanblade_metal","default:iron_ingot"},
+		{"default:iron_ingot","exatec:wire","default:iron_ingot"},
+	}
+})
+
 minetest.register_craft({
 	output = "exatec:codelock",
 	recipe = {{"default:iron_ingot","exatec:wire","default:iron_ingot"},
