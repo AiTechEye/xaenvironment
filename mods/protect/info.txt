@@ -1,0 +1,14 @@
+/protect 1		(select position 1)
+/protect 2		(select position 2)
+
+You can also punch a block to move the last selected
+
+/protect <name>		(protect)
+/protect			(abort or punch a marker)
+/remove_area <number>	(remove area)
+
+
+Privileges:
+
+protect_unlimited		(bigger then 100x100x100 and more then 5 areas)
+protection_bypass		can interact in all areas, exept "game rules" areas

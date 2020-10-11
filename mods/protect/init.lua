@@ -42,7 +42,7 @@ end)
 
 minetest.register_privilege("protect_unlimited", {
 	description = "Protection without limits",
-	give_to_singleplayer = false,
+	give_to_singleplayer = true,
 })
 
 minetest.register_chatcommand("protect", {
