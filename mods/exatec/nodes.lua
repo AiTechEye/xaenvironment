@@ -2266,3 +2266,85 @@ minetest.register_node("exatec:object_magnet", {
 		end,
 	}
 })
+
+minetest.register_node("exatec:codelock", {
+	description = "Codelock panel",
+	tiles = {"default_steelblock.png","exatec_codelock.png"},
+	groups = {snappy = 3,exatec_data_wire_connected=1,store=300},
+	sounds = default.node_sound_wood_defaults(),
+	after_place_node = function(pos, placer, itemstack)
+		local meta=minetest.get_meta(pos)
+		meta:set_string("owner",placer:get_player_name())
+	end,
+	on_construct=function(pos)
+		minetest.registered_nodes["exatec:codelock"].update_panel(pos)
+	end,
+	update_panel=function(pos,show)
+		local meta=minetest.get_meta(pos)
+		local owner = meta:get_string("owner")
+		local user = meta:get_string("user")
+		local current = meta:get_string("current")
+
+		meta:set_string("formspec",
+			"size[3,5]"
+			.."tooltip[current;Enter code]"
+			.."button[0,1;1,1;b1;1]"
+			.."button[1,1;1,1;b2;2]"
+			.."button[2,1;1,1;b3;3]"
+			.."button[0,2;1,1;b4;4]"
+			.."button[1,2;1,1;b5;5]"
+			.."button[2,2;1,1;b6;6]"
+			.."button[0,3;1,1;b7;7]"
+			.."button[1,3;1,1;b8;8]"
+			.."button[2,3;1,1;b9;9]"
+			.."button[1,4;1,1;b0;0]"
+
+			.."button_exit[2,4;1,1;ok;OK]"
+			..(show and "button_exit[0,4;1,1;save;Set]tooltip[save;Change code]" or "")
+			.."field[0.3,0;3,1;current;;" .. current .."]"
+		)
+	end,
+	on_receive_fields=function(pos, form, pressed, sender)
+		local meta = minetest.get_meta(pos)
+		if pressed.save and sender:get_player_name() == meta:get_string("owner") then
+			if not tonumber(pressed.current) then
+				minetest.chat_send_player(sender:get_player_name(), "Not a valid code")
+				return
+			end
+			meta:set_string("code",pressed.current)
+			minetest.chat_send_player(sender:get_player_name(), "Code set!")
+			meta:set_string("current","")
+			minetest.registered_nodes["exatec:codelock"].update_panel(pos)
+		elseif pressed.ok then
+			meta:set_string("current","")
+			minetest.registered_nodes["exatec:codelock"].update_panel(pos)
+			if pressed.current == meta:get_string("code") or sender:get_player_name() == meta:get_string("owner") then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				exatec.send({x=pos.x+d.x*2,y=pos.y+d.y*2,z=pos.z+d.z*2})
+			end
+			return
+		end
+		local n
+		for i = 0,9 do
+			if pressed["b"..i] then
+				n = i
+				break
+			end
+		end
+		if n then
+			meta:set_string("current",meta:get_string("current")..n)
+			minetest.registered_nodes["exatec:codelock"].update_panel(pos,sender:get_player_name() == meta:get_string("owner"))
+		end
+	end,
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	walkable = false,
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.1875, -0.4375, 0.375, 0.1875, 0.0625, 0.5},
+		}
+	}
+})
