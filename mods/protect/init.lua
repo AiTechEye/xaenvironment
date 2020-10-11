@@ -237,6 +237,34 @@ protect.add_area=function(name,title)
 	return false
 end
 
+protect.add_game_rule_area=function(pos1,pos2,title)
+	local id = 0
+	local a = {}
+	for i,v in pairs(protect.areas) do
+		a[v.id] = true
+	end
+	for i=0,#protect.areas+1 do
+		if not a[i] then
+			id = i
+			break
+		end
+	end
+	p.pos1,p.pos2 = protect.sort(p.pos1,p.pos2)
+	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=p.pos1,pos2=p.pos2,title=title})
+	protect.storage:set_string("areas",minetest.serialize(protect.areas))
+end
+
+protect.remove_game_rule_area=function(id)
+	for i,v in pairs(protect.areas) do
+		if v.id == n then
+			table.remove(protect.areas,i)
+			protect.storage:set_string("areas",minetest.serialize(protect.areas))
+			protect.global_timer = 2
+			return
+		end
+	end
+end
+
 protect.clear=function(name)
 	protect.user[name] = {hud=protect.user[name].hud}
 end
