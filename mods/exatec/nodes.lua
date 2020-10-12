@@ -2277,6 +2277,8 @@ minetest.register_node("exatec:codelock", {
 		meta:set_string("owner",placer:get_player_name())
 	end,
 	on_construct=function(pos)
+		minetest.get_meta(pos):set_string("code",math.random(0,99)..math.random(0,99)..math.random(0,99))
+
 		minetest.registered_nodes["exatec:codelock"].update_panel(pos)
 	end,
 	update_panel=function(pos,show)
