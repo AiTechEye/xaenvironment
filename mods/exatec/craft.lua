@@ -1,8 +1,17 @@
 
+
+minetest.register_craft({
+	output = "exatec:transsignal",
+	recipe = {{"materials:plastic_sheet","default:copper_ingot","materials:plastic_sheet"},
+		{"default:iron_ingot","default:uranium_lump","default:iron_ingot"},
+		{"materials:plastic_sheet","exatec:wire","materials:plastic_sheet"},
+	}
+})
+
 minetest.register_craft({
 	output = "exatec:burner",
 	recipe = {{"default:copper_ingot","materials:tube_metal","default:copper_ingot"},
-		{"default:iron_ingot","materials:fanblade_metal","default:iron_ingot"},
+		{"default:iron_ingot","materials:diode","default:iron_ingot"},
 		{"default:iron_ingot","exatec:wire","default:iron_ingot"},
 	}
 })

@@ -2268,7 +2268,7 @@ minetest.register_node("exatec:object_magnet", {
 })
 
 minetest.register_node("exatec:codelock", {
-	description = "Codelock panel",
+	description = "Codelock panel (sends signals 2 blocks away)",
 	tiles = {"default_steelblock.png","exatec_codelock.png"},
 	groups = {snappy = 3,exatec_wire_connected=1,store=300},
 	sounds = default.node_sound_wood_defaults(),
@@ -2284,7 +2284,6 @@ minetest.register_node("exatec:codelock", {
 		local owner = meta:get_string("owner")
 		local user = meta:get_string("user")
 		local current = meta:get_string("current")
-
 		meta:set_string("formspec",
 			"size[3,5]"
 			.."tooltip[current;Enter code]"
@@ -2320,7 +2319,7 @@ minetest.register_node("exatec:codelock", {
 			minetest.registered_nodes["exatec:codelock"].update_panel(pos)
 			if pressed.current == meta:get_string("code") or sender:get_player_name() == meta:get_string("owner") then
 				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-				exatec.send({x=pos.x+d.x*2,y=pos.y+d.y*2,z=pos.z+d.z*2})
+				exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
 			end
 			return
 		end
@@ -2347,6 +2346,26 @@ minetest.register_node("exatec:codelock", {
 			{-0.1875, -0.4375, 0.375, 0.1875, 0.0625, 0.5},
 		}
 	}
+})
+
+minetest.register_node("exatec:transsignal", {
+	description = "Transsignal (sends signals 2 blocks away)",
+	tiles = {
+		"exatec_pcb.png^default_crafting_arrowup.png",
+		"exatec_pcb.png^default_crafting_arrowup.png",
+		"exatec_pcb.png^exatec_codelock.png",
+
+	},
+	groups = {snappy = 3,exatec_wire_connected=1,store=300},
+	sounds = default.node_sound_wood_defaults(),
+	exatec={
+		on_wire = function(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+		end,
+	},
+	paramtype2 = "facedir",
+	on_place = minetest.rotate_node,
 })
 
 minetest.register_node("exatec:burner", {
