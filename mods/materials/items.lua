@@ -419,6 +419,12 @@ minetest.register_node("materials:concrete", {
 	groups = {cracky=2,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
+minetest.register_node("materials:concrete_floor", {
+	description = "Concrete floor",
+	tiles = {"materials_concretefloor.png"},
+	groups = {cracky=2,treasure=1},
+	sounds = default.node_sound_stone_defaults(),
+})
 
 minetest.register_node("materials:concrete_stair",{
 	description = "Concrete stair",
@@ -436,7 +442,24 @@ minetest.register_node("materials:concrete_stair",{
 		}
 	},
 	on_place = minetest.rotate_node,
+})
 
+minetest.register_node("materials:concrete_floor_stair",{
+	description = "Concrete floor stair",
+	tiles = {"materials_concretefloor.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=2,treasure=1},
+	sounds = default.node_sound_stone_defaults(),
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0},
+			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+		}
+	},
+	on_place = minetest.rotate_node,
 })
 
 default.register_chest({

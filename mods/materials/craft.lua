@@ -1,8 +1,22 @@
 minetest.register_craft({
 	output="materials:concrete_stair 3",
 	recipe={
-		{"","materials:concrete"},
-		{"materials:concrete","materials:concrete"}
+		{"materials:concrete","",""},
+		{"materials:concrete","materials:concrete",""}
+	},
+})
+minetest.register_craft({
+	output="materials:concrete_floor_stair 3",
+	recipe={
+		{"materials:concrete_floor","",""},
+		{"materials:concrete_floor","materials:concrete_floor",""}
+	},
+})
+
+minetest.register_craft({
+	output="materials:concrete_floor 2",
+	recipe={
+		{"materials:concrete","group:stone"}
 	},
 })
 
