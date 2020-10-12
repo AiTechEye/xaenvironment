@@ -484,18 +484,6 @@ minetest.register_node("spacestuff:air_compressor", {
 	sounds = default.node_sound_metal_defaults(),
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
 minetest.register_node("spacestuff:door_1_safe", {
 	description = "Safe door (only safe in protected areas)",
 	drop="spacestuff:door_1_safe",
