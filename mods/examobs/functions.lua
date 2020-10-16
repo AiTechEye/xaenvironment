@@ -132,6 +132,9 @@ examobs.environment=function(self)
 		if self:on_lifedeadline() then
 			self.lifetimer = self.lifetime
 		else
+			if not (self.dead or self.dying) and math.random(1,100) then
+				self:on_expression("leave")
+			end
 			self.object:remove()
 		end
 		return self
@@ -270,12 +273,19 @@ examobs.environment=function(self)
 		if v.y < 0 and not self.falling then
 			self.falling = pos.y
 		end
-		if self.falling and v.y >= 0 and walkable(apos(pos,0,-1)) then
-			local d = math.floor(self.falling+0.5) - math.floor(pos.y+0.5)
-			if d >= 10 then
-				self:hurt(d)
+
+		if self.falling then
+			if v.y < -10 and not self.falling_expression then
+				self.falling_expression = true
+				self:on_expression("fall")
+			elseif v.y >= 0 and walkable(apos(pos,0,-1)) then
+				local d = math.floor(self.falling+0.5) - math.floor(pos.y+0.5)
+				if d >= 10 then
+					self:hurt(d)
+				end
+				self.falling = nil
+				self.falling_expression = nil
 			end
-			self.falling = nil
 		end
 	end
 
@@ -384,7 +394,7 @@ examobs.exploring=function(self)
 end
 
 examobs.fleeing=function(self)
-	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range/2) then
+	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range) then
 		local p = examobs.pointat(self)
 		if walkable(p) and walkable(apos(p,0,1)) then
 			if  self.aggressivity > -2 and examobs.distance(self.object,self.flee) <= self.reach then
@@ -427,6 +437,7 @@ examobs.fighting=function(self)
 				end
 				local en = self.fight:get_luaentity()
 				if en and en.name == "__builtin:item" then
+					self:on_expression("eat")
 					self:eat_item(en.itemstring)
 				end
 				self:before_punching()
@@ -435,6 +446,7 @@ examobs.fighting=function(self)
 				examobs.anim(self,"attack")
 				if examobs.gethp(self.fight) < 1 then
 					self.fight = nil
+					self:on_expression("kill")
 				end
 			end
 		else
@@ -715,7 +727,11 @@ examobs.showtext=function(self,text,color)
 	minetest.after(1.5, function(self,del)
 		if self and self.object and self.delstatus==del then
 			self.delstatus = nil
-			self.object:set_properties({nametag="",nametag_color=""})
+			if self.storage.npcname then
+				self.object:set_properties({nametag=self.storage.npcname,nametag_color="#FFF"})
+			else
+				self.object:set_properties({nametag="",nametag_color=""})
+			end
 		end
 	end, self,del)
 	return self

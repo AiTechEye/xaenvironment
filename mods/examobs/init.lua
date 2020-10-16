@@ -11,6 +11,9 @@ examobs={
 dofile(minetest.get_modpath("examobs") .. "/main.lua")
 dofile(minetest.get_modpath("examobs") .. "/functions.lua")
 dofile(minetest.get_modpath("examobs") .. "/mob_types.lua")
+dofile(minetest.get_modpath("examobs") .. "/npc_stuff.lua")
 dofile(minetest.get_modpath("examobs") .. "/mobs.lua")
 dofile(minetest.get_modpath("examobs") .. "/items.lua")
 dofile(minetest.get_modpath("examobs") .. "/sweet.lua")
+
+

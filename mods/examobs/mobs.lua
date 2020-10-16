@@ -1,6 +1,7 @@
 examobs.register_mob({
 	name = "crab",
 	team = "crab",
+	type = "animal",
 	hp = 4,
 	coin = 1,
 	breathing = 0,
@@ -501,6 +502,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "mouse",
 	team = "mouse",
+	type = "animal",
 	hp = 2,
 	coin = 1,
 	textures = {"examobs_wolf.png^[combine:0x0:-15,-15=examobs_skin.png"},
@@ -1312,6 +1314,7 @@ examobs.register_mob({
 examobs.register_mob({
 	name = "tomato_npc",
 	type = "npc",
+	speaking = 0,
 	dmg = 1,
 	coin = 2,
 	aggressivity = 1,
@@ -1520,6 +1523,7 @@ examobs.register_mob({
 	name = "arctic_wolf",
 	textures = {"examobs_arctic_wolf.png"},
 	mesh = "examobs_wolf.b3d",
+	type = "monster",
 	dmg = 2,
 	coin = 2,
 	aggressivity = 1,
@@ -1577,6 +1581,7 @@ examobs.register_mob({
 	name = "golden_wolf",
 	textures = {"examobs_golden_wolf.png"},
 	mesh = "examobs_wolf.b3d",
+	type = "monster",
 	dmg = 2,
 	coin = 2,
 	aggressivity = 1,

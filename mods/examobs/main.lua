@@ -1,7 +1,6 @@
 examobs.main=function(self, dtime)
-
 	if not self:pos() then
-		print(111,self.name)
+		return
 	end
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
@@ -71,6 +70,7 @@ examobs.register_mob=function(def)
 	def.aggressivity =			def.aggressivity or			1
 	def.flee_from_threats_only =		def.flee_from_threats_only or		0
 
+	def.speaking =			def.speaking or			(def.type == "npc" and 1 or 0)
 	def.floating =			def.floating or			{}
 	def.floating_in_group =		def.floating_in_group
 	def.updatetime =			def.updatetime or			1
@@ -117,6 +117,7 @@ examobs.register_mob=function(def)
 	def.on_walk =			def.on_walk or			function() end
 	def.on_fly =			def.on_fly or			function() end
 	def.on_stand =			def.on_stand or			function() end
+
 	def.before_spawn =		def.before_spawn or		function(pos)
 		return examobs.get_interacts(pos) < 5
 	end
@@ -131,6 +132,10 @@ examobs.register_mob=function(def)
 	local egg = def.spawner_egg
 	local bottom = def.bottom * -1
 	def.spawner_egg = nil
+
+
+	def.on_expression = (def.type == "npc" and def.speaking == 1 and examobs.on_expression) or function() end
+
 
 	def.eat_item=function(self,item,add)
 		local s
@@ -160,7 +165,9 @@ examobs.register_mob=function(def)
 		end
 	end
 	def.pos=function(self)
-		return self.object:get_pos() or self.last_pos
+		local p = self.object:get_pos() or self.storage.last_pos
+		self.storage.last_pos = p
+		return p
 	end
 	def.on_step=examobs.on_step
 
@@ -188,6 +195,8 @@ examobs.register_mob=function(def)
 		self.dying = self.storage.dying or nil
 		self.hp = self.storage.hp or def.hp
 		self.lifetimer = self.storage.lifetimer or def.lifetimer
+		self.storage.last_pos = def.last_pos
+
 		self.inv = self.storage.inv or table.copy(def.inv)
 		self.otype = self.type
 
@@ -196,6 +205,10 @@ examobs.register_mob=function(def)
 
 		if self.dead or self.dying then
 			examobs.anim(self,"lay")
+		end
+
+		if self.type == "npc" and def.speaking == 1 then
+			examobs.npc_setup(self)
 		end
 
 		if staticdata ~= "" then
@@ -229,6 +242,8 @@ examobs.register_mob=function(def)
 				self.object:remove()
 				return self
 			end
+		else
+			self:on_expression("hurt")
 		end
 		examobs.showtext(self,self.hp .. "/" .. self.hp_max)
 	end
@@ -236,8 +251,19 @@ examobs.register_mob=function(def)
 		local en = puncher:get_luaentity()
 		local dmg = 0
 		self.last_punched_by = puncher or self.last_punched_by
+
 		if not (en and en.examob == self.examob) then
-			if self.aggressivity > 0 then
+		
+			if not (self.dying or self.dead) then
+				self:on_expression("punched")
+			end
+
+			if self.type == "npc" and self.hp < self.hp_max/2 then
+				examobs.known(self,puncher,"flee")
+				self.flee = puncher
+				self.fight = nil
+				self.folow = nil
+			elseif self.aggressivity > 0 then
 				self.fight = puncher
 				if not examobs.known(self,puncher,"flee",true) then
 					examobs.known(self,puncher,"fight")
