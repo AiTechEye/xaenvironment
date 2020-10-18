@@ -249,18 +249,18 @@ protect.add_game_rule_area=function(pos1,pos2,title)
 			break
 		end
 	end
-	p.pos1,p.pos2 = protect.sort(p.pos1,p.pos2)
-	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=p.pos1,pos2=p.pos2,title=title})
+	pos1,pos2 = protect.sort(pos1,pos2)
+	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=pos1,pos2=pos2,title=title})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
 end
 
 protect.remove_game_rule_area=function(id)
 	for i,v in pairs(protect.areas) do
-		if v.id == n then
+		if v.id == id then
 			table.remove(protect.areas,i)
 			protect.storage:set_string("areas",minetest.serialize(protect.areas))
 			protect.global_timer = 2
-			return
+			return true
 		end
 	end
 end
@@ -345,7 +345,6 @@ minetest.register_entity("protect:pos",{
 	timer=0.09
 })
 
-
 minetest.register_entity("protect:mark",{
 	physical = false,
 	pointable = false,
@@ -373,4 +372,35 @@ minetest.register_entity("protect:mark",{
 		end
 	end,
 	timer=0.09
+})
+
+
+
+
+
+minetest.register_node("protect:area_breaker", {
+	description = "Area breaker",
+	tiles = {"default_lava.png"},
+	groups = {exatec_wire_connected=1},
+	exatec={
+		on_wire = function(pos)
+			minetest.registered_nodes["protect:area_breaker"].del(pos) then
+			minetest.remove_node(pos)
+		end,
+	},
+	del=function(pos)
+		for i,v in pairs(protect.areas) do
+			if v.game_rule then
+				if (pos.x >= v.pos1.x and pos.x <= v.pos2.x)
+				and (pos.y >= v.pos1.y and pos.y <= v.pos2.y)
+				and (pos.z >= v.pos1.z and pos.z <= v.pos2.z) then
+					protect.remove_game_rule_area(v.id)
+					return true
+				end
+			end
+		end
+	end,
+	after_destruct = function(pos)
+		minetest.registered_nodes["protect:area_breaker"].del(pos)
+	end
 })
