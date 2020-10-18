@@ -24,7 +24,7 @@ vexcazer_schematic.a=function(itemstack, user, pointed_thing,input,typ)
 			u.p = u.p or 1
 			local up = user:get_pos()
 			up.y = up.y +1
-			pos = vector.floor(up)
+			pos = vector.round(up)
 			u["pos"..u.p] = pos
 		end
 
@@ -220,7 +220,7 @@ vexcazer.registry_mode({
 			if pointed_thing.type == "node" then
 				minetest.place_schematic(pointed_thing.under, u.path,"random",nil,false,"place_center_x,place_center_z")
 			else
-				minetest.place_schematic(vector.floor(user:get_pos()), u.path,"random",nil,false,"place_center_x,place_center_z")
+				minetest.place_schematic(vector.round(user:get_pos()), u.path,"random",nil,false,"place_center_x,place_center_z")
 			end
 		end
 	end
