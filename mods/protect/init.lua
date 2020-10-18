@@ -199,7 +199,7 @@ protect.add_area=function(name,title)
 	local x = math.abs(p.pos1.x-p.pos2.x)
 	local y = math.abs(p.pos1.z-p.pos2.z)
 	local z = math.abs(p.pos1.z-p.pos2.z)
-	if x > protect.max_size or y > protect.max_size or z > protect.max_size then
+	if not pu and (x > protect.max_size or y > protect.max_size or z > protect.max_size) then
 		minetest.chat_send_player(name,"The area are too big (max "..protect.max_size.."x"..protect.max_size.."x"..protect.max_size..") your are "..x.."x"..y.."x"..z)
 		return false
 	end
