@@ -380,7 +380,7 @@ minetest.register_node("protect:area_breaker", {
 	groups = {exatec_wire_connected=1},
 	exatec={
 		on_wire = function(pos)
-			minetest.registered_nodes["protect:area_breaker"].del(pos) then
+			minetest.registered_nodes["protect:area_breaker"].del(pos)
 			minetest.remove_node(pos)
 		end,
 	},
