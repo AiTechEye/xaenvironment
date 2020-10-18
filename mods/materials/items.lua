@@ -425,7 +425,6 @@ minetest.register_node("materials:concrete_floor", {
 	groups = {cracky=2,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
-
 minetest.register_node("materials:concrete_stair",{
 	description = "Concrete stair",
 	tiles = {"materials_concrete.png"},
@@ -443,7 +442,6 @@ minetest.register_node("materials:concrete_stair",{
 	},
 	on_place = minetest.rotate_node,
 })
-
 minetest.register_node("materials:concrete_floor_stair",{
 	description = "Concrete floor stair",
 	tiles = {"materials_concretefloor.png"},
@@ -472,4 +470,81 @@ default.register_chest({
 		{"default:iron_ingot","","default:iron_ingot"},
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"}
 	}
+})
+
+
+minetest.register_node("materials:granite", {
+	description = "Granite",
+	tiles = {"materials_granite.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+})
+minetest.register_node("materials:granite_block", {
+	description = "Granite block",
+	tiles = {"materials_granite_block.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+})
+minetest.register_node("materials:granite_brick", {
+	description = "Granite brick",
+	tiles = {"materials_granite_brick.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("materials:granite_stair",{
+	description = "Granite stair",
+	tiles = {"materials_granite.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0},
+			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+		}
+	},
+	on_place = minetest.rotate_node,
+})
+minetest.register_node("materials:granite_brick_stair",{
+	description = "Granite brick stair",
+	tiles = {"materials_granite_brick.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0},
+			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+		}
+	},
+	on_place = minetest.rotate_node,
+})
+
+minetest.register_node("materials:granite_cylinder",{
+	description = "Granite cylinder",
+	tiles = {"materials_granite.png"},
+	drawtype = "mesh",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	mesh = "materials_cylinder.obj",
+	on_place = minetest.rotate_node,
+})
+
+minetest.register_node("materials:granite_orb",{
+	description = "Granite orb",
+	tiles = {"materials_granite.png"},
+	drawtype = "mesh",
+	paramtype = "light",
+	groups = {cracky=2},
+	sounds = default.node_sound_stone_defaults(),
+	mesh = "materials_orb.obj",
 })
