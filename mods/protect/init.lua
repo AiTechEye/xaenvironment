@@ -374,10 +374,6 @@ minetest.register_entity("protect:mark",{
 	timer=0.09
 })
 
-
-
-
-
 minetest.register_node("protect:area_breaker", {
 	description = "Area breaker",
 	tiles = {"default_lava.png"},
