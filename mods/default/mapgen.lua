@@ -6,6 +6,21 @@ minetest.register_alias("mapgen_lava_source","default:lava_source")
 minetest.register_alias("mapgen_mossycobble","default:mossycobble")
 minetest.register_alias("mapgen_cobble","default:cobble")
 
+minetest.register_tool("default:biocheck", {
+	description = "Biocheck",
+	inventory_image = "default_stick.png",
+	groups={not_in_creative_inventory=1},
+	on_use=function(itemstack, user, pointed_thing)
+		local pos = user:get_pos()
+		--local heat = math.floor(minetest.get_heat(pos)/10+0.5)*10
+		--local humidity =math.floor(minetest.get_humidity(pos)/10+0.5)*10
+		print(dump(minetest.registered_biomes[n]))
+		local b = minetest.get_biome_data(pos)
+		local n = minetest.get_biome_name(b.biome)
+		minetest.chat_send_player(user:get_player_name(),n.." "..minetest.get_heat(pos) .." " ..minetest.get_humidity(pos))
+	end
+})
+
 minetest.register_ore({
 	ore_type = "blob",
 	ore= "default:bedrock",
@@ -203,7 +218,7 @@ minetest.register_biome({
 	node_water = "default:salt_water_source",
 	node_river_water = "default:salt_water_source",
 	y_min = -31000,
-	y_max = -50,
+	y_max = 4,
 	heat_point = 50,
 	humidity_point = 50,
 })
@@ -220,6 +235,19 @@ minetest.register_biome({
 	y_max = 0,
 	heat_point = 90,
 	humidity_point = 40,
+})
+
+minetest.register_biome({
+	name = "deep_ocean",
+	depth_top = 5,
+	node_top = "default:sand",
+	node_stone = "default:stone",
+	node_water = "default:salt_water_source",
+	node_river_water = "default:salt_water_source",
+	y_min = -200,
+	y_max = 4,
+	heat_point = 51,
+	humidity_point = 49
 })
 
 default.register_bio=function(def)
@@ -264,21 +292,6 @@ default.register_bio=function(def)
 		})
 	end
 end
-
-minetest.register_tool("default:biocheck", {
-	description = "Biocheck",
-	inventory_image = "default_stick.png",
-	groups={not_in_creative_inventory = 1},
-	on_use=function(itemstack, user, pointed_thing)
-		local pos = user:get_pos()
-		--local heat = math.floor(minetest.get_heat(pos)/10+0.5)*10
-		--local humidity =math.floor(minetest.get_humidity(pos)/10+0.5)*10
-
-		minetest.chat_send_player(user:get_player_name(),minetest.get_heat(pos) .." " ..minetest.get_humidity(pos))
-	end
-})
-
---desert_rocky
 
 default.register_bio({"semi_desert",		100,20,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
 default.register_bio({"desert",		100,0,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
@@ -374,6 +387,84 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		vm:set_data(data)
 		vm:write_to_map()
 	end
+
+	if minp.y< 0 and maxp.y> 0 then
+-- deep ocean
+
+		local depth = math.random(80,150)
+		local height = 0
+		local lenth = maxp.x-minp.x+1
+		local cindx = 1
+		local heat = minetest.get_heat(minp)
+
+		if not default.deepocean_perlin_map then
+			default.deepocean_perlin_map =  minetest.get_perlin_map(default.deepocean_map,{x=lenth,y=lenth,z=lenth})
+			default.deepocean_water = minetest.get_content_id("default:salt_water_source")
+			default.deepocean_sand = minetest.get_content_id("default:sand")
+			default.deepocean_dsand = minetest.get_content_id("default:desert_sand")
+			default.deepocean_plants = {}
+			default.deepocean_corals = {}
+			for i=1,20 do
+				table.insert(default.deepocean_corals,minetest.get_content_id("plants:coral1_"..i))
+				table.insert(default.deepocean_corals,minetest.get_content_id("plants:coral2_"..i))
+				if i <= 4 then
+					if minetest.registered_nodes["plants:kelp"..i] then
+						table.insert(default.deepocean_plants,minetest.get_content_id("plants:kelp"..i))
+					end
+					if minetest.registered_nodes["plants:seaweed"..i] then
+						table.insert(default.deepocean_plants,minetest.get_content_id("plants:seaweed"..i))
+					end
+				end
+			end
+		end
+
+		local water = default.deepocean_water
+		local sand = default.deepocean_sand
+		local dsand = default.deepocean_dsand
+		local plants = default.deepocean_plants
+		local corals = default.deepocean_corals
+		local plants_len = #plants
+		local under_water
+
+
+		local map =  default.deepocean_perlin_map:get_3d_map_flat(minp)
+		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vm:get_data()
+
+		for z=minp.z,maxp.z do
+		for y=maxp.y,minp.y,-1 do
+			local id=area:index(minp.x,y,z)
+		for x=minp.x,maxp.x do
+			local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
+			under_water = data[area:index(x,1,z)] == water
+			if under_water and  y <= height and den > 0.7 and y >= height-depth then
+				data[id] = water
+				local ystr = id-area.ystride
+
+				if data[ystr] ~= water then
+
+					data[ystr] = sand
+					if math.random(1,20) == 1 then
+						data[ystr] = plants[math.random(1,plants_len)]
+					end
+					if heat > 85 then
+						data[ystr] = dsand
+						if math.random(1,80) == 1 then
+							data[ystr] = corals[math.random(1,20)]
+						end
+					end
+				end
+			end
+			cindx=cindx+1
+			id=id+1
+		end
+		end
+		end
+		vm:set_data(data)
+		vm:write_to_map()
+	end
+
 
 	if minp.y> 200 and maxp.y< 300 then
 --cloudland
