@@ -19,6 +19,48 @@ villages = {
 		["villages_sheep_farm"]={chance=18,area=10,height=3},
 		["villages_wheat_farm"]={chance=18,area=10,height=2},
 	},
+	atlantis = {
+		["atlantis_building1"]={chance=15,area=31,spawn=function(pos)
+			villages.chetsts_to_treasures_in_area(pos,16)
+		end},
+		["atlantis_building2"]={chance=15,area=17,spawn=function(pos)
+			villages.chetsts_to_treasures_in_area(pos,16)
+		end},
+		["atlantis_building3"]={chance=15,area=34,spawn=function(pos)
+			protect.add_game_rule_area(vector.subtract(pos,17),vector.add(pos,17),"atlantis")
+			villages.chetsts_to_treasures_in_area(pos,17)
+		end},
+		["atlantis_building4"]={chance=15,area=13},
+		["atlantis_building5"]={chance=15,area=16},
+		["atlantis_building6"]={chance=15,area=36,spawn=function(pos)
+			protect.add_game_rule_area(vector.subtract(pos,18),vector.add(pos,18),"atlantis")
+			villages.chetsts_to_treasures_in_area(pos,18)
+			local code = math.random(0,9)..math.random(0,9)..math.random(0,9)..math.random(0,9)
+			local nodes = minetest.find_nodes_in_area(vector.subtract(pos,18),vector.add(pos,18),{"exatec:codelock","materials:granite_orb"})
+			local I = 0
+			for i,v in pairs(nodes) do
+				local n = minetest.get_node(v)
+				if n.name == "exatec:codelock" then
+					minetest.set_node(v,{name="exatec:codelock",param2=n.param2})
+					minetest.get_meta(v):set_string("code",code)
+					I = i
+					break
+				end
+			end
+			table.remove(nodes,I)
+			local p = nodes[math.random(1,#nodes)]
+			minetest.get_meta(p):set_string("infotext",code)
+		end},
+		["atlantis_building7"]={chance=15,area=10},
+		["atlantis_building8"]={chance=15,area=6},
+		["atlantis_building9"]={chance=15,area=10,spawn=function(pos)
+			villages.chetsts_to_treasures_in_area(pos,16)
+		end},
+		["atlantis_building10"]={chance=15,area=32,spawn=function(pos)
+			protect.add_game_rule_area(vector.subtract(pos,16),vector.add(pos,16),"atlantis")
+			villages.chetsts_to_treasures_in_area(pos,16)
+		end},
+	},
 	nodes_reset = {
 		"default:paper_compressor",
 		"default:craftguide",
@@ -36,6 +78,14 @@ villages = {
 		"examobs:pig_spawner",
 	}
 }
+
+villages.chetsts_to_treasures_in_area=function(pos,rad)
+	local nodes = minetest.find_nodes_in_area(vector.subtract(pos,rad),vector.add(pos,rad),"default:chest")
+	for i,v in pairs(nodes) do
+		default.treasure({level=2,pos=v,node=minetest.get_node(v).name})
+	end
+
+end
 
 villages.set_village=function(pos)
 	local s = math.random(villages.village_size[1],villages.village_size[2])
