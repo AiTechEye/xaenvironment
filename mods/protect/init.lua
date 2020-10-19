@@ -375,9 +375,8 @@ minetest.register_entity("protect:mark",{
 })
 
 minetest.register_node("protect:area_breaker", {
-	description = "Area breaker",
-	tiles = {"default_lava.png"},
-	groups = {exatec_wire_connected=1},
+	tiles = {"default_goldblock.png"},
+	groups = {exatec_wire_connected=1,unbreakable=1,not_in_creative_inventory=1},
 	exatec={
 		on_wire = function(pos)
 			minetest.registered_nodes["protect:area_breaker"].del(pos)
