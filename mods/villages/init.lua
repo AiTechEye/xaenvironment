@@ -20,21 +20,21 @@ villages = {
 		["villages_wheat_farm"]={chance=18,area=10,height=2},
 	},
 	atlantis = {
-		["atlantis_building1"]={chance=15,area=31,spawn=function(pos)
-			villages.chetsts_to_treasures_in_area(pos,16)
+		{name="atlantis_building1",chance=15,area=31,spawn=function(pos)
+			villages.chests_to_treasures_in_area(pos,16)
 		end},
-		["atlantis_building2"]={chance=15,area=17,spawn=function(pos)
-			villages.chetsts_to_treasures_in_area(pos,16)
+		{name="atlantis_building2",chance=15,area=17,spawn=function(pos)
+			villages.chests_to_treasures_in_area(pos,16)
 		end},
-		["atlantis_building3"]={chance=15,area=34,spawn=function(pos)
-			protect.add_game_rule_area(vector.subtract(pos,17),vector.add(pos,17),"atlantis")
-			villages.chetsts_to_treasures_in_area(pos,17)
+		{name="atlantis_building3",chance=15,area=10,spawn=function(pos)
+			protect.add_game_rule_area(apos(pos,6,14,6),apos(pos,-6,-1,-6),"atlantis")
+			villages.chests_to_treasures_in_area(pos,17)
 		end},
-		["atlantis_building4"]={chance=15,area=13},
-		["atlantis_building5"]={chance=15,area=16},
-		["atlantis_building6"]={chance=15,area=36,spawn=function(pos)
+		{name="atlantis_building4",chance=15,area=13},
+		{name="atlantis_building5",chance=15,area=16},
+		{name="atlantis_building6",chance=15,area=36,spawn=function(pos)
 			protect.add_game_rule_area(vector.subtract(pos,18),vector.add(pos,18),"atlantis")
-			villages.chetsts_to_treasures_in_area(pos,18)
+			villages.chests_to_treasures_in_area(pos,18)
 			local code = math.random(0,9)..math.random(0,9)..math.random(0,9)..math.random(0,9)
 			local nodes = minetest.find_nodes_in_area(vector.subtract(pos,18),vector.add(pos,18),{"exatec:codelock","materials:granite_orb"})
 			local I = 0
@@ -51,14 +51,14 @@ villages = {
 			local p = nodes[math.random(1,#nodes)]
 			minetest.get_meta(p):set_string("infotext",code)
 		end},
-		["atlantis_building7"]={chance=15,area=10},
-		["atlantis_building8"]={chance=15,area=6},
-		["atlantis_building9"]={chance=15,area=10,spawn=function(pos)
-			villages.chetsts_to_treasures_in_area(pos,16)
+		{name="atlantis_building7",chance=15,area=10},
+		{name="atlantis_building8",chance=15,area=6},
+		{name="atlantis_building9",chance=15,area=10,spawn=function(pos)
+			villages.chests_to_treasures_in_area(pos,16)
 		end},
-		["atlantis_building10"]={chance=15,area=32,spawn=function(pos)
+		{name="atlantis_building10",chance=15,area=32,spawn=function(pos)
 			protect.add_game_rule_area(vector.subtract(pos,16),vector.add(pos,16),"atlantis")
-			villages.chetsts_to_treasures_in_area(pos,16)
+			villages.chests_to_treasures_in_area(pos,16)
 		end},
 	},
 	nodes_reset = {
@@ -79,7 +79,19 @@ villages = {
 	}
 }
 
-villages.chetsts_to_treasures_in_area=function(pos,rad)
+
+minetest.register_tool("villages:biocheck", {
+	description = "Biocheck",
+	inventory_image = "default_stick.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local pos = user:get_pos()
+		local i = 3
+		minetest.place_schematic(pos,minetest.get_modpath("villages").."/schematics/atlantis_building"..i..".mts","random",nil,true,"place_center_x,place_center_z")
+		villages.atlantis[i].spawn(pos)
+	end
+})
+
+villages.chests_to_treasures_in_area=function(pos,rad)
 	local nodes = minetest.find_nodes_in_area(vector.subtract(pos,rad),vector.add(pos,rad),"default:chest")
 	for i,v in pairs(nodes) do
 		default.treasure({level=2,pos=v,node=minetest.get_node(v).name})
@@ -119,6 +131,78 @@ villages.set_village=function(pos)
 			cs = cs + 1
 			if cs >= (s*s)*s then
 				break
+			end
+		end
+	end
+end
+
+villages.set_atlantis=function(pos)
+	if pos.y > -25 or minetest.get_node(apos(pos,0,1)).name ~= "default:salt_water_source" then
+		return
+	end
+	pos.y=pos.y+1
+	local dir = {vector.new(pos),vector.new(pos),vector.new(pos),vector.new(pos)}
+	local hit = {}
+	local h = 0
+
+	for a=1,200 do
+		dir[1] = apos(dir[1],1)
+		dir[2] = apos(dir[2],-1)
+		dir[3] = apos(dir[3],0,0,1)
+		dir[4] = apos(dir[4],0,0,-1)
+		for i=1,4 do
+			if not hit[i] and minetest.get_node(dir[i]).name ~= "default:salt_water_source" then
+				hit[i] = vector.new(dir[i])
+				h = h +1
+				if h >= 4 then
+					break
+				end
+			end
+		end
+		if h >= 4 then
+			break
+		end
+	end
+	for i=1,4 do
+		hit[i] = hit[i] or dir[i]
+	end
+	local sx = pos.x-hit[1].x + pos.x-hit[2].x
+	local sz = pos.z-hit[3].z + pos.z-hit[4].z
+	local npos = {x=pos.x-sx/2,y=pos.y,z=pos.z-sz/2}	-- center of area
+
+	local sizex,sizez = hit[1].x-hit[2].x,hit[3].z-hit[4].z
+
+
+	if sizez < 50 or sizez < 50 then
+		return
+	end
+
+
+	local num = math.random(10,20)
+	local list = {}
+	local i = 0
+	local n = #villages.atlantis
+
+	for I=0,100 do
+		local p = {x=npos.x+math.random(-sizex,sizex),y=npos.y,z=npos.z+math.random(-sizez,sizez)}
+		local b = villages.atlantis[math.random(1,n)]
+		local able = true
+		for i,v in pairs(list) do
+			local d = vector.distance(v.pos,npos)
+			if (d-b.area)-v.area <= 0 then
+				able = false
+				break
+			end
+		end
+		if able then
+			table.insert(list,{pos=p,area=b.area})
+			minetest.place_schematic(p,minetest.get_modpath("villages").."/schematics/"..b.name..".mts","random",nil,true,"place_center_x,place_center_z")
+			if b.spawn then
+				b.spawn(p)
+			end
+			num = num -1
+			if num <= 0 then
+				return
 			end
 		end
 	end
@@ -258,10 +342,6 @@ minetest.register_node("villages:spawner", {
 	walkable = false,
 	buildable_to = true,
 	groups={on_load=1,not_in_creative_inventory=1},
-	on_construct=function(pos)
-		minetest.remove_node(pos)
-		villages.set_village(pos)
-	end,
 	on_load=function(pos)
 		minetest.remove_node(pos)
 		local n = minetest.get_node({x=pos.x+math.random(-1,1),y=pos.y,z=pos.z+math.random(-1,1)})
@@ -272,6 +352,32 @@ minetest.register_node("villages:spawner", {
 	end,
 })
 
+minetest.register_node("villages:atlantis_spawner", {
+	drawtype = "airlike",
+	paramtype = "light",
+	walkable = false,
+	buildable_to = true,
+	groups={on_load=1,not_in_creative_inventory=1},
+	on_load=function(pos)
+		minetest.remove_node(pos)
+		local n = minetest.get_node({x=pos.x+math.random(-1,1),y=pos.y,z=pos.z+math.random(-1,1)})
+		minetest.set_node(pos,n)
+		if math.random(1,10) == 1 then
+			villages.set_atlantis(pos)
+		end
+	end,
+})
+
+
+minetest.register_ore({
+	ore_type = "blob",
+	ore= "villages:atlantis_spawner",
+	wherein= "default:sand",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 1,
+	y_min= -200,
+	y_max= -25,
+})
 minetest.register_ore({
 	ore_type = "blob",
 	ore= "villages:spawner",
