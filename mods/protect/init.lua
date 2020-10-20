@@ -225,7 +225,7 @@ protect.add_area=function(name,title)
 		end
 
 		p.pos1,p.pos2 = protect.sort(p.pos1,p.pos2)
-		table.insert(protect.areas,{id=id,owner=name,pos1=p.pos1,pos2=p.pos2,title=title})
+		table.insert(protect.areas,{id=id,owner=name,pos1=p.pos1,pos2=p.pos2,title=title,date=default.date("get")})
 		protect.clear(name)
 		protect.storage:set_string("areas",minetest.serialize(protect.areas))
 		minetest.chat_send_player(name,"Protected "..title.." ("..id..")")
@@ -250,7 +250,7 @@ protect.add_game_rule_area=function(pos1,pos2,title)
 		end
 	end
 	pos1,pos2 = protect.sort(pos1,pos2)
-	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=pos1,pos2=pos2,title=title})
+	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
 end
 
