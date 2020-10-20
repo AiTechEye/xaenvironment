@@ -402,6 +402,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			default.deepocean_water = minetest.get_content_id("default:salt_water_source")
 			default.deepocean_sand = minetest.get_content_id("default:sand")
 			default.deepocean_dsand = minetest.get_content_id("default:desert_sand")
+			default.deepocean_atlantis = minetest.get_content_id("villages:atlantis_spawner")
 			default.deepocean_plants = {}
 			default.deepocean_corals = {}
 			for i=1,20 do
@@ -423,9 +424,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local dsand = default.deepocean_dsand
 		local plants = default.deepocean_plants
 		local corals = default.deepocean_corals
+		local atlantis = default.deepocean_atlantis
 		local plants_len = #plants
 		local under_water
-
 
 		local map =  default.deepocean_perlin_map:get_3d_map_flat(minp)
 		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
@@ -441,12 +442,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if under_water and  y <= height and den > 0.7 and y >= height-depth then
 				data[id] = water
 				local ystr = id-area.ystride
-
 				if data[ystr] ~= water then
-
 					data[ystr] = sand
 					if math.random(1,20) == 1 then
 						data[ystr] = plants[math.random(1,plants_len)]
+					elseif math.random(1,1000) == 1 then
+						data[ystr] = atlantis
 					end
 					if heat > 85 then
 						data[ystr] = dsand
@@ -461,7 +462,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 		end
 		end
+
 		vm:set_data(data)
+		vm:set_lighting({day=0,night=0})
+		vm:calc_lighting()
 		vm:write_to_map()
 	end
 
