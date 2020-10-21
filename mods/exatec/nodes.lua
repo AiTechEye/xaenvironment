@@ -234,7 +234,6 @@ minetest.register_node("exatec:tube_dir", {
 			en.storage.dir = d
 			ob:set_velocity(d)
 		end,
-
 		on_tube = function(pos,stack,opos,ob)
 			if minetest.get_meta(pos):get_int("on") == 1 then
 				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -276,16 +275,20 @@ minetest.register_node("exatec:recycling_dir_filter", {
 	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
 	exatec={
 		test_input=function(pos,stack,opos)
-			local inv = minetest.get_meta(pos):get_inventory()
-			return stack:get_wear() == 0 and minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, "input",1, stack, nil,stack)
+			return true
 		end,
 		on_input=function(pos,stack,opos)
-			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			local ob = minetest.add_entity(pos,"exatec:tubeitem")
-			local en = ob:get_luaentity()
-			en:new_item(stack,opos)
-			en.storage.dir = d
-			ob:set_velocity(d)
+			local inv = minetest.get_meta(pos):get_inventory()
+			if stack:get_wear() == 0 and minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, "input",1, stack, nil,stack) then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				local ob = minetest.add_entity(pos,"exatec:tubeitem")
+				local en = ob:get_luaentity()
+				en:new_item(stack,opos)
+				en.storage.dir = d
+				ob:set_velocity(d)
+			else
+				minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+			end
 		end,
 		on_tube = function(pos,stack,opos,ob)
 			local inv = minetest.get_meta(pos):get_inventory()
@@ -329,15 +332,19 @@ minetest.register_node("exatec:fuel_dir_filter", {
 	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
 	exatec={
 		test_input=function(pos,stack,opos)
-			return default.get_fuel(stack) > 0
+			return true
 		end,
 		on_input=function(pos,stack,opos)
-			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			local ob = minetest.add_entity(pos,"exatec:tubeitem")
-			local en = ob:get_luaentity()
-			en:new_item(stack,opos)
-			en.storage.dir = d
-			ob:set_velocity(d)
+			if default.get_fuel(stack) > 0 then
+				local ob = minetest.add_entity(pos,"exatec:tubeitem")
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				local en = ob:get_luaentity()
+				en:new_item(stack,opos)
+				en.storage.dir = d
+				ob:set_velocity(d)
+			else
+				minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+			end
 		end,
 		on_tube = function(pos,stack,opos,ob)
 			if default.get_fuel(stack) > 0 then
@@ -380,16 +387,20 @@ minetest.register_node("exatec:cookable_dir_filter", {
 	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
 	exatec={
 		test_input=function(pos,stack,opos)
-			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
 			return result.item:get_name() ~= ""
 		end,
 		on_input=function(pos,stack,opos)
-			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			local ob = minetest.add_entity(pos,"exatec:tubeitem")
-			local en = ob:get_luaentity()
-			en:new_item(stack,opos)
-			en.storage.dir = d
-			ob:set_velocity(d)
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
+			if result.item:get_name() ~= "" then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				local ob = minetest.add_entity(pos,"exatec:tubeitem")
+				local en = ob:get_luaentity()
+				en:new_item(stack,opos)
+				en.storage.dir = d
+				ob:set_velocity(d)
+			else
+				minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+			end
 		end,
 		on_tube = function(pos,stack,opos,ob)
 			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
