@@ -611,7 +611,7 @@ default.registry_bucket=function(node_name)
 			local n = user:get_player_name()
 			if p.type == "node" then
 				local no = minetest.get_node(p.under)
-				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(n,p.under) then
+				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(p.under,n) then
 					minetest.set_node(p.under,{name=node_name})
 				elseif (no.name == "default:tankstorage" or no.name == tan) and no.param2 < 56 then
 					minetest.set_node(p.under,{name=tan,param2=no.param2+7})
