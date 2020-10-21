@@ -1376,18 +1376,8 @@ local qblock = function(def)
 	})
 end
 
-qblock({color="FF0000",store=10000})
-qblock({color="1c7800",store=10000})
-qblock({color="e29f00",store=10000})
-qblock({color="800080",store=10000})
-qblock({color="0000FF",store=10000})
-
-qblock({color="0000FF",name = "0000FF_used",
-groups = {dig_immediate = 2,not_in_creative_inventory=1,on_load=1},
-on_load=function(pos)
-	minetest.set_node(pos,{name="default:qblock_0000FF"})
-end,
-after_place_node = function(pos, placer)
-	minetest.set_node(pos,{name="default:qblock_0000FF"})
-end
-})
+qblock({color="FF0000",store=5000})
+qblock({color="1c7800",store=5000})
+qblock({color="e29f00",store=5000})
+qblock({color="800080",store=5000})
+qblock({color="0000FF",store=5000})

@@ -1,5 +1,5 @@
 minetest.register_tool("default:wrench", {
-	description = "Wrench",
+	description = "Wrench (rotate blocks)",
 	groups = {treasure=1},
 	inventory_image = "default_wrench.png",
 	on_place=function(itemstack, user, pointed_thing)
