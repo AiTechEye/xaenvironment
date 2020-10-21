@@ -512,7 +512,7 @@ minetest.register_globalstep(function(dtime)
 					end
 				end
 
-				if v.y < 0 and not default.defpos(apos(p,0,-1),"walkable") then
+				if v.y < 0 and not default.defpos(apos(p,0,-0.5),"walkable") then
 					local d = player:get_look_dir()
 					local w = vector.add(apos(p,0),{x=d.x,y=0,z=d.z})
 					if default.defpos(apos(w,0,1),"walkable") and not default.defpos(apos(w,0,2),"walkable") then
@@ -527,7 +527,6 @@ minetest.register_globalstep(function(dtime)
 						end
 					elseif default.defpos(apos(w,0,0),"walkable") and not default.defpos(apos(w,0,1),"walkable") then
 						if player_style.get_airlike(p) then
-
 							if default.defpos(p,"drowning") == 1 then
 								minetest.set_node(p,{name="player_style:edgehook2"})
 							else
