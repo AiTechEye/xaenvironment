@@ -17,7 +17,7 @@ pchest.setpchest=function(pos,user,label)
 	meta:get_inventory():set_size("main", 32)
 	meta:get_inventory():set_size("trans", 1)
 	meta:set_string("formspec",
-	"size[8,8]" ..
+	"size[8,9]" ..
 	"list[context;main;0,1;8,4;]" ..
 	"list[context;trans;0,0;0,0;]" ..
 	"list[current_player;main;0,5.3;8,4;]" ..
