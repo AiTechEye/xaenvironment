@@ -1,4 +1,4 @@
-![Alt text](https://github.com/AiTechEye/xaenvironment/blob/master/screenshot.png)
+![Alt text](screenshot.png)
 
 # XaEnvironment V8.9
 
