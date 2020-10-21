@@ -9,20 +9,22 @@ minetest.register_craft({
 	}
 })
 
-pchest.setpchest=function(pos,user)
+pchest.setpchest=function(pos,user,label)
 	local meta = minetest.get_meta(pos)
+	label = label or "PChest"
 	meta:set_string("owner", user:get_player_name())
 	meta:set_int("state", 0)
 	meta:get_inventory():set_size("main", 32)
 	meta:get_inventory():set_size("trans", 1)
 	meta:set_string("formspec",
 	"size[8,8]" ..
-	"list[context;main;0,0;8,4;]" ..
+	"list[context;main;0,1;8,4;]" ..
 	"list[context;trans;0,0;0,0;]" ..
-	"list[current_player;main;0,4.3;8,4;]" ..
+	"list[current_player;main;0,5.3;8,4;]" ..
 	"listring[current_player;main]" ..
-	"listring[current_name;main]")
-	meta:set_string("infotext", "PChest by: " .. user:get_player_name())
+	"listring[current_name;main]" ..
+	"field[0.3,0.3;2,1;label;;"..label.."]")
+	meta:set_string("infotext", label.." (" .. user:get_player_name()..")")
 end
 
 minetest.register_tool("hook:pchest", {
@@ -41,14 +43,15 @@ minetest.register_tool("hook:pchest", {
 		local p=minetest.dir_to_facedir(user:get_look_dir())
 		local item=itemstack:to_table()
 		minetest.set_node(pointed_thing.above, {name = "hook:pchest_node",param1="",param2=p})
-		pchest.setpchest(pointed_thing.above,user)
-			
 		minetest.sound_play("default_place_node_hard", {pos=pointed_thing.above, gain = 1.0, max_hear_distance = 5})
 
 		if not (item.meta or item.metadata) then
 			itemstack:take_item()
 			return itemstack
 		end
+
+		pchest.setpchest(pointed_thing.above,user,item.meta.label)
+
 		if item.meta.items then
 			local its = minetest.deserialize(item.meta.items or "") or {}
 			local items = {}
@@ -147,9 +150,20 @@ minetest.register_node("hook:pchest_node", {
 			table.insert(items,v:to_table())
 		end
 		local item = ItemStack("hook:pchest"):to_table()
-		item.meta={items=minetest.serialize(items)}
+		local label = meta:get_string("label")
+		item.meta={items=minetest.serialize(items),label=label,description=label.." ("..name..")"}
 		pinv:add_item("main", ItemStack(item))
 		minetest.set_node(pos, {name = "air"})
 		minetest.sound_play("default_dig_dig_immediate", {pos=pos, gain = 1.0, max_hear_distance = 5,})
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.label then
+			local m = minetest.get_meta(pos)
+			local owner = m:get_string("owner")
+			if owner == sender:get_player_name() or owner == "" then
+				m:set_string("label",pressed.label)
+				pchest.setpchest(pos,sender,pressed.label)
+			end
+		end
 	end
 })
