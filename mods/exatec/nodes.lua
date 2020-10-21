@@ -449,15 +449,17 @@ minetest.register_node("exatec:tube_filter", {
 			end
 			end
 		end
+		local out = m:get_int("out")
 		m:set_string("formspec",
-			"size[12,10]" 
+			"size[13.2,10]" 
 			.."listcolors[#77777777;#777777aa;#000000ff]"
-			.."box[0,0;12,1;#ff0000]".."list[context;input1;11,0;1,1;]" 
-			.."box[0,1;12,1;#00ff00]".."list[context;input2;11,1;1,1;]" 
-			.."box[0,2;12,1;#0000ff]".."list[context;input3;11,2;1,1;]" 
-			.."box[0,3;12,1;#ffff00]".."list[context;input4;11,3;1,1;]"
-			.."box[0,4;12,1;#000000]".."list[context;input5;11,4;1,1;]"
-			.."box[0,5;12,1;#ffffff]".."list[context;input6;11,5;1,1;]" 
+			.."label[12.5,-0.2;Out]"
+			.."box[0,0;12,1;#ff0000]".."list[context;input1;11,0;1,1;]checkbox[12.5,0;out5;;"..(out==5 and "true" or "false").."]"
+			.."box[0,1;12,1;#00ff00]".."list[context;input2;11,1;1,1;]checkbox[12.5,1;out4;;"..(out==4 and "true" or "false").."]"
+			.."box[0,2;12,1;#0000ff]".."list[context;input3;11,2;1,1;]checkbox[12.5,2;out3;;"..(out==3 and "true" or "false").."]" 
+			.."box[0,3;12,1;#ffff00]".."list[context;input4;11,3;1,1;]checkbox[12.5,3;out2;;"..(out==2 and "true" or "false").."]"
+			.."box[0,4;12,1;#000000]".."list[context;input5;11,4;1,1;]checkbox[12.5,4;out1;;"..(out==1 and "true" or "false").."]"
+			.."box[0,5;12,1;#ffffff]".."list[context;input6;11,5;1,1;]checkbox[12.5,5;out0;;"..(out==0 and "true" or "false").."]" 
 			.."list[current_player;main;2,6.2;8,4;]" 
 			..b
 		)
@@ -482,12 +484,16 @@ minetest.register_node("exatec:tube_filter", {
 		return 0
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
+		local m = minetest.get_meta(pos)
 		for i,v in pairs(pressed) do
 			if i:sub(1,5) == "input" then
 				local it = i:sub(8,-1)
 				local na = i:sub(1,6)
-				local m = minetest.get_meta(pos)
 				m:set_string(na,m:get_string(na):gsub(it..",",""))
+				minetest.registered_nodes["exatec:tube_filter"].on_construct(pos)
+				return
+			elseif i:sub(1,3) == "out" then
+				m:set_int("out",tonumber(i:sub(4,5)))
 				minetest.registered_nodes["exatec:tube_filter"].on_construct(pos)
 				return
 			end
@@ -495,18 +501,7 @@ minetest.register_node("exatec:tube_filter", {
 	end,
 	exatec={
 		test_input=function(pos,stack,opos)
-			local m = minetest.get_meta(pos)
-			local n = stack:get_name()
-			local e = false
-			for i=1,6 do
-				local d = m:get_string("input"..i)
-				if d == "" then
-					e = true
-				elseif d:find(n) then
-					return true
-				end
-			end
-			return e
+			return true
 		end,
 		on_input=function(pos,stack,opos)
 			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
@@ -517,25 +512,29 @@ minetest.register_node("exatec:tube_filter", {
 			local e
 			for i,v in pairs(exatec.tube_rules) do
 				local d = m:get_string("input"..i)
-				if d == "" then
-					e = v
-				elseif d:find(n) then
+				if d:find(n) then
 					ob:set_velocity(v)
 					ob:get_luaentity().storage.dir = v
 					ob:set_pos(pos)
 					return
 				end
 			end
-			if not e then
-				local en = ob:get_luaentity()
-				local dir = en.storage.dir
-				en.storage.dir = {x=dir.x*-1,y=dir.y*-1,z=dir.z*-1,}
-				ob:set_velocity(en.storage.dir)
-				return
+
+			local out =  m:get_int("out")
+			for i=0,5 do
+				if i == out then
+					local I = math.abs(6-i)
+					local v = exatec.tube_rules[I]
+
+
+
+
+					ob:set_velocity(v)
+					ob:get_luaentity().storage.dir = v
+					ob:set_pos(pos)
+					return
+				end
 			end
-			ob:set_velocity(e)
-			ob:get_luaentity().storage.dir = e
-			ob:set_pos(pos)
 		end,
 	},
 })
@@ -1977,6 +1976,9 @@ minetest.register_node("exatec:industrial_miner", {
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=600},
 	sounds = default.node_sound_glass_defaults(),
+	after_place_node = function(pos, placer)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
@@ -2012,7 +2014,8 @@ minetest.register_node("exatec:industrial_miner", {
 			end
 			local n = minetest.get_node_drops(no)[1]
 			local def = minetest.registered_nodes[n] or {}
-			if minetest.get_item_group(no,"unbreakable") == 0 and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return "" end}) ==  false) and not minetest.is_protected(p, "") then
+			local owner = minetest.get_meta(pos):get_string("owner")
+			if minetest.get_item_group(no,"unbreakable") == 0 and minetest.get_item_group(n,"unbreakable") == 0 and not (def.can_dig and def.can_dig(p, {get_player_name=function() return owner end}) ==  false) and not minetest.is_protected(p, owner) then
 				local stack = ItemStack(n)
 				local inv = m:get_inventory()
 
