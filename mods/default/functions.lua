@@ -616,7 +616,7 @@ default.registry_bucket=function(node_name)
 				elseif (no.name == "default:tankstorage" or no.name == tan) and no.param2 < 56 then
 					minetest.set_node(p.under,{name=tan,param2=no.param2+7})
 					minetest.get_meta(p.under):set_string("bucket",buk)
-				elseif default.defpos(p.above,"buildable_to") and not minetest.is_protected(n,p.above) then
+				elseif default.defpos(p.above,"buildable_to") and not minetest.is_protected(p.above,n) then
 					minetest.set_node(p.above,{name=node_name})
 				else
 					return itemstack
