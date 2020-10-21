@@ -233,7 +233,7 @@ minetest.register_craftitem("default:bucket", {
 		local p = pointed_thing
 		local n = user:get_player_name()
 		local no = p.under and default.bucket[minetest.get_node(p.under).name]
-		if p.type == "node" and not minetest.is_protected(n,p.under) then
+		if p.type == "node" and not minetest.is_protected(p.under,n) then
 			local item
 			local nn = minetest.get_node(p.under)
 			if minetest.get_item_group(nn.name,"tankstorage") == 2 and nn.param2 > 0  then
