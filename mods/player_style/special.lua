@@ -171,7 +171,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local b = special.blocks[string.sub(i,12,-1)]
 				local c = m:get_int("coins")
 				if c > 100 and m:get_int(b.meta) <= 99900 then
-					m:set_int("coins",m:get_int("coins")-100)
+					m:set_int("coins",c-100)
 					b.trigger(player)
 					special.show(player)
 				end
