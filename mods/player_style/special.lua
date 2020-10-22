@@ -159,6 +159,7 @@ special.show=function(player)
 		"listcolors[#77777777;#777777aa;#000000ff]"..
 		"list[detached:special;main;1.5,0.2;"..special.num..",1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
+		"label[0,-0.35;"..minetest.colorize("#FFFF00",player:get_meta():get_int("coins")).."]" ..
 		slots)
 	end, player)
 end
