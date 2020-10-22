@@ -1376,8 +1376,8 @@ local qblock = function(def)
 	})
 end
 
-qblock({color="FF0000",store=5000})
+qblock({color="FF0000",store=5000,description="No hunger"})
 qblock({color="1c7800",store=5000})
-qblock({color="e29f00",store=5000})
-qblock({color="800080",store=5000})
+qblock({color="e29f00",store=5000,description="Fire resistance"})
+qblock({color="800080",store=5000,description="Immortal"})
 qblock({color="0000FF",store=5000})
