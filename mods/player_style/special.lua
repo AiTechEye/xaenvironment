@@ -121,7 +121,7 @@ minetest.register_on_joinplayer(function(player)
 	special.user[name].inv:set_size("main", special.num)
 	local list = {}
 	for i,v in pairs(minetest.deserialize(player:get_meta():get_string("special") or "") or {}) do
-		list[i] = v.name
+		list[special.blocks[v.name].i] = v.name
 	end
 	special.user[name].inv:set_list("main", list)
 	special.update(player)
