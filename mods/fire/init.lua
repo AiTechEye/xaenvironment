@@ -53,11 +53,15 @@ minetest.register_node("fire:basic_flame", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
+				if ob:is_player() and special.use_ability(ob,"Fire resistance") then
+					goto continue
+				end
 				minetest.add_node(p,{name="fire:not_igniter"})
 				minetest.get_meta(p):set_int("radius",3)
 				minetest.get_node_timer(p):start(0.1)
 				sr = true
 			end
+			::continue::
 		end
 		if not sr and r > 1.5 then
 			minetest.get_meta(pos):set_int("radius",1.5)
@@ -104,11 +108,15 @@ minetest.register_node("fire:not_igniter", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
+				if ob:is_player() and special.use_ability(ob,"Fire resistance") then
+					goto continue
+				end
 				minetest.add_node(p,{name="fire:not_igniter"})
 				minetest.get_meta(p):set_int("radius",3)
 				minetest.get_node_timer(p):start(0.1)
 				sr = true
 			end
+			::continue::
 		end
 		if not sr and r > 1.5 then
 			minetest.get_meta(pos):set_int("radius",1.5)
