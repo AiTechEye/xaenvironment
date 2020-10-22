@@ -5,9 +5,10 @@ special={
 		["default:qblock_FF0000"]={i=1,
 			image="player_style_hunger_bar.png",
 			meta = "no_hunger",
+			coins=50,
 			trigger=function(player)
 				local m = player:get_meta()
-				m:set_int("no_hunger",m:get_int("no_hunger")+100)
+				m:set_int("no_hunger",m:get_int("no_hunger")+50)
 				special.hud(player,"default:qblock_FF0000")
 			end,
 			use=function(player)
@@ -29,9 +30,10 @@ special={
 		["default:qblock_e29f00"]={i=3,
 			image="fire_basic_flame.png",
 			meta = "fire_resistance",
+			coins=50,
 			trigger=function(player)
 				local m = player:get_meta()
-				m:set_int("fire_resistance",m:get_int("fire_resistance")+100)
+				m:set_int("fire_resistance",m:get_int("fire_resistance")+50)
 				special.hud(player,"default:qblock_e29f00")
 			end,
 			use=function(player,c)
@@ -52,9 +54,10 @@ special={
 		["default:qblock_800080"]={i=4,
 			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
 			meta = "immortal",
+			coins=10,
 			trigger=function(player)
 				local m = player:get_meta()
-				m:set_int("immortal",m:get_int("immortal")+100)
+				m:set_int("immortal",m:get_int("immortal")+10)
 				special.hud(player,"default:qblock_800080")
 			end,
 			use=function(player,c)
@@ -76,7 +79,6 @@ special={
 		},
 	}
 }
-
 
 special.hud=function(player,n)
 	local b = special.blocks[n]
@@ -144,7 +146,7 @@ special.show=function(player)
 				local info = "?"
 				if v.trigger then
 					slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
-					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]"
+					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";"..v.coins.."]"
 				else
 					slots = slots .. "label["..(v.i+0.5)..",1;yet\nunable]"
 				end
@@ -167,8 +169,8 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local m = player:get_meta()
 				local b = special.blocks[string.sub(i,12,-1)]
 				local c = m:get_int("coins")
-				if c > 100 and m:get_int(b.meta) <= 99900 then
-					m:set_int("coins",c-100)
+				if c >= b.coins and m:get_int(b.meta)+b.coins <= 10000 then
+					m:set_int("coins",c-b.coins)
 					b.trigger(player)
 					special.show(player)
 				end
