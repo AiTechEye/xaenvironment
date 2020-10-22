@@ -2,29 +2,80 @@ special={
 	user={},
 	num = 5,
 	blocks = {
-		["default:qblock_FF0000"]={i=1},
-		["default:qblock_1c7800"]={i=2},
-		["default:qblock_e29f00"]={i=3,ability="Fire resistance",
+		["default:qblock_FF0000"]={i=1,
+			meta = "?"
+		},
+		["default:qblock_1c7800"]={i=2,
+			meta = "?"
+		},
+		["default:qblock_e29f00"]={i=3,
+			ability="Fire resistance",
+			image="fire_basic_flame.png",
+			meta = "fire_resistance",
 			trigger=function(player)
 				local m = player:get_meta()
 				m:set_int("fire_resistance",m:get_int("fire_resistance")+100)
+				special.hud(player,"default:qblock_e29f00")
 			end,
 			use=function(player)
 				local m = player:get_meta()
 				local f  = m:get_int("fire_resistance")
 				if f > 0 then
 					m:set_int("fire_resistance",f-1)
+					special.hud(player,"default:qblock_e29f00")
 					return true
 				end
 			end,
-			count = function(player)
+			count=function(player)
 				return player:get_meta():get_int("fire_resistance")
 			end
 		},
-		["default:qblock_800080"]={i=4},
-		["default:qblock_0000FF"]={i=5},
+		["default:qblock_800080"]={i=4,
+			meta = "?"
+		},
+		["default:qblock_0000FF"]={i=5,
+			meta = "?"
+		},
 	}
 }
+
+
+special.hud=function(player,n)
+	local b = special.blocks[n]
+
+	if not b.trigger then
+		return
+	end
+
+	local u = special.user[player:get_player_name()]
+	local c = b.count(player)
+	if u[n] then
+		if c <= 0 then
+			player:hud_remove(u[n].text)
+			player:hud_remove(u[n].image)
+		else
+			player:hud_change(u[n].text, "text", c)
+		end
+	elseif c > 0 then
+		u[n] = {
+		text = player:hud_add({
+			hud_elem_type="text",
+			scale = {x=200,y=60},
+			text=b.count(player),
+			number=0xFFFFFF,
+			offset={x=32,y=8},
+			position={x=0,y=0.5},
+			alignment={x=1,y=1},
+		}),
+		image = player:hud_add({
+			hud_elem_type="image",
+			scale = {x=2,y=2},
+			position={x=0,y=0.5},
+			text=b.image,
+			offset={x=16,y=8},
+		})}
+	end	
+end
 
 special.use_ability=function(player,ab)
 	for i,v in pairs(special.blocks) do
@@ -52,9 +103,11 @@ special.show=function(player)
 		for i,v in pairs(special.blocks) do
 			slots = slots .. "item_image["..(v.i+0.5)..",0.2;1,1;"..i.."]"
 			if inv:get_stack("main",v.i):get_count() > 0 then
+				local info = "?"
 				if v.trigger then
+					info = v.ability
 					slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
-					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]"
+					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";"..info.."]"
 				else
 					slots = slots .. "label["..(v.i+0.5)..",1;yet\nunable]"
 				end
@@ -73,8 +126,13 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 	if form == "special" then
 		for i,v in pairs(pressed) do
 			if string.sub(i,1,11) == "specialbut_" then
-				special.blocks[string.sub(i,12,-1)].trigger(player)
-				special.show(player)
+				local m = player:get_meta()
+				local b = special.blocks[string.sub(i,12,-1)]
+				if m:get_int(b.meta) <= 99900 then
+					m:set_int("coins",m:get_int("coins")-100)
+					b.trigger(player)
+					special.show(player)
+				end
 				return
 			end
 		end
@@ -125,4 +183,10 @@ minetest.register_on_joinplayer(function(player)
 	end
 	special.user[name].inv:set_list("main", list)
 	special.update(player)
+	local m = player:get_meta()
+	for i,v in pairs(special.blocks) do
+		if m:get_int(v.meta) then
+			special.hud(player,i)
+		end
+	end
 end)
