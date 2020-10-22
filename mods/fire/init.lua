@@ -53,7 +53,7 @@ minetest.register_node("fire:basic_flame", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
-				if ob:is_player() and special.use_ability(ob,"Fire resistance") then
+				if ob:is_player() and special.use_ability(ob,"fire_resistance") then
 					goto continue
 				end
 				minetest.add_node(p,{name="fire:not_igniter"})
