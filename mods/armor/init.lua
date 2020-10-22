@@ -14,7 +14,6 @@ player_style.register_button({
 	end
 })
 
-
 armor.show=function(player)
 	local name = player:get_player_name()
 	minetest.after(0.2, function(name)
@@ -139,7 +138,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 end)
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
-	if player and hp_change < 0 and (modifer.type == "node_damage" or modifer.type == "fall") then
+	if player and hp_change < 0 then
 		hp_change = special.use_ability(player,"immortal",hp_change)
 		if hp_change < 0 then
 			armor.update(player,hp_change*-1)
