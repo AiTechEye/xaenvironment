@@ -169,7 +169,8 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if string.sub(i,1,11) == "specialbut_" then
 				local m = player:get_meta()
 				local b = special.blocks[string.sub(i,12,-1)]
-				if m:get_int(b.meta) <= 99900 then
+				local c = m:get_int("coins")
+				if c > 100 and m:get_int(b.meta) <= 99900 then
 					m:set_int("coins",m:get_int("coins")-100)
 					b.trigger(player)
 					special.show(player)
