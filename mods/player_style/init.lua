@@ -23,6 +23,9 @@ end
 dofile(minetest.get_modpath("player_style") .. "/inv.lua")
 dofile(minetest.get_modpath("player_style") .. "/stuff.lua")
 dofile(minetest.get_modpath("player_style") .. "/store.lua")
+dofile(minetest.get_modpath("player_style") .. "/special.lua")
+
+
 
 player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 

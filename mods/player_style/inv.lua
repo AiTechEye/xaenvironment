@@ -7,7 +7,7 @@ player_style.register_button=function(def)
 	.. (def.label or "") .."]"
 	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
 	player_style.buttons.text = player_style.buttons.text .. b
-	player_style.buttons.num = player_style.buttons.num + 1
+	player_style.buttons.num = player_style.buttons.num + 0.8
 	player_style.buttons.action[def.name]=def.action
 end
 
@@ -176,7 +176,7 @@ player_style.inventory=function(player)
 			.."label[9.6,7.9;"..page.."/"..pages.."]"
 
 			.."field[8.3,6.5;3,1;searchbox;;"..(invp.search and invp.search.text or "").."]"
-			.."image_button[11,6.3;1,0.8;;search;]"
+			.."image_button[11,6.3;1,0.8;player_style_search.png;search;]"
 
 			..itembutts
 		)
