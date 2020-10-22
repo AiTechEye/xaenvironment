@@ -3,7 +3,6 @@ special={
 	num = 5,
 	blocks = {
 		["default:qblock_FF0000"]={i=1,
-			ability="No hunger",
 			image="player_style_hunger_bar.png",
 			meta = "no_hunger",
 			trigger=function(player)
@@ -28,7 +27,6 @@ special={
 			meta = "?"
 		},
 		["default:qblock_e29f00"]={i=3,
-			ability="Fire resistance",
 			image="fire_basic_flame.png",
 			meta = "fire_resistance",
 			trigger=function(player)
@@ -52,7 +50,6 @@ special={
 			end
 		},
 		["default:qblock_800080"]={i=4,
-			ability="Immortal",
 			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
 			meta = "immortal",
 			trigger=function(player)
@@ -146,9 +143,8 @@ special.show=function(player)
 			if inv:get_stack("main",v.i):get_count() > 0 then
 				local info = "?"
 				if v.trigger then
-					info = v.ability
 					slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
-					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";"..info.."]"
+					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]"
 				else
 					slots = slots .. "label["..(v.i+0.5)..",1;yet\nunable]"
 				end
