@@ -140,7 +140,10 @@ end)
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and hp_change < 0 and (modifer.type == "node_damage" or modifer.type == "fall") then
-		armor.update(player,hp_change*-1)
+		hp_change = special.use_ability(player,"immortal",hp_change)
+		if hp_change < 0 then
+			armor.update(player,hp_change*-1)
+		end
 	end
 	return hp_change
 end,true)
