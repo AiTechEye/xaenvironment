@@ -252,6 +252,12 @@ player_style.hunger=function(player,add,reset)
 	end
 
 	local a = p.hunger.level+add
+
+	if special.use_ability(player,"no_hunger") then
+		a = math.ceil(p.hunger.level)+1
+		p.hunger.level = a
+	end
+
 	if a < 0 then
 		a = 0
 		player:set_hp(0)
@@ -267,7 +273,6 @@ player_style.hunger=function(player,add,reset)
 end
 
 player_style.thirst=function(player,add,reset)
-
 	if player_style.survive_thirst == false then
 		return
 	end
@@ -286,6 +291,11 @@ player_style.thirst=function(player,add,reset)
 	end
 
 	local a = p.thirst.level+add
+
+	if special.use_ability(player,"no_hunger") then
+		a = math.ceil(p.thirst.level)+1
+		p.thirst.level = a
+	end
 
 	if a <= 0 then
 		a = 0

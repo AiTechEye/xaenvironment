@@ -3,7 +3,26 @@ special={
 	num = 5,
 	blocks = {
 		["default:qblock_FF0000"]={i=1,
-			meta = "?"
+			ability="No hunger",
+			image="player_style_hunger_bar.png",
+			meta = "no_hunger",
+			trigger=function(player)
+				local m = player:get_meta()
+				m:set_int("no_hunger",m:get_int("no_hunger")+100)
+				special.hud(player,"default:qblock_FF0000")
+			end,
+			use=function(player)
+				local m = player:get_meta()
+				local f  = m:get_int("no_hunger")
+				if f > 0 then
+					m:set_int("no_hunger",f-1)
+					special.hud(player,"default:qblock_FF0000")
+					return true
+				end
+			end,
+			count=function(player)
+				return player:get_meta():get_int("no_hunger")
+			end
 		},
 		["default:qblock_1c7800"]={i=2,
 			meta = "?"
@@ -64,13 +83,13 @@ special.hud=function(player,n)
 			text=b.count(player),
 			number=0xFFFFFF,
 			offset={x=32,y=8},
-			position={x=0,y=0.5},
+			position={x=0,y=0.5+(b.i*0.04)},
 			alignment={x=1,y=1},
 		}),
 		image = player:hud_add({
 			hud_elem_type="image",
 			scale = {x=2,y=2},
-			position={x=0,y=0.5},
+			position={x=0,y=0.5+(b.i*0.04)},
 			text=b.image,
 			offset={x=16,y=8},
 		})}
@@ -79,7 +98,7 @@ end
 
 special.use_ability=function(player,ab)
 	for i,v in pairs(special.blocks) do
-		if v.ability == ab then
+		if v.meta == ab then
 			return v.use(player)
 		end
 	end
