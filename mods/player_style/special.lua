@@ -36,21 +36,43 @@ special={
 				m:set_int("fire_resistance",m:get_int("fire_resistance")+100)
 				special.hud(player,"default:qblock_e29f00")
 			end,
-			use=function(player)
+			use=function(player,c)
+				c = c or -1
 				local m = player:get_meta()
 				local f  = m:get_int("fire_resistance")
+				local hp  = f+c
 				if f > 0 then
-					m:set_int("fire_resistance",f-1)
+					m:set_int("fire_resistance",hp > 0 and hp or 0)
 					special.hud(player,"default:qblock_e29f00")
-					return true
 				end
+				return hp > 0 and 0 or hp
 			end,
 			count=function(player)
 				return player:get_meta():get_int("fire_resistance")
 			end
 		},
 		["default:qblock_800080"]={i=4,
-			meta = "?"
+			ability="Immortal",
+			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
+			meta = "immortal",
+			trigger=function(player)
+				local m = player:get_meta()
+				m:set_int("immortal",m:get_int("immortal")+100)
+				special.hud(player,"default:qblock_800080")
+			end,
+			use=function(player,c)
+				local m = player:get_meta()
+				local f = m:get_int("immortal")
+				local hp  = f+c
+				if f > 0 then
+					m:set_int("immortal",hp > 0 and hp or 0)
+					special.hud(player,"default:qblock_800080")
+				end
+				return hp > 0 and 0 or hp
+			end,
+			count=function(player)
+				return player:get_meta():get_int("immortal")
+			end
 		},
 		["default:qblock_0000FF"]={i=5,
 			meta = "?"
@@ -96,10 +118,10 @@ special.hud=function(player,n)
 	end	
 end
 
-special.use_ability=function(player,ab)
+special.use_ability=function(player,ab,c)
 	for i,v in pairs(special.blocks) do
 		if v.meta == ab then
-			return v.use(player)
+			return v.use(player,c)
 		end
 	end
 end
