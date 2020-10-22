@@ -53,7 +53,7 @@ minetest.register_node("fire:basic_flame", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
-				if ob:is_player() and special.use_ability(ob,"fire_resistance") then
+				if ob:is_player() and special.use_ability(ob,"fire_resistance") == 0 then
 					goto continue
 				end
 				minetest.add_node(p,{name="fire:not_igniter"})
@@ -108,7 +108,7 @@ minetest.register_node("fire:not_igniter", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
-				if ob:is_player() and special.use_ability(ob,"Fire resistance") then
+				if ob:is_player() and special.use_ability(ob,"fire_resistance") == 0 then
 					goto continue
 				end
 				minetest.add_node(p,{name="fire:not_igniter"})
@@ -210,6 +210,13 @@ minetest.register_abm({
 		end
 	end
 })
+
+minetest.register_on_player_hpchange(function(player,hp_change,modifer)
+	if player and hp_change < 0 and modifer.type == "node_damage" and minetest.get_item_group(modifer.node,"igniter") > 0 then
+		hp_change = special.use_ability(player,"fire_resistance",hp_change)
+	end
+	return hp_change
+end,true)
 
 player_style.register_environment_sound({node="fire:basic_flame",sound="fire_fire",gain=3,timeloop=8.3})
 player_style.register_environment_sound({node="fire:permanent_flame",sound="fire_fire",gain=3,timeloop=8.3})
