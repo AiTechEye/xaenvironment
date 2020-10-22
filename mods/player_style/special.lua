@@ -93,6 +93,7 @@ special.hud=function(player,n)
 		if c <= 0 then
 			player:hud_remove(u[n].text)
 			player:hud_remove(u[n].image)
+			u[n] = nil
 		else
 			player:hud_change(u[n].text, "text", c)
 		end
