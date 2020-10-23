@@ -719,8 +719,14 @@ player_style.player_diveing=function(name,player,a,water,kong)
 
 
 	else
+
 		local pr =  player_style.player_dive[name]
 		local p = player:get_pos()
+		local b = player:get_breath()
+
+		if b < 10 and minetest.get_item_group(minetest.get_node(p).name,"water") > 0 and special.use_ability(player,"no_water_drowning") then
+			player:set_breath(b+1)
+		end
 
 		if not a and pr and (pr.kong == nil or player:get_player_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
 			local profile=player_style.registered_profiles[player_style.players[name].profile]

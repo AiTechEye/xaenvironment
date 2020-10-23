@@ -75,7 +75,26 @@ special={
 			end
 		},
 		["default:qblock_0000FF"]={i=5,
-			meta = "?"
+			image="bubble.png",
+			meta = "no_water_drowning",
+			coins=50,
+			trigger=function(player)
+				local m = player:get_meta()
+				m:set_int("no_water_drowning",m:get_int("no_water_drowning")+50)
+				special.hud(player,"default:qblock_0000FF")
+			end,
+			use=function(player)
+				local m = player:get_meta()
+				local f = m:get_int("no_water_drowning")
+				if f > 0 then
+					m:set_int("no_water_drowning",f-1)
+					special.hud(player,"default:qblock_0000FF")
+					return true
+				end
+			end,
+			count=function(player)
+				return player:get_meta():get_int("no_water_drowning")
+			end
 		},
 	}
 }
@@ -105,13 +124,13 @@ special.hud=function(player,n)
 			text=b.count(player),
 			number=0xFFFFFF,
 			offset={x=32,y=8},
-			position={x=0,y=0.5+(b.i*0.04)},
+			position={x=0,y=0.5+(b.i*0.05)},
 			alignment={x=1,y=1},
 		}),
 		image = player:hud_add({
 			hud_elem_type="image",
 			scale = {x=2,y=2},
-			position={x=0,y=0.5+(b.i*0.04)},
+			position={x=0,y=0.5+(b.i*0.05)},
 			text=b.image,
 			offset={x=16,y=8},
 		})}
