@@ -39,16 +39,8 @@ default.workbench.set_form=function(pos,add)
 	add = add or ""
 	local x=-0.2
 	local y=0
-
-
-			--meta:set_string("search",minetest.serialize(its))
-			--meta:set_int("search_index",1)
-			--meta:set_int("search_text",text)
-
-
 	local search = meta:get_string("search")
 	local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
-
 
 	for i=page,page+but_am,1 do
 		local it = itemlist[i]
