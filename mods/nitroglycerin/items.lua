@@ -1,7 +1,7 @@
 minetest.register_node("nitroglycerin:timed_bomb", {
 	description = "Timed bomb",
 	tiles = {"nitroglycerin_timed_bomb.png"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=500},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -40,7 +40,7 @@ minetest.register_node("nitroglycerin:timed_bomb", {
 minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 	description = "Timed nuclear bomb",
 	tiles = {"nitroglycerin_timed_bomb.png^[colorize:#aaff0055"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1},
+	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=4000},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -106,7 +106,7 @@ minetest.override_item("default:coalblock",{
 minetest.register_craftitem("nitroglycerin:c4", {
 	description = "C4",
 	inventory_image = "nitroglycerin_c4.png",
-	groups={treasure=1},
+	groups={treasure=1,store=200},
 	on_use=function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "object" then
 			local ref = pointed_thing.ref
