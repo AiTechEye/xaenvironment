@@ -304,18 +304,20 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 
 	minetest["register_" .. kind](name, def)
 
-if gaps > 1 then
-	if kind ~= "tool" then
-		local groups = table.copy(def.groups)
-		groups.not_in_creative_inventory = 1
-		minetest.register_tool(def.name .. "_eaten", {
-			description = def.description,
-			inventory_image = def.inventory_image or def.tiles[1],
-			groups = groups,
-			on_use = def.on_use
-		})	
+	if gaps > 1 then
+		if kind ~= "tool" then
+			local groups = table.copy(def.groups)
+			groups.not_in_creative_inventory = 1
+			groups.store = nil
+
+			minetest.register_tool(def.name .. "_eaten", {
+				description = def.description,
+				inventory_image = def.inventory_image or def.tiles[1],
+				groups = groups,
+				on_use = def.on_use
+			})	
+		end
 	end
-end
 end
 
 default.registry_mineral=function(def)
