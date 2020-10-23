@@ -54,7 +54,7 @@ special={
 		["default:qblock_800080"]={i=4,
 			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
 			meta = "immortal",
-			coins=10,
+			coins=20,
 			trigger=function(player)
 				local m = player:get_meta()
 				m:set_int("immortal",m:get_int("immortal")+10)
