@@ -478,6 +478,7 @@ minetest.register_globalstep(function(dtime)
 				en.target = player
 				en.playerskin = player:get_properties().textures
 				player:set_properties({textures = {"default_air.png","default_air.png","default_air.png"}})
+				ob:set_properties({pointable=false})
 				player:set_attach(ob, "", {x=0,y=0,z=0},{x=0,y=0,z=100})
 				player:set_eye_offset({x=0, y=-15, z=-20}, {x=0, y=0, z=0})
 				player:set_look_vertical(0)
@@ -492,7 +493,7 @@ minetest.register_globalstep(function(dtime)
 					local key = target:get_player_control()
 					self.flee = nil
 					self.fight = nil
-					if not key.	jump or not target:get_attach() or target:get_hp() <= 0 or self.hp <= 0 then
+					if not key.	jump or not target:get_attach() or target:get_hp() <= 0 or self.dead or self.dying then
 						target:set_detach()
 						target:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 						target:set_properties({textures = en.playerskin})
@@ -512,7 +513,7 @@ minetest.register_globalstep(function(dtime)
 					end
 					examobs.walk(self,true)
 					local v = self.object:get_velocity()
-					local y = key.up and -50 or -5
+					local y = key.up and -25 or -5
 					local s = key.up and 5 or 1
 					self.object:set_velocity({x=v.x*s,y=target:get_look_vertical()*y,z=v.z*s})
 					self.object:set_yaw(target:get_look_horizontal())

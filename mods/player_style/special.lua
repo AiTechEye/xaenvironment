@@ -3,6 +3,7 @@ special={
 	num = 5,
 	blocks = {
 		["default:qblock_FF0000"]={i=1,
+			info="\nWont be hungry or thirsty",
 			image="player_style_hunger_bar.png",
 			meta = "no_hunger",
 			amount=50,
@@ -25,6 +26,7 @@ special={
 			end
 		},
 		["default:qblock_1c7800"]={i=2,
+			info="\nLook up and jump to fly, walk forward to fly fast",
 			image="examobs_feather.png",
 			meta = "fly_as_a_bird",
 			amount=20,
@@ -47,6 +49,7 @@ special={
 			end
 		},
 		["default:qblock_e29f00"]={i=3,
+			info="\nImmortal to fire & lava",
 			image="fire_basic_flame.png",
 			meta = "fire_resistance",
 			amount=50,
@@ -71,6 +74,7 @@ special={
 			end
 		},
 		["default:qblock_800080"]={i=4,
+			info="\nImmortal to everything except lava & fire",
 			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
 			meta = "immortal",
 			amount=20,
@@ -94,6 +98,7 @@ special={
 			end
 		},
 		["default:qblock_0000FF"]={i=5,
+			info="\nYou wont drown in water",
 			image="bubble.png",
 			meta = "no_water_drowning",
 			amount=50,
@@ -182,13 +187,8 @@ special.show=function(player)
 		for i,v in pairs(special.blocks) do
 			slots = slots .. "item_image["..(v.i+0.5)..",0.2;1,1;"..i.."]"
 			if inv:get_stack("main",v.i):get_count() > 0 then
-				local info = "?"
-				if v.trigger then
-					slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
-					"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";"..v.amount.."]"
-				else
-					slots = slots .. "label["..(v.i+0.5)..",1;yet\nunable]"
-				end
+				slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
+				"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";Adds value: "..v.amount..v.info.."]"
 			end
 		end
 		return minetest.show_formspec(name, "special",
@@ -245,7 +245,12 @@ minetest.register_on_joinplayer(function(player)
 			return b and b.i == index and inv:get_stack("main",b.i):get_count() == 0 and 1 or 0
 		end,
 		allow_take = function(inv, listname, index, stack, player)
-			return stack:get_count()
+			for i,v in pairs(special.blocks) do
+				if index == v.i then
+					return v.count(player) == 0 and stack:get_count() or 0
+				end
+			end
+			return 0
 		end,
 		on_put = function(inv, listname, index, stack, player)
 			special.update(player)
