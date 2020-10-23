@@ -177,6 +177,7 @@ minetest.register_craft({
 
 minetest.register_craftitem("player_style:coin", {
 	description = "Coin",
+	stack_max = 10000,
 	inventory_image = "player_style_coin.png",
 	groups = {treasure=1,coin=1,store=1},
 	on_use=function(itemstack, user, pointed_thing)
