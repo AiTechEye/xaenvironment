@@ -189,7 +189,15 @@ examobs.register_mob=function(def)
 	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
-		self.examob = math.random(1,9999)
+		while self.examob ~= nil do
+			local r = math.random(1,9999)
+			if not examobs.active[r] then
+				self.examob = r
+				break
+			end
+		end
+
+		examobs.active[self.examob] = self.object
 
 		self.dead = self.storage.dead or nil
 		self.dying = self.storage.dying or nil
@@ -320,6 +328,7 @@ examobs.register_mob=function(def)
 
 	def.on_death=function(self,killer)
 		examobs.dropall(self)
+		examobs.active[self.examob] = nil
 	end
 	minetest.register_entity(name,def)
 
@@ -389,9 +398,22 @@ examobs.register_mob=function(def)
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
 					local c = 0
+					local ac = 0
+
+					for i, v in pairs(examobs.active) do
+						if not v and v:get_luaentity() then
+							examobs.active[i] = nil
+						else
+							ac = ac +1
+							if ac >= examobs.active_spawn_mob_limit then
+								return
+							end
+						end
+					end
+
 					for _, ob in pairs(minetest.get_objects_inside_radius(pos, 20)) do
 						local en = ob:get_luaentity()
-						if en and en.name ==name and en.storage and en.storage.self_spawned then
+						if en and en.examob then
 							c = c +1
 							if c >= 5 then
 								return
