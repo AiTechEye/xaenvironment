@@ -471,6 +471,57 @@ minetest.register_globalstep(function(dtime)
 			local key=player:get_player_control()
 			local a="stand"
 			local hunger = -0.0001
+
+			if key.jump and player:get_look_vertical() <= -1.5 and not player:get_attach() and special.use_ability(player,"fly_as_a_bird") then
+				local ob = minetest.add_entity(apos(p,0,1), "examobs:hawk")
+				local en = ob:get_luaentity()
+				en.target = player
+				en.playerskin = player:get_properties().textures
+				player:set_properties({textures = {"default_air.png","default_air.png","default_air.png"}})
+				player:set_attach(ob, "", {x=0,y=0,z=0},{x=0,y=0,z=100})
+				player:set_eye_offset({x=0, y=-15, z=-20}, {x=0, y=0, z=0})
+				player:set_look_vertical(0)
+				player:hud_set_flags({wielditem=false})
+				en.on_abs_step=function(self)
+					local target = self.target
+					if not target and target:get_pos() then
+						self.object:remove()
+						return self
+					end
+
+					local key = target:get_player_control()
+					self.flee = nil
+					self.fight = nil
+					if not key.	jump or not target:get_attach() or target:get_hp() <= 0 or self.hp <= 0 then
+						target:set_detach()
+						target:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+						target:set_properties({textures = en.playerskin})
+						target:hud_set_flags({wielditem=true})
+						self.object:remove()
+						return self
+					elseif self.timer2 >= self.updatetime then
+						if not special.use_ability(target,"fly_as_a_bird") then
+							target:set_detach()
+							target:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+							target:set_properties({textures = en.playerskin})
+							target:hud_set_flags({wielditem=true})
+							self.object:remove()
+							return self
+						end
+						self.timer2 = 0
+					end
+					examobs.walk(self,true)
+					local v = self.object:get_velocity()
+					local y = key.up and -50 or -5
+					local s = key.up and 5 or 1
+					self.object:set_velocity({x=v.x*s,y=target:get_look_vertical()*y,z=v.z*s})
+					self.object:set_yaw(target:get_look_horizontal())
+					return true
+				end
+			end
+
+
+
 			if key.up or key.down or key.left or key.right then
 				hunger = -0.0002
 				a="walk"
@@ -547,9 +598,9 @@ minetest.register_globalstep(function(dtime)
 							end
 						end
 					end
-				elseif key.aux1 and key.jump and vector.distance(vector.new(),v) < 9 then--and  not (key.left or key.right) then
+				elseif key.aux1 and key.jump and vector.distance(vector.new(),v) < 9 then
 --walljump
-					local ly = player:get_look_yaw()
+					local ly = player:get_look_horizontal()
 					local x1 =math.sin(ly) * -1
 					local z1 =math.cos(ly)
 					local x2 =math.sin(ly)

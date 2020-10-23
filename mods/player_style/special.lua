@@ -25,7 +25,26 @@ special={
 			end
 		},
 		["default:qblock_1c7800"]={i=2,
-			meta = "?"
+			image="examobs_feather.png",
+			meta = "fly_as_a_bird",
+			amount=20,
+			trigger=function(player)
+				local m = player:get_meta()
+				m:set_int("fly_as_a_bird",m:get_int("fly_as_a_bird")+50)
+				special.hud(player,"default:qblock_1c7800")
+			end,
+			use=function(player)
+				local m = player:get_meta()
+				local f  = m:get_int("fly_as_a_bird")
+				if f > 0 then
+					m:set_int("fly_as_a_bird",f-1)
+					special.hud(player,"default:qblock_1c7800")
+					return true
+				end
+			end,
+			count=function(player)
+				return player:get_meta():get_int("fly_as_a_bird")
+			end
 		},
 		["default:qblock_e29f00"]={i=3,
 			image="fire_basic_flame.png",
