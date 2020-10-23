@@ -135,6 +135,8 @@ player_style.store=function(player)
 					x = 0
 				end
 			end
+		else
+			break
 		end
 	end
 
@@ -159,7 +161,7 @@ player_style.store=function(player)
 
 			.."label[7.6,9.9;"..page.."/"..pages.."]"
 			.."field[4,7.3;3,1;searchbox;;"..(store.search and store.search.text or "").."]"
-			.."image_button[3.2,7.1;0.8,0.8;;search;]"
+			.."image_button[3.2,7.1;0.8,0.8;player_style_search.png;search;]"
 			..itembutts
 		)
 	end,name,page,pages,store,itembutts)
