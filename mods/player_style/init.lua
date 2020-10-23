@@ -477,6 +477,7 @@ minetest.register_globalstep(function(dtime)
 				local en = ob:get_luaentity()
 				en.target = player
 				en.playerskin = player:get_properties().textures
+				en.aggressivity = 0
 				player:set_properties({textures = {"default_air.png","default_air.png","default_air.png"}})
 				ob:set_properties({pointable=false})
 				player:set_attach(ob, "", {x=0,y=0,z=0},{x=0,y=0,z=100})
