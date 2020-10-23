@@ -11,3 +11,5 @@ xaenvironment_black_death (Black death) bool true
 xaenvironment_protection_max_size (Max protection area size) int 100
 
 xaenvironment_protection_max_amount (Max protection areas per player) int 5
+
+xaenvironment_active_spawn_mob_limit (Max spawning mobs whith active) int 100
