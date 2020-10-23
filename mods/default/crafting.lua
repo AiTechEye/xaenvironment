@@ -40,8 +40,18 @@ default.workbench.set_form=function(pos,add)
 	local x=-0.2
 	local y=0
 
+
+			--meta:set_string("search",minetest.serialize(its))
+			--meta:set_int("search_index",1)
+			--meta:set_int("search_text",text)
+
+
+	local search = meta:get_string("search")
+	local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
+
+
 	for i=page,page+but_am,1 do
-		local it = default.workbench.items_list[i]
+		local it = itemlist[i]
 		if not it then
 			break
 		end
@@ -55,11 +65,14 @@ default.workbench.set_form=function(pos,add)
 
 	if meta:get_int("craftguide") == 1 then
 		meta:set_string("formspec",
-			"size[8,12]" ..
+			"size[8,9]" ..
 			craftguide_items ..
-			"list[current_player;main;0,8.3;8,4;]" ..
-			"image_button[3.1,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
-			"image_button[3.9,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
+			"list[current_player;main;0,5.4;8,4;]" ..
+			"image_button[3.6,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
+			"image_button[4.3,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
+			"field[0,4.8;2.5,1;searchbox;;"..meta:get_string("search_text").."]"..
+			"image_button[2,4.5;" .. but_size ..";player_style_search.png;search;]" ..
+			"image_button[2.8,4.5;" .. but_size ..";synth_repeat.png;reset;]" ..
 			add
 		)
 	else
@@ -76,8 +89,11 @@ default.workbench.set_form=function(pos,add)
 		"listring[current_name;output]".. 
 		"listring[current_player;main]" ..
 		craftguide_items ..
-		"image_button[-0.2,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
-		"image_button[0.3,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
+		"image_button[3,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
+		"image_button[3.5,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
+		"field[0,3.5;2.5,0.5;searchbox;;"..meta:get_string("search_text").."]"..
+		"image_button[2,3;0.7,0.7;player_style_search.png;search;]" ..
+		"image_button[2.5,3;0.7,0.7;synth_repeat.png;reset;]" ..
 		add
 		)
 	end
@@ -87,7 +103,9 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 		local meta = minetest.get_meta(pos)
 		if pressed.guidefront then
 			local page = meta:get_int("page")
-			if page + 40 < #default.workbench.items_list then
+			local search = meta:get_string("search")
+			local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
+			if page + 40 < #itemlist then
 				meta:set_int("page",page + meta:get_int("but_am")+1)
 				default.workbench.set_form(pos)
 			end
@@ -100,6 +118,22 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 			end
 			return
 		elseif pressed.reset then
+			meta:set_string("search","")
+			meta:set_string("search_text","")
+			meta:set_int("page",1)
+			default.workbench.set_form(pos)
+			return
+		elseif pressed.search then
+			local its = {}
+			local s = pressed.searchbox:lower()
+			for i,it in pairs(default.workbench.items_list) do
+				if it:find(s) or (minetest.registered_items[it].description or ""):lower():find(s) then
+					table.insert(its,it)
+				end
+			end
+			meta:set_string("search",minetest.serialize(its))
+			meta:set_string("search_text",s)
+			meta:set_int("page",1)
 			default.workbench.set_form(pos)
 			return
 		end
