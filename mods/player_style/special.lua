@@ -1,6 +1,6 @@
 special={
 	user={},
-	num = 5,
+	num = 6,
 	blocks = {
 		["default:qblock_FF0000"]={i=1,
 			info="\nWont be hungry or thirsty",
@@ -120,6 +120,67 @@ special={
 				return player:get_meta():get_int("no_water_drowning")
 			end
 		},
+		["default:qblock_FFFFFF"]={i=6,
+			info="\nAutomatic light in darkness",
+			image="default_cloud.png^default_alpha_gem_round.png^[makealpha:0,255,0",
+			meta = "light_in_darkness",
+			amount=1000,
+			trigger=function(player)
+				local m = player:get_meta()
+				m:set_int("light_in_darkness",m:get_int("light_in_darkness")+1000)
+				special.hud(player,"default:qblock_FFFFFF")
+				special.blocks["default:qblock_FFFFFF"].on_load(player)
+			end,
+			use=function(player)
+				local m = player:get_meta()
+				local f = m:get_int("light_in_darkness")
+				if f > 0 then
+					m:set_int("light_in_darkness",f-1)
+					special.hud(player,"default:qblock_FFFFFF")
+					return true
+				end
+				return false
+			end,
+			count=function(player)
+				return player:get_meta():get_int("light_in_darkness")
+			end,
+			on_load=function(player)
+				local name = player:get_player_name()
+				if not player then
+					return
+				end
+				local p = player:get_pos()
+				if not p then
+					return
+				end
+				p = apos(p,0,0.1)
+				local n = minetest.get_node(p).name
+				local l = minetest.get_node_light(p) or 14
+
+				print(l , n)
+
+				if l < 11 or n == "vexcazer_flashlight:flht" or n == "vexcazer_flashlight:flhtw" then
+					local v
+					local s
+					if minetest.get_node_group(n, "water") > 0 then
+						minetest.set_node(p, {name="vexcazer_flashlight:flhtw"})
+						v = special.blocks["default:qblock_FFFFFF"].use(player)
+					elseif (n == "air" or n == "vexcazer_flashlight:flht") then
+						minetest.set_node(p, {name="vexcazer_flashlight:flht"})
+						v = special.blocks["default:qblock_FFFFFF"].use(player)
+					end
+					if v ~= false then
+						minetest.after(0.5,function(player)
+							special.blocks["default:qblock_FFFFFF"].on_load(player)
+						end,player)
+					end
+				else
+					minetest.after(1,function(player)
+						special.blocks["default:qblock_FFFFFF"].on_load(player)
+					end,player)
+				end
+			end
+		},
 	}
 }
 
@@ -185,16 +246,16 @@ special.show=function(player)
 		local inv = special.user[name].inv
 		local slots = ""
 		for i,v in pairs(special.blocks) do
-			slots = slots .. "item_image["..(v.i+0.5)..",0.2;1,1;"..i.."]"
+			slots = slots .. "item_image["..(v.i)..",0.2;1,1;"..i.."]"
 			if inv:get_stack("main",v.i):get_count() > 0 then
-				slots = slots .. "label["..(v.i+0.5)..",-0.3;"..v.count(player).."]" ..
-				"image_button["..(v.i+0.5)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";Adds value: "..v.amount..v.info.."]"
+				slots = slots .. "label["..(v.i)..",-0.3;"..v.count(player).."]" ..
+				"image_button["..(v.i)..",1.2;1,1;player_style_coin.png;specialbut_"..i..";100]tooltip[specialbut_"..i..";Adds value: "..v.amount..v.info.."]"
 			end
 		end
 		return minetest.show_formspec(name, "special",
 		"size[8,6]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]"..
-		"list[detached:special;main;1.5,0.2;"..special.num..",1;]" ..
+		"list[detached:special;main;1,0.2;"..special.num..",1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
 		"label[0,-0.35;"..minetest.colorize("#FFFF00",player:get_meta():get_int("coins")).."]" ..
 		slots)
@@ -270,8 +331,11 @@ minetest.register_on_joinplayer(function(player)
 	special.update(player)
 	local m = player:get_meta()
 	for i,v in pairs(special.blocks) do
-		if m:get_int(v.meta) then
+		if m:get_int(v.meta) > 0 then
 			special.hud(player,i)
+			if v.on_load then
+				v.on_load(player)
+			end
 		end
 	end
 end)
