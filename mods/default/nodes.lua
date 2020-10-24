@@ -795,7 +795,7 @@ minetest.register_node("default:snow", {
 	buildable_to=true,
 	sunlight_propagates=true,
 	paramtype="light",
-	sounds = default.node_sound_dirt_defaults(),
+	sounds = default.node_sound_snow_defaults(),
 	drawtype="nodebox",
 	walkable=false,
 	node_box = {
