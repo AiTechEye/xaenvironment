@@ -155,11 +155,7 @@ special={
 				end
 				p = apos(p,0,0.1)
 				local n = minetest.get_node(p).name
-				local l = minetest.get_node_light(p) or 14
-
-				print(l , n)
-
-				if l < 11 or n == "vexcazer_flashlight:flht" or n == "vexcazer_flashlight:flhtw" then
+				if (l = minetest.get_node_light(p) or 14) < 11 or n == "vexcazer_flashlight:flht" or n == "vexcazer_flashlight:flhtw" then
 					local v
 					local s
 					if minetest.get_node_group(n, "water") > 0 then
