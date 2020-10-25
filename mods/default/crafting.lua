@@ -67,7 +67,7 @@ default.workbench.set_form=function(pos,add)
 			"field[0,4.8;2.5,1;searchbox;;"..meta:get_string("search_text").."]"..
 			"image_button[2,4.5;" .. but_size ..";player_style_search.png;search;]" ..
 			"image_button[2.8,4.5;" .. but_size ..";synth_repeat.png;reset;]" ..
-			"image_button[5.3,4.5;" .. but_size ..";default_craftgreed.png;add2c;]tooltip[add2c;Add to craft greed]" ..
+			"image_button[5.3,4.5;" .. but_size ..";default_craftgrid.png;add2c;]tooltip[add2c;Add to craft grid]" ..
 			add
 		)
 	else
@@ -89,7 +89,7 @@ default.workbench.set_form=function(pos,add)
 		"field[0,3.5;2.5,0.5;searchbox;;"..meta:get_string("search_text").."]"..
 		"image_button[2,3;0.7,0.7;player_style_search.png;search;]" ..
 		"image_button[2.5,3;0.7,0.7;synth_repeat.png;reset;]" ..
-		"image_button[3.5,3.5;0.7,0.7;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft greed]" ..
+		"image_button[3.5,3.5;0.7,0.7;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]" ..
 		add
 		)
 	end
