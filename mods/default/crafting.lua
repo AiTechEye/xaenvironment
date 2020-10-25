@@ -41,6 +41,8 @@ default.workbench.set_form=function(pos,add)
 	local y=0
 	local search = meta:get_string("search")
 	local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
+	local craftr = add ~= ""
+
 
 	for i=page,page+but_am,1 do
 		local it = itemlist[i]
@@ -57,14 +59,15 @@ default.workbench.set_form=function(pos,add)
 
 	if meta:get_int("craftguide") == 1 then
 		meta:set_string("formspec",
-			"size[8,9]" ..
+			"size[8,"..(craftr and 12 or 9).. "]" ..
 			craftguide_items ..
-			"list[current_player;main;0,5.4;8,4;]" ..
+			"list[current_player;main;0,"..(craftr and 8 or 5)..".4;8,4;]" ..
 			"image_button[3.6,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
 			"image_button[4.3,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
 			"field[0,4.8;2.5,1;searchbox;;"..meta:get_string("search_text").."]"..
 			"image_button[2,4.5;" .. but_size ..";player_style_search.png;search;]" ..
 			"image_button[2.8,4.5;" .. but_size ..";synth_repeat.png;reset;]" ..
+			"image_button[5.3,4.5;" .. but_size ..";default_craftgreed.png;add2c;]tooltip[add2c;Add to craft greed]" ..
 			add
 		)
 	else
@@ -86,6 +89,7 @@ default.workbench.set_form=function(pos,add)
 		"field[0,3.5;2.5,0.5;searchbox;;"..meta:get_string("search_text").."]"..
 		"image_button[2,3;0.7,0.7;player_style_search.png;search;]" ..
 		"image_button[2.5,3;0.7,0.7;synth_repeat.png;reset;]" ..
+		"image_button[3.5,3.5;0.7,0.7;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft greed]" ..
 		add
 		)
 	end
@@ -128,6 +132,51 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 			meta:set_int("page",1)
 			default.workbench.set_form(pos)
 			return
+		elseif pressed.add2c then
+			local craft_item = meta:get_string("craft_item")
+			local craft
+			if craft_item ~= "" then
+				craft = minetest.get_craft_recipe(craft_item)
+				if not (craft.items and craft.type == "normal") then
+					return
+				end
+			else
+				return
+			end
+
+			local take_from
+			local add_to
+			local inv
+
+			if meta:get_int("craftguide") == 1 then
+				inv = sender:get_inventory()
+				take_from = "main"
+				add_to = "craft"
+			elseif meta:get_int("workbench") == 1 then
+				inv = meta:get_inventory()
+				take_from = "stock"
+				add_to = "craft"
+			else
+				return
+			end
+
+			for i,v in pairs(craft.items) do
+				local n =  inv:get_stack(add_to,i):get_name()
+				local c =  inv:get_stack(add_to,i):get_count()
+				local max = n ~= "" and minetest.registered_items[n] and minetest.registered_items[n].stack_max or 99
+				if v:sub(1,6) == "group:" then
+					for i2,v2 in pairs(inv:get_list(take_from)) do
+						if minetest.get_item_group(v2:get_name(),v:sub(7,-1)) > 0 and (n == "" or v2:get_name() == n and c < max) then
+							inv:set_stack(add_to,i,v2:get_name() .. " "..(c+1))
+							inv:remove_item(take_from,v2:get_name() .. " 1")
+							break
+						end
+					end
+				elseif inv:contains_item(take_from,v) and (n == "" or n == v and c < max) then
+					inv:set_stack(add_to,i,v .. " "..(c+1))
+					inv:remove_item(take_from,v .. " 1")
+				end
+			end
 		end
 
 		local but_size = meta:get_string("but_size")
@@ -142,32 +191,30 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 
 		for i,it in pairs(pressed) do
 			if string.sub(i,1,11) == "guide_item#" or string.sub(i,1,18) == "guide_alternative#" then
-
 				local item
 				local itlist = ""
 				local craft
-
 				if string.sub(i,1,18) == "guide_alternative#" then
-
 					item = string.sub(i,19,-3)
 					local c = minetest.get_all_craft_recipes(item)
 					if c and #c > 1 then
 						for i,v in pairs(c) do
-							itlist = itlist .. "item_image_button[" .. (2+i) .. ",7;" .. but_size ..";".. v.output ..";guide_alternative#" ..v.output .."="..i..";]"
+							itlist = itlist .. "item_image_button[" .. (1.5+i) .. ",5.7;" .. but_size ..";".. v.output ..";guide_alternative#" ..v.output .."="..i..";]"
 						end
 						craft = c[tonumber(string.sub(i,-1,-1))]
 					else
 						item = string.sub(i,12,-1)
 						craft = minetest.get_craft_recipe(item)
 					end
-					
 				else
 					item = string.sub(i,12,-1)
 					craft = minetest.get_craft_recipe(item)
+					meta:set_string("craft_item",item)
+
 				end
 
 				local x = x_start
-				local y = y_start_crafring
+				local y = y_start_crafring+0.5
 				
 				if craft.items and craft.type == "normal" then
 					local craftgl = 9
@@ -176,6 +223,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 						local label = ""
 						local kind = "item"
 						local but = it2s
+
 						if it2s=="" or minetest.registered_items[it2s] then
 						elseif string.sub(it2s,1,6) == "group:" and default.workbench.groups_list[it2s] then
 							but = it2s
@@ -224,7 +272,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 						if s then
 							na = string.sub(na,1,s-1)
 						end
-						itlist = itlist .. "item_image_button[" .. (2+i) .. ",7;" .. but_size ..";".. na ..";guide_alternative#" ..na .."="..i..";]"
+						itlist = itlist .. "item_image_button[" .. (1.5+i) .. ",6.5;" .. but_size ..";".. na ..";guide_alternative#" ..na .."="..i..";]"
 					end
 				end
 
@@ -235,7 +283,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 				local group = default.workbench.groups_list[groupname] or {}
 				local x = x_start
 				local y = y_start_cooking
-				local itlist = "label[-0.2," .. y_label .. ";" .. groupname .."]"
+				local itlist = "label[-0.2," .. (y_label+0.1) .. ";" .. groupname .."]"
 				local bs = tonumber(but_size.split(but_size,",")[1])
 				for _,nam in pairs(group) do
 					itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. nam ..";guide_item#" ..nam ..";]"
@@ -290,6 +338,7 @@ minetest.register_node("default:workbench", {
 		inv:set_size("output", 1)
 		inv:set_size("stock", 16)
 		meta:set_string("infotext", "Workbench")
+		meta:set_int("workbench", 1)
 		meta:set_int("page", 1)
 		meta:set_string("but_size", "0.7,0.7")
 		meta:set_string("x_start", "-0.2")
