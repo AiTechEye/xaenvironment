@@ -2409,8 +2409,7 @@ minetest.register_node("exatec:burner", {
 	on_timer = function (pos, elapsed)
 		local owner = minetest.get_meta(pos):get_string("owner")
 		local up = apos(pos,0,1)
-
-		if default.defpos(up,"buildable_to") and not minetest.is_protected(up, minetest.get_meta(up):get_string("owner")) then
+		if default.defpos(up,"buildable_to") and not minetest.is_protected(up, owner) then
 			minetest.set_node(up,{name="fire:basic_flame"})
 		end
 		return true
