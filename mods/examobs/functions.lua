@@ -716,7 +716,7 @@ examobs.distance=function(pos1,pos2)
 end
 
 examobs.punch=function(puncher,target,damage)
-	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}})
+	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}},{x=0,y=0,z=0})
 end
 
 examobs.showtext=function(self,text,color)
