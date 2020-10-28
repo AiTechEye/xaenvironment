@@ -1,4 +1,10 @@
-
+minetest.register_craft({
+	output = "exatec:cmdphone",
+	recipe = {{"materials:plastic_sheet","default:glass_tabletop",""},
+		{"default:silver_ingot","materials:diode",""},
+		{"default:uraniumactive_ingot","exatec:wire",""},
+	}
+})
 
 minetest.register_craft({
 	output = "exatec:transsignal",

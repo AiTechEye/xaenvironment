@@ -269,10 +269,15 @@ end
 exatec.run_code=function(text,A)
 	A = A or {}
 	local s
-	local m = minetest.get_meta(A.pos)
+	local m
+	local ccp
+	local findc
 
-	local ccp = m:get_string("connected_constructor")
-	local findc = string.find(string.lower(text),"node.")
+	if not A.mob then
+		m = minetest.get_meta(A.pos)
+		ccp = m:get_string("connected_constructor")
+		findc = string.find(string.lower(text),"node.")
+	end
 
 	if ccp ~= "" and findc then
 		local cc = minetest.string_to_pos(ccp)
@@ -293,8 +298,8 @@ exatec.run_code=function(text,A)
 		return "Connect a ''Node constructor'' to use the node functions"
 	end
 
-	local g={count = 0,pos=vector.new(A.pos),storage=minetest.deserialize(m:get_string("storage")) or {}}
-	--local id = g.pos and minetest.pos_to_string(g.pos) or ""
+	local g={count = 0,pos=vector.new(A.pos),storage=(A.mob and (A.self and A.self.storage.pcb or {}) or {}) or minetest.deserialize(m:get_string("storage")) or {},self=A.self,text=A.self and text or nil}
+
 	local F=function()
 		local f,err = loadstring(text)
 		if f then
@@ -307,21 +312,19 @@ exatec.run_code=function(text,A)
 					g.count = g.count + 1
 					if g.count >= 100000 then
 						debug.sethook()
-						--print(id.." Overheated (event limit) ("..g.count.."/10000)")
 						error(" Overheated (event limit) ("..g.count.."/100000)",1)
 					end
 				end,"",2
 			)
 			f()
 			debug.sethook()
-			m:set_string("storage",minetest.serialize(g.storage) or {})
-		end
-		if err then
-			local e1,e2 = err:find(":")
-			if type(e2) == "number" then
-				err = err:sub(e2-1,-1)
+			if A.mob then
+				A.self.storage.pcb = g.storage
+			else
+				m:set_string("storage",minetest.serialize(g.storage) or {})
 			end
 		end
+		err = err and err:sub(8,-1)
 		return (err or ""),g.count
 	end
 	local s,err = pcall(F)
@@ -342,7 +345,156 @@ exatec.create_env=function(A,g)
 		storage=g and g.storage or nil,
 		apos=apos,
 		event=A,
-		exatec = {
+		mob= g and g.self and {
+			get_pos=function(n)
+				if not n then
+					return g.self.object:get_pos()
+				end
+				g.self.objects = g.self.objects or {}
+				local ob = g.self.objects[n]
+				return ob and ob:get_pos() or nil
+			end,
+			self=function()
+				g.self.objects = g.self.objects or {}
+				g.self.objects[g.self.examob] = g.self.object
+				return g.self.examob
+			end,
+			exists=function(id)
+				g.self.objects = g.self.objects or {}
+				local ob = g.self.objects[id]
+				if ob and not ob:get_pos() then
+					g.self.objects[id] = nil
+					return false
+				end
+				return ob ~= nil
+			end,
+			walk=function(run)
+				examobs.walk(g.self,run)
+			end,
+			jump=function()
+				examobs.jump(g.self)
+			end,
+			stand=function()
+				examobs.stand(g.self)
+			end,
+			lookat=function(n)
+				local ob = g.self.objects and g.self.objects[n] or n
+				examobs.lookat(g.self,ob)
+			end,
+			visiable=function(pos)
+				examobs.visiable(g.self,pos)
+			end,
+			team=function(n)
+				local ob = g.self.objects and g.self.objects[n] or g.self.object
+				examobs.team(ob)
+			end,
+			gethp=function(n)
+				local ob = g.self.objects and g.self.objects[n] or g.self.objects
+				examobs.gethp(ob)
+			end,
+			viewfield=function(n)
+				local ob = g.self.objects and g.self.objects[n]
+				examobs.viewfield(g.self,g.self.objects[ob])
+			end,
+			dropall=function()
+				examobs.dropall(g.self)
+			end,
+			dying=function(n)
+				examobs.dying(g.self,n)
+			end,
+			distance=function(pos1,pos2)
+				g.self.objects = g.self.objects or {}
+				local p1 = type(pos1) ~= "table" and g.self.objects[pos1] or pos1 == nil and g.self.object or pos1
+				local p2 = type(pos2) ~= "table" and g.self.objects[pos2] or pos2
+				if not p1 then
+					error("pos1/object1 is nil")
+				elseif not p2 then
+					error("pos2/object2 is nil")
+				end
+				return examobs.distance(p1,p2)
+			end,
+			pointat=function(d)
+				examobs.pointat(g.self,d)
+			end,
+			punch=function(n)
+				local ob = g.self.objects and g.self.objects[n] or g.self.object
+				if examobs.distance(g.self.object,ob) <= g.self.reach  then
+					examobs.punch(g.self.object,ob,g.self.dmg)
+				end
+			end,
+			showtext=function(text,color)
+				examobs.showtext(g.self,text,color)
+			end,
+			get_object=function(typ)
+				local types = {fight=true,flee=true,folow=true,target=true}
+				if types[typ] then
+					local id = ob_id(g.self[typ])
+					if id then
+						g.self.objects = g.self.objects or {}
+						local ob = g.self.objects[id]
+						if ob and examobs.gethp(ob) <= 0 then
+							g.self.objects[id] = nil
+							return
+						end
+						ob = g.self[typ]
+					end
+					return id
+				else
+					error("(fight/flee/folow/target)")
+				end
+			end,
+			remove_object=function(n,typ)
+				local types = {fight=true,flee=true,folow=true,target=true}
+				g.self.objects = g.self.objects or {}
+				g.self.objects[n] = nil
+				if types[typ] and n then
+					g.self[n] = {}
+				end
+			end,
+			set_object=function(typ,n)
+				local types = {fight=true,flee=true,folow=true,target=true}
+				if types[typ] and n then
+					g.self.objects = g.self.objects or {}
+					local o = g.self.objects[n]
+					g.self[typ] = o
+					if not o then
+						g.self.objects[n] = nil
+					end
+				else
+					error("set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
+				end
+			end,
+			collect_objects_inside_radius=function(d)
+				local obs = {}
+				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or g.self.range)) do
+					local en = ob:get_luaentity()
+					if not en or en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(g.self,ob) then
+						obs[ob_id(ob)] = ob
+					end
+				end
+				g.self.objects = obs
+			end,
+			get_objects=function(d)
+				local p1 = g.self.object:get_pos()
+				local l = {}
+				g.self.objects = g.self.objects or {}
+				for i, v in pairs(g.self.objects or {}) do
+					local p2 = v:get_pos()
+					if d then
+						if p2 and examobs.distance(p1,p2) <= d then
+							table.insert(l,i)
+						end
+					elseif p2 then
+						table.insert(l,i)
+					end
+				end
+				return l
+			end,
+			say=function(t)
+				g.self:say(t)
+			end
+		} or nil,
+		exatec=(g and g.self and {}) or {
 			send=function(x,y,z)
 				x = x and (x == 0 or math.abs(x) == 1) and x or error("(x,y,z) x: number 0, 1 or -1 expected")
 				y = y and (y == 0 or math.abs(y) == 1) and y or error("(x,y,z) y: number 0, 1 or -1 expected")
@@ -358,21 +510,21 @@ exatec.create_env=function(A,g)
 				exatec.data_send(g.pos,to_channel,minetest.get_meta(g.pos):get_string("channel"),data)
 			end,
 		},
-		timeout=function(n)
+		timeout=(g and g.self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
 			end
 			minetest.get_meta(g.pos):set_int("interval",0)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
-		interval=function(n)
+		interval=(g and g.self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
 			end
 			minetest.get_meta(g.pos):set_int("interval",1)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
-		stop=function()
+		stop=(g and g.self and {}) or function()
 			minetest.get_node_timer(g.pos):stop()
 			minetest.get_meta(g.pos):set_int("interval",0)
 		end,
@@ -448,7 +600,7 @@ exatec.create_env=function(A,g)
 			clock=os.clock,
 			time=os.time,
 		},
-		node = {
+		node=(g and g.self and {}) or {
 			dig=exatec.dig_node,
 			place=exatec.place_node,
 		},
