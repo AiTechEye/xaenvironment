@@ -28,7 +28,23 @@ examobs.main=function(self, dtime)
 	end	
 	if (self.dying or self.dead) and examobs.dying(self) then
 		return
-	elseif self.step(self) or self.target then
+	elseif self.storage.code_execute_interval then
+		if not self.cmdphone then
+			local us = self.storage.code_execute_interval_user
+			exatec.cmdphone.user[us] = exatec.cmdphone.user[us] or {obs={}}
+			exatec.cmdphone.user[us].obs[self.examob] = self.object
+			self.cmdphone = true
+		end
+		local err,limit = exatec.run_code(self.storage.code_execute_interval,{type={run=true},user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
+		if err ~= "" then
+			examobs.showtext(self,"ERROR","ffff00")
+			examobs.stand(self)
+			if not self.cmdphone_error then
+				self.cmdphone_error = err
+			end
+		end
+		return
+	elseif self.step(self) or self.targetthen then
 		return
 	end
 	if examobs.following(self) then return end
