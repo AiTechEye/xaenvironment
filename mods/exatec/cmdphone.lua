@@ -75,7 +75,7 @@ exatec.show_cmdphone=function(player,pressed)
 	local list = "textlist[10,-0.3;2.1,11.5;list;"
 	local c = ""
 	local listn = 0
-	local listin = ""
+	local listin = pressed.posinput or ""
 	local preslist = pressed.list and tonumber(pressed.list:sub(5,-1)) or -1
 
 	text = minetest.formspec_escape(text)
@@ -163,6 +163,7 @@ minetest.register_tool("exatec:cmdphone", {
 	groups = {store=500},
 	on_use=function(itemstack, user, pointed_thing)
 		local name = user:get_player_name()
+		local pressed
 		exatec.cmdphone.user[name] = exatec.cmdphone.user[name] or {obs={}}
 		if pointed_thing.type == "object" then
 			local en = pointed_thing.ref:get_luaentity()
@@ -170,7 +171,10 @@ minetest.register_tool("exatec:cmdphone", {
 				exatec.cmdphone.user[name].obs[en.examob] = pointed_thing.ref
 				return itemstack
 			end
+		elseif pointed_thing.type == "node" then
+			local p = vector.round(pointed_thing.above)
+			pressed={posinput="{x="..p.x..",y="..p.y..",z="..p.z.."}"}
 		end
-		exatec.show_cmdphone(user)
+		exatec.show_cmdphone(user,pressed)
 	end,
 })

@@ -298,12 +298,12 @@ exatec.run_code=function(text,A)
 		return "Connect a ''Node constructor'' to use the node functions"
 	end
 
-	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=(A.mob and (A.self and A.self.storage.pcb or {}) or {}) or minetest.deserialize(m:get_string("storage")) or {},self=A.self,text=A.self and text or nil}
+	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=A.mob and A.self and (A.self.storage.exatec or {}) or minetest.deserialize(m:get_string("storage")) or {}}
 
 	local F=function()
 		local f,err = loadstring(text)
 		if f then
-			setfenv(f,exatec.create_env(A,g))
+			setfenv(f,exatec.create_env(A,g,A.self))
 			if rawget(_G,"jit") then
 				jit.off(f,true)
 			end
@@ -318,8 +318,9 @@ exatec.run_code=function(text,A)
 			)
 			f()
 			debug.sethook()
+
 			if A.mob then
-				A.self.storage.pcb = g.storage
+				A.self.storage.exatec = g.storage
 			else
 				m:set_string("storage",minetest.serialize(g.storage) or {})
 			end
@@ -330,6 +331,7 @@ exatec.run_code=function(text,A)
 	local s,err = pcall(F)
 	debug.sethook()
 	exatec.temp.constructor = nil
+
 	if err then
 		local e1,e2 = err:find(":")
 		if type(e2) == "number" then
@@ -339,73 +341,73 @@ exatec.run_code=function(text,A)
 	return err,g.count
 end
 
-exatec.create_env=function(A,g)
+exatec.create_env=function(A,g,self)
 	local id = g and g.pos and (g.pos.x..",".. g.pos.y..",".. g.pos.z) or ""
 	return {
 		storage=g and g.storage or nil,
 		apos=apos,
-		event=A,
-		mob= g and g.self and {
+		event=g,
+		mob= self and {
 			get_pos=function(n)
 				if not n then
-					return g.self.object:get_pos()
+					return self.object:get_pos()
 				end
-				g.self.objects = g.self.objects or {}
-				local ob = g.self.objects[n]
+				self.objects = self.objects or {}
+				local ob = self.objects[n]
 				return ob and ob:get_pos() or nil
 			end,
 			self=function()
-				g.self.objects = g.self.objects or {}
-				g.self.objects[g.self.examob] = g.self.object
-				return g.self.examob
+				self.objects = self.objects or {}
+				self.objects[self.examob] = self.object
+				return self.examob
 			end,
 			exists=function(id)
-				g.self.objects = g.self.objects or {}
-				local ob = g.self.objects[id]
+				self.objects = self.objects or {}
+				local ob = self.objects[id]
 				if ob and not ob:get_pos() then
-					g.self.objects[id] = nil
+					self.objects[id] = nil
 					return false
 				end
 				return ob ~= nil
 			end,
 			walk=function(run)
-				examobs.walk(g.self,run)
+				examobs.walk(self,run)
 			end,
 			jump=function()
-				examobs.jump(g.self)
+				examobs.jump(self)
 			end,
 			stand=function()
-				examobs.stand(g.self)
+				examobs.stand(self)
 			end,
 			lookat=function(n)
-				local ob = g.self.objects and g.self.objects[n] or n
-				examobs.lookat(g.self,ob)
+				local ob = self.objects and self.objects[n] or n
+				examobs.lookat(self,ob)
 			end,
 			visiable=function(pos)
-				examobs.visiable(g.self,pos)
+				examobs.visiable(self,pos)
 			end,
 			team=function(n)
-				local ob = g.self.objects and g.self.objects[n] or g.self.object
+				local ob = self.objects and self.objects[n] or self.object
 				examobs.team(ob)
 			end,
 			gethp=function(n)
-				local ob = g.self.objects and g.self.objects[n] or g.self.objects
+				local ob = self.objects and self.objects[n] or self.objects
 				examobs.gethp(ob)
 			end,
 			viewfield=function(n)
-				local ob = g.self.objects and g.self.objects[n]
-				examobs.viewfield(g.self,g.self.objects[ob])
+				local ob = self.objects and self.objects[n]
+				examobs.viewfield(self,self.objects[ob])
 			end,
 			dropall=function()
-				examobs.dropall(g.self)
+				examobs.dropall(self)
 			end,
 			dying=function(n)
-				examobs.dying(g.self,n)
+				examobs.dying(self,n)
 			end,
 			distance=function(pos1,pos2)
-				g.self.objects = g.self.objects or {}
-				local p1 = type(pos1) ~= "table" and g.self.objects[pos1] or pos1 == nil and g.self.object or pos1
-				local p2 = type(pos2) ~= "table" and g.self.objects[pos2] or pos2
+				self.objects = self.objects or {}
+				local p1 = type(pos1) ~= "table" and self.objects[pos1] or pos1 == nil and self.object or pos1
+				local p2 = type(pos2) ~= "table" and self.objects[pos2] or pos2
 				if not p1 then
 					error("pos1/object1 is nil")
 				elseif not p2 then
@@ -414,29 +416,29 @@ exatec.create_env=function(A,g)
 				return examobs.distance(p1,p2)
 			end,
 			pointat=function(d)
-				examobs.pointat(g.self,d)
+				examobs.pointat(self,d)
 			end,
 			punch=function(n)
-				local ob = g.self.objects and g.self.objects[n] or g.self.object
-				if examobs.distance(g.self.object,ob) <= g.self.reach  then
-					examobs.punch(g.self.object,ob,g.self.dmg)
+				local ob = self.objects and self.objects[n] or self.object
+				if examobs.distance(self.object,ob) <= self.reach  then
+					examobs.punch(self.object,ob,self.dmg)
 				end
 			end,
 			showtext=function(text,color)
-				examobs.showtext(g.self,text,color)
+				examobs.showtext(self,text,color)
 			end,
 			get_object=function(typ)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] then
-					local id = ob_id(g.self[typ])
+					local id = ob_id(self[typ])
 					if id then
-						g.self.objects = g.self.objects or {}
-						local ob = g.self.objects[id]
+						self.objects = self.objects or {}
+						local ob = self.objects[id]
 						if ob and examobs.gethp(ob) <= 0 then
-							g.self.objects[id] = nil
+							self.objects[id] = nil
 							return
 						end
-						ob = g.self[typ]
+						ob = self[typ]
 					end
 					return id
 				else
@@ -445,20 +447,20 @@ exatec.create_env=function(A,g)
 			end,
 			remove_object=function(n,typ)
 				local types = {fight=true,flee=true,folow=true,target=true}
-				g.self.objects = g.self.objects or {}
-				g.self.objects[n] = nil
+				self.objects = self.objects or {}
+				self.objects[n] = nil
 				if types[typ] and n then
-					g.self[n] = {}
+					self[n] = {}
 				end
 			end,
 			set_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] and n then
-					g.self.objects = g.self.objects or {}
-					local o = g.self.objects[n]
-					g.self[typ] = o
+					self.objects = self.objects or {}
+					local o = self.objects[n]
+					self[typ] = o
 					if not o then
-						g.self.objects[n] = nil
+						self.objects[n] = nil
 					end
 				else
 					error("set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
@@ -466,19 +468,19 @@ exatec.create_env=function(A,g)
 			end,
 			collect_objects_inside_radius=function(d)
 				local obs = {}
-				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or g.self.range)) do
+				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or self.range)) do
 					local en = ob:get_luaentity()
-					if not en or en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(g.self,ob) then
+					if not en or en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(self,ob) then
 						obs[ob_id(ob)] = ob
 					end
 				end
-				g.self.objects = obs
+				self.objects = obs
 			end,
 			get_objects=function(d)
-				local p1 = g.self.object:get_pos()
+				local p1 = self.object:get_pos()
 				local l = {}
-				g.self.objects = g.self.objects or {}
-				for i, v in pairs(g.self.objects or {}) do
+				self.objects = self.objects or {}
+				for i, v in pairs(self.objects or {}) do
 					local p2 = v:get_pos()
 					if d then
 						if p2 and examobs.distance(p1,p2) <= d then
@@ -491,18 +493,18 @@ exatec.create_env=function(A,g)
 				return l
 			end,
 			say=function(t)
-				g.self:say(t)
+				self:say(t)
 			end,
-			set_full_control=function(toggle)
-				g.self.full_control = g.self.full_control == false
+			set_paralyze=function(toggle)
+				self.paralyze = toggle
 			end,
 			dig=function(pos)
 				local n = minetest.get_node(pos).name
-				local sp = g.self:pos()
-				if vector.distance(sp,pos) <= g.self.reach and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
+				local sp = self:pos()
+				if vector.distance(sp,pos) <= self.reach and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
 					local d = minetest.get_node_drops(n)
 					for i,v in pairs(d) do
-						g.self.inv[v] = (g.self.inv[v] or 0)+1
+						self.inv[v] = (self.inv[v] or 0)+1
 					end
 					minetest.remove_node(pos)
 					return true
@@ -511,21 +513,46 @@ exatec.create_env=function(A,g)
 			end,
 			place=function(pos,item)
 				local n = minetest.get_node(pos).name
-				local sp = g.self:pos()
-				local inv = g.self.inv[item]
-				if g.self.inv[item] and minetest.registered_nodes[item] and vector.distance(sp,pos) <= g.self.reach and not minetest.is_protected(pos,A.user) and default.defpos(pos,"buildable_to") then
+				local sp = self:pos()
+				local inv = self.inv[item]
+				if self.inv[item] and minetest.registered_nodes[item] and vector.distance(sp,pos) <= self.reach and not minetest.is_protected(pos,A.user) and default.defpos(pos,"buildable_to") then
 					minetest.set_node(pos,{name=item})
-					g.self.inv[item] = g.self.inv[item] -1
-					if g.self.inv[item] <= 0 then
-						g.self.inv[item] = nil
+					self.inv[item] = self.inv[item] -1
+					if self.inv[item] <= 0 then
+						self.inv[item] = nil
 					end
 					return true
 				end
 				return false
 			end,
-
-
-
+			new_path=function(pos)
+				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 1,"Dijkstra")
+				self.path_index = 1
+				return self.path ~= nil
+			end,
+			get_path=function(pos)
+				return self.path
+			end,
+			folow_path=function()
+				if self.path then
+					local p = self:pos()
+					local c = self.path[self.path_index]
+					self.timer2 = self.updatetime -0.1
+					if vector.distance(c,p) < 1 then
+						if not self.path[self.path_index+1] then
+							self.path = nil
+							self.path_index = nil
+							return true
+						else
+							self.path_index = self.path_index +1
+						end
+					else
+						examobs.lookat(self,c)
+						examobs.walk(self)
+					end
+				end
+				return false
+			end
 --minetest.get_meta(plpos):get_inventory():get_size("main") > 0 then
 
 
@@ -535,9 +562,8 @@ exatec.create_env=function(A,g)
 
 
 
-
 		} or nil,
-		exatec=(g and g.self and {}) or {
+		exatec=(self and {}) or {
 			send=function(x,y,z)
 				x = x and (x == 0 or math.abs(x) == 1) and x or error("(x,y,z) x: number 0, 1 or -1 expected")
 				y = y and (y == 0 or math.abs(y) == 1) and y or error("(x,y,z) y: number 0, 1 or -1 expected")
@@ -553,21 +579,21 @@ exatec.create_env=function(A,g)
 				exatec.data_send(g.pos,to_channel,minetest.get_meta(g.pos):get_string("channel"),data)
 			end,
 		},
-		timeout=(g and g.self and {}) or function(n)
+		timeout=(self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
 			end
 			minetest.get_meta(g.pos):set_int("interval",0)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
-		interval=(g and g.self and {}) or function(n)
+		interval=(self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
 			end
 			minetest.get_meta(g.pos):set_int("interval",1)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
-		stop=(g and g.self and {}) or function()
+		stop=(self and {}) or function()
 			minetest.get_node_timer(g.pos):stop()
 			minetest.get_meta(g.pos):set_int("interval",0)
 		end,
@@ -643,7 +669,7 @@ exatec.create_env=function(A,g)
 			clock=os.clock,
 			time=os.time,
 		},
-		node=(g and g.self and {}) or {
+		node=(self and {}) or {
 			dig=exatec.dig_node,
 			place=exatec.place_node,
 		},
