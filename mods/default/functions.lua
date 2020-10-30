@@ -1,4 +1,4 @@
-default.waterslash=function(pos,item)
+default.watersplash=function(pos,item)
 	local def = default.def(minetest.get_node(pos).name)
 	local s = math.random(10,20)
 	if item then
@@ -8,13 +8,13 @@ default.waterslash=function(pos,item)
 	end
 	if def and def.liquidtype == "source" and def.groups and def.groups.water then
 		pos.y = math.ceil(pos.y)-0.49
-		minetest.add_entity(pos,"default:waterslash_ring")
+		minetest.add_entity(pos,"default:watersplash_ring")
 		for i=math.random(1,10),20 do
 			minetest.after(math.random(5,8)*0.1,function(pos)
 				local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
 				local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
 				if d and d.liquidtype == "source" and d.groups and d.groups.water then
-					local e = minetest.add_entity(p,"default:waterslash_ring")
+					local e = minetest.add_entity(p,"default:watersplash_ring")
 					local en = e:get_luaentity()
 					en.size1 = 0.05
 					en.size2 = 0.15
@@ -28,7 +28,7 @@ default.waterslash=function(pos,item)
 					local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
 					local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
 					if d and d.liquidtype == "source" and d.groups and d.groups.water then
-						local e = minetest.add_entity(p,"default:waterslash_ring")
+						local e = minetest.add_entity(p,"default:watersplash_ring")
 						local en = e:get_luaentity()
 						en.size1 = 0.1
 						en.size2 = 0.3
