@@ -35,7 +35,7 @@ examobs.main=function(self, dtime)
 			exatec.cmdphone.user[us].obs[self.examob] = self.object
 			self.cmdphone = true
 		end
-		local err,limit = exatec.run_code(self.storage.code_execute_interval,{type={run=true},user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
+		local err,limit = exatec.run_code(self.storage.code_execute_interval,{type={run=true},mob=true,user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
 		if err ~= "" then
 			examobs.showtext(self,"ERROR","ffff00")
 			examobs.stand(self)
