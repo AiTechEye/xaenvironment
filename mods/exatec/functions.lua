@@ -298,7 +298,7 @@ exatec.run_code=function(text,A)
 		return "Connect a ''Node constructor'' to use the node functions"
 	end
 
-	local g={count = 0,pos=vector.new(A.pos),storage=(A.mob and (A.self and A.self.storage.pcb or {}) or {}) or minetest.deserialize(m:get_string("storage")) or {},self=A.self,text=A.self and text or nil}
+	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=(A.mob and (A.self and A.self.storage.pcb or {}) or {}) or minetest.deserialize(m:get_string("storage")) or {},self=A.self,text=A.self and text or nil}
 
 	local F=function()
 		local f,err = loadstring(text)
@@ -492,7 +492,50 @@ exatec.create_env=function(A,g)
 			end,
 			say=function(t)
 				g.self:say(t)
-			end
+			end,
+			set_full_control=function(toggle)
+				g.self.full_control = g.self.full_control == false
+			end,
+			dig=function(pos)
+				local n = minetest.get_node(pos).name
+				local sp = g.self:pos()
+				if vector.distance(sp,pos) <= g.self.reach and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
+					local d = minetest.get_node_drops(n)
+					for i,v in pairs(d) do
+						g.self.inv[v] = (g.self.inv[v] or 0)+1
+					end
+					minetest.remove_node(pos)
+					return true
+				end
+				return false
+			end,
+			place=function(pos,item)
+				local n = minetest.get_node(pos).name
+				local sp = g.self:pos()
+				local inv = g.self.inv[item]
+				if g.self.inv[item] and minetest.registered_nodes[item] and vector.distance(sp,pos) <= g.self.reach and not minetest.is_protected(pos,A.user) and default.defpos(pos,"buildable_to") then
+					minetest.set_node(pos,{name=item})
+					g.self.inv[item] = g.self.inv[item] -1
+					if g.self.inv[item] <= 0 then
+						g.self.inv[item] = nil
+					end
+					return true
+				end
+				return false
+			end,
+
+
+
+--minetest.get_meta(plpos):get_inventory():get_size("main") > 0 then
+
+
+
+
+
+
+
+
+
 		} or nil,
 		exatec=(g and g.self and {}) or {
 			send=function(x,y,z)

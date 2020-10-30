@@ -57,8 +57,6 @@ exatec.show_cmdphone=function(player,pressed)
 		end
 	end
 
-
-
 	if self and self.cmdphone_error then
 		err = self.cmdphone_error
 	end
