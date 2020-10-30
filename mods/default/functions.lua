@@ -1,3 +1,87 @@
+default.waterslash=function(pos,item)
+	local def = default.def(minetest.get_node(pos).name)
+	local s = math.random(10,20)
+	if item then
+		minetest.sound_play("default_item_watersplash", {pos=pos, gain = 4,max_hear_distance = 10})
+	else
+		minetest.sound_play("default_object_watersplash", {pos=pos, gain = 4,max_hear_distance = 10})
+	end
+	if def and def.liquidtype == "source" and def.groups and def.groups.water then
+		pos.y = math.ceil(pos.y)-0.49
+		minetest.add_entity(pos,"default:waterslash_ring")
+		for i=math.random(1,10),20 do
+			minetest.after(math.random(5,8)*0.1,function(pos)
+				local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
+				local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
+				if d and d.liquidtype == "source" and d.groups and d.groups.water then
+					local e = minetest.add_entity(p,"default:waterslash_ring")
+					local en = e:get_luaentity()
+					en.size1 = 0.05
+					en.size2 = 0.15
+					en.speed = 0.2
+				end
+			end,pos)
+		end
+		if not item then
+			for i=math.random(1,10),40 do
+				minetest.after(math.random(5,8)*0.1,function(pos)
+					local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
+					local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
+					if d and d.liquidtype == "source" and d.groups and d.groups.water then
+						local e = minetest.add_entity(p,"default:waterslash_ring")
+						local en = e:get_luaentity()
+						en.size1 = 0.1
+						en.size2 = 0.3
+						en.speed = 0.4
+					end
+				end,pos)
+			end
+		end
+
+
+	end
+	for i=1,item and math.random(80,100) or math.random(100,140) do
+		if i <= s then
+			minetest.add_particle({
+				pos=pos,
+				time = 0.1,
+				velocity={x=math.random(-1,1),y=math.random(4,5),z=math.random(-1,1)},
+				acceleration={x=0,y=-9,z=0},
+				size=math.random(2,3)*0.1,
+				texture = "default_item_smoke.png^[colorize:#dddddd",
+				expirationtime=1,
+				collision_removal=true,
+				vertical=true,
+			})
+		end
+		if item then
+			minetest.add_particle({
+				pos=pos,
+				time = 0.1,
+				velocity={x=math.random(-50,50)*0.01,y=math.random(10,40)*0.1,z=math.random(-50,50)*0.01},
+				acceleration={x=0,y=-9,z=0},
+				size=math.random(5,7)*0.1,
+				texture = "default_item_smoke.png^[colorize:#dddddd",
+				expirationtime=1,
+				collision_removal=true,
+				vertical=true,
+			})
+		else
+			minetest.add_particle({
+				pos=pos,
+				time = 0.1,
+				velocity={x=math.random(-70,70)*0.01,y=math.random(20,60)*0.1,z=math.random(-70,70)*0.01},
+				acceleration={x=0,y=-9,z=0},
+				size=math.random(6,9)*0.1,
+				texture = "default_item_smoke.png^[colorize:#dddddd",
+				expirationtime=1.3,
+				collision_removal=true,
+				vertical=true,
+			})
+		end
+	end
+end
+
 Coin=function(player,count)
 	local m = player:get_meta()
 	m:set_int("coins",m:get_int("coins")+count)

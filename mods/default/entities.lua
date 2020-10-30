@@ -99,7 +99,7 @@ local item = {
 			local v = self.object:get_velocity() or {x=0, y=0, z=0}
 			if not self.spawn_in_viscosity then
 				if minetest.get_item_group(def.name,"water") > 0 then
-					minetest.sound_play("default_item_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+					default.waterslash(pos,true)
 				elseif minetest.get_item_group(def.name,"lava") > 0 then
 					minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
 				end
@@ -175,7 +175,7 @@ node = {
 			if def and not self.in_viscosity and def.liquid_viscosity > 0 then
 				self.in_viscosity = true
 				if minetest.get_item_group(def.name,"water") > 0 then
-					minetest.sound_play("default_item_watersplash", {object=self.object, gain = 4,max_hear_distance = 10})
+					default.waterslash(pos)
 				elseif minetest.get_item_group(def.name,"lava") > 0 then
 					minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
 				end
@@ -246,6 +246,25 @@ minetest.register_entity("default:item",{
 	get_staticdata = function(self)
 		return minetest.serialize(self.storage)
 	end,
+})
+
+minetest.register_entity("default:waterslash_ring",{
+	physical = false,
+	pointable=false,
+	visual="cube",
+	visual_size = {x=0,y=0,z=0},
+	textures = {"default_waterslash_ring.png","default_air.png"},
+	size2 = 1.5,
+	size1 = 0.5,
+	speed = 2,
+	use_texture_alpha=true,
 	on_step=function(self, dtime)
+		self.size1 = self.size1 + dtime*self.speed
+		self.object:set_properties({
+			visual_size = {x=self.size1,y=0,z=self.size1},
+		})
+		if self.size1 > self.size2 then
+			self.object:remove()
+		end
 	end,
 })
