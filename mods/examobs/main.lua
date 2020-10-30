@@ -192,7 +192,11 @@ examobs.register_mob=function(def)
 	def.on_rightclick=function(self, clicker)
 		if self.fight or self.dead or self.dying then
 			return
+		elseif self.newspawned then
+			self.newspawned = nil
+			return
 		end
+
 		examobs.lookat(self,clicker)
 		self.on_click(self,clicker)
 		if def.type == "npc" then
@@ -373,7 +377,9 @@ examobs.register_mob=function(def)
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
 					local p = pointed_thing.above
-					minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, name):set_yaw(math.random(0,6.28))
+					local e = minetest.add_entity({x=p.x,y=p.y+1,z=p.z}, name)
+					e:set_yaw(math.random(0,6.28))
+					e:get_luaentity().newspawned = true
 					itemstack:take_item()
 				minetest.after(0.5, function(p)
 					minetest.add_node(p,{name="air"})
