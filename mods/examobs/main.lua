@@ -195,6 +195,14 @@ examobs.register_mob=function(def)
 		end
 		examobs.lookat(self,clicker)
 		self.on_click(self,clicker)
+		if def.type == "npc" then
+			local i = clicker:get_wielded_item():get_name()
+			local c = clicker:get_wielded_item():get_count()
+			if i:sub(-8,-1) ~= "_spawner" then
+				self.inv[i] = (self.inv[i] or 0) + c
+				clicker:set_wielded_item(nil)
+			end
+		end
 	end
 	def.get_staticdata = function(self)
 		self.storage = self.storage or {}

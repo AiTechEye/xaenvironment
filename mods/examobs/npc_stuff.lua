@@ -222,7 +222,7 @@ examobs.npc_setup=function(self)
 					end
 				end
 
-				if exp == nil and r == math.random(1,10) then
+				if exp == nil and math.random(1,10) == 1 then
 					for i, w in pairs(weather.currweather) do
 						if vector.distance(pos,w.pos) <= w.size and w.bio == 1 then
 							exp = "raining"
