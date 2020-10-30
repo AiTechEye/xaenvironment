@@ -43,10 +43,11 @@ examobs.main=function(self, dtime)
 				self.cmdphone_error = err
 			end
 			return
-		elseif self.full_control then
+		elseif self.paralyze then
 			return
 		end
-	elseif self.step(self) or self.targetthen then
+	end
+	if self.step(self) or self.targetthen then
 		return
 	end
 	if examobs.following(self) then return end
