@@ -6,7 +6,10 @@ default.watersplash=function(pos,item)
 	else
 		minetest.sound_play("default_object_watersplash", {pos=pos, gain = 4,max_hear_distance = 10})
 	end
-	if def and def.liquidtype == "source" and def.groups and def.groups.water then
+
+	if minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0  then
+		return false
+	elseif def and def.liquidtype == "source" and def.groups and def.groups.water then
 		pos.y = math.ceil(pos.y)-0.49
 		minetest.add_entity(pos,"default:watersplash_ring")
 		for i=math.random(1,10),20 do
@@ -37,8 +40,6 @@ default.watersplash=function(pos,item)
 				end,pos)
 			end
 		end
-
-
 	end
 	for i=1,item and math.random(80,100) or math.random(100,140) do
 		if i <= s then
@@ -80,6 +81,7 @@ default.watersplash=function(pos,item)
 			})
 		end
 	end
+	return true
 end
 
 Coin=function(player,count)
