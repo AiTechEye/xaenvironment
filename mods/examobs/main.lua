@@ -42,8 +42,10 @@ examobs.main=function(self, dtime)
 			if not self.cmdphone_error then
 				self.cmdphone_error = err
 			end
+			return
+		elseif self.full_control then
+			return
 		end
-		return
 	elseif self.step(self) or self.targetthen then
 		return
 	end
