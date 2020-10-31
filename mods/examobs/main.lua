@@ -43,7 +43,7 @@ examobs.main=function(self, dtime)
 				self.cmdphone_error = err
 			end
 			return
-		elseif self.paralyze then
+		elseif self.standby then
 			return
 		end
 	end
