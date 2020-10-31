@@ -529,10 +529,10 @@ exatec.create_env=function(A,g,self)
 			dig=function(pos)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
-				local def = minetest.registered_nodes[item] or {}
+				local def = minetest.registered_nodes[n] or {}
 				local owner = minetest.get_meta(pos):get_string("owner")
 				local can_dig = def and (def.can_dig and def.can_dig(pos, {get_player_name=function() return owner end}))
-				if vector.distance(sp,pos) <= self.reach and can_dig and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
+				if vector.distance(sp,pos) <= self.reach and (can_dig == nil or can_dig == true) and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
 					local d = minetest.get_node_drops(n)
 					for i,v in pairs(d) do
 						self.inv[v] = (self.inv[v] or 0)+1
@@ -559,31 +559,55 @@ exatec.create_env=function(A,g,self)
 			end,
 			new_path_text = "(pos) create new path to pos",
 			new_path=function(pos)
-				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 1,"Dijkstra")
+				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 2,"Dijkstra")
 				self.path_index = 1
+				self.path_attempts = 100
+				if not self.path then
+					examobs.jump(self)
+					local p2 = minetest.find_node_near(pos,2,{"air"})
+					if p2 then
+						self.path = minetest.find_path(apos(self:pos(),0,1),p2, 50, 3, 3,"Dijkstra")
+						if not self.path then
+							examobs.lookat(self,p2)
+							examobs.walk(self)
+						end
+					end
+					self.path_create_attempt = (self.path_create_attempt or 0) +1
+					if self.path_create_attempt > 5 then
+						error(self.path_create_attempt.." attempts to create paths to "..minetest.pos_to_string(pos).. (p2 and " and "..minetest.pos_to_string(p2) or ""))
+						self.path_create_attempt = nil
+					end
+				end
 				return self.path ~= nil
 			end,
 			get_path_text = "() return path/nil",
 			get_path=function(pos)
 				return self.path
 			end,
-			folow_path_text = "() folow created path",
-			folow_path=function()
+			folow_path_text = "(rad/nil) folow created path, finish when inside rad or near it",
+			folow_path=function(rad)
 				if self.path then
 					local p = self:pos()
 					local c = self.path[self.path_index]
 					self.timer2 = self.updatetime -0.1
-					if vector.distance(c,p) < 1 then
+					if vector.distance(c,p) <= (rad or 1) then
 						if not self.path[self.path_index+1] then
 							self.path = nil
 							self.path_index = nil
+							self.path_attempts = nil
+							self.path_create_attempt = nil
 							return true
 						else
 							self.path_index = self.path_index +1
+							self.path_attempts = 100
 						end
 					else
 						examobs.lookat(self,c)
 						examobs.walk(self)
+						self.path_attempts = self.path_attempts -1
+						if self.path_attempts < 0 then
+							self.path_index = self.path_index +1
+						end
 					end
 				end
 				return false
@@ -732,6 +756,12 @@ exatec.create_env=function(A,g,self)
 					end
 				end
 				return false
+			end,
+			get_nodes_in_area_text = "(pos,nodes,rad/nil) return list of positions of nodes in area, rad max is 20",
+			get_nodes_in_area=function(pos,nodes,rad)
+				rad = math.abs(rad or 5)
+				rad = rad <= 20 and rad or 20
+				return minetest.find_nodes_in_area(vector.add(pos,rad),vector.subtract(pos,rad),nodes)
 			end,
 		} or nil,
 		exatec=(self and {}) or {

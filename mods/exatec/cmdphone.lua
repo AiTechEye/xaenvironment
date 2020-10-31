@@ -45,14 +45,11 @@ exatec.show_cmdphone=function(player,pressed)
 	local mlist = ""
 	local c = ""
 
-print(description,pressed.description)
-
 	if pressed.description and description ~= pressed.description then
-print(111)
 		m:set_string("description",pressed.description)
 		description = pressed.description
 	end
-print(description,pressed.description)
+
 	if self then
 		if pressed.save or pressed.interval and not self.storage.code_execute_interval then
 			self.storage.code_execute_interval = text
