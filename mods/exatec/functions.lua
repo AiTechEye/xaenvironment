@@ -588,11 +588,15 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
+			get_item_count_text = "(item_name) return item count",
+			get_item_count=function(item)
+				return self.inv[item] or 0
+			end,
 			add_item_text = "(pos,item,count/nil) add as much as possible from mob inventory to node inventory",
 			add_item=function(pos,item,c)
 				local def = minetest.registered_items[item]
 				local inv = self.inv[item]
-				if not (def and inv and (c == nil or type(c) == "number")) then
+				if not (def and inv) or (c and type(c) ~= "number") then
 					return false
 				end
 				local added = false
@@ -617,9 +621,117 @@ exatec.create_env=function(A,g,self)
 				end
 				return added
 			end,
-			get_item_count_text = "(item_name) return item count",
-			get_item_count=function(item)
-				return self.inv[item] or 0
+			add_all_items_text = "(pos,item,count/nil) add as much items as possible from mob inventory to node inventory",
+			add_all_items=function(pos)
+				local added = false
+				for i,v in pairs(self.inv) do
+					local stack=ItemStack(i.." "..v)
+					if minetest.registered_items[i] and exatec.test_input(pos,stack,pos,pos) then
+						exatec.input(pos,stack,pos,pos)
+						self.inv[i] = self.inv[i] - v
+						added = true
+						if self.inv[i] <= 0 then
+							self.inv[i] = nil
+						end
+					else
+						break
+					end
+				end
+				return added
+			end,
+			take_item_text = "(pos,item,count/nil) take as much as possible from the node inventory",
+			take_item=function(pos,item,c)
+				local def = minetest.registered_items[item]
+				if not def or (c and type(c) ~= "number") then
+					return false
+				end
+				self.inv[item] = self.inv[item] or 0
+				local taken = false
+				local take = c or 99
+				for i=0,32 do
+					local stack=ItemStack(item.." "..c)
+					local test = exatec.test_output(pos,stack,pos,pos)
+					if test then
+						local nstack = exatec.output(pos,stack,pos,pos)
+						taken = true
+						self.inv[item] = self.inv[item] + nstack:get_count()
+						take = take - c
+						if take <= 0 then
+							break
+						end
+					else
+						break
+					end
+				end
+				return taken
+			end,
+			take_all_items_text = "(pos) take all items from the node inventory",
+			take_all_items=function(pos,item,c)
+				local can_take
+				local a = exatec.def(pos)
+				if not a.output_list then
+					return false
+				end
+				for i,stack in pairs(minetest.get_meta(pos):get_inventory():get_list(a.output_list)) do
+					if not can_take then
+						if exatec.test_output(pos,stack,pos,pos) then
+							can_take = true
+						else
+							return false
+						end
+					end
+					local n = stack:get_name()
+					self.inv[n] = (self.inv[n] or 0) + stack:get_count()
+					exatec.output(pos,stack,pos,pos)
+				end
+				return true
+			end,
+			pick_up_items_text = "() pick up items around the mob",
+			pick_up_items=function()
+				for _, ob in ipairs(minetest.get_objects_inside_radius(self:pos(), self.reach)) do
+					local en = ob:get_luaentity()
+					if en and en.name == "__builtin:item" then
+						local st = en.itemstring.split(en.itemstring," ")
+						local item = st[1]
+						local count = st[2] and tonumber(st[2]) or 0
+						self.inv[item] = (self.inv[item] or 0) + count
+						ob:remove()
+					end
+				end
+			end,
+			give_text = "(id,item,count/nil) give items to object and player",
+			give=function(id,item,c)
+				self.objects = self.objects or {}
+				local ob = self.objects[id]
+				c = c or 1
+
+				if type(c) ~= "number" or not self.inv[item] then
+					return false
+				end
+				c = c <= self.inv[item] and c or self.inv[item]
+
+				if ob and vector.distance(self:pos(),ob:get_pos()) <= self.reach then
+					local en = ob:get_luaentity()
+					if en and en.examob then
+						en.inv[item] = (en.inv[item] or 0) + c
+						self.inv[item] = self.inv[item] -c
+						if self.inv[item] <= 0 then
+							self.inv[item] = nil
+						end
+						return true
+					elseif ob:is_player() then
+						local stack = ItemStack(item.." "..c)
+						if ob:get_inventory():room_for_item("main",stack) then
+							ob:get_inventory():add_item("main",stack)
+							self.inv[item] = self.inv[item] -c
+							if self.inv[item] <= 0 then
+								self.inv[item] = nil
+							end
+							return true
+						end
+					end
+				end
+				return false
 			end,
 		} or nil,
 		exatec=(self and {}) or {

@@ -141,7 +141,7 @@ exatec.show_cmdphone=function(player,pressed)
 			.."label[6.5,0.6;storage variable: storage]"
 
 			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png"..(func_info and "^[invert:r" or "")..";info;]"
-			.."tooltip[info;" .. (func_info or "event: incoming variable\nevent.storage: storage\nevent.pos: incoming position")
+			.."tooltip[info;" .. (func_info or "event: incoming variable\nevent.storage: storage\nevent.pos: incoming position\n\nrun mob.collect_objects_inside_radius_text()\nto add objects the a list of ID's and make the mob able to interact with other objects")
 		.."]")
 	end,name,err,list,listin,memory,limit)
 end
