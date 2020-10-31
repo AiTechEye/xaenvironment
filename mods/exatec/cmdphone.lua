@@ -76,6 +76,7 @@ exatec.show_cmdphone=function(player,pressed)
 	local c = ""
 	local listn = 0
 	local listin = pressed.posinput or ""
+	local func_info
 	local preslist = pressed.list and tonumber(pressed.list:sub(5,-1)) or -1
 
 	text = minetest.formspec_escape(text)
@@ -94,21 +95,26 @@ exatec.show_cmdphone=function(player,pressed)
 		end
 	end
 	c = ""
-	for i,v in pairs(exatec.create_env(nil,nil,self or {})) do
+	local funcs = exatec.create_env(nil,nil,self or {})
+	for i,v in pairs(funcs) do
 		if type(v) == "table" then
 			for i2,v2 in pairs(v) do
-				list = list..c..i.."."..i2
-				c=","
-				listn = listn + 1
-				if listn == preslist then
-					listin = i.."."..i2.."()"
+				if type(v2) == "function" then
+					list = list..c..i.."."..i2
+					c=","
+					listn = listn + 1
+					if listn == preslist then
+						func_info = funcs[i][i2.."_text"]
+						listin = i.."."..i2.."()"
+					end
 				end
 			end
-			else
+		elseif type(v) == "function" then
 			list = list..c..i
-				c=","
+			c=","
 			listn = listn + 1
-				if listn == preslist then
+			if listn == preslist then
+				func_info = funcs[i.."_text"]
 				listin = i.."()"
 			end
 		end
@@ -134,59 +140,10 @@ exatec.show_cmdphone=function(player,pressed)
 			.."label[6.5,0.2;Incoming variable: event]"
 			.."label[6.5,0.6;storage variable: storage]"
 
-			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png;info;]"
-			.."tooltip[info;"
-			.."storage variable: storage"
-			.."\nincomming event variable: event"
-			.."\napos(pos,x,y,z) add to pos/vector"
-			.."\nexatec.send(x,y,z) send signal"
-			.."\nexatec.data_send(channel,data) data can be string number and table, eg: {connect=true}"
-			.."\ntimeout(n)"
-			.."\ninterval(n)"
-			.."\nstop(n) stop interval/timeout"
-			.."\nprint(var) print to chatt"
-			.."\ndump(var) print to chatt"
-
-			.."\nto use node functions, do exatec.data_send(''channel'',{connect=true}) to a ''Node constructor'' once\n"
-
-			.."\nnode.dig(pos)"
-			.."\nnode.place(pos,name)"
-
-			.."\n===mob==="
-			.."\nmob.get_pos(id/nil) get pos from object"
-			.."\nmob.self() get self object id"
-			.."\nmob.exists(id) returns true if object exists in object list"
-			.."\nmob.walk(nil/true) walk/run"
-			.."\nmob.jump() jump"
-			.."\nmob.stand() stand"
-			.."\nmob.lookat(id/pos) look at object or pos"
-			.."\nmob.visiable(pos) if pos is visiable (not blocked)"
-			.."\nmob.team(id/nil) get object/self team"
-			.."\nmob.gethp(id/nil) get object/self health"
-			.."\nmob.viewfield(id) if object is in viewfield"
-			.."\nmob.dropall() drop all items"
-			.."\nmob.dying(n) 1 = dying, 2 = dead, 3 = relive"
-			.."\nmob.distance(object1/pos1,object2/pos2)"
-			.."\nmob.pointat(n) pos front of self"
-			.."\nmob.punch(id)"
-			.."\nmob.showtext(text,nil/hexcolor) temporary change the nametag, do not add # to the color code"
-			.."\nmob.set_object(type,id) set object as fight, flee, folow, target"
-			.."\nmob.get_object(type) get object id from fight, flee, folow, target"
-			.."\nmob.remove_object(id/nil,type/nil) remove object from list, and or from fight, flee, folow, target"
-			.."\nmob.collect_objects_inside_radius(rad/nil) adds object in radius to list"
-			.."\nmob.get_objects(rad) return objects in list"
-			.."\nmob.say(text)"
-			.."\nmob.standby(true/false) make the mob paralyzed (standby mode)"
-			.."\nmob.dig(pos)"
-			.."\nmob.place(pos,node)"
-			.."\nmob.new_path(pos) create new path"
-			.."\nmob.get_path() return path/nil"
-			.."\nmob.folow_path() folow created path"
-			.."\nmob.add_item(pos,item,count/nil) add as much as possible from mob inventory to node inventory"
-
-			.."]")
-		end,name,err,list,listin,memory,limit)
-
+			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png"..(func_info and "^[invert:r" or "")..";info;]"
+			.."tooltip[info;" .. (func_info or "event: incoming variable\nevent.storage: storage\nevent.pos: incoming position")
+		.."]")
+	end,name,err,list,listin,memory,limit)
 end
 
 minetest.register_tool("exatec:cmdphone", {

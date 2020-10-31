@@ -1662,6 +1662,7 @@ minetest.register_node("exatec:pcb", {
 			local memory = 0
 			local user = sender:get_player_name()
 			local channel = pressed.channel or m:get_string("channel")
+			local func_info
 			m:set_string("channel",channel)
 			m:set_string("owner",sender:get_player_name())
 			local text,err,limit = pressed.text or m:get_string("text")
@@ -1686,21 +1687,26 @@ minetest.register_node("exatec:pcb", {
 			local listin = ""
 			local preslist = pressed.list and tonumber(pressed.list:sub(5,-1)) or -1
 
-			for i,v in pairs(exatec.create_env()) do
+			local funcs = exatec.create_env()
+			for i,v in pairs(funcs) do
 				if type(v) == "table" then
 					for i2,v2 in pairs(v) do
-						list = list..c..i.."."..i2
-						c=","
-						listn = listn + 1
-						if listn == preslist then
-							listin = i.."."..i2.."()"
+						if type(v2) == "function" then
+							list = list..c..i.."."..i2
+							c=","
+							listn = listn + 1
+							if listn == preslist then
+								func_info = funcs[i][i2.."_text"]
+								listin = i.."."..i2.."()"
+							end
 						end
 					end
-				else
+				elseif type(v) == "function" then
 					list = list..c..i
 					c=","
 					listn = listn + 1
 					if listn == preslist then
+						func_info = funcs[i.."_text"]
 						listin = i.."()"
 					end
 				end
@@ -1724,24 +1730,8 @@ minetest.register_node("exatec:pcb", {
 			.."label[6.5,0.2;Incoming variable: event]"
 			.."label[6.5,0.6;storage variable: storage]"
 
-			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png;info;]"
-			.."tooltip[info;"
-			.."storage variable: storage"
-			.."\nincomming event variable: event"
-			.."\napos(pos,x,y,z) add to pos/vector"
-			.."\nexatec.send(x,y,z) send signal"
-			.."\nexatec.data_send(channel,data) data can be string number and table, eg: {connect=true}"
-			.."\ntimeout(n)"
-			.."\ninterval(n)"
-			.."\nstop(n) stop interval/timeout"
-			.."\nprint(var) print to chatt"
-			.."\ndump(var) print to chatt"
-
-			.."\nto use node functions, do exatec.data_send(''channel'',{connect=true}) to a ''Node constructor'' once\n"
-
-			.."\nnode.dig(pos)"
-			.."\nnode.place(pos,name)"
-
+			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png"..(func_info and "^[invert:r" or "")..";info;]"
+			.."tooltip[info;"..(func_info or "storage variable: storage\nincomming event variable: event\nevent.pos: incoming position")
 			.."]")
 		end
 	end,

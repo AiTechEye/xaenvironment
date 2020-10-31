@@ -346,8 +346,10 @@ exatec.create_env=function(A,g,self)
 	return {
 		storage=g and g.storage or nil,
 		apos=apos,
+		apos_text = "apos(pos,x,y,z) add to pos/vector",
 		event=g,
 		mob= self and {
+			get_pos_text = "(id/nil) get pos from object",
 			get_pos=function(n)
 				if not n then
 					return self.object:get_pos()
@@ -356,11 +358,13 @@ exatec.create_env=function(A,g,self)
 				local ob = self.objects[n]
 				return ob and ob:get_pos() or nil
 			end,
+			self_text = "() get self object id",
 			self=function()
 				self.objects = self.objects or {}
 				self.objects[self.examob] = self.object
 				return self.examob
 			end,
+			exists_text = "(id) returns true if object exists in object list",
 			exists=function(id)
 				self.objects = self.objects or {}
 				local ob = self.objects[id]
@@ -370,40 +374,51 @@ exatec.create_env=function(A,g,self)
 				end
 				return ob ~= nil
 			end,
+			walk_text = "(nil/true) walk/run",
 			walk=function(run)
 				examobs.walk(self,run)
 			end,
+			jump_text = "() jump",
 			jump=function()
 				examobs.jump(self)
 			end,
+			stand_text = "(id/pos) look at object or pos",
 			stand=function()
 				examobs.stand(self)
 			end,
+			lookat_text = "(id/pos) look at object/pos",
 			lookat=function(n)
 				local ob = self.objects and self.objects[n] or n
 				examobs.lookat(self,ob)
 			end,
+			visiable_text = "(pos) if pos is visiable (not blocked)",
 			visiable=function(pos)
 				examobs.visiable(self,pos)
 			end,
+			team_text = "(id/nil) get object/self team",
 			team=function(n)
 				local ob = self.objects and self.objects[n] or self.object
 				examobs.team(ob)
 			end,
+			gethp_text = "(id/nil) get object/self health",
 			gethp=function(n)
 				local ob = self.objects and self.objects[n] or self.objects
 				examobs.gethp(ob)
 			end,
+			viewfield_text = "(id) if object is in viewfield",
 			viewfield=function(n)
 				local ob = self.objects and self.objects[n]
 				examobs.viewfield(self,ob)
 			end,
+			dropall_text = "() drop all items",
 			dropall=function()
 				examobs.dropall(self)
 			end,
+			dying_text = "(n) 1 = dying, 2 = dead, 3 = relive",
 			dying=function(n)
 				examobs.dying(self,n)
 			end,
+			distance_text = "(object1/pos1,object2/pos2)",
 			distance=function(pos1,pos2)
 				self.objects = self.objects or {}
 				local p1 = type(pos1) ~= "table" and self.objects[pos1] or pos1 == nil and self.object or pos1
@@ -415,18 +430,22 @@ exatec.create_env=function(A,g,self)
 				end
 				return examobs.distance(p1,p2)
 			end,
+			pointat_text = "(n) pos front of self",
 			pointat=function(d)
 				examobs.pointat(self,d)
 			end,
+			punch_text = "(id)",
 			punch=function(n)
 				local ob = self.objects and self.objects[n] or self.object
 				if examobs.distance(self.object,ob) <= self.reach  then
 					examobs.punch(self.object,ob,self.dmg)
 				end
 			end,
+			showtext_text = "(text,nil/hexcolor) temporary change the nametag, do not add # to the color code",
 			showtext=function(text,color)
 				examobs.showtext(self,text,color)
 			end,
+			get_object_text = "(type) get object id from fight, flee, folow, target",
 			get_object=function(typ)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] then
@@ -445,6 +464,7 @@ exatec.create_env=function(A,g,self)
 					error("(fight/flee/folow/target)")
 				end
 			end,
+			set_object_text = "(type,id) set object as fight, flee, folow, target",
 			set_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] and n then
@@ -458,6 +478,7 @@ exatec.create_env=function(A,g,self)
 					error("set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
 				end
 			end,
+			remove_object_text = "(id/nil,type/nil) remove object from list, and or from fight, flee, folow, target",
 			remove_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] then
@@ -468,6 +489,7 @@ exatec.create_env=function(A,g,self)
 					self.objects[n] = nil
 				end
 			end,
+			collect_objects_inside_radius_text = "(rad/nil) adds object in radius to list",
 			collect_objects_inside_radius=function(d)
 				local obs = {}
 				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or self.range)) do
@@ -478,6 +500,7 @@ exatec.create_env=function(A,g,self)
 				end
 				self.objects = obs
 			end,
+			get_objects_text = "(rad/nil) return object in list",
 			get_objects=function(d)
 				local p1 = self.object:get_pos()
 				local l = {}
@@ -494,12 +517,15 @@ exatec.create_env=function(A,g,self)
 				end
 				return l
 			end,
+			say_text = "(text) send chat text",
 			say=function(t)
 				self:say(t)
 			end,
+			standby_text = "(true/false) waiting mode",
 			standby=function(toggle)
 				self.standby = toggle
 			end,
+			dig_text = "(pos) dig",
 			dig=function(pos)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
@@ -516,6 +542,7 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
+			place_text = "(pos,node_name) place",
 			place=function(pos,item)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
@@ -530,14 +557,17 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
+			new_path_text = "(pos) create new path to pos",
 			new_path=function(pos)
 				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 1,"Dijkstra")
 				self.path_index = 1
 				return self.path ~= nil
 			end,
+			get_path_text = "() return path/nil",
 			get_path=function(pos)
 				return self.path
 			end,
+			folow_path_text = "() folow created path",
 			folow_path=function()
 				if self.path then
 					local p = self:pos()
@@ -558,6 +588,7 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
+			add_item_text = "(pos,item,count/nil) add as much as possible from mob inventory to node inventory",
 			add_item=function(pos,item,c)
 				local def = minetest.registered_items[item]
 				local inv = self.inv[item]
@@ -585,15 +616,21 @@ exatec.create_env=function(A,g,self)
 					end
 				end
 				return added
-			end
+			end,
+			get_item_count_text = "(item_name) return item count",
+			get_item_count=function(item)
+				return self.inv[item] or 0
+			end,
 		} or nil,
 		exatec=(self and {}) or {
+			send_text = "(x,y,z) send signal",
 			send=function(x,y,z)
 				x = x and (x == 0 or math.abs(x) == 1) and x or error("(x,y,z) x: number 0, 1 or -1 expected")
 				y = y and (y == 0 or math.abs(y) == 1) and y or error("(x,y,z) y: number 0, 1 or -1 expected")
 				z = z and (z == 0 or math.abs(z) == 1) and z or error("(x,y,z) z: number 0, 1 or -1 expected")
 				exatec.send(apos(g.pos,x,y,z),nil,true,g.pos)
 			end,
+			data_send_text = "(channel,data) data can be string number and table, eg: {connect=true}",
 			data_send=function(to_channel,data)
 				if type(to_channel) ~= "string" and type(to_channel) ~="number" then
 					error("(to_channel,data_table) string or number expected")
@@ -603,6 +640,7 @@ exatec.create_env=function(A,g,self)
 				exatec.data_send(g.pos,to_channel,minetest.get_meta(g.pos):get_string("channel"),data)
 			end,
 		},
+		timeout_text = "(n)",
 		timeout=(self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
@@ -610,6 +648,7 @@ exatec.create_env=function(A,g,self)
 			minetest.get_meta(g.pos):set_int("interval",0)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
+		interval_text = "(n)",
 		interval=(self and {}) or function(n)
 			if type(n) ~="number" and n <= 0 then
 				error("Positive number value expected")
@@ -617,10 +656,12 @@ exatec.create_env=function(A,g,self)
 			minetest.get_meta(g.pos):set_int("interval",1)
 			minetest.get_node_timer(g.pos):start(n)
 		end,
+		stop_text = "(n) stop interval/timeout",
 		stop=(self and {}) or function()
 			minetest.get_node_timer(g.pos):stop()
 			minetest.get_meta(g.pos):set_int("interval",0)
 		end,
+		print_text = "print(var) print to chat",
 		print=function(b)
 			b = b or ""
 			if type(b) == "table" then
@@ -629,6 +670,7 @@ exatec.create_env=function(A,g,self)
 			minetest.chat_send_player(A.user,"(PCB "..id..") "..b)
 			g.count = g.count + 500
 		end,
+		dump_text = "(var) print to chat",
 		dump=function(p)
 			p = p or ""
 			minetest.chat_send_player(A.user,"(PCB "..id..") (dump) ========== ")
@@ -694,7 +736,9 @@ exatec.create_env=function(A,g,self)
 			time=os.time,
 		},
 		node=(self and {}) or {
+			dig_text = "to use node functions, do exatec.data_send(''channel'',{connect=true}) to a ''Node constructor'' once\n(pos) dig node",
 			dig=exatec.dig_node,
+			place_text = "to use node functions, do exatec.data_send(''channel'',{connect=true}) to a ''Node constructor'' once\n(pos,name) place node",
 			place=exatec.place_node,
 		},
 	}
