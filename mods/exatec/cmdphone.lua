@@ -8,7 +8,7 @@ ob_id=function(ob)
 end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
-	if form == "cmdphone" and (pressed.save or pressed.run or pressed.list or pressed.interval or pressed.setmob) then
+	if form == "cmdphone" and (pressed.save or pressed.list or pressed.interval or pressed.setmob) then
 		exatec.show_cmdphone(player, pressed)
 	end
 end)
@@ -36,17 +36,24 @@ exatec.show_cmdphone=function(player,pressed)
 		end
 	end
 
-	local memory = 0
-	
+	local limit = self and self.exatec_limit
 	local err = ""
-	local limit = 0
 	local item = player:get_wielded_item()
 	local m = item:get_meta()
+	local description = m:get_string("description")
 	local text = pressed.text or minetest.deserialize(m:get_string("text")) or ""
 	local mlist = ""
 	local c = ""
 
-	if self and not pressed.run then
+print(description,pressed.description)
+
+	if pressed.description and description ~= pressed.description then
+print(111)
+		m:set_string("description",pressed.description)
+		description = pressed.description
+	end
+print(description,pressed.description)
+	if self then
 		if pressed.save or pressed.interval and not self.storage.code_execute_interval then
 			self.storage.code_execute_interval = text
 			self.storage.code_execute_interval_user = name
@@ -64,14 +71,6 @@ exatec.show_cmdphone=function(player,pressed)
 	m:set_string("text",minetest.serialize(text))
 	player:set_wielded_item(item)
 
-	if pressed.run and self then
-		local mb = memory_mb()
-		err,limit = exatec.run_code(text,{type={run=true},user=name,mob=true,self=self,pos=self and self.object and vector.round(self.object:get_pos())})
-		memory = math.floor((memory_mb()-mb)*1000)/1000
-		if self then
-			self.cmdphone_error = nil
-		end
-	end
 	local list = "textlist[10,-0.3;2.1,11.5;list;"
 	local c = ""
 	local listn = 0
@@ -81,7 +80,7 @@ exatec.show_cmdphone=function(player,pressed)
 
 	text = minetest.formspec_escape(text)
 
-	if self and (pressed.run or pressed.save) then
+	if self and pressed.save then
 		self.cmdphone_error = nil
 	end
 
@@ -120,30 +119,27 @@ exatec.show_cmdphone=function(player,pressed)
 		end
 	end
 
-	minetest.after(0.2, function(name,err,list,listin,memory,limit)
-		minetest.show_formspec(name,"cmdphone","size[12,11]"
-			.."button[-0.2,-0.2;1,1;save;Save]"
-			.."button[0.7,-0.2;1,1;run;Run]"
+	local showfosp = "size[12,11]"
+	.."button[-0.2,-0.2;1,1;save;Save]"
+	.."label[3.7,-0.2;"..(self and minetest.colorize("#00FF00",self.examob.." is connected") or minetest.colorize("#FFFF00","No mob connected")).."]"
+	.."button[2.5,-0.2;1,1;setmob;Set]tooltip[setmob;Select mob from the list]"
+	.."button[1.6,-0.2;1,1;interval;"..(self and self.storage.code_execute_interval and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[interval;Code execute interval]"
+	.."dropdown[1.6,0.5;2;mobs;" ..mlist..";"..(self and self.examob or "").."]"
 
-			..(self and "label[3.7,0;"..minetest.colorize("#00FF00",self.examob.." is connected").."]" or "label[3.7,0;"..minetest.colorize("#FFFF00","No mob connected").."]")
-			.."button[2.5,-0.2;1,1;setmob;Set]tooltip[setmob;Select mob from the list]"
-			.."button[1.6,-0.2;1,1;interval;"..(self and self.storage.code_execute_interval and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[interval;Code execute interval]"
-			.."dropdown[1.6,0.5;2;mobs;" ..mlist..";"..(self and self.examob or "").."]"
+	.."textarea[0,1;10.5,12;text;;"..text.."]"
+	..list.."]"
+	.."field[7,1;3,0.1;listin;;"..listin.."]"
+	.."field[3.7,1;3,0.1;description;;"..description.."]tooltip[description;Item description]"
+	.."label[0,11;"..err.."]"
+	.."tooltip[channel;Channel]"
+	.."label[6.8,-0.2;"..(limit or 0).."/10000 Events]"
 
-			.."textarea[0,1;10.5,12;text;;"..text.."]"
-			..list.."]"
-			.."field[4,1;3,0.1;listin;;"..listin.."]"
-			.."label[0,11;"..err.."]"
-			.."tooltip[channel;Channel]"
-			.."label[4.5,-0.3;"..memory.."MB]"
-			.."label[6.5,-0.2;"..(limit or 0).."/10000 Events]"
-			.."label[6.5,0.2;Incoming variable: event]"
-			.."label[6.5,0.6;storage variable: storage]"
+	.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png"..(func_info and "^[invert:r" or "")..";info;]"
+	.."tooltip[info;" .. (func_info or "event: incoming variable\nevent.storage: storage\nevent.pos: incoming position\n\nrun mob.collect_objects_inside_radius_text()\nto add objects the a list of ID's and make the mob able to interact with other objects").."]"
 
-			.."image_button[-0.2,0.5;0.7,0.7;default_unknown.png"..(func_info and "^[invert:r" or "")..";info;]"
-			.."tooltip[info;" .. (func_info or "event: incoming variable\nevent.storage: storage\nevent.pos: incoming position\n\nrun mob.collect_objects_inside_radius_text()\nto add objects the a list of ID's and make the mob able to interact with other objects")
-		.."]")
-	end,name,err,list,listin,memory,limit)
+	minetest.after(0.2, function(name,showfosp)
+		minetest.show_formspec(name,"cmdphone",showfosp)
+	end,name,showfosp)
 end
 
 minetest.register_tool("exatec:cmdphone", {
