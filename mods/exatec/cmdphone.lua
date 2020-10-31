@@ -64,7 +64,7 @@ exatec.show_cmdphone=function(player,pressed)
 	m:set_string("text",minetest.serialize(text))
 	player:set_wielded_item(item)
 
-	if pressed.run then
+	if pressed.run and self then
 		local mb = memory_mb()
 		err,limit = exatec.run_code(text,{type={run=true},user=name,mob=true,self=self,pos=self and self.object and vector.round(self.object:get_pos())})
 		memory = math.floor((memory_mb()-mb)*1000)/1000
@@ -93,8 +93,8 @@ exatec.show_cmdphone=function(player,pressed)
 			u.obs[i] = nil
 		end
 	end
-
-	for i,v in pairs(exatec.create_env(nil,{self=true})) do
+	c = ""
+	for i,v in pairs(exatec.create_env(nil,nil,self or {})) do
 		if type(v) == "table" then
 			for i2,v2 in pairs(v) do
 				list = list..c..i.."."..i2
@@ -152,6 +152,38 @@ exatec.show_cmdphone=function(player,pressed)
 			.."\nnode.dig(pos)"
 			.."\nnode.place(pos,name)"
 
+			.."\n===mob==="
+			.."\nmob.get_pos(id/nil) get pos from object"
+			.."\nmob.self() get self object id"
+			.."\nmob.exists(id) returns true if object exists in object list"
+			.."\nmob.walk(nil/true) walk/run"
+			.."\nmob.jump() jump"
+			.."\nmob.stand() stand"
+			.."\nmob.lookat(id/pos) look at object or pos"
+			.."\nmob.visiable(pos) if pos is visiable (not blocked)"
+			.."\nmob.team(id/nil) get object/self team"
+			.."\nmob.gethp(id/nil) get object/self health"
+			.."\nmob.viewfield(id) if object is in viewfield"
+			.."\nmob.dropall() drop all items"
+			.."\nmob.dying(n) 1 = dying, 2 = dead, 3 = relive"
+			.."\nmob.distance(object1/pos1,object2/pos2)"
+			.."\nmob.pointat(n) pos front of self"
+			.."\nmob.punch(id)"
+			.."\nmob.showtext(text,nil/hexcolor) temporary change the nametag, do not add # to the color code"
+			.."\nmob.set_object(type,id) set object as fight, flee, folow, target"
+			.."\nmob.get_object(type) get object id from fight, flee, folow, target"
+			.."\nmob.remove_object(id/nil,type/nil) remove object from list, and or from fight, flee, folow, target"
+			.."\nmob.collect_objects_inside_radius(rad/nil) adds object in radius to list"
+			.."\nmob.get_objects(rad) return objects in list"
+			.."\nmob.say(text)"
+			.."\nmob.standby(true/false) make the mob paralyzed (standby mode)"
+			.."\nmob.dig(pos)"
+			.."\nmob.place(pos,node)"
+			.."\nmob.new_path(pos) create new path"
+			.."\nmob.get_path() return path/nil"
+			.."\nmob.folow_path() folow created path"
+			.."\nmob.add_item(pos,item,count/nil) add as much as possible from mob inventory to node inventory"
+
 			.."]")
 		end,name,err,list,listin,memory,limit)
 
@@ -173,6 +205,16 @@ minetest.register_tool("exatec:cmdphone", {
 			end
 		elseif pointed_thing.type == "node" then
 			local p = vector.round(pointed_thing.above)
+			pressed={posinput="{x="..p.x..",y="..p.y..",z="..p.z.."}"}
+		end
+		exatec.show_cmdphone(user,pressed)
+	end,
+	on_place=function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		local pressed
+		exatec.cmdphone.user[name] = exatec.cmdphone.user[name] or {obs={}}
+		if pointed_thing.type == "node" then
+			local p = vector.round(pointed_thing.under)
 			pressed={posinput="{x="..p.x..",y="..p.y..",z="..p.z.."}"}
 		end
 		exatec.show_cmdphone(user,pressed)

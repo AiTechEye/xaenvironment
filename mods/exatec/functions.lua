@@ -298,12 +298,12 @@ exatec.run_code=function(text,A)
 		return "Connect a ''Node constructor'' to use the node functions"
 	end
 
-	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=A.mob and A.self and (A.self.storage.exatec or {}) or minetest.deserialize(m:get_string("storage")) or {}}
+	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=A.mob and A.self and (A.self.storage and A.self.storage.exatec or {}) or minetest.deserialize(m:get_string("storage")) or {}}
 
 	local F=function()
 		local f,err = loadstring(text)
 		if f then
-			setfenv(f,exatec.create_env(A,g,A.self))
+			local br,br2,br3 = setfenv(f,exatec.create_env(A,g,A.self))
 			if rawget(_G,"jit") then
 				jit.off(f,true)
 			end
@@ -396,7 +396,7 @@ exatec.create_env=function(A,g,self)
 			end,
 			viewfield=function(n)
 				local ob = self.objects and self.objects[n]
-				examobs.viewfield(self,self.objects[ob])
+				examobs.viewfield(self,ob)
 			end,
 			dropall=function()
 				examobs.dropall(self)
@@ -445,14 +445,6 @@ exatec.create_env=function(A,g,self)
 					error("(fight/flee/folow/target)")
 				end
 			end,
-			remove_object=function(n,typ)
-				local types = {fight=true,flee=true,folow=true,target=true}
-				self.objects = self.objects or {}
-				self.objects[n] = nil
-				if types[typ] and n then
-					self[n] = {}
-				end
-			end,
 			set_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] and n then
@@ -464,6 +456,16 @@ exatec.create_env=function(A,g,self)
 					end
 				else
 					error("set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
+				end
+			end,
+			remove_object=function(typ,n)
+				local types = {fight=true,flee=true,folow=true,target=true}
+				if types[typ] then
+					self[typ] = nil
+				end
+				if n then
+					self.objects = self.objects or {}
+					self.objects[n] = nil
 				end
 			end,
 			collect_objects_inside_radius=function(d)
@@ -495,13 +497,16 @@ exatec.create_env=function(A,g,self)
 			say=function(t)
 				self:say(t)
 			end,
-			set_paralyze=function(toggle)
-				self.paralyze = toggle
+			standby=function(toggle)
+				self.standby = toggle
 			end,
 			dig=function(pos)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
-				if vector.distance(sp,pos) <= self.reach and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
+				local def = minetest.registered_nodes[item] or {}
+				local owner = minetest.get_meta(pos):get_string("owner")
+				local can_dig = def and (def.can_dig and def.can_dig(pos, {get_player_name=function() return owner end}))
+				if vector.distance(sp,pos) <= self.reach and can_dig and not minetest.is_protected(pos,A.user) and minetest.get_item_group(n,"unbreakable") == 0 then
 					local d = minetest.get_node_drops(n)
 					for i,v in pairs(d) do
 						self.inv[v] = (self.inv[v] or 0)+1
@@ -552,16 +557,35 @@ exatec.create_env=function(A,g,self)
 					end
 				end
 				return false
+			end,
+			add_item=function(pos,item,c)
+				local def = minetest.registered_items[item]
+				local inv = self.inv[item]
+				if not (def and inv and (c == nil or type(c) == "number")) then
+					return false
+				end
+				local added = false
+				local add = c or 99999
+				for i=0,32 do
+					c = c and c <= inv and c or def.stack_max <= self.inv[item] and def.stack_max or self.inv[item]
+					local stack=ItemStack(item.." "..c)
+					if exatec.test_input(pos,stack,pos,pos) then
+						exatec.input(pos,stack,pos,pos)
+						added = true
+						self.inv[item] = self.inv[item] - c
+						add = add - c
+						if self.inv[item] <= 0 then
+							self.inv[item] = nil
+							break
+						elseif add <= 0 then
+							break
+						end
+					else
+						break
+					end
+				end
+				return added
 			end
---minetest.get_meta(plpos):get_inventory():get_size("main") > 0 then
-
-
-
-
-
-
-
-
 		} or nil,
 		exatec=(self and {}) or {
 			send=function(x,y,z)
