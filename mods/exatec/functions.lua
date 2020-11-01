@@ -325,7 +325,6 @@ exatec.run_code=function(text,A)
 				m:set_string("storage",minetest.serialize(g.storage) or {})
 			end
 		end
-		err = err and err:sub(8,-1)
 		return (err or ""),g.count
 	end
 	local s,err = pcall(F)
@@ -333,9 +332,9 @@ exatec.run_code=function(text,A)
 	exatec.temp.constructor = nil
 
 	if err then
-		local e1,e2 = err:find(":")
+		local e1,e2 = err:find(": ")
 		if type(e2) == "number" then
-			err = err:sub(e2-1,-1)
+			err = err:sub(e2,-1)
 		end
 	end
 	return err,g.count
@@ -386,10 +385,14 @@ exatec.create_env=function(A,g,self)
 			stand=function()
 				examobs.stand(self)
 			end,
-			lookat_text = "(id/pos) look at object/pos",
+			lookat_text = "(id/pos/nil) look at object/pos/random",
 			lookat=function(n)
 				local ob = self.objects and self.objects[n] or n
-				examobs.lookat(self,ob)
+				if ob then
+					examobs.lookat(self,ob)
+				else
+					self.object:set_yaw(math.random(0,6.28))
+				end
 			end,
 			visiable_text = "(pos) if pos is visiable (not blocked)",
 			visiable=function(pos)
@@ -424,9 +427,9 @@ exatec.create_env=function(A,g,self)
 				local p1 = type(pos1) ~= "table" and self.objects[pos1] or pos1 == nil and self.object or pos1
 				local p2 = type(pos2) ~= "table" and self.objects[pos2] or pos2
 				if not p1 then
-					error("pos1/object1 is nil")
+					error("mob.distance: pos1/object1 is nil")
 				elseif not p2 then
-					error("pos2/object2 is nil")
+					error("mob.distance: pos2/object2 is nil")
 				end
 				return examobs.distance(p1,p2)
 			end,
@@ -461,7 +464,7 @@ exatec.create_env=function(A,g,self)
 					end
 					return id
 				else
-					error("(fight/flee/folow/target)")
+					error("mob.get_object(fight/flee/folow/target)")
 				end
 			end,
 			set_object_text = "(type,id) set object as fight, flee, folow, target",
@@ -475,7 +478,7 @@ exatec.create_env=function(A,g,self)
 						self.objects[n] = nil
 					end
 				else
-					error("set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
+					error("mob.set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
 				end
 			end,
 			remove_object_text = "(id/nil,type/nil) remove object from list, and or from fight, flee, folow, target",
@@ -559,23 +562,34 @@ exatec.create_env=function(A,g,self)
 			end,
 			new_path_text = "(pos) create new path to pos",
 			new_path=function(pos)
-				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 2,"Dijkstra")
-				self.path_index = 1
-				self.path_attempts = 100
-				if not self.path then
-					examobs.jump(self)
-					local p2 = minetest.find_node_near(pos,2,{"air"})
-					if p2 then
-						self.path = minetest.find_path(apos(self:pos(),0,1),p2, 50, 3, 3,"Dijkstra")
-						if not self.path then
-							examobs.lookat(self,p2)
-							examobs.walk(self)
+				if default.defpos(pos,"walkable") then
+					for y=-1,1 do
+					for x=-1,1 do
+					for z=-1,1 do
+						local p2 = apos(pos,x,y,z)
+						if not default.defpos(p2,"walkable") then
+							pos = p2
+							goto path
 						end
 					end
+					end
+					end
+				end
+				::path::
+				self.lifetimer = self.lifetime*2
+
+				self.path = minetest.find_path(vector.round(self:pos()),pos, 50, 1, 1,"Dijkstra")
+				self.path_index = 1
+				self.path_attempts = 100
+
+				if not self.path then
+					self.object:set_yaw(math.random(0,6.28))
+					examobs.walk(self)
+					examobs.jump(self)
 					self.path_create_attempt = (self.path_create_attempt or 0) +1
-					if self.path_create_attempt > 5 then
-						error(self.path_create_attempt.." attempts to create paths to "..minetest.pos_to_string(pos).. (p2 and " and "..minetest.pos_to_string(p2) or ""))
+					if self.path_create_attempt >= 10 then
 						self.path_create_attempt = nil
+						error("mob.new_path: 10 attempts to create paths to "..minetest.pos_to_string(pos))
 					end
 				end
 				return self.path ~= nil
@@ -620,7 +634,7 @@ exatec.create_env=function(A,g,self)
 			add_item=function(pos,item,c)
 				local def = minetest.registered_items[item]
 				local inv = self.inv[item]
-				if not (def and inv) or (c and type(c) ~= "number") then
+				if not (def and inv) or (c and type(c) ~= "number") or vector.distance(self:pos(),pos) > self.reach  then
 					return false
 				end
 				local added = false
@@ -648,6 +662,9 @@ exatec.create_env=function(A,g,self)
 			add_all_items_text = "(pos,item,count/nil) add as much items as possible from mob inventory to node inventory",
 			add_all_items=function(pos)
 				local added = false
+				if vector.distance(self:pos(),pos) > self.reach then
+					return false
+				end
 				for i,v in pairs(self.inv) do
 					local stack=ItemStack(i.." "..v)
 					if minetest.registered_items[i] and exatec.test_input(pos,stack,pos,pos) then
@@ -666,7 +683,7 @@ exatec.create_env=function(A,g,self)
 			take_item_text = "(pos,item,count/nil) take as much as possible from the node inventory",
 			take_item=function(pos,item,c)
 				local def = minetest.registered_items[item]
-				if not def or (c and type(c) ~= "number") then
+				if not def or (c and type(c) ~= "number") or vector.distance(self:pos(),pos) > self.reach then
 					return false
 				end
 				self.inv[item] = self.inv[item] or 0
@@ -693,7 +710,7 @@ exatec.create_env=function(A,g,self)
 			take_all_items=function(pos,item,c)
 				local can_take
 				local a = exatec.def(pos)
-				if not a.output_list then
+				if not a.output_list or vector.distance(self:pos(),pos) > self.reach then
 					return false
 				end
 				for i,stack in pairs(minetest.get_meta(pos):get_inventory():get_list(a.output_list)) do
@@ -762,6 +779,19 @@ exatec.create_env=function(A,g,self)
 				rad = math.abs(rad or 5)
 				rad = rad <= 20 and rad or 20
 				return minetest.find_nodes_in_area(vector.add(pos,rad),vector.subtract(pos,rad),nodes)
+			end,
+			rightclick_text = "(pos) rightclick",
+			rightclick=function(pos)
+				if vector.distance(self:pos(),pos) <= self.reach then
+					local n = minetest.get_node(pos).name
+					local def = default.def(n)
+					if def and def.on_rightclick then
+						local user = minetest.get_player_by_name(self.storage.code_execute_interval_user)
+						if user then
+							def.on_rightclick(pos, n, user, user:get_wielded_item(), {type="node",under=pos,above=pos})
+						end
+					end
+				end
 			end,
 		} or nil,
 		exatec=(self and {}) or {
