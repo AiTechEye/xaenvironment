@@ -101,6 +101,11 @@ player_style.inventory=function(player)
 		invp.backpack:set_list("main", list)
 	end
 
+
+	local skin = player:get_properties().textures[1] or "character.png"
+
+	local model = "" -- later in mt 5.4     "model[0,0;3,3;character_preview;preview_character.obj;"..skin..";0,0;false;true]"
+
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
 		player:set_inventory_formspec(
@@ -112,6 +117,7 @@ player_style.inventory=function(player)
 			.."list[detached:backpackslot;main;7,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
+			..model
 			..player_style.buttons.text
 		)
 	else
@@ -177,7 +183,7 @@ player_style.inventory=function(player)
 
 			.."field[8.3,6.5;3,1;searchbox;;"..(invp.search and invp.search.text or "").."]"
 			.."image_button[11,6.3;1,0.8;player_style_search.png;search;]"
-
+			..model
 			..itembutts
 		)
 	end

@@ -529,7 +529,7 @@ minetest.register_globalstep(function(dtime)
 				a="walk"
 				local p = player:get_pos()
 				local pr = player_style.player_dive[name]
-				local v = player:get_player_velocity()
+				local v = player:get_velocity()
 
 				if pr and pr.kong then
 					if default.defpos({x=p.x,y=p.y-0.1,z=p.z},"walkable") then
@@ -552,7 +552,7 @@ minetest.register_globalstep(function(dtime)
 					if run and run.wallrun then
 						local d = player:get_look_dir()
 						local walkable = default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
-						local v = player:get_player_velocity()
+						local v = player:get_velocity()
 						hunger = -0.002
 						if key.jump then
 							run.wallrun = nil
@@ -757,7 +757,7 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		local pos = player:get_pos()
 		local nod = minetest.get_node(pos).name
 
-		if player:get_player_velocity().y < 0 then
+		if player:get_velocity().y < 0 then
 			if minetest.get_item_group(nod,"water") > 0 then
 				local d = default.def(nod)
 				default.watersplash(pos,d.drawtype and d.drawtype == "flowingliquid")
@@ -777,7 +777,7 @@ player_style.player_diveing=function(name,player,a,water,kong)
 			player:set_breath(b+1)
 		end
 
-		if not a and pr and (pr.kong == nil or player:get_player_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
+		if not a and pr and (pr.kong == nil or player:get_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
 			local profile=player_style.registered_profiles[player_style.players[name].profile]
 			player_style.player_dive[name] = nil
 			player:set_properties({
