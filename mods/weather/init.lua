@@ -151,7 +151,7 @@ end)
 weather.get_temp=function(pos)
 	if pos.y<-50 then return 0 end
 	local p={x=math.floor(pos.x),y=0,z=math.floor(pos.z)}
-	return minetest.get_perlin(weather.perlin):get2d({x=p.x,y=p.z})
+	return minetest.get_perlin(weather.perlin):get_2d({x=p.x,y=p.z})
 end
 
 weather.get_bio=function(pos)
