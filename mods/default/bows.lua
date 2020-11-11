@@ -25,7 +25,7 @@ bows.register_arrow=function(name,def)
 
 	minetest.register_craftitem(def.name, {
 		description = def.description or name,
-		inventory_image = (def.texture or "default_wood.png") .. "^default_arrow.png^[makealpha:0,255,0",
+		inventory_image = (def.texture and def.texture .. "^default_arrow.png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_arrow.png^[makealpha:0,255,0",
 		groups = def.groups,
 	})
 	if def.craft then
