@@ -66,7 +66,7 @@ minetest.register_node("weather:lightsning", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	light_source = 15,
+	light_source = 14,
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.5)
 	end,
