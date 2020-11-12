@@ -47,7 +47,7 @@ minetest.register_node("default:lamp", {
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	sunlight_propagates = true,
-	light_source = 15,
+	light_source = 14,
 	exatec={
 		on_wire = function(pos)
 			minetest.set_node(pos,{name="default:lamp_off",param2=minetest.get_node(pos).param2})
