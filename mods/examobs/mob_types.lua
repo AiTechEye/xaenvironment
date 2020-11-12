@@ -159,6 +159,7 @@ examobs.register_fish=function(def)
 	def2.floating_in_group = def.floating_in_group or "water"
 	def2.light_min = def.light_min or 5
 	def2.breathing = 0
+	def2.hurt_outside = def.hurt_outside or 1
 
 	def2.lay_on_death = def.lay_on_death or 0
 	def2.inv = def.inv or {[mobname]=1}
@@ -179,7 +180,7 @@ examobs.register_fish=function(def)
 	def2.step=function(self)
 		if def.step(self) then
 			return self
-		elseif minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
+		elseif def2.hurt_outside == 1 and minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
 			self:hurt(1)
 			examobs.stand(self)
 		elseif self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then

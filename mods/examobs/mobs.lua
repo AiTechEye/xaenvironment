@@ -2364,6 +2364,50 @@ examobs.register_fish({
 		end,p)
 	end
 })
+examobs.register_fish({
+	name = "cloud",
+	floating = {["default:cloud"]=1,["air"]=1},
+	floating_in_group = "cloud",
+	textures = {"default_cloud.png"},
+	physical = false,
+	inv={["examobs:cloud"]=1,["default:cloud"]=1},
+	spawn_on = {"default:cloud"},
+	spawn_in = "default:cloud",
+	hurt_outside = 0,
+	on_spawn=function(self)
+		self.storage.size = math.random(0.5,2)
+		self:on_load()
+	end,
+	on_load=function(self)
+		local s = self.storage.size or 1
+		self.object:set_properties({visual_size= {x=s,y=s,z=s}})
+		self.storage.lastcpos = self.storage.lastcpos or self:pos()
+	end,
+	step=function(self)
+		local p = self:pos()
+		if minetest.get_node(p).name == "default:cloud" then
+			self.storage.lastcpos = p
+			if self.was_outside then
+				self.was_outside = nil
+				local v = self.object:get_velocity()
+				self.object:set_velocity({x=v.x,y=0,z=v.z})
+			end
+		else
+			examobs.lookat(self,self.storage.lastcpos)
+			examobs.walk(self)
+			local v = self.object:get_velocity()
+			local py = math.floor(p.y+0.5)
+			local ly = math.floor(self.storage.lastcpos.y+0.5)
+			if py > ly then
+				self.object:set_velocity({x=v.x,y=-3,z=v.z})
+			elseif py < ly then
+				self.object:set_velocity({x=v.x,y=3,z=v.z})
+			end
+			self.was_outside = true
+			return self
+		end
+	end
+})
 
 examobs.register_mob({
 	name = "gass_man",
