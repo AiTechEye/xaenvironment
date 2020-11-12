@@ -2438,6 +2438,43 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	name = "airmonster",
+	type = "monster",
+	physical = false,
+	coin = 30,
+	team = "air",
+	floating = {["air"]=1,["default:water_source"]=1,["defult:dirt"]=1,["default:sand"]=1,["default:desert_sand"]=1},
+	floating_in_group = "cracky",
+	textures = {"examobs_airmonster.png"},
+	aggressivity = 1,
+	walk_speed = 1,
+	dmg = 1,
+	run_speed = 4,
+	lay_on_death=0,
+	animation = {
+		stand={x=136,y=156,speed=0},
+		walk={x=136,y=156,speed=30},
+		run={x=136,y=156,speed=60},
+		attack={x=136,y=156,speed=60},
+	},
+	spawn_chance = 800,
+	spawn_on={"default:desert_sand","group:spreading_dirt_type","group:stone"},
+	step=function(self)
+		self.is_floating = true
+		if self.fight and math.random(1,10) == 1 and examobs.distance(self.object,self.fight) < 5 then
+			local pos1 = self:pos()
+			local pos2 = self.fight:get_pos()
+			local p = {
+				x=pos2.x+((pos1.x-pos2.x)*-1),
+				y=pos1.y,
+				z=pos2.z+(pos1.z-pos2.z)*-1
+			}
+			self.object:set_pos(p)
+		end
+	end
+})
+
+examobs.register_mob({
 	name = "sandmonster",
 	type = "monster",
 	dmg = 2,
