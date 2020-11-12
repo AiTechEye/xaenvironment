@@ -39,7 +39,7 @@ local vex_gravity=function(itemstack, user, pointed_thing,input)
 			end
 			target:set_detach()
 			target:set_hp(1)
-			target:punch(target, {full_punch_interval=1.0,damage_groups={fleshy=4}}, "default:bronze_pick", nil)
+			target:punch(target,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 			minetest.sound_play("vexcazer_mode", {pos=pos,max_hear_distance = 5, gain = 1})
 			end
 
@@ -78,7 +78,7 @@ end
 
 
 vexcazer_gravity_power={}
-vexcazer_gravity_item_time=tonumber(minetest.setting_get("item_entity_ttl"))
+vexcazer_gravity_item_time=tonumber(minetest.settings:get("item_entity_ttl"))
 if not vexcazer_gravity_item_time then
 	vexcazer_gravity_item_time=880
 else
@@ -159,9 +159,8 @@ on_step= function(self, dtime)
 			self.target:set_acceleration({x=0, y=-8, z=0})
 		end
 		if self.target==nil or (not self.target:get_attach()) then
-			self.object:set_hp(0)
-			self.object:punch(self.object, {full_punch_interval=1.0,damage_groups={fleshy=4}}, "default:bronze_pick", nil)
 			if self.sound then minetest.sound_stop(self.sound) end
+			self.object:remove()
 		end
 		local d=4
 		local pos = self.user:get_pos()
@@ -210,7 +209,7 @@ on_step= function(self, dtime)
 				igpos=math.floor(igpos.x+igpos.y+igpos.z)
 				if igpos~=self.ignore then
 					self.ignore=igpos
-					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=4}})
+					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 					ob:set_hp(ob:get_hp()-self.damage)
 					if (not ob:get_attach()) and (ob:get_hp()>0 or ob:is_player()) then
 						local c=ob:get_properties().collisionbox
@@ -246,7 +245,7 @@ on_step= function(self, dtime)
 			end
 			self.target:set_detach()
 			self.target:set_hp(self.target:get_hp()-self.damage)
-			self.target:punch(self.target,1,{full_punch_interval=1,damage_groups={fleshy=4}})
+			self.target:punch(self.target,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 			self.throw_timer=self.throw_time
 		end
 		if self.throw_timer>=self.throw_time then
@@ -256,7 +255,7 @@ on_step= function(self, dtime)
 				self.target:set_acceleration({x=0, y=-8, z=0})
 			end
 			self.object:set_hp(0)
-			self.object:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=4}})
+			self.object:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 		end
 	end
 	return self
@@ -423,7 +422,7 @@ on_step= function(self, dtime)
 		local pos=self.object:get_pos()
 		if self.timer2>10 then
 			self.object:set_hp(0)
-			self.object:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=4}})
+			self.object:punch(self.object,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 			return self
 		end
 	end,
