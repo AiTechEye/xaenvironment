@@ -147,7 +147,6 @@ examobs.npc_setup=function(self)
 		examobs.on_chat(pos,self.storage.npcname,text,self,self.object)
 	end
 
-
 	local s = self.step
 	self.step=function(self)
 		if s(self) then
@@ -223,6 +222,7 @@ examobs.npc_setup=function(self)
 				end
 
 				if exp == nil and math.random(1,10) == 1 then
+					local pos = self:pos()
 					for i, w in pairs(weather.currweather) do
 						if vector.distance(pos,w.pos) <= w.size and w.bio == 1 then
 							exp = "raining"
