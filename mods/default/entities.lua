@@ -134,7 +134,7 @@ local item = {
 			local defp = minetest.get_node(pos).param2
 			if def and def.drawtype == "flowingliquid" and defp > 0 and (not self.flowing_param or defp < self.flowing_param) then
 				self.flowing_param = defp
-				self.object:set_acceleration({x=0, y=-1, z=0})´
+				self.object:set_acceleration({x=0, y=-1, z=0})
 			elseif not self.flowing_param then
 				self.flowing_param = 100
 			end
