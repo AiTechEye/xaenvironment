@@ -129,6 +129,70 @@ local item = {
 				end
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=v.y, z=math.floor((v.z*0.95)*100)/100})
 			end
+
+
+			local defp = minetest.get_node(pos).param2
+			if def and def.drawtype == "flowingliquid" and defp > 0 and (not self.flowing_param or defp < self.flowing_param) then
+				self.flowing_param = defp
+				self.object:set_acceleration({x=0, y=-1, z=0})´
+			elseif not self.flowing_param then
+				self.flowing_param = 100
+			end
+
+			local d = self.flowing_pos and vector.distance(pos,self.flowing_pos) or 0
+
+			if not self.flowing_d or not (d <= self.flowing_d or d > self.flowing_d+1) then
+				if d > 1 and def and def.drawtype ~= "flowingliquid" then
+					self.in_viscosity = false
+					self.object:set_acceleration({x=0, y=-10, z=0})
+					self.object:set_velocity({x=0, y=0 , z=0})
+					self.flowing_param = nil
+					self.flowing_d = nil
+					self.flowing_pos = nil
+					return
+				end
+				d = 0
+			end
+
+			self.flowing_d = d
+
+			if d <= 0.1 then
+				for x=-1,1 do
+				for z=-1,1 do
+				for y=0,-1,-1 do
+					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+					local n = minetest.get_node(p)
+					if (x ~=0 or z ~= 0) and default.def(n.name).drawtype == "flowingliquid" and (n.param2 <= self.flowing_param or (n.param2 > 2 and self.flowing_param == 1)) then
+						local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
+						local rvv = vector.round(v)
+						if not self.flowing_v or not (rvv.x*-1 == self.flowing_v.x and rvv.z*-1 == self.flowing_v.z) then --prevent go backwards
+							self.flowing_v = vector.round(v)
+							self.flowing_pos = vector.round(p)
+							self.flowing_startpos = vector.round(pos)
+							goto setv
+						end
+
+					end
+				end
+				end
+				end
+			end
+			::setv::
+
+			if self.flowing_pos then
+				local p = self.flowing_pos
+				local s = self.flowing_startpos
+				local v = {x=p.x-s.x,y=p.y-s.y,z=p.z-s.z}
+				local yaw = math.atan(v.z/v.x)-math.pi/2
+				if p.x >= s.x then yaw = yaw+math.pi end
+				local x = (math.sin(yaw) * -1) * -1
+				local z = (math.cos(yaw) * 1) * -1
+				self.object:set_velocity({
+					x = x,
+					y = -1,
+					z = z
+				})
+			end
 		end
 	end
 }
