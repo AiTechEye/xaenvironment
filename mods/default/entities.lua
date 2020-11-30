@@ -136,23 +136,29 @@ local item = {
 						self.flowing_timer = 0
 						self.flowing_oldpos = pos
 
-					elseif self.flowing_timer > 5 then
+					elseif self.flowing_timer > 4 then
 						self.flowing_timer = 0
 						self.flowing_v = nil
+						self.flowing_pos = nil
 						local nodes = {}
-						for x = -1,1 do
-						for z = -1,1 do
-						for y = -1,1 do
-							local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+						for x = -1,1,2 do
+							local p = {x=pos.x+x,y=pos.y,z=pos.z}
 							if default.def(minetest.get_node(p).name).drawtype == "flowingliquid" then
 								table.insert(nodes,p)
 							end
 						end
-						end
+						for z = -1,1,2 do
+							local p = {x=pos.x,y=pos.y,z=pos.z+z}
+							if default.def(minetest.get_node(p).name).drawtype == "flowingliquid" then
+								table.insert(nodes,p)
+							end
 						end
 						if #nodes > 0 then
-							self.object:set_pos(vector.round(nodes[math.random(1,#nodes)]))
-							self.object:set_velocity({x=math.random(-1,1)*2, y=0, z=math.random(-1,1)*2})
+							local r = vector.round(nodes[math.random(1,#nodes)])
+							r.y = r.y +0.5
+							minetest.add_item(vector.round(nodes[math.random(1,#nodes)]),self.itemstring)
+							self.object:remove()
+							return
 						end
 					else
 						self.flowing_oldpos = pos
