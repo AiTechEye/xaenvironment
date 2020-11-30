@@ -114,6 +114,97 @@ local item = {
 			end
 			self.in_viscosity = true
 		elseif self.in_viscosity then
+			local defp = minetest.get_node(pos).param2
+
+			if def.drawtype ~= "flowingliquid" and self.flowing_pos and def.drawtype ~= "liquid" then
+				minetest.add_item(vector.round(pos),self.itemstring)
+				self.object:remove()
+				return
+			elseif defp == 15 and def.drawtype == "flowingliquid" then
+				local r = vector.round(pos)
+				self.object:set_pos({x=r.x,y=pos.y,z=r.z})
+				self.object:set_velocity({x=0, y=-10, z=0})
+				self.flowing_v = nil
+				self.flowing_pos = nil
+			else
+
+				if self.flowing_oldpos and def.drawtype == "flowingliquid" then
+					self.flowing_timer = self.flowing_timer and self.flowing_timer + dtime or 0
+					local d = vector.distance(pos,self.flowing_oldpos)
+
+					if d > 0.1 then
+						self.flowing_timer = 0
+						self.flowing_oldpos = pos
+
+					elseif self.flowing_timer > 5 then
+						self.flowing_timer = 0
+						self.flowing_v = nil
+						local nodes = {}
+						for x = -1,1 do
+						for z = -1,1 do
+						for y = -1,1 do
+							local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+							if default.def(minetest.get_node(p).name).drawtype == "flowingliquid" then
+								table.insert(nodes,p)
+							end
+						end
+						end
+						end
+						if #nodes > 0 then
+							self.object:set_pos(vector.round(nodes[math.random(1,#nodes)]))
+							self.object:set_velocity({x=math.random(-1,1)*2, y=0, z=math.random(-1,1)*2})
+						end
+					else
+						self.flowing_oldpos = pos
+					end
+				else
+					self.flowing_oldpos = pos
+				end
+
+				for x=-1,1 do
+				for z=-1,1 do
+				for y=0,-1,-1 do
+					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+					local n = minetest.get_node(p)
+					if self.flowing_pos and (defp == 0 or  n.name == "air"  and defp == 0 and def.drawtype == "flowingliquid") then
+						goto kg
+					elseif default.def(n.name).drawtype == "flowingliquid" and (defp == 0 or defp-1 == n.param2 or y == -1 and defp+2 < n.param2) then
+						if not self.flowing_dir or (y== -1 or x ~= 0 or z ~= 0) and ( x*-1 ~= self.flowing_dir.x or z*-1 ~= self.flowing_dir.z) then
+							self.flowing_dir = {x=x,y=y,z=z}
+							self.flowing_pos = vector.round(p)
+							goto setv
+						end
+
+					end
+				end
+				end
+				end
+			end
+
+
+			::kg::
+			if self.flowing_v then
+				self.object:set_velocity(self.flowing_v)
+				return
+			end
+			::setv::
+			if self.flowing_pos then
+				if not self.flowing_v then
+					self.object:set_acceleration({x=0, y=-1, z=0})
+				end
+				local p = self.flowing_pos
+				local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
+				local yaw = self.num(math.atan(v.z/v.x)-math.pi/2)
+				if p.x >= pos.x then yaw = yaw+math.pi end
+				local x = (math.sin(yaw) * -1) * -1
+				local z = (math.cos(yaw) * 1) * -1
+				self.flowing_v = {x = x,y = -1,z = z}
+				self.object:set_velocity(self.flowing_v)
+
+				return
+
+			end
+
 			if def.liquid_viscosity == 0 then
 				self.object:set_acceleration({x=0, y=0, z=0})
 				self.object:set_velocity({x=0, y=0 , z=0})
@@ -129,72 +220,12 @@ local item = {
 				end
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=v.y, z=math.floor((v.z*0.95)*100)/100})
 			end
-
-
-			local defp = minetest.get_node(pos).param2
-			if def and def.drawtype == "flowingliquid" and defp > 0 and (not self.flowing_param or defp < self.flowing_param) then
-				self.flowing_param = defp
-				self.object:set_acceleration({x=0, y=-1, z=0})
-			elseif not self.flowing_param then
-				self.flowing_param = 100
-			end
-
-			local d = self.flowing_pos and vector.distance(pos,self.flowing_pos) or 0
-
-			if not self.flowing_d or not (d <= self.flowing_d or d > self.flowing_d+1) then
-				if d > 1 and def and def.drawtype ~= "flowingliquid" then
-					self.in_viscosity = false
-					self.object:set_acceleration({x=0, y=-10, z=0})
-					self.object:set_velocity({x=0, y=0 , z=0})
-					self.flowing_param = nil
-					self.flowing_d = nil
-					self.flowing_pos = nil
-					return
-				end
-				d = 0
-			end
-
-			self.flowing_d = d
-
-			if d <= 0.1 then
-				for x=-1,1 do
-				for z=-1,1 do
-				for y=0,-1,-1 do
-					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
-					local n = minetest.get_node(p)
-					if (x ~=0 or z ~= 0) and default.def(n.name).drawtype == "flowingliquid" and (n.param2 <= self.flowing_param or (n.param2 > 2 and self.flowing_param == 1)) then
-						local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
-						local rvv = vector.round(v)
-						if not self.flowing_v or not (rvv.x*-1 == self.flowing_v.x and rvv.z*-1 == self.flowing_v.z) then --prevent go backwards
-							self.flowing_v = vector.round(v)
-							self.flowing_pos = vector.round(p)
-							self.flowing_startpos = vector.round(pos)
-							goto setv
-						end
-
-					end
-				end
-				end
-				end
-			end
-			::setv::
-
-			if self.flowing_pos then
-				local p = self.flowing_pos
-				local s = self.flowing_startpos
-				local v = {x=p.x-s.x,y=p.y-s.y,z=p.z-s.z}
-				local yaw = math.atan(v.z/v.x)-math.pi/2
-				if p.x >= s.x then yaw = yaw+math.pi end
-				local x = (math.sin(yaw) * -1) * -1
-				local z = (math.cos(yaw) * 1) * -1
-				self.object:set_velocity({
-					x = x,
-					y = -1,
-					z = z
-				})
-			end
 		end
+	end,
+	num=function(a)
+		return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
 	end
+
 }
 
 setmetatable(item,builtin_item)
