@@ -127,44 +127,20 @@ local item = {
 				self.flowing_v = nil
 				self.flowing_pos = nil
 			else
-
-				if self.flowing_oldpos and def.drawtype == "flowingliquid" then
-					self.flowing_timer = self.flowing_timer and self.flowing_timer + dtime or 0
-					local d = vector.distance(pos,self.flowing_oldpos)
-
-					if d > 0.1 then
-						self.flowing_timer = 0
-						self.flowing_oldpos = pos
-
-					elseif self.flowing_timer > 4 then
-						self.flowing_timer = 0
-						self.flowing_v = nil
-						self.flowing_pos = nil
-						local nodes = {}
-						for x = -1,1,2 do
-							local p = {x=pos.x+x,y=pos.y,z=pos.z}
-							if default.def(minetest.get_node(p).name).drawtype == "flowingliquid" then
-								table.insert(nodes,p)
+				for i,v in pairs({{1,0},{-1,0},{0,1},{0,-1}}) do
+					local x = v[1]
+					local z = v[2]
+					for xz=-7,7 do
+						local u = {x=pos.x+x,y=pos.y-1,z=pos.z+z}
+						if default.defpos({x=pos.x+x,y=pos.y,z=pos.z+z},"drawtype") == "flowingliquid" then
+							if default.defpos(u,"drawtype") == "flowingliquid" then
+								self.flowing_pos = vector.round(u)
+								goto setv
 							end
+						else
+							break
 						end
-						for z = -1,1,2 do
-							local p = {x=pos.x,y=pos.y,z=pos.z+z}
-							if default.def(minetest.get_node(p).name).drawtype == "flowingliquid" then
-								table.insert(nodes,p)
-							end
-						end
-						if #nodes > 0 then
-							local r = vector.round(nodes[math.random(1,#nodes)])
-							r.y = r.y +0.5
-							minetest.add_item(vector.round(nodes[math.random(1,#nodes)]),self.itemstring)
-							self.object:remove()
-							return
-						end
-					else
-						self.flowing_oldpos = pos
 					end
-				else
-					self.flowing_oldpos = pos
 				end
 
 				for x=-1,1 do
@@ -186,7 +162,6 @@ local item = {
 				end
 				end
 			end
-
 
 			::kg::
 			if self.flowing_v then
