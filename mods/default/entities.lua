@@ -114,79 +114,9 @@ local item = {
 			end
 			self.in_viscosity = true
 		elseif self.in_viscosity then
-			local defp = minetest.get_node(pos).param2
-
-			if def.drawtype ~= "flowingliquid" and self.flowing_pos and def.drawtype ~= "liquid" then
-				minetest.add_item(vector.round(pos),self.itemstring)
-				self.object:remove()
+			if default.flowing(self.object) then
 				return
-			elseif defp == 15 and def.drawtype == "flowingliquid" then
-				local r = vector.round(pos)
-				self.object:set_pos({x=r.x,y=pos.y,z=r.z})
-				self.object:set_velocity({x=0, y=-10, z=0})
-				self.flowing_v = nil
-				self.flowing_pos = nil
-			else
-				for i,v in pairs({{1,0},{-1,0},{0,1},{0,-1}}) do
-					local x = v[1]
-					local z = v[2]
-					for xz=-7,7 do
-						local u = {x=pos.x+x,y=pos.y-1,z=pos.z+z}
-						if default.defpos({x=pos.x+x,y=pos.y,z=pos.z+z},"drawtype") == "flowingliquid" then
-							if default.defpos(u,"drawtype") == "flowingliquid" then
-								self.flowing_pos = vector.round(u)
-								goto setv
-							end
-						else
-							break
-						end
-					end
-				end
-
-				for x=-1,1 do
-				for z=-1,1 do
-				for y=0,-1,-1 do
-					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
-					local n = minetest.get_node(p)
-					if self.flowing_pos and (defp == 0 or  n.name == "air"  and defp == 0 and def.drawtype == "flowingliquid") then
-						goto kg
-					elseif default.def(n.name).drawtype == "flowingliquid" and (defp == 0 or defp-1 == n.param2 or y == -1 and defp+2 < n.param2) then
-						if not self.flowing_dir or (y== -1 or x ~= 0 or z ~= 0) and ( x*-1 ~= self.flowing_dir.x or z*-1 ~= self.flowing_dir.z) then
-							self.flowing_dir = {x=x,y=y,z=z}
-							self.flowing_pos = vector.round(p)
-							goto setv
-						end
-
-					end
-				end
-				end
-				end
-			end
-
-			::kg::
-			if self.flowing_v then
-				self.object:set_velocity(self.flowing_v)
-				return
-			end
-			::setv::
-			if self.flowing_pos then
-				if not self.flowing_v then
-					self.object:set_acceleration({x=0, y=-1, z=0})
-				end
-				local p = self.flowing_pos
-				local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
-				local yaw = self.num(math.atan(v.z/v.x)-math.pi/2)
-				if p.x >= pos.x then yaw = yaw+math.pi end
-				local x = (math.sin(yaw) * -1) * -1
-				local z = (math.cos(yaw) * 1) * -1
-				self.flowing_v = {x = x,y = -1,z = z}
-				self.object:set_velocity(self.flowing_v)
-
-				return
-
-			end
-
-			if def.liquid_viscosity == 0 then
+			elseif def.liquid_viscosity == 0 then
 				self.object:set_acceleration({x=0, y=0, z=0})
 				self.object:set_velocity({x=0, y=0 , z=0})
 			elseif self.flammable == 0 then
@@ -202,11 +132,7 @@ local item = {
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=v.y, z=math.floor((v.z*0.95)*100)/100})
 			end
 		end
-	end,
-	num=function(a)
-		return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
 	end
-
 }
 
 setmetatable(item,builtin_item)

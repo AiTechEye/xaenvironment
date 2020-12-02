@@ -84,6 +84,113 @@ default.watersplash=function(pos,item)
 	return true
 end
 
+default.flowing=function(object)
+	local pos = object:get_pos()
+	if not pos then
+		return
+	end
+	local def = default.def(minetest.get_node(pos).name)
+	local flow
+	local typ
+	local self
+	local name
+
+	if object:is_player() then
+		name = object:get_player_name()
+		flow = default.get_on_player_death(name,"flowing") or {}
+		typ = "player"
+	else
+		self = object:get_luaentity()
+		flow = self.flowing or {}
+		typ = self.itemstring and "item" or "object"
+	end
+
+	local defp = minetest.get_node(pos).param2
+	if typ == "item" and def.drawtype ~= "flowingliquid" and flow.flowing_pos and def.drawtype ~= "liquid" then
+		minetest.add_item(vector.round(pos),self.itemstring)
+		object:remove()
+		return self
+	elseif defp == 15 and def.drawtype == "flowingliquid" then
+		local r = vector.round(pos)
+		object:set_pos({x=r.x,y=pos.y,z=r.z})
+		if typ == "player" then
+			object:add_velocity({x=0, y=-10, z=0})
+		else	
+			object:set_velocity({x=0, y=-10, z=0})
+		end
+		flow.flowing_v = nil
+		flow.flowing_pos = nil
+	else
+		for i,v in pairs({{1,0},{-1,0},{0,1},{0,-1}}) do
+			local x = v[1]
+			local z = v[2]
+			for xz=-7,7 do
+				local u = {x=pos.x+x,y=pos.y-1,z=pos.z+z}
+				if default.defpos({x=pos.x+x,y=pos.y,z=pos.z+z},"drawtype") == "flowingliquid" then
+					if default.defpos(u,"drawtype") == "flowingliquid" then
+						flow.flowing_pos = vector.round(u)
+						goto setv
+					end
+				else
+					break
+				end
+			end
+		end
+
+		for x=-1,1 do
+		for z=-1,1 do
+		for y=0,-1,-1 do
+			local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+			local n = minetest.get_node(p)
+			if flow.flowing_pos and (defp == 0 or  n.name == "air"  and defp == 0 and def.drawtype == "flowingliquid") then
+				goto kg
+			elseif default.def(n.name).drawtype == "flowingliquid" and (defp == 0 or defp-1 == n.param2 or y == -1 and defp+2 < n.param2) then
+				if not flow.flowing_dir or (y== -1 or x ~= 0 or z ~= 0) and ( x*-1 ~= flow.flowing_dir.x or z*-1 ~= flow.flowing_dir.z) then
+					flow.flowing_dir = {x=x,y=y,z=z}
+					flow.flowing_pos = vector.round(p)
+					goto setv
+				end
+			end
+		end
+		end
+		end
+	end
+
+	::kg::
+	if flow.flowing_v then
+		if typ == "player" then
+			object:add_velocity(flow.flowing_v)
+			default.set_on_player_death(name,"flowing",flow)
+		else	
+			self.flowing = flow
+			object:set_velocity(flow.flowing_v)
+		end
+		return true
+	end
+	::setv::
+	if flow.flowing_pos then
+		if not flow.flowing_v and typ ~= "player" then
+			object:set_acceleration({x=0, y=-1, z=0})
+		end
+		local p = flow.flowing_pos
+		local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
+		local yaw = num(math.atan(v.z/v.x)-math.pi/2)
+		if p.x >= pos.x then yaw = yaw+math.pi end
+		local x = (math.sin(yaw) * -1) * -1
+		local z = (math.cos(yaw) * 1) * -1
+		flow.flowing_v = {x = x,y = -1,z = z}
+
+		if typ == "player" then
+			object:add_velocity(flow.flowing_v)
+			default.set_on_player_death(name,"flowing",flow)
+		else	
+			self.flowing = flow
+			object:set_velocity(flow.flowing_v)
+		end
+		return true
+	end
+end
+
 Coin=function(player,count)
 	local m = player:get_meta()
 	m:set_int("coins",m:get_int("coins")+count)
@@ -98,6 +205,10 @@ minetest.register_on_newplayer(function(player)
 	player:get_inventory():add_item("main","default:craftguide")
 	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
 end)
+
+num=function(a)
+	return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
+end
 
 apos=function(pos,x,y,z)
 	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
