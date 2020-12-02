@@ -263,6 +263,8 @@ examobs.environment=function(self)
 			local v = self.object:get_velocity() or {x=0, y=0, z=0}
 			self.object:set_acceleration({x =0, y=0, z =0})
 			self.object:set_velocity({x=v.x, y=0, z =v.y})
+		elseif def.liquid_viscosity > 0 then
+			default.flowing(self.object)
 		end
 		return
 	elseif self.is_floating then
@@ -299,7 +301,6 @@ examobs.environment=function(self)
 				minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
 			end
 		end
-
 		self.in_liquid = true
 		local s=1
 		local v = self.object:get_velocity() or {x=0,y=0,z=0}
@@ -327,8 +328,10 @@ examobs.environment=function(self)
 		end
 
 		self.object:set_acceleration({x =0, y =0.1*s, z =0})
-		
-		if v.y<-0.1 then
+
+		if default.flowing(self.object) then
+			return
+		elseif v.y<-0.1 then
 			self.object:set_velocity({x = v.x, y =v.y/2, z =v.z})
 			return self
 		end
@@ -338,7 +341,7 @@ examobs.environment=function(self)
 		local v=self.object:get_velocity() or {x=0, y=0, z=0}
 		self.object:set_acceleration({x=0, y=0, z=0})
 		self.object:set_velocity({x=v.x, y=0, z=v.z})
-		if walkable(apos(posf,0,-1)) then
+		if not default.flowing(self.object) and walkable(apos(posf,0,-1)) then
 			examobs.jump(self)
 			self.object:set_acceleration({x=0, y=-10, z=0})
 		end
