@@ -766,7 +766,6 @@ player_style.player_diveing=function(name,player,a,water,kong)
 			end
 		end
 
-
 	else
 
 		local pr =  player_style.player_dive[name]
@@ -791,4 +790,7 @@ player_style.player_diveing=function(name,player,a,water,kong)
 			})
 		end
 	end
+
+
+	default.flowing(player)
 end
