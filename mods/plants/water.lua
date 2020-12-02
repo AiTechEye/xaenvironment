@@ -186,7 +186,7 @@ default.register_plant({
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "node" then
 			local n = user:get_player_name()
-			if minetest.get_node(pointed_thing.above).name == "air" and not minetest.is_protected(n,pointed_thing.above) then
+			if minetest.get_node(pointed_thing.above).name == "air" and not minetest.is_protected(pointed_thing.above,n) then
 				minetest.set_node(pointed_thing.above,{name="plants:lily_pad",param2=math.random(0,3)})
 				itemstack:take_item()
 				return itemstack
