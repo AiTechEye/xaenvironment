@@ -109,12 +109,12 @@ default.flowing=function(object)
 	if typ == "item" and def.drawtype ~= "flowingliquid" and flow.flowing_pos and def.drawtype ~= "liquid" then
 		minetest.add_item(vector.round(pos),self.itemstring)
 		object:remove()
-		return self
+		return true
 	elseif defp == 15 and def.drawtype == "flowingliquid" then
 		local r = vector.round(pos)
 		object:set_pos({x=r.x,y=pos.y,z=r.z})
 		if typ == "player" then
-			object:add_velocity({x=0, y=-10, z=0})
+			object:add_velocity({x=0, y=-5, z=0})
 		else	
 			object:set_velocity({x=0, y=-10, z=0})
 		end
