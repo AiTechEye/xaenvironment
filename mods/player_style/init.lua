@@ -741,6 +741,7 @@ player_style.player_run=function(name,player,a)
 end
 
 player_style.player_diveing=function(name,player,a,water,kong)
+	local pos = player:get_pos()
 
 	if a and not player_style.player_dive[name] then
 		player_style.player_run(name,player)
@@ -754,7 +755,6 @@ player_style.player_diveing=function(name,player,a,water,kong)
 			jump= water == 0 and 0 or 1,
 		})
 
-		local pos = player:get_pos()
 		local nod = minetest.get_node(pos).name
 
 		if player:get_velocity().y < 0 then
@@ -769,14 +769,13 @@ player_style.player_diveing=function(name,player,a,water,kong)
 	else
 
 		local pr =  player_style.player_dive[name]
-		local p = player:get_pos()
 		local b = player:get_breath()
 
-		if b < 10 and minetest.get_item_group(minetest.get_node(p).name,"water") > 0 and special.use_ability(player,"no_water_drowning") then
+		if b < 10 and minetest.get_item_group(minetest.get_node(pos).name,"water") > 0 and special.use_ability(player,"no_water_drowning") then
 			player:set_breath(b+1)
 		end
 
-		if not a and pr and (pr.kong == nil or player:get_velocity().y == 0) then --default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") ~= true
+		if not a and pr and (pr.kong == nil or player:get_velocity().y == 0) then --default.defpos({x=pos.x,y=pos.y-1,z=pos.z},"walkable") ~= true
 			local profile=player_style.registered_profiles[player_style.players[name].profile]
 			player_style.player_dive[name] = nil
 			player:set_properties({
@@ -791,6 +790,7 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		end
 	end
 
-
-	default.flowing(player)
+	if default.def(minetest.get_node(pos).name).drawtype == "flowingliquid" then
+		default.flowing(player)
+	end
 end
