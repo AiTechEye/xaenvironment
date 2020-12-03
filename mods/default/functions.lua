@@ -178,7 +178,7 @@ default.flowing=function(object)
 		if p.x >= pos.x then yaw = yaw+math.pi end
 		local x = math.sin(yaw) * 2
 		local z = math.cos(yaw) * -2
-		flow.flowing_v = {x = x,y = -2,z = z}
+		flow.flowing_v = {x = x,y = flow.flowing_dir and flow.flowing_dir.y*2 or 0,z = z}
 
 		if typ == "player" then
 			object:add_velocity(flow.flowing_v)
