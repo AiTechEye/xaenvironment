@@ -1,4 +1,4 @@
-if 1 then return end -- coming nowhere, working on it later
+--if 1 then return end -- coming nowhere, working on it later
 
 minetest.register_node("exacarts:rail", {
 	description = "Rail",
@@ -77,7 +77,7 @@ minetest.register_entity("exacarts:dotg",{
 
 
 minetest.register_entity("exacarts:cart",{
-	physical = false,
+	physical = true,
 	hp_max = 100000,
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
 	visual = "cube",
@@ -85,15 +85,12 @@ minetest.register_entity("exacarts:cart",{
 	textures = {"default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png"},
 	on_activate=function(self, staticdata)
 		--self.storage = minetest.deserialize(staticdata) or {}
-		--if self.storage.itemframe then
-		--	self.itemframe(self)
-		--end
-		--self.object:set_acceleration({x=0, y=-10, z =0})
 		self.map = {}
 		self.explores = {vector.round(self.object:get_pos())}
 		--self.get_rails_loop(self)
 
-
+		self.derail = true
+		self.object:set_acceleration({x=0, y=-10, z =0})
 
 		self.index = {}
 		self.index_list={}
@@ -120,9 +117,6 @@ minetest.register_entity("exacarts:cart",{
 				if not self.map[s] and self.get_rail(p) then
 					table.insert(explores,p)
 					self.map[s] = p
-
-
---minetest.add_entity(p,"exacarts:dotr")
 				end
 			end
 			end
@@ -130,20 +124,6 @@ minetest.register_entity("exacarts:cart",{
 		end
 		self.explores = explores
 	end,
-	move=function(self,pos2)
-		local pos1 = self.object:get_pos()
-		local v = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
-		local yaw = num(math.atan(v.z/v.x)-math.pi/2)
-		if pos1.x >= pos2.x then yaw = yaw+math.pi end
-		self.object:set_yaw(yaw)
-		local x = (math.sin(yaw) * -1) * self.v
-		local z = math.cos(yaw) * self.v
-		self.object:set_velocity({x=x,y= v.y*-1,z=z})
-	end,
-
-
-
-
 	pointat=function(self,d)
 		local pos = self.object:get_pos()
 		local yaw = num(self.object:get_yaw())
@@ -168,8 +148,6 @@ minetest.register_entity("exacarts:cart",{
 		return a ~= 0 and a/math.abs(a) or 0
 	end,
 	in_map=function(self,pos)
---print(minetest.pos_to_string(pos))
---print(dump(self.map))
 		return self.map[minetest.pos_to_string(pos)] ~= nil
 	end,
 	contrast=function(a,x,y,z)
@@ -197,7 +175,6 @@ minetest.register_entity("exacarts:cart",{
 			return self
 		end
 	end,
-t=0,
 	on_step = function(self,dtime,moveresult)
 		if #self.explores > 0 then
 			self.get_rails_loop(self)
@@ -209,160 +186,138 @@ t=0,
 
 		local pos = self.object:get_pos()
 		local p = vector.round(pos)
+print(self.v)
+		if not self.derail and #self.index_list < 10+(math.ceil(self.v)) then
+			for i=#self.index_list, 10+(math.ceil(self.v)) do
+				local i = self.index[self.index_list[#self.index_list]]
+				local dir = i and i.dir or self.dir
+				local ip = i and i.pos or p
+				local nip = {x=ip.x+dir.x,y=ip.y+dir.y,z=ip.z+dir.z}
+				local s = minetest.pos_to_string(nip)
 
-		if #self.index_list < 10 then
-			local i = self.index[self.index_list[#self.index_list]]
-			local dir = i and i.dir or self.dir
-			local ip = i and i.pos or p
---print(i,#self.index_list,dir.x,dir.y,dir.z)		
---print(dump(ip))
-			local nip = {x=ip.x+dir.x,y=ip.y+dir.y,z=ip.z+dir.z}
-			local s = minetest.pos_to_string(nip)
-
-
-			if #self.index_list == 0 then
-				local s2 = minetest.pos_to_string(ip)
-				self.index[s2] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=ip}
-				table.insert(self.index_list,s2)
-			end
-
-			if self:in_map(nip) and not self.index[s] then
-				self.index[s] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=nip}
-				table.insert(self.index_list,s)
-minetest.add_entity(nip,"exacarts:dotg")
-				goto setv
-			end
-
-			for y=-1,1 do
-			for x=-1,1 do
-			for z=-1,1 do
-				local mp = {x=ip.x+x,y=ip.y+y,z=ip.z+z}
-				s = minetest.pos_to_string(mp)
-				if self:in_map(mp) and not self.index[s] then
-					table.insert(self.index_list,s)
-					self.index[s] = {dir={x=x,y=y,z=z},pos=mp}
---print(s,x,y,z)
-						--self.dir = {x=x,y=y,z=z}
-						--if self.v >= 10 then
-						--	self.object:set_pos({x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z})
-						--end
-	minetest.add_entity(mp,"exacarts:dotr")
-					goto setv
+				if #self.index_list == 0 then
+					local s2 = minetest.pos_to_string(ip)
+					self.index[s2] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=ip}
+					table.insert(self.index_list,s2)
 				end
-			end
-			end
+
+				if self:in_map(nip) and not self.index[s] then
+					self.index[s] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=nip}
+					table.insert(self.index_list,s)
+					minetest.add_entity(nip,"exacarts:dotg")
+					goto br
+				end
+
+				for y=-1,1 do
+				for x=-1,1 do
+				for z=-1,1 do
+					local mp = {x=ip.x+x,y=ip.y+y,z=ip.z+z}
+					s = minetest.pos_to_string(mp)
+					if self:in_map(mp) and not self.index[s] then
+						table.insert(self.index_list,s)
+						self.index[s] = {dir={x=x,y=y,z=z},pos=mp}
+						minetest.add_entity(mp,"exacarts:dotr")
+						goto br
+					end
+				end
+				end
+				end
+			::br::
 			end
 		end
-		::setv::
 
-		local s = minetest.pos_to_string(p)
-
-
-		if self.v <= 10 then
-			local d = self.nextpos and vector.distance(self.nextpos,pos) or 0
-			if d < 0.5 then
+		if not self.derail then
+			local skip
+			local target = self.currpos and not vector.equals(self.currpos,p) and not vector.equals(self.nextpos,p)
+-- speed < 15
+			if self.v < 15 and not self.rerail and target and self.currpos then
+				self.object:set_pos(self.currpos)
+-- speed > 15: super speed
+			elseif target then
+				self.rerail = nil
+				self.object:set_velocity({x=0,y=0,z=0})
+				skip = true
+				local list = {}
+				local ilist = {}
+				for n=1,#self.index_list do
+					local inx = self.index_list[n]
+					if inx then
+						local i = self.index[inx]
+						local d = vector.distance(i.pos,pos)
+						list[d] = {pos=i.pos,i=inx,n=n}
+						table.insert(ilist,d)
+					end
+				end
+				local min = math.min(unpack(ilist))
+				local a = list[min]
+				self.object:set_pos(a.pos)
+				for n=1,a.n-1 do
+					local inx = self.index_list[1]
+					self.index[inx] = nil
+					table.remove(self.index_list,1)
+				end
+			end
+-- next path step
+			if skip or not self.nextpos or vector.equals(self.nextpos,p) then
 				local inx = self.index_list[2]
 				if inx then
-					self.nextpos = self.index[inx].pos
+					local i = self.index[inx]
+					if self.dir.y == 0 and i.dir.y > 0 then
+						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+					elseif self.dir.y > 0 and i.dir.y == 0 then
+						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+					elseif self.dir.y == 0 and i.dir.y < 0 then
+						self.object:set_pos({x=p.x,y=p.y,z=p.z})
+					elseif self.dir.y < 0 and i.dir.y == 0 then
+						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+					elseif self.dir.y == 0 and (self.dir.x ~= 0 or self.dir.z ~= 0) then
+						self.object:move_to(p)
+					end
+					self.dir = i.dir
+					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
+					local oinx = self.index_list[1]
+					self.index[oinx] = nil
+					table.remove(self.index_list,1)
+					self.nextpos = i.pos
+-- derail
+					local key = self.user and self.user:get_player_control() or {}
+
+					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
+						self.derail = true
+						self.object:move_to(apos(p,0,1))
+						self.object:set_properties({physical = true})
+						self.object:set_acceleration({x=0, y=-10, z =0})
+						return self
+					elseif not self.index_list[2] then
+						self.derail = true
+						self.object:set_properties({physical = true})
+						self.object:set_acceleration({x=0, y=-10, z =0})
+					end
+					self.currpos = p
 				end
-				local oinx = self.index_list[1]
-				self.index[oinx] = nil
-				table.remove(self.index_list,1)
-			end
-			if self.nextpos then
-				self:move(self.nextpos)
 			end
 			return self
-		elseif self.index_cur ~= s and 1==2 then
-			self.index_cur = s
-			for n=1,#self.index_list do
-				local inx = self.index_list[1]
-				if inx == s then
-					inx = self.index_list[2]
-					local i = self.index[inx]
-					if i then
-						self.dir = i.dir
-						self.nextpos = i.pos
-						minetest.add_entity(i.pos,"exacarts:dotb")
-						self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
-					end
-					break
-				elseif inx then
-					self.index[inx] = nil
-					table.remove(self.index_list,1)
+		else
+			if self:in_map(p) and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
+				self.derail = nil
+				self.rerail = true
+				self.object:set_properties({physical = false})
+				self.object:set_acceleration({x=0, y=0, z =0})
+				self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+				local v = self.object:get_velocity()
+				if v.x == 0 and v.z == 0 and v.y ~= 0 then
+					self.object:set_velocity({x=0,y=0,z=0})
 				end
 			end
-		end
 
+			local def = default.def(minetest.get_node({x=p.x,y=p.y-1,z=p.z}).name)
 
-self.t = self.t + dtime
-		if self.t < 0.1 then
-			return self
-		end
-self.t = 0
-
-		local a = self.index_list[1]
-		local b = self.index_list[2]
-if a and b then
-		print(vector.distance(self.index[a].pos,pos),vector.distance(self.index[b].pos,pos))
-end
-
-		if false and not self.nextpos or vector.distance(self.index[a].pos,pos) > 1 then
-print(s)
-			self.index_cur = s
-			for n=1,#self.index_list do
-				local inx = self.index_list[1]
-				if inx == s then
-
-					inx = self.index_list[2]
-					local i = self.index[inx]
-					if i then
-						self.nextpos = i.pos
-						self.dir = i.dir
-						minetest.add_entity(i.pos,"exacarts:dotb")
-						self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
-					end
-					break
-				elseif inx then
-
-					self.index[inx] = nil
-					table.remove(self.index_list,1)
-				end
-			end
-		end
-
-
-
-
-if true then return end
-
-
-
-
-		local in_map = self:in_map(p)
-
-		if not in_map and not self.derail then
-			self.derail = true
-			self.object:set_properties({physical = true})
-			self.object:set_acceleration({x=0, y=-10, z =0})
-		elseif self.derail and in_map then
-			self.derail = nil
-			self.object:set_properties({physical = false})
-			self.object:set_acceleration({x=0, y=0, z =0})
-			self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
-			local v = self.object:get_velocity()
-			if v.x == 0 and v.z == 0 and v.y ~= 0 then
-				self.object:set_velocity({x=0,y=0,z=0})
-			end
-		elseif self.derail then
-			if self.v > 0 and default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") then
-				self.v = self.v-dtime*10
+			if self.v > 0 and def.walkable then
+				local g = def.groups or {}
+				self.v = self.v - dtime*((g.snowy or g.sand and 8) or 2)
 				self.v = self.v > 0 and self.v or 0
-				--if not self.user and self.v == 0 then
-				--	minetest.add_item(pos,ItemStack("exacarts:cart"))
-				--	self.object:remove()
-				--	return self
-				--end
+				local v = self.object:get_velocity()
+				self.object:set_velocity({x=self.dir.x*self.v,y=v.y,z=self.dir.z*self.v})
 			end
 		end
 	end,
