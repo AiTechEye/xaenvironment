@@ -114,7 +114,9 @@ default.flowing=function(object)
 		local r = vector.round(pos)
 		object:set_pos({x=r.x,y=pos.y,z=r.z})
 		if typ == "player" then
-			object:add_velocity({x=0, y=-5, z=0})
+			if object:get_velocity().y > -10 then
+				object:add_velocity({x=0, y=-7, z=0})
+			end
 		else	
 			object:set_velocity({x=0, y=-10, z=0})
 		end
