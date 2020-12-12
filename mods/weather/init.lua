@@ -222,7 +222,7 @@ weather.ac=function()
 							sound=minetest.sound_play("weather_rain", {to_player = name,gain = 6,loop=true})
 						end
 						if t>6 and t<19 then
-							player:set_sky({r=149-(s*2),g=154-(s*3),b=209-(s*9),a=255},"plain",{})
+							player:set_sky({base_color={r=149-(s*2),g=154-(s*3),b=209-(s*9),a=255},type="plain"})
 							player:set_clouds({density=0.5+(s*0.05),color={r=240/s,g=240/s,b=250/s,a=229*s}})
 						end
 						if weather.players[name] and weather.players[name].sound then
