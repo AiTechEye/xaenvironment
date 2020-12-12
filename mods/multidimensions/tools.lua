@@ -133,9 +133,9 @@ multidimensions.apply_dimension=function(player)
 			multidimensions.player_pos[name] = {y1 = v.dim_y, y2 = v.dim_y+v.dim_height, name=i}
 			player:set_physics_override({gravity=v.gravity})
 			if v.sky then
-				player:set_sky(v.sky[1],v.sky[2],v.sky[3])
+				player:set_sky(v.sky)
 			else
-				player:set_sky(nil,"regular",nil)
+				player:set_sky({"regular"})
 			end
 
 			if v.sun then
