@@ -146,18 +146,9 @@ minetest.register_entity("exacarts:cart",{
 		if self.derail then
 			self.object:set_acceleration({x=0, y=-10, z =0})
 		else
-
-
-
 			if not self:in_map(self.object:get_pos()) and self.lastpos then
 				self.object:set_pos(self.lastpos)
-print(1111)
 			end
-
-
-
-
-
 			self.object:set_velocity({x=0,y=0,z=0})
 			self.object:set_properties({physical = false})
 		end
