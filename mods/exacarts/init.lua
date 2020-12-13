@@ -259,7 +259,6 @@ minetest.register_entity("exacarts:cart",{
 				if self:in_map(nip) and not self.index[s] then
 					self.index[s] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=nip}
 					table.insert(self.index_list,s)
-					minetest.add_entity(nip,"exacarts:dotg")
 					goto br
 				end
 
@@ -271,7 +270,6 @@ minetest.register_entity("exacarts:cart",{
 					if self:in_map(mp) and not self.index[s] then
 						table.insert(self.index_list,s)
 						self.index[s] = {dir={x=x,y=y,z=z},pos=mp}
-						minetest.add_entity(mp,"exacarts:dotr")
 						goto br
 					end
 				end
