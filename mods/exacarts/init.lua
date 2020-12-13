@@ -1,12 +1,28 @@
---if 1 then return end -- coming nowhere, working on it later
+exacarts={
+	storage = minetest.get_mod_storage(),
+	map = {},
+	add_to_map=function(pos)
+		exacarts.map = exacarts.map or minetest.deserialize(exacarts.storage:get_string("map")) or {}
+		local p = exacarts.map[minetest.pos_to_string(pos)]
+		if not p then
+			exacarts.map[minetest.pos_to_string(pos)] = pos
+			exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
+		end
+	end,
+	remove_from_map=function(pos)
+		exacarts.map = exacarts.map or minetest.deserialize(exacarts.storage:get_string("map")) or {}
+		exacarts.map[minetest.pos_to_string(pos)] = nil
+		exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
+	end,
+}
 
 minetest.register_node("exacarts:rail", {
 	description = "Rail",
 	drawtype="raillike",
 	walkable=false,
-	inventory_iamge="exacarts_straight.png",
+	inventory_image="exacarts_straight.png",
 	tiles={"exacarts_straight.png","exacarts_curve.png","exacarts_junction.png","exacarts_cross.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3,rail=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3,rail=1,on_load=1},
 	sounds =  default.node_sound_metal_defaults(),
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -15,12 +31,21 @@ minetest.register_node("exacarts:rail", {
 		fixed = {
 			{-0.5, -0.5, -0.5, 0.5, -0.49, 0.5},
 		}
-	}
+	},
+	on_load=function(pos)
+		exacarts.add_to_map(pos)
+	end,
+	on_construct=function(pos)
+		exacarts.add_to_map(pos)
+	end,
+	on_destruct=function(pos)
+		exacarts.remove_from_map(pos)
+	end
 })
 
 minetest.register_tool("exacarts:cart", {
 	description = "Cart",
-	inventory_image = "default_wood.png",
+	inventory_image = "exacarts_minecart.png",
 	on_place=function(itemstack, user, pointed_thing)
 		if pointed_thing.type=="node" and minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"rail") > 0 then
 			local en=minetest.add_entity(pointed_thing.under,"exacarts:cart")
@@ -33,7 +58,6 @@ minetest.register_tool("exacarts:cart", {
 minetest.register_entity("exacarts:dotb",{
 	physical = false,
 	pointable=false,
-	visual_size = {x=0,y=0,z=0},
 	textures = {"player_style_coin.png^[colorize:#00f"},
 	use_texture_alpha=true,
 	t=0.5,
@@ -48,7 +72,6 @@ minetest.register_entity("exacarts:dotb",{
 minetest.register_entity("exacarts:dotr",{
 	physical = false,
 	pointable=false,
-	visual_size = {x=0,y=0,z=0},
 	textures = {"player_style_coin.png^[colorize:#00f"},
 	use_texture_alpha=true,
 	t=0.5,
@@ -63,7 +86,6 @@ minetest.register_entity("exacarts:dotr",{
 minetest.register_entity("exacarts:dotg",{
 	physical = false,
 	pointable=false,
-	visual_size = {x=0,y=0,z=0},
 	textures = {"player_style_coin.png^[colorize:#0f0"},
 	use_texture_alpha=true,
 	t=0.5,
@@ -75,54 +97,49 @@ minetest.register_entity("exacarts:dotg",{
 	end,
 })
 
-
 minetest.register_entity("exacarts:cart",{
 	physical = true,
-	hp_max = 100000,
+	hp_max = 1,
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
-	visual = "cube",
-	--visual_size = {x=0.3,y=0.3},
-	textures = {"default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png","default_wood.png"},
-	on_activate=function(self, staticdata)
-		--self.storage = minetest.deserialize(staticdata) or {}
-		self.map = {}
-		self.explores = {vector.round(self.object:get_pos())}
-		--self.get_rails_loop(self)
+	visual = "mesh",
+	mesh = "exacarts_minecart.obj",
+	textures = {"exacarts_minecart.png"},
+	backface_culling = false,
+	get_staticdata = function(self)
+		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail})
+	end,
+	on_activate=function(self, staticdata,dtime)
+		if dtime > 0 then
+			self.object:set_velocity({x=0,y=0,z=0})
+		end
+		local save = minetest.deserialize(staticdata) or {}
 
-		self.derail = true
-		self.object:set_acceleration({x=0, y=-10, z =0})
-
+		self.derail = save.derail
 		self.index = {}
 		self.index_list={}
-		self.index_cur=""
 		self.next_pos = {x=0,y=0,z=0}
-		self.dir = {x=0,y=0,z=0}
-		self.olddir = {x=0,y=0,z=0}
-		self.v = 0
-	end,
-	get_staticdata = function(self)
-		return minetest.serialize(self.storage)
+		self.dir = save.dir or {x=0,y=0,z=0}
+		self.v = save.v or 0
+
+		self.trackout_timer = 0
+		self.trackout = 0
+
+		if self.derail then
+			self.object:set_acceleration({x=0, y=-10, z =0})
+		elseif self.v == 0 then
+			local pos = self.object:get_pos()
+			for i=-1,1,2 do
+				if self.get_rail(apos(pos,i)) then
+					self:lookat({x=i,y=0,z=0})
+					break
+				end
+			end
+		end
+
+		self.object:set_armor_groups({immortal=1})
 	end,
 	get_rail=function(p)
 		return minetest.get_item_group(minetest.get_node(p).name,"rail") > 0
-	end,
-	get_rails_loop=function(self)
-		local explores = {}
-		for i,v in pairs(self.explores) do
-			for x=-1,1 do
-			for y=-1,1 do
-			for z=-1,1 do
-				local p = {x=v.x+x,y=v.y+y,z=v.z+z}
-				local s = minetest.pos_to_string(p)
-				if not self.map[s] and self.get_rail(p) then
-					table.insert(explores,p)
-					self.map[s] = p
-				end
-			end
-			end
-			end
-		end
-		self.explores = explores
 	end,
 	pointat=function(self,d)
 		local pos = self.object:get_pos()
@@ -132,26 +149,39 @@ minetest.register_entity("exacarts:cart",{
 		local z = math.cos(yaw) * d
 		return {x=pos.x+x,y=pos.y,z=pos.z+z}
 	end,
-	on_rightclick=function(self, clicker,name)
+	on_rightclick=function(self, clicker)
 		if self.user then
 			local n = self.user:is_player() and self.user:get_player_name() or ""
 			if self.user:is_player() and self.user:get_player_name() == n then
+				default.player_attached[self.user:get_player_name()] = nil
+				default.player_set_animation(self.user, "stand")
+				self.user:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 				self.user:set_detach()
 				self.user = nil
+
 			end
 		elseif clicker:is_player() then
 			self.user = clicker
-			self.user:set_attach(self.object, "",{x = 0, y = -5, z = 0}, {x = 0, y = 0, z = 0})
+			self.user:set_attach(self.object, "",{x = 0, y = -4, z = -3}, {x = 0, y = 0, z = 0})
+			clicker:set_eye_offset({x=0,y=-7,z=0}, {x=0,y=0,z=0})
+			local name = clicker:get_player_name()
+			default.player_attached[name]=true
+			default.player_set_animation(clicker, "sit")
+		end
+	end,
+	lookat=function(self,d)
+		self.object:set_rotation({x=d.y,y=(d.x*(-math.pi/2)) + (d.z < 0 and math.pi or 0),z=0})
+	end,
+	on_death=function(self)
+		if self.user then
+			self.on_rightclick(self)
 		end
 	end,
 	a=function(a)
 		return a ~= 0 and a/math.abs(a) or 0
 	end,
 	in_map=function(self,pos)
-		return self.map[minetest.pos_to_string(pos)] ~= nil
-	end,
-	contrast=function(a,x,y,z)
-		return a.x*-1==x and a.y*-1==y and a.z*-1==z
+		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		if self.user then
@@ -174,19 +204,18 @@ minetest.register_entity("exacarts:cart",{
 			self.object:remove()
 			return self
 		end
+		return false
 	end,
 	on_step = function(self,dtime,moveresult)
-		if #self.explores > 0 then
-			self.get_rails_loop(self)
-		end
-
 		if self.v == 0 then
 			return self
+		elseif self.v > 100 then
+			self.v = 100
 		end
 
 		local pos = self.object:get_pos()
 		local p = vector.round(pos)
-print(self.v)
+
 		if not self.derail and #self.index_list < 10+(math.ceil(self.v)) then
 			for i=#self.index_list, 10+(math.ceil(self.v)) do
 				local i = self.index[self.index_list[#self.index_list]]
@@ -225,6 +254,19 @@ print(self.v)
 			::br::
 			end
 		end
+
+
+		--self.trackout_timer = self.trackout_timer + dtime
+		--if self.trackout_timer > 0.01 then -- weird bugs
+			--self.trackout_timer = 0
+			--if self.trackout*0.1 > 10 then
+			--	self.v = self.v-self.trackout*0.1
+				--self.trackout = 0
+			--end
+
+		--end
+
+
 
 		if not self.derail then
 			local skip
@@ -274,6 +316,7 @@ print(self.v)
 						self.object:move_to(p)
 					end
 					self.dir = i.dir
+					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
 					local oinx = self.index_list[1]
 					self.index[oinx] = nil
@@ -281,6 +324,11 @@ print(self.v)
 					self.nextpos = i.pos
 -- derail
 					local key = self.user and self.user:get_player_control() or {}
+
+if key.up then
+self.v = self.v + 1
+end
+
 
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
 						self.derail = true
