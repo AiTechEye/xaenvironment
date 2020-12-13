@@ -270,6 +270,12 @@ minetest.register_node("default:tankstorage", {
 	paramtype = "light",
 })
 
+minetest.register_craftitem("default:ironstick", {
+	description = "Iron stick",
+	inventory_image = "default_ironblock.png^default_alpha_stick.png^[makealpha:0,255,0",
+	groups = {metalstick=1,treasure=1},
+})
+
 minetest.register_craftitem("default:stick", {
 	description = "Wooden stick",
 	inventory_image = "default_stick.png",

@@ -197,11 +197,16 @@ minetest.register_craft({
 	},
 })
 
-
 minetest.register_craft({
 	output="default:stick 4",
 	recipe={{"group:wood"}},
 })
+
+minetest.register_craft({
+	output="default:ironstick 4",
+	recipe={{"default:iron_ingot"}},
+})
+
 minetest.register_craft({
 	output="default:torch 4",
 	recipe={
