@@ -16,6 +16,24 @@ exacarts={
 	end,
 }
 
+minetest.register_craft({
+	output="exacarts:rail 24",
+	recipe={
+		{"group:metalstick","group:stick","group:metalstick"},
+		{"group:metalstick","group:stick","group:metalstick"},
+		{"group:metalstick","group:stick","group:metalstick"}
+	},
+})
+
+minetest.register_craft({
+	output="exacarts:cart",
+	recipe={
+		{"default:iron_ingot","","default:iron_ingot"},
+		{"group:wood","group:wood","group:wood"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"}
+	},
+})
+
 minetest.register_node("exacarts:rail", {
 	description = "Rail",
 	drawtype="raillike",
@@ -106,12 +124,13 @@ minetest.register_entity("exacarts:cart",{
 	textures = {"exacarts_minecart.png"},
 	backface_culling = false,
 	get_staticdata = function(self)
-		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail})
+		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos})
 	end,
 	on_activate=function(self, staticdata,dtime)
 		local save = minetest.deserialize(staticdata) or {}
 
 		self.derail = save.derail
+		self.lastpos = save.lastpos
 		self.index = {}
 		self.index_list={}
 		self.next_pos = {x=0,y=0,z=0}
@@ -127,6 +146,18 @@ minetest.register_entity("exacarts:cart",{
 		if self.derail then
 			self.object:set_acceleration({x=0, y=-10, z =0})
 		else
+
+
+
+			if not self:in_map(self.object:get_pos()) and self.lastpos then
+				self.object:set_pos(self.lastpos)
+print(1111)
+			end
+
+
+
+
+
 			self.object:set_velocity({x=0,y=0,z=0})
 			self.object:set_properties({physical = false})
 		end
@@ -339,14 +370,8 @@ minetest.register_entity("exacarts:cart",{
 					self.index[oinx] = nil
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
+					self.lastpos = i.pos
 -- derail
-
-
-if key.up then
-self.v = self.v + 1
-end
-
-
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
 						self.derail = true
 						self.object:move_to(apos(p,0,1))
@@ -354,9 +379,15 @@ end
 						self.object:set_acceleration({x=0, y=-10, z =0})
 						return self
 					elseif not self.index_list[2] then
+						if default.def(minetest.get_node(p).name).walkable then
+							self.v = 0
+							self.object:set_velocity({x=0,y=0,z=0})
+							self.set_pos(self.lastpos)
+						end
 						self.derail = true
 						self.object:set_properties({physical = true})
 						self.object:set_acceleration({x=0, y=-10, z =0})
+						
 					end
 					self.currpos = p
 				end
