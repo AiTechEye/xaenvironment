@@ -72,7 +72,7 @@ minetest.register_entity("exacarts:dotb",{
 minetest.register_entity("exacarts:dotr",{
 	physical = false,
 	pointable=false,
-	textures = {"player_style_coin.png^[colorize:#00f"},
+	textures = {"player_style_coin.png^[colorize:#f00"},
 	use_texture_alpha=true,
 	t=0.5,
 	on_step=function(self, dtime)
@@ -109,9 +109,6 @@ minetest.register_entity("exacarts:cart",{
 		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail})
 	end,
 	on_activate=function(self, staticdata,dtime)
-		if dtime > 0 then
-			self.object:set_velocity({x=0,y=0,z=0})
-		end
 		local save = minetest.deserialize(staticdata) or {}
 
 		self.derail = save.derail
@@ -120,13 +117,21 @@ minetest.register_entity("exacarts:cart",{
 		self.next_pos = {x=0,y=0,z=0}
 		self.dir = save.dir or {x=0,y=0,z=0}
 		self.v = save.v or 0
+		self.rot = 0
 
 		self.trackout_timer = 0
 		self.trackout = 0
 
+		self.object:set_armor_groups({immortal=1})
+
 		if self.derail then
 			self.object:set_acceleration({x=0, y=-10, z =0})
-		elseif self.v == 0 then
+		else
+			self.object:set_velocity({x=0,y=0,z=0})
+			self.object:set_properties({physical = false})
+		end
+
+		if dtime == 0 then
 			local pos = self.object:get_pos()
 			for i=-1,1,2 do
 				if self.get_rail(apos(pos,i)) then
@@ -135,8 +140,6 @@ minetest.register_entity("exacarts:cart",{
 				end
 			end
 		end
-
-		self.object:set_armor_groups({immortal=1})
 	end,
 	get_rail=function(p)
 		return minetest.get_item_group(minetest.get_node(p).name,"rail") > 0
@@ -170,7 +173,8 @@ minetest.register_entity("exacarts:cart",{
 		end
 	end,
 	lookat=function(self,d)
-		self.object:set_rotation({x=d.y,y=(d.x*(-math.pi/2)) + (d.z < 0 and math.pi or 0),z=0})
+		self.rot = (d.x*(-math.pi/2)) + (d.z < 0 and math.pi or 0)
+		self.object:set_rotation({x=d.y,y=self.rot,z=0})
 	end,
 	on_death=function(self)
 		if self.user then
@@ -209,8 +213,8 @@ minetest.register_entity("exacarts:cart",{
 	on_step = function(self,dtime,moveresult)
 		if self.v == 0 then
 			return self
-		elseif self.v > 100 then
-			self.v = 100
+		--elseif self.v > 100 then
+		--	self.v = 100
 		end
 
 		local pos = self.object:get_pos()
@@ -255,27 +259,22 @@ minetest.register_entity("exacarts:cart",{
 			end
 		end
 
-
-		--self.trackout_timer = self.trackout_timer + dtime
-		--if self.trackout_timer > 0.01 then -- weird bugs
-			--self.trackout_timer = 0
-			--if self.trackout*0.1 > 10 then
-			--	self.v = self.v-self.trackout*0.1
-				--self.trackout = 0
-			--end
-
-		--end
-
-
-
 		if not self.derail then
 			local skip
 			local target = self.currpos and not vector.equals(self.currpos,p) and not vector.equals(self.nextpos,p)
+
+			self.trackout_timer = self.trackout_timer + dtime
+			if self.trackout_timer > 0.01 then
+				self.trackout_timer = 0
+				self.v = self.v-(self.trackout*0.1)
+				self.trackout = 0
+			end
+
 -- speed < 15
-			if self.v < 15 and not self.rerail and target and self.currpos then
-				self.object:set_pos(self.currpos)
+			if self.v < 15 and not self.rerail and target and self.currpos then-- and self.dir.y == 0 then
+				self.object:move_to(self.nextpos)	
 -- speed > 15: super speed
-			elseif target then
+			elseif self.v >= 15 and target then
 				self.rerail = nil
 				self.object:set_velocity({x=0,y=0,z=0})
 				skip = true
@@ -298,6 +297,7 @@ minetest.register_entity("exacarts:cart",{
 					self.index[inx] = nil
 					table.remove(self.index_list,1)
 				end
+				self.trackout = self.trackout +min
 			end
 -- next path step
 			if skip or not self.nextpos or vector.equals(self.nextpos,p) then
@@ -305,16 +305,33 @@ minetest.register_entity("exacarts:cart",{
 				if inx then
 					local i = self.index[inx]
 					if self.dir.y == 0 and i.dir.y > 0 then
-						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+						self.object:move_to({x=pos.x,y=p.y,z=pos.z})
 					elseif self.dir.y > 0 and i.dir.y == 0 then
-						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+						self.object:move_to({x=pos.x,y=p.y,z=pos.z})
 					elseif self.dir.y == 0 and i.dir.y < 0 then
-						self.object:set_pos({x=p.x,y=p.y,z=p.z})
+						self.object:move_to({x=p.x,y=p.y,z=p.z})
 					elseif self.dir.y < 0 and i.dir.y == 0 then
-						self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
-					elseif self.dir.y == 0 and (self.dir.x ~= 0 or self.dir.z ~= 0) then
+						self.object:move_to({x=i.pos.x,y=p.y,z=i.pos.z})
+					elseif self.dir.y == 0 and (self.dir.x ~= i.dir.x or self.dir.z ~= i.dir.z) then
 						self.object:move_to(p)
 					end
+
+					local key = self.user and self.user:get_player_control() or {}
+
+					if key.right or key.left then
+						local pi = math.pi/2*(key.left and 1 or -1)
+						local x = math.sin(self.rot+pi) * -1
+						local z = math.cos(self.rot+pi) * 1
+						if self:in_map({x=p.x+x,y=p.y,z=p.z+z}) and not vector.equals({x=x,y=0,z=z},self.dir) then
+							self.object:set_velocity({x=0,y=0,z=0})
+							self.object:move_to(p)
+							self.dir = {x=x,y=0,z=z}
+							self.index_list = {}
+							self.index = {}
+							return
+						end
+					end
+
 					self.dir = i.dir
 					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
@@ -323,7 +340,7 @@ minetest.register_entity("exacarts:cart",{
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
 -- derail
-					local key = self.user and self.user:get_player_control() or {}
+
 
 if key.up then
 self.v = self.v + 1
