@@ -1,11 +1,11 @@
 exacarts={
 	storage = minetest.get_mod_storage(),
 	map = {},
-	add_to_map=function(pos)
+	add_to_map=function(pos,on_rail)
 		exacarts.map = exacarts.map or minetest.deserialize(exacarts.storage:get_string("map")) or {}
 		local p = exacarts.map[minetest.pos_to_string(pos)]
 		if not p then
-			exacarts.map[minetest.pos_to_string(pos)] = pos
+			exacarts.map[minetest.pos_to_string(pos)] = {on_rail=on_rail}
 			exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
 		end
 	end,
@@ -14,31 +14,52 @@ exacarts={
 		exacarts.map[minetest.pos_to_string(pos)] = nil
 		exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
 	end,
+	in_map=function(pos)
+		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
+	end,
+	on_rail=function(pos,self,a)
+		local n = exacarts.map[minetest.pos_to_string(pos)] 
+		if n and n.on_rail then
+			local on_rail = default.def(n.on_rail).on_rail
+			if on_rail then
+				on_rail(pos,self,self.v)
+			end
+		end
+	end,
 	register_rail=function(def)
 		def = def or {}
 
 		local texture = def.texture or "default_ironblock.png"
+		local overlay = def.overlay and "^"..def.overlay or ""
 		local name = minetest.get_current_modname()..":"..(def.name or "rail")
 		local craft_recipe = def.craft_recipe and table.copy(def.craft_recipe) or nil
 		local wood = def.craft_wood
 		local item = def.craft_item
 		local count = def.craft_count
+		local alpha = def.wood_modifer and "exacarts_rails_alpha2.png" or "exacarts_rails_alpha.png"
+		local add_groups = def.add_groups and table.copy(def.add_groups) or nil
 
+		def.overlay = nil
+		def.texture = nil
 		def.craft_count = nil
 		def.craft_wood = nil
 		def.craft_item = nil
 		def.name = nil
 		def.texture = nil
 		def.craft = nil
+		def.wood_modifer = nil
+		def.add_groups = nil
+
+		def.on_rail = def.on_rail -- function(pos,self,v)
 
 		def.description = def.description or "Rail"
 		def.drawtype = def.drawtype or "raillike"
-		def.inventory_image = def.inventory_image or texture.."^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0"
+		def.inventory_image = def.inventory_image or texture.."^[combine:16x16:0,0="..alpha.."^[makealpha:0,255,0"..overlay
 		def.tiles = def.tiles or {
-			texture.."^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0",
-			texture.."^[combine:16x16:0,-16=exacarts_rails_alpha.png^[makealpha:0,255,0",
-			texture.."^[combine:16x16:-16,-16=exacarts_rails_alpha.png^[makealpha:0,255,0",
-			texture.."^[combine:16x16:-16,0=exacarts_rails_alpha.png^[makealpha:0,255,0"
+			texture.."^[combine:16x16:0,0="..alpha.."^[makealpha:0,255,0"..overlay,
+			texture.."^[combine:16x16:0,-16="..alpha.."^[makealpha:0,255,0"..overlay,
+			texture.."^[combine:16x16:-16,-16="..alpha.."^[makealpha:0,255,0"..overlay,
+			texture.."^[combine:16x16:-16,0="..alpha.."^[makealpha:0,255,0"..overlay
 		}
 		def.groups = def.groups or {choppy=3,oddly_breakable_by_hand=3,treasure=1,rail=1,on_load=1}
 		def.sounds = def.sounds or default.node_sound_metal_defaults()
@@ -57,13 +78,19 @@ exacarts={
 			}
 		}
 		def.on_load = def.on_load or function(pos)
-			exacarts.add_to_map(pos)
+			exacarts.add_to_map(pos,def.on_rail ~= nil and name or nil)
 		end
 		def.on_construct = def.on_construct or function(pos)
-			exacarts.add_to_map(pos)
+			exacarts.add_to_map(pos,def.on_rail ~= nil and name or nil)
 		end
 		def.on_destruct = def.on_destruct or function(pos)
 			exacarts.remove_from_map(pos)
+		end
+
+		if add_groups then
+			for i,v in pairs(add_groups) do
+				def.groups[i]=v
+			end
 		end
 
 		minetest.register_node(name,def)
@@ -95,6 +122,76 @@ minetest.register_craft({
 })
 
 exacarts.register_rail()
+
+exacarts.register_rail({
+	name="detector",
+	description="Detector rail",
+	overlay="default_chest_top.png^[invert:rg",
+	add_groups = {exatec_wire=1,exatec_wire_connected=1,store=200},
+	on_rail=function(pos,self,v)
+		exatec.send(pos)
+	end,
+	craft_recipe = {
+		output="exacarts:detector",
+		recipe={{"exacarts:rail","exatec:wire","group:stick"}}}
+})
+
+exacarts.register_rail({
+	name="acceleration",
+	description="Acceleration rail",
+	texture="default_electricblock.png",
+	add_groups = {store=400},
+	on_rail=function(pos,self,v)
+		local m = minetest.get_meta(pos)
+		local t = m:get_string("type")
+		local av = m:get_int("v")
+		if t == "+" then
+			if v+1 < 1000 then
+				self.v = v + 1
+			end
+		elseif t == "-" then
+			self.v = v-1 > 0 and (v-1) or 0
+		elseif t == "Max" then
+			 if v+1 < av then
+				self.v = v + 1
+			else
+				self.v = av
+			end
+		elseif t == "Min" then
+			 if v-1 < av then
+				self.v = v + 1
+			end
+		end
+		m:set_string("infotext",t.." "..av.." (Last speed test: "..math.floor(self.v)..")")
+	end,
+	craft_recipe = {
+		output="exacarts:acceleration",
+		recipe={{"exacarts:rail","default:electric_lump"}}},
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_string("formspec","size[1,0.5]button_exit[0,0;1,1;go;Setup]")
+		m:set_string("type","+")
+		m:set_string("infotext","+ 1")
+		exacarts.add_to_map(pos,"exacarts:acceleration")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.go and minetest.is_protected(pos, sender:get_player_name()) == false then
+			local m = minetest.get_meta(pos)
+			local n = tonumber(pressed.text) or m:get_int("v")
+			local t = pressed.type or m:get_string("type") ~= "" and m:get_string("type") or "+"
+			local types = {["+"]="1",["-"]="2",["Min"]="3",["Max"]="4"}
+
+			n = t ~= "+" and t ~= "-" and n or 1
+			n = math.abs(n)
+			n = n < 1000 and n or 1000
+
+			m:set_string("formspec","size[5,0.5]field[0,0;3,1;text;;"..n.."]dropdown[3,0;1,1;type;+,-,Min,Max;"..types[t].."]button_exit[4,-0.3;1,1;go;Go]")
+			m:set_int("v",n)
+			m:set_string("type",t)
+			m:set_string("infotext",t.." "..n)
+		end
+	end
+})
 
 minetest.register_tool("exacarts:cart", {
 	description = "Cart",
@@ -181,7 +278,7 @@ minetest.register_entity("exacarts:cart",{
 		if self.derail then
 			self.object:set_acceleration({x=0, y=-10, z =0})
 		else
-			if not self:in_map(self.object:get_pos()) and self.lastpos then
+			if not exacarts.in_map(self.object:get_pos()) and self.lastpos then
 				self.object:set_pos(self.lastpos)
 			end
 			self.object:set_velocity({x=0,y=0,z=0})
@@ -244,6 +341,9 @@ minetest.register_entity("exacarts:cart",{
 	in_map=function(self,pos)
 		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
 	end,
+	in_map=function(self,pos)
+		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
+	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		if self.user then
 			local d = puncher:get_look_dir()
@@ -252,7 +352,7 @@ minetest.register_entity("exacarts:cart",{
 			local dmg = tool_capabilities.damage_groups.fleshy or 1
 			if v.x == self.dir.x and v.z == self.dir.z then
 				self.v = self.v + dmg
-			elseif self.v == 0 and self:in_map({x=p.x+v.x,y=p.y,z=p.z+v.z}) or self:in_map({x=p.x+v.x,y=p.y-1,z=p.z+v.z}) or self:in_map({x=p.x+v.x,y=p.y+1,z=p.z+v.z}) then
+			elseif self.v == 0 and exacarts.in_map({x=p.x+v.x,y=p.y,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y-1,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y+1,z=p.z+v.z}) then
 				self.dir = v
 				self.v = dmg
 				self.next_pos = {x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z}
@@ -291,7 +391,7 @@ minetest.register_entity("exacarts:cart",{
 					table.insert(self.index_list,s2)
 				end
 
-				if self:in_map(nip) and not self.index[s] then
+				if exacarts.in_map(nip) and not self.index[s] then
 					self.index[s] = {dir={x=dir.x,y=dir.y,z=dir.z},pos=nip}
 					table.insert(self.index_list,s)
 					goto br
@@ -302,7 +402,7 @@ minetest.register_entity("exacarts:cart",{
 				for z=-1,1 do
 					local mp = {x=ip.x+x,y=ip.y+y,z=ip.z+z}
 					s = minetest.pos_to_string(mp)
-					if self:in_map(mp) and not self.index[s] then
+					if exacarts.in_map(mp) and not self.index[s] then
 						table.insert(self.index_list,s)
 						self.index[s] = {dir={x=x,y=y,z=z},pos=mp}
 						goto br
@@ -349,6 +449,7 @@ minetest.register_entity("exacarts:cart",{
 				self.object:set_pos(a.pos)
 				for n=1,a.n-1 do
 					local inx = self.index_list[1]
+					exacarts.on_rail(self.index[inx].pos,self,1)
 					self.index[inx] = nil
 					table.remove(self.index_list,1)
 				end
@@ -356,6 +457,7 @@ minetest.register_entity("exacarts:cart",{
 			end
 -- next path step
 			if skip or not self.nextpos or vector.equals(self.nextpos,p) then
+				exacarts.on_rail(p,self,2)
 				local inx = self.index_list[2]
 				if inx then
 					local i = self.index[inx]
@@ -377,7 +479,7 @@ minetest.register_entity("exacarts:cart",{
 						local pi = math.pi/2*(key.left and 1 or -1)
 						local x = math.sin(self.rot+pi) * -1
 						local z = math.cos(self.rot+pi) * 1
-						if self:in_map({x=p.x+x,y=p.y,z=p.z+z}) and not vector.equals({x=x,y=0,z=z},self.dir) then
+						if exacarts.in_map({x=p.x+x,y=p.y,z=p.z+z}) and not vector.equals({x=x,y=0,z=z},self.dir) then
 							self.object:set_velocity({x=0,y=0,z=0})
 							self.object:move_to(p)
 							self.dir = {x=x,y=0,z=z}
@@ -406,7 +508,7 @@ minetest.register_entity("exacarts:cart",{
 						if default.def(minetest.get_node(p).name).walkable then
 							self.v = 0
 							self.object:set_velocity({x=0,y=0,z=0})
-							self.set_pos(self.lastpos)
+							self.object:set_pos(self.lastpos)
 						end
 						self.derail = true
 						self.object:set_properties({physical = true})
@@ -418,7 +520,7 @@ minetest.register_entity("exacarts:cart",{
 			end
 			return self
 		else
-			if self:in_map(p) and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
+			if exacarts.in_map(p) and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
 				self.derail = nil
 				self.rerail = true
 				self.object:set_properties({physical = false})
