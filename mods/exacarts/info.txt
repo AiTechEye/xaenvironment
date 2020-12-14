@@ -1,0 +1,14 @@
+Righclick to enter/exit a cart
+Punch speed it up / pick up
+
+exacarts.register_rail({--	you can customize everything
+	name = "custom_rail"	required
+	texture = "texture"		"default_ironblock.png"
+
+	craft_recipe = def		you can make a full craft recipe, send directly to minetest.register_craft()
+				or automatically:
+
+	craft_item = "item"		"group:metalstick"
+	craft_wood = "item"	"group:stick"
+	craft_count = n		16
+})

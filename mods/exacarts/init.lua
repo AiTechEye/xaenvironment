@@ -14,16 +14,76 @@ exacarts={
 		exacarts.map[minetest.pos_to_string(pos)] = nil
 		exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
 	end,
-}
+	register_rail=function(def)
+		def = def or {}
 
-minetest.register_craft({
-	output="exacarts:rail 24",
-	recipe={
-		{"group:metalstick","group:stick","group:metalstick"},
-		{"group:metalstick","group:stick","group:metalstick"},
-		{"group:metalstick","group:stick","group:metalstick"}
-	},
-})
+		local texture = def.texture or "default_ironblock.png"
+		local name = minetest.get_current_modname()..":"..(def.name or "rail")
+		local craft_recipe = def.craft_recipe and table.copy(def.craft_recipe) or nil
+		local wood = def.craft_wood
+		local item = def.craft_item
+		local count = def.craft_count
+
+		def.craft_count = nil
+		def.craft_wood = nil
+		def.craft_item = nil
+		def.name = nil
+		def.texture = nil
+		def.craft = nil
+
+		def.description = def.description or "Rail"
+		def.drawtype = def.drawtype or "raillike"
+		def.inventory_image = def.inventory_image or texture.."^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0"
+		def.tiles = def.tiles or {
+			texture.."^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0",
+			texture.."^[combine:16x16:0,-16=exacarts_rails_alpha.png^[makealpha:0,255,0",
+			texture.."^[combine:16x16:-16,-16=exacarts_rails_alpha.png^[makealpha:0,255,0",
+			texture.."^[combine:16x16:-16,0=exacarts_rails_alpha.png^[makealpha:0,255,0"
+		}
+		def.groups = def.groups or {choppy=3,oddly_breakable_by_hand=3,treasure=1,rail=1,on_load=1}
+		def.sounds = def.sounds or default.node_sound_metal_defaults()
+		def.paramtype = def.paramtype or "light"
+		def.sunlight_propagates = def.sunlight_propagates == nil
+		def.selection_box = def.selection_box or {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+			}
+		}
+		def.collision_box = def.collision_box or {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, -0.49, 0.5},
+			}
+		}
+		def.on_load = def.on_load or function(pos)
+			exacarts.add_to_map(pos)
+		end
+		def.on_construct = def.on_construct or function(pos)
+			exacarts.add_to_map(pos)
+		end
+		def.on_destruct = def.on_destruct or function(pos)
+			exacarts.remove_from_map(pos)
+		end
+
+		minetest.register_node(name,def)
+
+		if craft_recipe then
+			minetest.register_craft(craft_recipe)
+		else
+			item = item or "group:metalstick"
+			wood = wood or "group:stick"
+			minetest.register_craft({
+				output = name .." " .. (count or 16),
+				recipe={
+					{item,wood,item},
+					{item,wood,item},
+					{item,wood,item}
+				}
+			})
+		end
+	end
+}
 
 minetest.register_craft({
 	output="exacarts:cart",
@@ -34,32 +94,7 @@ minetest.register_craft({
 	},
 })
 
-minetest.register_node("exacarts:rail", {
-	description = "Rail",
-	drawtype="raillike",
-	walkable=false,
-	inventory_image="exacarts_straight.png",
-	tiles={"exacarts_straight.png","exacarts_curve.png","exacarts_junction.png","exacarts_cross.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3,rail=1,on_load=1},
-	sounds =  default.node_sound_metal_defaults(),
-	paramtype = "light",
-	sunlight_propagates = true,
-	selection_box = {
-		type = "fixed",
-		fixed = {
-			{-0.5, -0.5, -0.5, 0.5, -0.49, 0.5},
-		}
-	},
-	on_load=function(pos)
-		exacarts.add_to_map(pos)
-	end,
-	on_construct=function(pos)
-		exacarts.add_to_map(pos)
-	end,
-	on_destruct=function(pos)
-		exacarts.remove_from_map(pos)
-	end
-})
+exacarts.register_rail()
 
 minetest.register_tool("exacarts:cart", {
 	description = "Cart",
