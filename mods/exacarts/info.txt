@@ -1,5 +1,6 @@
 Righclick to enter/exit a cart
 Punch speed it up / pick up
+Hold right/left to turn right/left
 
 exacarts.register_rail({--	you can customize everything
 	name = "custom_rail"	required
