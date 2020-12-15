@@ -137,6 +137,35 @@ exacarts.register_rail({
 })
 
 exacarts.register_rail({
+	name="exit_rail",
+	description="Exit rail",
+	overlay="default_chest_top.png^[invert:g",
+	craft_wood = "group:sand",
+	on_rail=function(pos,self,v)
+		self.timeout = 1
+		if self.user then
+			self:on_rightclick(self.user)
+		end
+		minetest.add_item(pos,"exacarts:cart")
+		self.object:remove()
+	end,
+})
+
+exacarts.register_rail({
+	name="wood_rail",
+	description="Wooden rail (breaks if faster then 50)",
+	craft_item = "group:wood",
+	texture = "default_wood.png",
+	sounds = default.node_sound_wood_defaults(),
+	on_rail=function(pos,self,v)
+		if v > 50 then
+			minetest.add_item(pos,"exacarts:wood_rail")
+			minetest.remove_node(pos)
+		end
+	end,
+})
+
+exacarts.register_rail({
 	name="max",
 	description="Max speed rail",
 	craft_item = "default:diamond",
