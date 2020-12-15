@@ -2,14 +2,19 @@ Righclick to enter/exit a cart
 Punch speed it up / pick up
 Hold right/left to turn right/left
 
-exacarts.register_rail({--	you can customize everything
+exacarts.register_rail({--	you can customize the node's properties
 	name = "custom_rail"	required
 	texture = "texture"		"default_ironblock.png"
-
+	overlay = "texture"		""
+	wood_modifer = true,	nil (modifer the wood instead of the bar)
+	add_groups = groups	add to groups and instead of making a whole new group set
 	craft_recipe = def		you can make a full craft recipe, send directly to minetest.register_craft()
 				or automatically:
 
 	craft_item = "item"		"group:metalstick"
 	craft_wood = "item"	"group:stick"
 	craft_count = n		16
+
+	on_rail=function(pos,self,velocity)
+	end
 })
