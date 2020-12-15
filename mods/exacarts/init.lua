@@ -29,9 +29,10 @@ exacarts={
 	register_rail=function(def)
 		def = def or {}
 
+		local mod = minetest.get_current_modname()
 		local texture = def.texture or "default_ironblock.png"
 		local overlay = def.overlay and "^"..def.overlay or ""
-		local name = minetest.get_current_modname()..":"..(def.name or "rail")
+		local name = minetest.get_current_modname()..":".. (def.full_custom_name or def.name .. "_rail")
 		local craft_recipe = def.craft_recipe and table.copy(def.craft_recipe) or nil
 		local wood = def.craft_wood
 		local item = def.craft_item
@@ -49,6 +50,8 @@ exacarts={
 		def.craft = nil
 		def.wood_modifer = nil
 		def.add_groups = nil
+		def.name = nil
+		def.full_custom_name = nil
 
 		def.on_rail = def.on_rail -- function(pos,self,v)
 
@@ -112,6 +115,24 @@ exacarts={
 	end
 }
 
+for i,v in pairs({"detector","max","acceleration"}) do
+minetest.register_node("exacarts:"..v, {
+	description="just place or use to recover your item, necessary change :)",
+	groups = {on_load=1,not_in_creative_inventory=1},
+	on_load = function(pos,node)
+		minetest.set_node(pos,{name="exacarts:"..v.."_rail"})
+	end,
+	on_construct = function(pos)
+		minetest.set_node(pos,{name="exacarts:"..v.."_rail"})
+	end,
+	on_use=function(itemstack, user, pointed_thing)
+		local t = itemstack:to_table()
+		t.name = "exacarts:"..v.."_rail"
+		return t
+	end
+})
+end
+
 minetest.register_craft({
 	output="exacarts:cart",
 	recipe={
@@ -121,12 +142,12 @@ minetest.register_craft({
 	},
 })
 
-exacarts.register_rail()
+exacarts.register_rail({full_custom_name="rail"})
 
 exacarts.register_rail({
 	name="detector",
 	description="Detector rail",
-	overlay="default_chest_top.png^[invert:rg",
+	texture="default_steelblock.png^[invert:b",
 	add_groups = {exatec_wire=1,exatec_wire_connected=1,store=200},
 	on_rail=function(pos,self,v)
 		exatec.send(pos)
@@ -137,9 +158,40 @@ exacarts.register_rail({
 })
 
 exacarts.register_rail({
-	name="exit_rail",
+	name="toggle",
+	description="Toggleable rail",
+	texture="default_steelblock.png^[invert:rg",
+	add_groups = {exatec_wire_connected=1,store=200},
+	on_rail=function(pos,self,v)
+		exatec.send(pos)
+	end,
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("infotext",on == 0 and "On" or "Off")
+		exacarts.add_to_map(pos,"exacarts:acceleration")
+	end,
+	craft_recipe = {
+		output="exacarts:detector",
+		recipe={{"exacarts:rail","materials:diode","group:stick"}}},
+	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local on = m:get_int("on") == 1 and 0 or 1
+			m:set_int("on",on)
+			m:set_string("infotext",on == 0 and "On" or "Off")
+
+			if on == 1 then
+				exacarts.remove_from_map(pos)
+			else
+				exacarts.add_to_map(pos,"exacarts:toggle_rail")
+			end
+		end,
+	}
+})
+
+exacarts.register_rail({
+	name="exit",
 	description="Exit rail",
-	overlay="default_chest_top.png^[invert:g",
+	texture="default_steelblock.png^[invert:bg",
 	craft_wood = "group:sand",
 	on_rail=function(pos,self,v)
 		self.timeout = 1
@@ -152,7 +204,7 @@ exacarts.register_rail({
 })
 
 exacarts.register_rail({
-	name="wood_rail",
+	name="wood",
 	description="Wooden rail (breaks if faster then 50)",
 	craft_item = "group:wood",
 	texture = "default_wood.png",
