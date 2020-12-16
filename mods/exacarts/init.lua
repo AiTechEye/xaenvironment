@@ -194,7 +194,6 @@ exacarts.register_rail({
 	texture="default_steelblock.png^[invert:bg",
 	craft_wood = "group:sand",
 	on_rail=function(pos,self,v)
-		self.timeout = 1
 		if self.user then
 			self:on_rightclick(self.user)
 		end
@@ -228,7 +227,6 @@ exacarts.register_rail({
 		if v == mv then
 			return
 		end
-		self.timeout = 0.1
 		self.nextpos = nil
 		self.currpos = nil
 		self.v = mv
@@ -360,29 +358,29 @@ minetest.register_entity("exacarts:dotg",{
 minetest.register_entity("exacarts:cart",{
 	physical = true,
 	hp_max = 1,
+	stepheight = 0.3,
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5},
 	visual = "mesh",
 	mesh = "exacarts_minecart.obj",
 	textures = {"exacarts_minecart.png"},
 	backface_culling = false,
 	get_staticdata = function(self)
-		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos})
+		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos,items=self.items})
 	end,
 	on_activate=function(self, staticdata,dtime)
 		local save = minetest.deserialize(staticdata) or {}
 
 		self.derail = save.derail
 		self.lastpos = save.lastpos
+		self.items = save.items or {}
+		self.itemtimer = 0
 		self.index = {}
 		self.index_list={}
 		self.dir = save.dir or {x=0,y=0,z=0}
 		self.v = save.v or 0
 		self.rot = 0
-		self.timeout = 0
 		self.exacar = true
-
-		self.trackout_timer = 0
-		self.trackout = 0
+		self.hill = 0
 
 		self.object:set_armor_groups({immortal=1})
 
@@ -410,12 +408,9 @@ minetest.register_entity("exacarts:cart",{
 		return minetest.get_item_group(minetest.get_node(p).name,"rail") > 0
 	end,
 	pointat=function(self,d)
-		local pos = self.object:get_pos()
-		local yaw = num(self.object:get_yaw())
+		local pos = vector.round(self.object:get_pos())
 		d=d or 1
-		local x = math.sin(yaw) * -d
-		local z = math.cos(yaw) * d
-		return {x=pos.x+x,y=pos.y,z=pos.z+z}
+		return {x=pos.x+self.dir.x*d,y=pos.y+self.dir.y*d,z=pos.z+self.dir.z*d}
 	end,
 	hit=function(self,ob,dir)
 		ob:add_velocity({x=dir.x*self.v,y=dir.y*self.v,z=dir.z*self.v})
@@ -434,6 +429,15 @@ minetest.register_entity("exacarts:cart",{
 				self.user = nil
 			end
 		elseif clicker:is_player() then
+			if #self.items > 0 then
+				local p = self.object:get_pos()
+				for i,v in pairs(self.items) do
+					minetest.add_item(p,v)
+				end
+				self.itemtimer = 10
+				self.items = {}
+				return self
+			end
 			self.user = clicker
 			local name = clicker:get_player_name()
 			self.username = name
@@ -461,7 +465,7 @@ minetest.register_entity("exacarts:cart",{
 		return a ~= 0 and a/math.abs(a) or 0
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		if self.user and puncher:is_player() then
+		if (self.user or #self.items > 0) and puncher:is_player() then
 			local d = puncher:get_look_dir()
 			local v = math.abs(d.x) > math.abs(d.z) and {x=self.a(d.x),y=0,z=0} or {x=0,y=0,z=self.a(d.z)}
 			local p =  vector.round(self.object:get_pos())
@@ -498,8 +502,21 @@ minetest.register_entity("exacarts:cart",{
 		end
 		return false
 	end,
-	on_step = function(self,dtime,moveresult)
+	on_step = function(self,dtime)
 		if self.v == 0 and not self.derail then
+			if self.itemtimer < 0 then
+				self.itemtimer = 0.1
+				for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(),1)) do
+					local en = ob:get_luaentity()
+					if en and en.name == "__builtin:item" then
+						table.insert(self.items,en.itemstring)
+						ob:remove()
+print(dump(self.items))
+					end
+				end
+			elseif not self.user then
+				self.itemtimer = self.itemtimer -dtime
+			end
 			return self
 		end
 
@@ -543,23 +560,16 @@ minetest.register_entity("exacarts:cart",{
 			end
 		end
 
-		if self.timeout > 0 then
-			self.timeout = self.timeout -dtime
-			return self
-		elseif not self.derail then
+		if not self.derail then
 			local target = self.currpos and not vector.equals(self.currpos,p) and not vector.equals(self.nextpos,p)
 			local skip
-			self.trackout_timer = self.trackout_timer + dtime
-			if self.trackout_timer > 0.01 then
-				self.trackout_timer = 0
-				self.v = self.v-(self.trackout*0.1)
-				self.trackout = 0
-			end
 
 -- speed < 15
+
 			if self.v < 15 and not self.rerail and target and self.currpos then
-				self.object:move_to(self.nextpos)	
--- speed > 15: super speed
+				skip = self.dir.y == 0
+				self.object:move_to(self.nextpos)
+-- speed > 15: super speed, return to path
 			elseif self.v >= 15 and target then
 				self.rerail = nil
 				self.object:set_velocity({x=0,y=0,z=0})
@@ -594,7 +604,6 @@ minetest.register_entity("exacarts:cart",{
 					end
 				end
 
-
 				for n=1,a.n-1 do
 					local inx = self.index_list[1]
 					exacarts.on_rail(self.index[inx].pos,self)
@@ -609,8 +618,22 @@ minetest.register_entity("exacarts:cart",{
 					self.index[inx] = nil
 					table.remove(self.index_list,1)
 				end
-				self.trackout = self.trackout +min
+				self.v = self.v-(min*0.1)
 			end
+
+-- hill
+			self.v = self.v + dtime*self.hill
+			if self.v < 0 then
+				self.v = self.v > -1 and 1 or self.v*-1
+				self.hill = -1
+				self.dir = {x=self.dir.x*-1,y=self.dir.y*-1,z=self.dir.z*-1}
+				self.index = {}
+				self.index_list = {}
+				self.currpos = nil
+				self.nextpos = nil
+				return
+			end
+
 -- next path step
 
 			if skip or not self.nextpos or vector.equals(self.nextpos,p) then
@@ -645,6 +668,8 @@ minetest.register_entity("exacarts:cart",{
 						end
 					end
 
+					self.hill = i.dir.y*-10
+
 					self.dir = i.dir
 					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
@@ -653,6 +678,8 @@ minetest.register_entity("exacarts:cart",{
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
 					self.lastpos = i.pos
+					self.currpos = p
+
 
 					for _, ob in pairs(minetest.get_objects_inside_radius(i.pos, 1)) do
 						if not (self.user and ob:get_attach()) then
@@ -660,39 +687,63 @@ minetest.register_entity("exacarts:cart",{
 						end
 					end
 
+
+					exacarts.on_rail(p,self)
+
+
 -- derail
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
 						self.derail = true
 						self.object:move_to(apos(p,0,1))
 						self.object:set_properties({physical = true})
 						self.object:set_acceleration({x=0, y=-10, z =0})
-						return self
+						self.index_list = {}
+						self.index = {}
 					elseif not self.index_list[2] then
-						if default.def(minetest.get_node(p).name).walkable then
+						if default.def(minetest.get_node(self:pointat(2)).name).walkable then
 							self.v = 0
 							self.object:set_velocity({x=0,y=0,z=0})
 							self.object:set_pos(self.lastpos)
+						else
+							self.derail = true
+							self.object:set_properties({physical = true})
+							self.object:set_acceleration({x=0, y=-10, z =0})
+							self.object:move_to(apos(p,0,1))
 						end
-						self.derail = true
-						self.object:set_properties({physical = true})
-						self.object:set_acceleration({x=0, y=-10, z =0})
-						
+						self.index_list = {}
+						self.index = {}
 					end
-					self.currpos = p
-					exacarts.on_rail(p,self)
+
 				end
 			end
 			return self
 		else
-			if exacarts.in_map(p) and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
+-- derail
+			local in_map = exacarts.in_map(p)
+
+			if in_map and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
 				self.derail = nil
 				self.rerail = true
+				self.nextpos = nil
+				self.currpos = nil
 				self.object:set_properties({physical = false})
 				self.object:set_acceleration({x=0, y=0, z =0})
-				self.object:set_pos({x=pos.x,y=p.y,z=pos.z})
+				self.object:set_pos({x=p.x,y=p.y,z=p.z})
 				local v = self.object:get_velocity()
 				if v.x == 0 and v.z == 0 and v.y ~= 0 then
 					self.object:set_velocity({x=0,y=0,z=0})
+				end
+			elseif in_map then
+				self.derail_timer = (self.derail_timer or 0.5) -dtime
+				if self.derail_timer < 0 then
+					self.derail_timer = 0
+					if not self.derail_lastpos or not vector.equals(self.derail_lastpos,pos) then
+						self.derail_lastpos = pos
+					else
+						self.v = 0
+						self.nextpos = nil
+						self.currpos = nil
+					end
 				end
 			end
 
