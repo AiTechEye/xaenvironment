@@ -375,12 +375,11 @@ minetest.register_entity("exacarts:cart",{
 		self.lastpos = save.lastpos
 		self.index = {}
 		self.index_list={}
-		self.next_pos = {x=0,y=0,z=0}
 		self.dir = save.dir or {x=0,y=0,z=0}
 		self.v = save.v or 0
 		self.rot = 0
 		self.timeout = 0
-		self.exacartid = math.random(1,9999)
+		self.exacar = true
 
 		self.trackout_timer = 0
 		self.trackout = 0
@@ -436,9 +435,10 @@ minetest.register_entity("exacarts:cart",{
 			end
 		elseif clicker:is_player() then
 			self.user = clicker
+			local name = clicker:get_player_name()
+			self.username = name
 			self.user:set_attach(self.object, "",{x = 0, y = -4, z = -3}, {x = 0, y = 0, z = 0})
 			clicker:set_eye_offset({x=0,y=-7,z=0}, {x=0,y=0,z=0})
-			local name = clicker:get_player_name()
 			default.player_attached[name]=true
 			default.player_set_animation(clicker, "sit")
 
@@ -466,15 +466,30 @@ minetest.register_entity("exacarts:cart",{
 			local v = math.abs(d.x) > math.abs(d.z) and {x=self.a(d.x),y=0,z=0} or {x=0,y=0,z=self.a(d.z)}
 			local p =  vector.round(self.object:get_pos())
 			local dmg = tool_capabilities.damage_groups.fleshy or 1
-			if v.x == self.dir.x and v.z == self.dir.z then
+			if v.x == self.dir.x and v.z == self.dir.z then -- add
 				self.v = self.v + dmg
-			elseif self.v == 0 and exacarts.in_map({x=p.x+v.x,y=p.y,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y-1,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y+1,z=p.z+v.z}) then
+			elseif self.v == 0 and exacarts.in_map({x=p.x+v.x,y=p.y,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y-1,z=p.z+v.z}) or exacarts.in_map({x=p.x+v.x,y=p.y+1,z=p.z+v.z}) then --start
 				self.dir = v
 				self.v = dmg
-				self.next_pos = {x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z}
-			else
+			elseif v.x == self.dir.x*-1 and v.z == self.dir.z*-1 then-- sub
 				self.v = self.v - dmg
-				self.v = self.v > 0 and self.v or 0
+				if self.v < 0 then
+					self.v = self.v *-1
+					self.dir = {x=self.dir.x*-1,y=self.dir.y*-1,z=self.dir.z*-1}
+					self.index = {}
+					self.index_list = {}
+					self.currpos = nil
+					self.nextpos = nil
+					self.object:set_velocity({x=0,y=0,z=0})
+				elseif self.v <= 0 then
+					self.v = 0
+					self.dir = {x=0,y=0,z=0}
+					self.index = {}
+					self.index_list = {}
+					self.currpos = nil
+					self.nextpos = nil
+					self.object:set_velocity({x=0,y=0,z=0})
+				end
 			end
 		elseif puncher:is_player() then
 			puncher:get_inventory():add_item("main",ItemStack("exacarts:cart"))
@@ -571,9 +586,8 @@ minetest.register_entity("exacarts:cart",{
 				local obs = {}
 				for _, ob in pairs(minetest.get_objects_inside_radius(dpos, d)) do
 					local en = ob:get_luaentity()
-
 					local obpos = ob:get_pos()
-					if not (en and en.exacartid == self.exacartid) and not (self.user and vector.equals(pos,obpos)) then
+					if not (en and en.exacart) and not (self.user and ob:get_attach()) then
 						local op = minetest.pos_to_string(vector.round(obpos))
 						obs[op] = obs[op] or {}
 						table.insert(obs[op],ob)
@@ -640,8 +654,10 @@ minetest.register_entity("exacarts:cart",{
 					self.nextpos = i.pos
 					self.lastpos = i.pos
 
-					for _, ob in pairs(minetest.get_objects_inside_radius(self.index[inx].pos, 1)) do
-						self:hit(ob,i.dir)
+					for _, ob in pairs(minetest.get_objects_inside_radius(i.pos, 1)) do
+						if not (self.user and ob:get_attach()) then
+							self:hit(ob,i.dir)
+						end
 					end
 
 -- derail
