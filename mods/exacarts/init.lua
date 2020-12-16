@@ -380,6 +380,7 @@ minetest.register_entity("exacarts:cart",{
 		self.v = save.v or 0
 		self.rot = 0
 		self.timeout = 0
+		self.exacartid = math.random(1,9999)
 
 		self.trackout_timer = 0
 		self.trackout = 0
@@ -417,16 +418,21 @@ minetest.register_entity("exacarts:cart",{
 		local z = math.cos(yaw) * d
 		return {x=pos.x+x,y=pos.y,z=pos.z+z}
 	end,
+	hit=function(self,ob,dir)
+		ob:add_velocity({x=dir.x*self.v,y=dir.y*self.v,z=dir.z*self.v})
+		default.punch(ob,self.object,self.v)	
+	end,
 	on_rightclick=function(self, clicker)
 		if self.user then
 			local n = self.user:is_player() and self.user:get_player_name() or ""
 			if self.user:is_player() and self.user:get_player_name() == n then
-				default.player_attached[self.user:get_player_name()] = nil
+				local name = self.user:get_player_name()
+				default.set_on_player_death(name,"exacarts",nil)
+				default.player_attached[name] = nil
 				default.player_set_animation(self.user, "stand")
 				self.user:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 				self.user:set_detach()
 				self.user = nil
-
 			end
 		elseif clicker:is_player() then
 			self.user = clicker
@@ -435,28 +441,27 @@ minetest.register_entity("exacarts:cart",{
 			local name = clicker:get_player_name()
 			default.player_attached[name]=true
 			default.player_set_animation(clicker, "sit")
+
+			local sobject = self.object
+			default.set_on_player_death(name,"exacarts",function(player)
+				default.player_attached[player:get_player_name()] = nil
+				default.player_set_animation(player, "stand")
+				player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
+				if sobject and sobject:get_luaentity() then
+					sobject:get_luaentity().user = nil
+				end
+			end)
 		end
 	end,
 	lookat=function(self,d)
 		self.rot = (d.x*(-math.pi/2)) + (d.z < 0 and math.pi or 0)
 		self.object:set_rotation({x=d.y,y=self.rot,z=0})
 	end,
-	on_death=function(self)
-		if self.user then
-			self.on_rightclick(self)
-		end
-	end,
 	a=function(a)
 		return a ~= 0 and a/math.abs(a) or 0
 	end,
-	in_map=function(self,pos)
-		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
-	end,
-	in_map=function(self,pos)
-		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
-	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		if self.user then
+		if self.user and puncher:is_player() then
 			local d = puncher:get_look_dir()
 			local v = math.abs(d.x) > math.abs(d.z) and {x=self.a(d.x),y=0,z=0} or {x=0,y=0,z=self.a(d.z)}
 			local p =  vector.round(self.object:get_pos())
@@ -558,9 +563,35 @@ minetest.register_entity("exacarts:cart",{
 				local min = math.min(unpack(ilist))
 				local a = list[min]
 				self.object:set_pos(a.pos)
+
+
+				local i1 = self.index[self.index_list[1]]
+				local d = vector.distance(a.pos,i1.pos)
+				local dpos = {x=(i1.pos.x+(a.pos.x-i1.pos.x)/2), y=(i1.pos.y+(a.pos.y-i1.pos.y)/2), z=(i1.pos.z+(a.pos.z-i1.pos.z)/2)}
+				local obs = {}
+				for _, ob in pairs(minetest.get_objects_inside_radius(dpos, d)) do
+					local en = ob:get_luaentity()
+
+					local obpos = ob:get_pos()
+					if not (en and en.exacartid == self.exacartid) and not (self.user and vector.equals(pos,obpos)) then
+						local op = minetest.pos_to_string(vector.round(obpos))
+						obs[op] = obs[op] or {}
+						table.insert(obs[op],ob)
+					end
+				end
+
+
 				for n=1,a.n-1 do
 					local inx = self.index_list[1]
 					exacarts.on_rail(self.index[inx].pos,self)
+
+					local obp = minetest.pos_to_string(self.index[inx].pos)
+					if obs[obp] then
+						for _,v in pairs(obs[obp]) do
+							self:hit(v,self.index[inx].dir)
+						end
+					end
+				
 					self.index[inx] = nil
 					table.remove(self.index_list,1)
 				end
@@ -608,6 +639,11 @@ minetest.register_entity("exacarts:cart",{
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
 					self.lastpos = i.pos
+
+					for _, ob in pairs(minetest.get_objects_inside_radius(self.index[inx].pos, 1)) do
+						self:hit(ob,i.dir)
+					end
+
 -- derail
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
 						self.derail = true
