@@ -124,10 +124,6 @@ exaachievements.customize=function(user,name)
 	end
 end
 
-apos=function(pos,x,y,z)
-	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
-end
-
 exaachievements.form=function(name,user,ach_num)
 	local gui = "size[8,8] listcolors[#77777777;#777777aa;#000000ff] textlist[-0.2,0.7;8.2,7.6;list;"
 	local y = 0
