@@ -365,7 +365,11 @@ minetest.register_entity("exacarts:cart",{
 	textures = {"exacarts_minecart.png"},
 	backface_culling = false,
 	get_staticdata = function(self)
-		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos,items=self.items})
+		local items = {}
+		for i,v in pairs(self.items) do
+			table.insert(items,type(v) ~="string" and v:to_table() or v)
+		end
+		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos,items=items})
 	end,
 	on_activate=function(self, staticdata,dtime)
 		local save = minetest.deserialize(staticdata) or {}
@@ -383,6 +387,15 @@ minetest.register_entity("exacarts:cart",{
 		self.hill = 0
 
 		self.object:set_armor_groups({immortal=1})
+
+
+		if #self.items > 0 then
+			local items = {}
+			for i,v in pairs(self.items) do
+				table.insert(items,ItemStack(v))
+			end
+			self.items = items
+		end
 
 		if self.derail then
 			self.object:set_acceleration({x=0, y=-10, z =0})
@@ -432,7 +445,7 @@ minetest.register_entity("exacarts:cart",{
 			if #self.items > 0 then
 				local p = self.object:get_pos()
 				for i,v in pairs(self.items) do
-					minetest.add_item(p,v)
+					minetest.add_item(p,ItemStack(v))
 				end
 				self.itemtimer = 10
 				self.items = {}
@@ -503,15 +516,30 @@ minetest.register_entity("exacarts:cart",{
 		return false
 	end,
 	on_step = function(self,dtime)
+		local pos = self.object:get_pos()
 		if self.v == 0 and not self.derail then
 			if self.itemtimer < 0 then
 				self.itemtimer = 0.1
-				for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(),1)) do
+				for _, ob in pairs(minetest.get_objects_inside_radius(apos(pos,0,1),1)) do
 					local en = ob:get_luaentity()
 					if en and en.name == "__builtin:item" then
-						table.insert(self.items,en.itemstring)
+						local stack = ItemStack(en.itemstring)
+						for i,v in pairs(self.items) do
+							if v:get_name() == na then
+								stack = v:add_item(stack)
+								if stack:get_count() == 0 then
+									ob:remove()
+									return self
+								end
+								break
+							end
+						end
+						if #self.items < 100 then
+							table.insert(self.items,stack)
+						else
+							minetest.add_item(apos(pos,0,-0.5),stack)
+						end
 						ob:remove()
-print(dump(self.items))
 					end
 				end
 			elseif not self.user then
@@ -520,7 +548,6 @@ print(dump(self.items))
 			return self
 		end
 
-		local pos = self.object:get_pos()
 		local p = vector.round(pos)
 
 		if not self.derail and #self.index_list < 10+(math.ceil(self.v)) then
