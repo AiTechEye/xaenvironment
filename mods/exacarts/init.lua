@@ -792,17 +792,15 @@ minetest.register_entity("exacarts:cart",{
 					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
 					local oinx = self.index_list[1]
-
-					exacarts.on_rail(self.index[oinx].pos,self)
-
+					local opos = self.index[oinx].pos
 					self.index[oinx] = nil
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
 					self.lastpos = i.pos
 					self.currpos = p
 
-
-					for _, ob in pairs(minetest.get_objects_inside_radius(i.pos, 1)) do
+					exacarts.on_rail(opos,self)
+					for _, ob in pairs(minetest.get_objects_inside_radius(opos, 1)) do
 						local en = ob:get_luaentity()
 						if not (en and (en.exacart or en.name == "__builtin:item")) and not (self.user and ob:get_attach()) then
 							self:hit(ob,i.dir)
