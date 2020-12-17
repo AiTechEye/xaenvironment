@@ -175,6 +175,65 @@ minetest.register_craft({
 
 exacarts.register_rail({full_custom_name="rail"})
 
+minetest.register_entity("exacarts:dot",{
+	physical = false,
+	pointable=false,
+	textures = {"player_style_coin.png"},
+	use_texture_alpha=true,
+	t=1,
+	on_step=function(self, dtime)
+		self.t = self.t -dtime
+		if self.t < 0 then
+			self.object:remove()
+		end
+	end,
+})
+
+
+exacarts.register_rail({-- gives wierd acceleration
+	name="dir",
+	description="Direction rail",
+	inventory_image="(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png",
+	tiles = {"(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png"},
+	add_groups = {exatec_wire=1,exatec_wire_connected=1,store=200},
+	paramtype2 = "facedir",
+	drawtype = "nodebox",
+	node_box={
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+		}
+	},
+	on_rail=function(pos,self,v)
+		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		if not vector.equals(self.dir,dir) then
+			self.object:move_to({x=pos.x+dir.x,y=pos.y+dir.y,z=pos.z+dir.z})
+			self.dir = dir
+			self.index_list = {}
+			self.index = {}
+		end
+
+	end,
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("infotext","On")
+		exacarts.add_to_map(pos,"exacarts:dir_rail")
+	end,
+	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local on = m:get_int("on") == 1 and 0 or 1
+			m:set_int("on",on)
+			m:set_string("infotext",on == 0 and "On" or "Off")
+
+			if on == 1 then
+				exacarts.remove_from_map(pos)
+			else
+				exacarts.add_to_map(pos,"exacarts:dir_rail")
+			end
+		end,
+	}
+})
+
 exacarts.register_rail({
 	name="detector",
 	description="Detector rail",
@@ -799,14 +858,6 @@ minetest.register_entity("exacarts:cart",{
 					self.lastpos = i.pos
 					self.currpos = p
 
-					exacarts.on_rail(opos,self)
-					for _, ob in pairs(minetest.get_objects_inside_radius(opos, 1)) do
-						local en = ob:get_luaentity()
-						if not (en and (en.exacart or en.name == "__builtin:item")) and not (self.user and ob:get_attach()) then
-							self:hit(ob,i.dir)
-						end
-					end
-
 -- derail
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
 						self.derail = true
@@ -828,6 +879,14 @@ minetest.register_entity("exacarts:cart",{
 						end
 						self.index_list = {}
 						self.index = {}
+					end
+
+					exacarts.on_rail(opos,self)
+					for _, ob in pairs(minetest.get_objects_inside_radius(opos, 1)) do
+						local en = ob:get_luaentity()
+						if not (en and (en.exacart or en.name == "__builtin:item")) and not (self.user and ob:get_attach()) then
+							self:hit(ob,i.dir)
+						end
 					end
 				end
 			end
