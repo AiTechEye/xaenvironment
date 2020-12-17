@@ -1,7 +1,7 @@
 dofile(minetest.get_modpath("chakram") .. "/wood.lua")
 dofile(minetest.get_modpath("chakram") .. "/steel.lua")
 dofile(minetest.get_modpath("chakram") .. "/electric.lua")
-pvp=minetest.setting_getbool("enable_pvp")
+pvp=minetest.settings:get_bool("enable_pvp")
 chakramshot_user=""
 chakramshot_user_name=""
 chakram_shot_chakram={}
