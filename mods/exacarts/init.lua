@@ -175,22 +175,7 @@ minetest.register_craft({
 
 exacarts.register_rail({full_custom_name="rail"})
 
-minetest.register_entity("exacarts:dot",{
-	physical = false,
-	pointable=false,
-	textures = {"player_style_coin.png"},
-	use_texture_alpha=true,
-	t=1,
-	on_step=function(self, dtime)
-		self.t = self.t -dtime
-		if self.t < 0 then
-			self.object:remove()
-		end
-	end,
-})
-
-
-exacarts.register_rail({-- gives wierd acceleration
+exacarts.register_rail({-- gives weird acceleration
 	name="dir",
 	description="Direction rail",
 	inventory_image="(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png",
