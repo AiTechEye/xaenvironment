@@ -2,6 +2,10 @@ Righclick to enter/exit a cart
 Punch speed it up / pick up
 Hold right/left to turn right/left
 
+You can throw items into a cart to add them, the carts have a 100 slots inventory.
+You can sit in a cart with items, punch it to move it away, right click it drop the items.
+
+
 exacarts.register_rail({--	you can customize the node's properties
 	name = "name"		required, adds "_rail" or
 	full_custom_name = "name"	name that doesn't add "_rail"
