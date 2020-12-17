@@ -153,8 +153,68 @@ exacarts.register_rail({
 		exatec.send(pos)
 	end,
 	craft_recipe = {
-		output="exacarts:detector",
+		output="exacarts:detector_rail",
 		recipe={{"exacarts:rail","exatec:wire","group:stick"}}}
+})
+
+exacarts.register_rail({
+	name="drop_items",
+	description="Drop items rail",
+	texture="default_steelblock.png^[invert:rb",
+	add_groups = {exatec_wire=1,exatec_wire_connected=1,store=200},
+	on_rail=function(pos,self,v)
+		if #self.items > 0 then
+			local p = self.object:get_pos()
+			for i,v in pairs(self.items) do
+				minetest.add_item(p,ItemStack(v))
+			end
+			self.items = {}
+		end
+	end,
+	craft_recipe = {
+		output="exacarts:drop_items_rail",
+		recipe={{"exacarts:rail","materials:tube_metal"}}}
+})
+
+exacarts.register_rail({
+	name="stop_start",
+	description="Toggle stop start rail",
+	texture="default_copperblock.png^[invert:b",
+	add_groups = {exatec_wire_connected=1,store=200},
+	on_rail=function(pos,self,v)
+		if minetest.get_meta(pos):get_int("on") == 0 then
+			self.v = 0
+			self.object:set_velocity({x=0,y=0,z=0})
+			minetest.after(0,function(self,pos)
+				self.object:set_velocity({x=0,y=0,z=0})
+				self.object:set_pos(pos)
+			end,self,pos)
+		end
+	end,
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("infotext","Stop")
+		exacarts.add_to_map(pos,"exacarts:acceleration")
+	end,
+	craft_recipe = {
+		output="exacarts:stop_start_rail",
+		recipe={{"exacarts:rail","default:copper_ingot","group:stick"}}},
+	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local on = m:get_int("on") == 1 and 0 or 1
+			m:set_int("on",on)
+			m:set_string("infotext",on == 0 and "Stop" or "Start")
+			if on == 1 then
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
+					local en = ob:get_luaentity()
+					if en and en.exacart then
+						en.v = 1
+						ob:set_velocity({x=en.dir.x*en.v,y=en.dir.y*en.v,z=en.dir.z*en.v})
+					end
+				end
+			end
+		end,
+	}
 })
 
 exacarts.register_rail({
@@ -170,7 +230,7 @@ exacarts.register_rail({
 		exacarts.add_to_map(pos,"exacarts:acceleration")
 	end,
 	craft_recipe = {
-		output="exacarts:detector",
+		output="exacarts:toggle_rail",
 		recipe={{"exacarts:rail","materials:diode","group:stick"}}},
 	exatec={
 		on_wire = function(pos)
@@ -284,7 +344,7 @@ exacarts.register_rail({
 		m:set_string("infotext",t.." "..av.." (Last speed test: "..math.floor(self.v)..")")
 	end,
 	craft_recipe = {
-		output="exacarts:acceleration",
+		output="exacarts:acceleration_rail",
 		recipe={{"exacarts:rail","default:electric_lump"}}},
 	on_construct = function(pos)
 		local m = minetest.get_meta(pos)
@@ -299,12 +359,11 @@ exacarts.register_rail({
 			local n = tonumber(pressed.text) or m:get_int("v")
 			local t = pressed.type or m:get_string("type") ~= "" and m:get_string("type") or "+"
 			local types = {["+"]="1",["-"]="2",["Min"]="3",["Max"]="4",["None"]="5"}
-
 			n = t ~= "+" and t ~= "-" and n or 1
 			n = math.abs(n)
 			n = n <= 1000 and n or 1000
 
-			m:set_string("formspec","size[5,0.5]field[0,0;3,1;text;;"..n.."]dropdown[3,0;1,1;type;+,-,Min,Max;None;"..types[t].."]button_exit[4,-0.3;1,1;go;Go]")
+			m:set_string("formspec","size[5,0.5]field[0,0;3,1;text;;"..n.."]dropdown[3,0;1,1;type;+,-,Min,Max,None;"..types[t].."]button_exit[4,-0.3;1,1;go;Go]")
 			m:set_int("v",n)
 			m:set_string("type",t)
 			m:set_string("infotext",t.." "..n)
@@ -383,7 +442,7 @@ minetest.register_entity("exacarts:cart",{
 		self.dir = save.dir or {x=0,y=0,z=0}
 		self.v = save.v or 0
 		self.rot = 0
-		self.exacar = true
+		self.exacart = true
 		self.hill = 0
 
 		self.object:set_armor_groups({immortal=1})
@@ -527,7 +586,7 @@ minetest.register_entity("exacarts:cart",{
 				break
 			end
 		end
-		if #self.items < 2 then
+		if #self.items < 100 then
 			table.insert(self.items,stack)
 			return true
 		else
