@@ -1,16 +1,13 @@
 exacarts={
-	storage = minetest.get_mod_storage(),
+	storage=minetest.get_mod_storage(),
 	map = {},
 	add_to_map=function(pos,on_rail)
-		exacarts.map = exacarts.map or minetest.deserialize(exacarts.storage:get_string("map")) or {}
-		local p = exacarts.map[minetest.pos_to_string(pos)]
-		if not p then
+		if not exacarts.map[minetest.pos_to_string(pos)] then
 			exacarts.map[minetest.pos_to_string(pos)] = {on_rail=on_rail}
 			exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
 		end
 	end,
 	remove_from_map=function(pos)
-		exacarts.map = exacarts.map or minetest.deserialize(exacarts.storage:get_string("map")) or {}
 		exacarts.map[minetest.pos_to_string(pos)] = nil
 		exacarts.storage:set_string("map",minetest.serialize(exacarts.map))
 	end,
@@ -18,7 +15,7 @@ exacarts={
 		return exacarts.map[minetest.pos_to_string(pos)] ~= nil
 	end,
 	on_rail=function(pos,self)
-		local n = exacarts.map[minetest.pos_to_string(pos)] 
+		local n = exacarts.map[minetest.pos_to_string(pos)]
 		if n and n.on_rail then
 			local on_rail = default.def(n.on_rail).on_rail
 			if on_rail then
@@ -115,6 +112,16 @@ exacarts={
 	end
 }
 
+minetest.register_on_mods_loaded(function()
+	exacarts.map = minetest.deserialize(exacarts.storage:get_string("map")) or {}
+end)
+
+
+
+
+
+--remove this later, made if someone using it before the change
+
 for i,v in pairs({"detector","max","acceleration"}) do
 minetest.register_node("exacarts:"..v, {
 	description="just place or use to recover your item, necessary change :)",
@@ -132,6 +139,30 @@ minetest.register_node("exacarts:"..v, {
 	end
 })
 end
+minetest.register_entity("exacarts:dotr",{
+	on_step=function(self, dtime)
+		self.object:remove()
+	end,
+})
+minetest.register_entity("exacarts:dotb",{
+	use_texture_alpha=true,
+	on_step=function(self, dtime)
+		self.object:remove()
+	end,
+})
+minetest.register_entity("exacarts:dotr",{
+	on_step=function(self, dtime)
+		self.object:remove()
+	end,
+})
+
+
+
+
+
+
+
+
 
 minetest.register_craft({
 	output="exacarts:cart",
@@ -161,14 +192,19 @@ exacarts.register_rail({
 	name="drop_items",
 	description="Drop items rail",
 	texture="default_steelblock.png^[invert:rb",
-	add_groups = {exatec_wire=1,exatec_wire_connected=1,store=200},
+	add_groups = {store=200},
 	on_rail=function(pos,self,v)
 		if #self.items > 0 then
 			local p = self.object:get_pos()
 			for i,v in pairs(self.items) do
 				minetest.add_item(p,ItemStack(v))
 			end
+			for i,v in pairs(self.childs) do
+				v:set_detach()
+			end
+			self.childs = {}
 			self.items = {}
+			self.itemtimer = 2
 		end
 	end,
 	craft_recipe = {
@@ -193,7 +229,7 @@ exacarts.register_rail({
 	end,
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("infotext","Stop")
-		exacarts.add_to_map(pos,"exacarts:acceleration")
+		exacarts.add_to_map(pos,"exacarts:stop_start_rail")
 	end,
 	craft_recipe = {
 		output="exacarts:stop_start_rail",
@@ -227,7 +263,7 @@ exacarts.register_rail({
 	end,
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("infotext",on == 0 and "On" or "Off")
-		exacarts.add_to_map(pos,"exacarts:acceleration")
+		exacarts.add_to_map(pos,"exacarts:toggle_rail")
 	end,
 	craft_recipe = {
 		output="exacarts:toggle_rail",
@@ -283,24 +319,13 @@ exacarts.register_rail({
 	texture="default_diamondblock.png^[invert:g",
 	add_groups = {store=2000},
 	on_rail=function(pos,self,v)
-		local mv = minetest.get_meta(pos):get_int("v")
-		if v == mv then
-			return
-		end
-		self.nextpos = nil
-		self.currpos = nil
-		self.v = mv
-		self.object:set_velocity({x=0,y=0,z=0})
-		minetest.after(0,function(self,pos)
-			self.object:set_velocity({x=0,y=0,z=0})
-			self.object:set_pos(pos)
-		end,self,pos)
+		self.v = minetest.get_meta(pos):get_int("v")
 	end,
 	on_construct = function(pos)
 		local m = minetest.get_meta(pos)
 		m:set_string("formspec","size[1,0.5]button_exit[0,0;1,1;go;Setup]")
 		m:set_string("infotext","0")
-		exacarts.add_to_map(pos,"exacarts:acceleration")
+		exacarts.add_to_map(pos,"exacarts:max_rail")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.go and minetest.is_protected(pos, sender:get_player_name()) == false then
@@ -351,7 +376,7 @@ exacarts.register_rail({
 		m:set_string("formspec","size[1,0.5]button_exit[0,0;1,1;go;Setup]")
 		m:set_string("type","+")
 		m:set_string("infotext","+ 1")
-		exacarts.add_to_map(pos,"exacarts:acceleration")
+		exacarts.add_to_map(pos,"exacarts:acceleration_rail")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.go and minetest.is_protected(pos, sender:get_player_name()) == false then
@@ -383,34 +408,16 @@ minetest.register_tool("exacarts:cart", {
 	end,
 })
 
-minetest.register_entity("exacarts:dotb",{
+minetest.register_entity("exacarts:item",{
 	physical = false,
 	pointable=false,
-	textures = {"player_style_coin.png^[colorize:#00f"},
-	use_texture_alpha=true,
+	visual="wielditem",
+	visual_size = {x=0.1,y=0.1,z=0.1},
+	textures = {"default:stick"},
 	on_step=function(self, dtime)
-		self.object:remove()
-	end,
-})
-
-minetest.register_entity("exacarts:dotr",{
-	physical = false,
-	pointable=false,
-	textures = {"player_style_coin.png^[colorize:#f00"},
-	use_texture_alpha=true,
-	t=0,
-	on_step=function(self, dtime)
-		self.object:remove()
-	end,
-})
-
-minetest.register_entity("exacarts:dotg",{
-	physical = false,
-	pointable=false,
-	textures = {"player_style_coin.png^[colorize:#0f0"},
-	use_texture_alpha=true,
-	on_step=function(self, dtime)
-		self.object:remove()
+		if not self.object:get_attach() then
+			self.object:remove()
+		end
 	end,
 })
 
@@ -426,7 +433,7 @@ minetest.register_entity("exacarts:cart",{
 	get_staticdata = function(self)
 		local items = {}
 		for i,v in pairs(self.items) do
-			table.insert(items,type(v) ~="string" and v:to_table() or v)
+			table.insert(items,v:to_table())
 		end
 		return minetest.serialize({dir=self.dir,v=self.v,derail=self.derail,lastpos=self.lastpos,items=items})
 	end,
@@ -444,14 +451,16 @@ minetest.register_entity("exacarts:cart",{
 		self.rot = 0
 		self.exacart = true
 		self.hill = 0
+		self.childs = {}
 
 		self.object:set_armor_groups({immortal=1})
-
 
 		if #self.items > 0 then
 			local items = {}
 			for i,v in pairs(self.items) do
-				table.insert(items,ItemStack(v))
+				local item = ItemStack(v)
+				table.insert(items,item)
+				self:spawn_item(item:get_name())
 			end
 			self.items = items
 		end
@@ -506,7 +515,11 @@ minetest.register_entity("exacarts:cart",{
 				for i,v in pairs(self.items) do
 					minetest.add_item(p,ItemStack(v))
 				end
-				self.itemtimer = 10
+				for i,v in pairs(self.childs) do
+					v:set_detach()
+				end
+				self.childs = {}
+				self.itemtimer = 2
 				self.items = {}
 				return self
 			end
@@ -574,6 +587,12 @@ minetest.register_entity("exacarts:cart",{
 		end
 		return false
 	end,
+	spawn_item=function(self,item)
+		local ob = minetest.add_entity(self.object:get_pos(),"exacarts:item")
+		ob:set_attach(self.object, "",{x = math.random(-2,2), y = math.random(0,2), z = math.random(-2,2)}, {x = 0, y = 0, z = 0})
+		ob:set_properties({textures={item}})
+		table.insert(self.childs,ob)
+	end,
 	add_item=function(self,itemstring,ob)
 		local stack = ItemStack(itemstring)
 		local na = stack:get_name()
@@ -588,6 +607,7 @@ minetest.register_entity("exacarts:cart",{
 		end
 		if #self.items < 100 then
 			table.insert(self.items,stack)
+			self:spawn_item(na)
 			return true
 		else
 			minetest.add_item(apos(self.object:get_pos(),0,-0.5),stack)
@@ -610,6 +630,13 @@ minetest.register_entity("exacarts:cart",{
 				self.itemtimer = self.itemtimer -dtime
 			end
 			return self
+		elseif self.v >= 300 and not self.derail then
+			self.fxitimer = self.fxitimer or 0
+			self.fxitimer = self.fxitimer > -7 and self.fxitimer -dtime*30 or 0
+			self.object:set_properties({textures = {"exacarts_minecart.png^[combine:16x16:0,"..math.ceil(self.fxitimer*16).."=exacarts_superspeed.png"}})
+		elseif self.fxitimer then
+			self.fxitimer = nil
+			self.object:set_properties({textures = {"exacarts_minecart.png"}})
 		end
 
 		local p = vector.round(pos)
@@ -765,6 +792,9 @@ minetest.register_entity("exacarts:cart",{
 					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
 					local oinx = self.index_list[1]
+
+					exacarts.on_rail(self.index[oinx].pos,self)
+
 					self.index[oinx] = nil
 					table.remove(self.index_list,1)
 					self.nextpos = i.pos
@@ -778,10 +808,6 @@ minetest.register_entity("exacarts:cart",{
 							self:hit(ob,i.dir)
 						end
 					end
-
-
-					exacarts.on_rail(p,self)
-
 
 -- derail
 					if i.pos.y > p.y and (key.jump or not self.index_list[3]) then
@@ -805,7 +831,6 @@ minetest.register_entity("exacarts:cart",{
 						self.index_list = {}
 						self.index = {}
 					end
-
 				end
 			end
 			return self
