@@ -28,7 +28,6 @@ multidimensions={
 		flags="absvalue",
 	},
 }
-
 dofile(minetest.get_modpath("multidimensions") .. "/api.lua")
 dofile(minetest.get_modpath("multidimensions") .. "/dimensions.lua")
 dofile(minetest.get_modpath("multidimensions") .. "/tools.lua")
