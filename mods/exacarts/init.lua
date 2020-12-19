@@ -178,6 +178,27 @@ minetest.register_craft({
 exacarts.register_rail({full_custom_name="rail"})
 
 exacarts.register_rail({
+	name="derail",
+	description="Derail rail",
+	texture="default_stone.png",
+	add_groups = {store=200},
+	on_rail=function(pos,self,v)
+		self.derail = true
+		self.object:set_properties({physical = true})
+		self.object:set_acceleration({x=0, y=-10, z =0})
+		self.index_list = {}
+		self.index = {}
+		self.derailpos = pos
+		self.dir = self.olddir
+		self:lookat(self.olddir)
+		return self
+	end,
+	craft_recipe = {
+		output="exacarts:detector_rail",
+		recipe={{"exacarts:rail","group:stone"}}}
+})
+
+exacarts.register_rail({
 	name="dir",
 	description="Direction rail",
 	inventory_image="(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png",
@@ -881,6 +902,8 @@ minetest.register_entity("exacarts:cart",{
 
 					self.hill = i.dir.y*-10
 
+
+					self.olddir = {x=self.dir.x,y=self.dir.y,z=self.dir.z}
 					self.dir = i.dir
 					self:lookat(i.dir)
 					self.object:set_velocity({x=self.dir.x*self.v,y=self.dir.y*self.v,z=self.dir.z*self.v})
@@ -900,6 +923,9 @@ minetest.register_entity("exacarts:cart",{
 						self.object:set_acceleration({x=0, y=-10, z =0})
 						self.index_list = {}
 						self.index = {}
+						self.derailpos = pos
+						self.dir = self.olddir
+						self:lookat(self.olddir)
 					elseif not self.index_list[2] then
 						if default.def(minetest.get_node(self:pointat(2)).name).walkable then
 							self.v = 0
@@ -909,7 +935,9 @@ minetest.register_entity("exacarts:cart",{
 							self.derail = true
 							self.object:set_properties({physical = true})
 							self.object:set_acceleration({x=0, y=-10, z =0})
-							self.object:move_to(apos(p,0,1))
+							self.derailpos = pos
+							self.dir = self.olddir
+							self:lookat(self.olddir)
 						end
 						self.index_list = {}
 						self.index = {}
@@ -930,12 +958,12 @@ minetest.register_entity("exacarts:cart",{
 		else
 -- derail
 			local in_map = exacarts.in_map(p)
-
-			if in_map and not (self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p))) then
+			if in_map and not (self.derailpos and vector.equals(self.derailpos,p)) and not ((self.currpos and (vector.equals(self.currpos,p) or vector.equals(self.nextpos,p)))) then
 				self.derail = nil
 				self.rerail = true
 				self.nextpos = nil
 				self.currpos = nil
+				self.derailpos = nil
 				self.object:set_properties({physical = false})
 				self.object:set_acceleration({x=0, y=0, z =0})
 				self.object:set_pos({x=p.x,y=p.y,z=p.z})
