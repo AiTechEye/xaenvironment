@@ -13,6 +13,8 @@ exacarts.register_rail({--	you can customize the node's properties
 	texture = "texture"		"default_ironblock.png"
 	overlay = "texture"		""
 	wood_modifer = true,	nil (modifer the wood instead of the bar)
+	all_modifer = true,		nil (modifer the wood & bar)
+
 	add_groups = groups	add to groups and instead of making a whole new group set
 	craft_recipe = def		you can make a full craft recipe, send directly to minetest.register_craft()
 				or automatically:

@@ -34,7 +34,7 @@ exacarts={
 		local wood = def.craft_wood
 		local item = def.craft_item
 		local count = def.craft_count
-		local alpha = def.wood_modifer and "exacarts_rails_alpha2.png" or "exacarts_rails_alpha.png"
+		local alpha = def.wood_modifer and "exacarts_rails_alpha2.png" or def.all_modifer and "exacarts_rails_alpha3.png" or "exacarts_rails_alpha.png"
 		local add_groups = def.add_groups and table.copy(def.add_groups) or nil
 
 		def.overlay = nil
@@ -46,6 +46,7 @@ exacarts={
 		def.texture = nil
 		def.craft = nil
 		def.wood_modifer = nil
+		def.all_modifer = nil
 		def.add_groups = nil
 		def.name = nil
 		def.full_custom_name = nil
@@ -115,9 +116,6 @@ exacarts={
 minetest.register_on_mods_loaded(function()
 	exacarts.map = minetest.deserialize(exacarts.storage:get_string("map")) or {}
 end)
-
-
-
 
 
 --remove this later, made if someone using it before the change
@@ -192,8 +190,11 @@ exacarts.register_rail({-- gives weird acceleration
 	on_rail=function(pos,self,v)
 		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		if not vector.equals(self.dir,dir) then
-			self.object:move_to({x=pos.x+dir.x,y=pos.y+dir.y,z=pos.z+dir.z})
-			self.dir = dir
+			self.object:move_to(pos)
+			self.dir = {x=dir.x,y=0,z=dir.z}
+			self.nextpos = nil
+			self.lastpos = nil
+			self.currpos = nil
 			self.index_list = {}
 			self.index = {}
 		end
@@ -216,7 +217,10 @@ exacarts.register_rail({-- gives weird acceleration
 				exacarts.add_to_map(pos,"exacarts:dir_rail")
 			end
 		end,
-	}
+	},
+	craft_recipe = {
+		output="exacarts:dir_rail",
+		recipe={{"exacarts:rail","materials:gear_metal","group:metalstick"}}}
 })
 
 exacarts.register_rail({
@@ -239,9 +243,8 @@ exacarts.register_rail({
 	add_groups = {store=200},
 	on_rail=function(pos,self,v)
 		if #self.items > 0 then
-			local p = self.object:get_pos()
 			for i,v in pairs(self.items) do
-				minetest.add_item(p,ItemStack(v))
+				minetest.add_item(pos,ItemStack(v))
 			end
 			for i,v in pairs(self.childs) do
 				v:set_detach()
@@ -254,6 +257,24 @@ exacarts.register_rail({
 	craft_recipe = {
 		output="exacarts:drop_items_rail",
 		recipe={{"exacarts:rail","materials:tube_metal"}}}
+})
+
+exacarts.register_rail({
+	name="pickup_items",
+	description="Pick up items rail",
+	texture="default_silverblock.png",
+	add_groups = {store=600},
+	on_rail=function(pos,self,v)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos,2)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "__builtin:item" then
+				self:add_item(en.itemstring,ob)
+			end
+		end
+	end,
+	craft_recipe = {
+		output="exacarts:drop_items_rail",
+		recipe={{"exacarts:rail","default:silver_ingot"}}}
 })
 
 exacarts.register_rail({
@@ -337,6 +358,14 @@ exacarts.register_rail({
 		if self.user then
 			self:on_rightclick(self.user)
 		end
+		if #self.items > 0 then
+			for i,v in pairs(self.items) do
+				minetest.add_item(pos,ItemStack(v))
+			end
+			for i,v in pairs(self.childs) do
+				v:set_detach()
+			end
+		end
 		minetest.add_item(pos,"exacarts:cart")
 		self.object:remove()
 	end,
@@ -354,6 +383,24 @@ exacarts.register_rail({
 			minetest.remove_node(pos)
 		end
 	end,
+})
+
+exacarts.register_rail({
+	name="copper",
+	description="Copper rail",
+	craft_item = "default:copper_ingot",
+	texture = "default_copperblock.png",
+	sounds = default.node_sound_metal_defaults(),
+})
+
+exacarts.register_rail({
+	name="ice",
+	add_groups = {store=200,slippery=10},
+	description="Ice rail",
+	craft_item = "default:ice",
+	texture = "default_ice.png",
+	all_modifer = true,
+	sounds = default.node_sound_glass_defaults(),
 })
 
 exacarts.register_rail({
@@ -640,11 +687,12 @@ minetest.register_entity("exacarts:cart",{
 	add_item=function(self,itemstring,ob)
 		local stack = ItemStack(itemstring)
 		local na = stack:get_name()
+		ob:remove()
 		for i,v in pairs(self.items) do
 			if v:get_name() == na then
 				stack = v:add_item(stack)
 				if stack:get_count() == 0 then
-					return true
+					return
 				end
 				break
 			end
@@ -652,10 +700,8 @@ minetest.register_entity("exacarts:cart",{
 		if #self.items < 100 then
 			table.insert(self.items,stack)
 			self:spawn_item(na)
-			return true
 		else
 			minetest.add_item(apos(self.object:get_pos(),0,-0.5),stack)
-			return false
 		end
 	end,
 	on_step = function(self,dtime)
@@ -666,8 +712,7 @@ minetest.register_entity("exacarts:cart",{
 				for _, ob in pairs(minetest.get_objects_inside_radius(apos(pos,0,1),1)) do
 					local en = ob:get_luaentity()
 					if en and en.name == "__builtin:item" then
-						self:add_item(en.itemstring)
-						ob:remove()
+						self:add_item(en.itemstring,ob)
 					end
 				end
 			elseif not self.user then
