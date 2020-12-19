@@ -194,7 +194,7 @@ exacarts.register_rail({
 		return self
 	end,
 	craft_recipe = {
-		output="exacarts:detector_rail",
+		output="exacarts:derail_rail",
 		recipe={{"exacarts:rail","group:stone"}}}
 })
 
