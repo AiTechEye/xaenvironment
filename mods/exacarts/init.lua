@@ -87,6 +87,10 @@ exacarts={
 		def.on_destruct = def.on_destruct or function(pos)
 			exacarts.remove_from_map(pos)
 		end
+		def.on_blast = def.on_blast or function(pos)
+			exacarts.remove_from_map(pos)
+		end
+
 
 		if add_groups then
 			for i,v in pairs(add_groups) do
@@ -325,7 +329,7 @@ exacarts.register_rail({
 	texture="default_steelblock.png^[invert:rg",
 	add_groups = {exatec_wire_connected=1,store=200},
 	on_construct = function(pos)
-		minetest.get_meta(pos):set_string("infotext",on == 0 and "On" or "Off")
+		minetest.get_meta(pos):set_string("infotext","On")
 		exacarts.add_to_map(pos,"exacarts:toggle_rail")
 	end,
 	craft_recipe = {
