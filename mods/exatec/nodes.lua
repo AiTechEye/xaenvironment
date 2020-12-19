@@ -2041,6 +2041,13 @@ minetest.register_node("exatec:industrial_miner", {
 			minetest.remove_node(d)
 		end
 	end,
+	on_blast = function(pos)
+		minetest.get_meta(pos):set_string("pos","") 
+		local d = {x=pos.x,y=pos.y-1,z=pos.z}
+		if exatec.get_node(d) == "exatec:vacuumtransport" then
+			minetest.remove_node(d)
+		end
+	end
 })
 
 minetest.register_node("exatec:vacuumtransport", {
@@ -2056,6 +2063,17 @@ minetest.register_node("exatec:vacuumtransport", {
 		}
 	},
 	after_destruct=function(pos)
+		local u = {x=pos.x,y=pos.y+1,z=pos.z}
+		if exatec.get_node(u) == "exatec:vacuumtransport" then
+			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("base"))
+			if p == nil then
+				return
+			elseif minetest.get_meta(p):get_string("pos") == "" then
+				minetest.remove_node(u)
+			end
+		end
+	end,
+	on_blast = function(pos)
 		local u = {x=pos.x,y=pos.y+1,z=pos.z}
 		if exatec.get_node(u) == "exatec:vacuumtransport" then
 			local p = minetest.string_to_pos(minetest.get_meta(pos):get_string("base"))
