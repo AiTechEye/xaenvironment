@@ -19,7 +19,7 @@ exacarts={
 		if n and n.on_rail then
 			local on_rail = default.def(n.on_rail).on_rail
 			if on_rail then
-				on_rail(pos,self,self.v)
+				return on_rail(pos,self,self.v)
 			end
 		end
 	end,
@@ -173,7 +173,7 @@ minetest.register_craft({
 
 exacarts.register_rail({full_custom_name="rail"})
 
-exacarts.register_rail({-- gives weird acceleration
+exacarts.register_rail({
 	name="dir",
 	description="Direction rail",
 	inventory_image="(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png",
@@ -197,6 +197,7 @@ exacarts.register_rail({-- gives weird acceleration
 			self.currpos = nil
 			self.index_list = {}
 			self.index = {}
+			return self
 		end
 
 	end,
@@ -323,9 +324,6 @@ exacarts.register_rail({
 	description="Toggleable rail",
 	texture="default_steelblock.png^[invert:rg",
 	add_groups = {exatec_wire_connected=1,store=200},
-	on_rail=function(pos,self,v)
-		exatec.send(pos)
-	end,
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("infotext",on == 0 and "On" or "Off")
 		exacarts.add_to_map(pos,"exacarts:toggle_rail")
@@ -368,6 +366,7 @@ exacarts.register_rail({
 		end
 		minetest.add_item(pos,"exacarts:cart")
 		self.object:remove()
+		return self
 	end,
 })
 
@@ -813,8 +812,9 @@ minetest.register_entity("exacarts:cart",{
 
 				for n=1,a.n-1 do
 					local inx = self.index_list[1]
-					exacarts.on_rail(self.index[inx].pos,self)
-
+					if exacarts.on_rail(self.index[inx].pos,self) then
+						return
+					end
 					local obp = minetest.pos_to_string(self.index[inx].pos)
 					if obs[obp] then
 						for _,v in pairs(obs[obp]) do
@@ -911,7 +911,9 @@ minetest.register_entity("exacarts:cart",{
 						self.index = {}
 					end
 
-					exacarts.on_rail(opos,self)
+					if exacarts.on_rail(opos,self) then
+						return
+					end
 					for _, ob in pairs(minetest.get_objects_inside_radius(opos, 1)) do
 						local en = ob:get_luaentity()
 						if not (en and (en.exacart or en.name == "__builtin:item")) and not (self.user and ob:get_attach()) then
