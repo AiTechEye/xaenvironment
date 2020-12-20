@@ -6,6 +6,9 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
 ## Compatible for minetest 3.4-dev
 
+[Releases](https://github.com/AiTechEye/xaenvironment/releases)  
+[Minetest forum topic](https://forum.minetest.net/viewtopic.php?f=15&t=22340) 
+
 ---
 
 ## api info:
@@ -17,5 +20,3 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 [nitroglycerin](mods/nitroglycerin/api.lua)  
 [player_style](mods/player_style/info.txt)  
 [examobs](mods/examobs/api%20info.txt)  
-
-
