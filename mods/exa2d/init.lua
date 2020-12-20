@@ -107,7 +107,7 @@ exa2d.mapgen=function(pos,dir,fdir)
 
 	for xz=20,-20,-1 do
 	if xz <= 2 and xz >= 0 -2 then
-		goto continue
+		goto conti
 	end
 	for y=5,-5,-1 do
 		if dir.z ~= 0 then
@@ -162,7 +162,7 @@ exa2d.mapgen=function(pos,dir,fdir)
 		end
 
 	end
-		::continue::
+		::conti::
 	end
 
 	if save then
