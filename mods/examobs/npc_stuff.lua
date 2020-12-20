@@ -89,9 +89,9 @@ examobs.on_chat=function(pos,name,msg,self,object)
 
 		if not en then
 			table.remove(examobs.npc.list,index)
-			goto continue
+			goto conti
 		elseif self and self.examob == en.examob then
-			goto continue
+			goto conti
 		end
 
 		for i,v in pairs(examobs.npc.conversations) do
@@ -121,7 +121,7 @@ examobs.on_chat=function(pos,name,msg,self,object)
 				end
 			end
 		end
-		::continue::
+		::conti::
 	end
 end
 
