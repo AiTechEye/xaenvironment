@@ -280,7 +280,7 @@ minetest.register_entity("default:arrow",{
 	end,
 	is_hit=function(self,p,ob)
 		local en  = ob:get_luaentity()
-		if (bows.pvp and ob:is_player() and self.dir and ob:get_player_name() ~= self.user:get_player_name()) or en and en.physical and (not en.bow_arrow and en.name ~= "__builtin:item" and self.user.examob ~= en.examob) then
+		if self.dir and ((bows.pvp and ob:is_player() and ob:get_player_name() ~= self.user:get_player_name()) or (en and en.physical and (not en.bow_arrow and en.name ~= "__builtin:item" and self.user.examob ~= en.examob))) then
 			local c = ob:get_properties().collisionbox
 			local o = ob:get_pos()
 			local pp = {x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z}
