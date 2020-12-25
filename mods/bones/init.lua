@@ -109,6 +109,10 @@ end)
 
 minetest.register_on_dieplayer(function(player)
 	bones.drop(player)
+	local name = player:get_player_name()
+	local p = minetest.pos_to_string(vector.round(player:get_pos()))
+	minetest.chat_send_player(name,p)
+	minetest.log("action",name.."died at "..p)
 end)
 bones.drop=function(player)
 	if bones.enabled and not bones.creative then
