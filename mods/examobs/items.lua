@@ -589,3 +589,123 @@ minetest.register_node("examobs:titan_core", {
 	light_source=14,
 	damage_per_second = 9,
 })
+
+-- ================ torpedo ================
+minetest.register_craft({
+	output = "examobs:torpedo 5",
+	recipe = {
+		{"","default:uranium_lump",""},
+		{"materials:fanblade_metal","materials:diode","default:iron_ingot"},
+		{"","materials:gear_metal",""}
+	}
+})
+
+minetest.register_craftitem("examobs:torpedo",{
+	description = "Torpedo (aim to a mob & use, works best in water)",
+	groups = {treasure=1,store=300},
+	inventory_image = "examobs_torpedo.png",
+	wield_scale={x=2,y=2,z=1},
+	on_use=function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		local p1 = user:get_pos()
+		local d = user:get_look_dir()
+		local pointat = {x=p1.x+(d.x*2),y=p1.y+(d.y*2)+1.5,z=p1.z+(d.z*2)}
+		local p2 = {x=p1.x+(d.x*50),y=p1.y+1.5+(d.y*50)+1.5,z=p1.z+(d.z*50)}
+		for v in minetest.raycast(pointat,p2) do
+			if v.type == "node" then
+				return itemstack
+			elseif v.type == "object" then
+				local en = v.ref:get_luaentity()
+				if en and en.examob then
+					local e = minetest.add_entity(pointat,"examobs:torpedo")
+					e:get_luaentity().target = v.ref
+					itemstack:take_item()
+					return itemstack
+				end
+			end
+		end
+	end
+})
+
+minetest.register_entity("examobs:torpedo",{
+	hp_max = 1,
+	visual = "wielditem",
+	visual_size={x=0.2,y=0.2,z=1},
+	pointable = false,
+	textures={"examobs:torpedo"},
+	on_activate=function(self, staticdata)
+		self.torpedo = math.random(1,9999)
+		self.object:set_acceleration({x=0,y=-10,z=0})
+	end,
+	blow=function(self)
+		if not self.blowed then
+			self.target = nil
+			self.blowed = true
+			nitroglycerin.explode(self.object:get_pos(),{radius=5,set="air"})
+			self.object:remove()
+		end
+	end,
+	on_blow=function(self)
+		if not self.blowed then
+			self.target = nil
+			self.blowed = true
+			local p = self.object:get_pos()
+			minetest.after(0,function(p)
+				nitroglycerin.explode(p,{radius=3,set="air"})
+				self.object:remove()
+			end,p)
+		end
+	end,
+	on_step=function(self,dtime)
+		if self.target then
+			self.timer = (self.timer or 0) + dtime
+			local pos1 = self.object:get_pos()
+			local pos2 = self.target:get_pos()
+			if not (pos2 and pos2.y) then
+				self:blow()
+				return
+			end
+			local v = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+			local y = math.atan(v.z/v.x)
+			local z = math.atan(v.y/math.sqrt(v.x^2+v.z^2))
+			if pos1.x >= pos2.x then y = y+math.pi end
+			self.object:set_rotation({x=0,y=y,z=z+(math.pi/4)})
+
+			local def = default.def(minetest.get_node(pos1).name)
+
+			if def.liquidtype == "none" then
+				local vy = self.object:get_velocity() or {x=0,y=0,z=0}
+				self.object:set_velocity({x=v.x*-1,y=vy.y,z=v.z*-1})
+				if self.splash then
+					self.splash = nil
+					self.object:set_acceleration({x=0,y=-10,z=0})
+				end
+			else
+				if not self.splash then
+					self.splash = true
+					if self.timer > 0.1 then
+						default.watersplash(pos1)
+					end
+				end
+				self.object:set_acceleration({x=0,y=0,z=0})
+				self.object:set_velocity(vector.multiply(v,-1))
+			end
+
+			if self.timer < 0.5 then
+				return self
+			elseif def.walkable then
+				self:blow()
+				return self
+			end
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos1,1)) do
+				local en = ob:get_luaentity()
+				if not (en and (en.torpedo == self.torpedo or en.name == "default:watersplash_ring")) then
+					self:blow()
+					return self
+				end
+			end
+		elseif not self.blowed then
+			self:blow()
+		end
+	end,
+})
