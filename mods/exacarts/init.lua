@@ -289,7 +289,7 @@ exacarts.register_rail({
 	name="pickup_items",
 	description="Pick up items rail",
 	texture="default_silverblock.png",
-	add_groups = {store=600},
+	add_groups = {store=800},
 	on_rail=function(pos,self,v)
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos,2)) do
 			local en = ob:get_luaentity()
@@ -307,7 +307,7 @@ exacarts.register_rail({
 	name="stop_start",
 	description="Toggle stop start rail",
 	texture="default_copperblock.png^[invert:b",
-	add_groups = {exatec_wire_connected=1,store=200},
+	add_groups = {exatec_wire_connected=1,store=600},
 	on_rail=function(pos,self,v)
 		if minetest.get_meta(pos):get_int("on") == 0 then
 			self.v = 0
@@ -376,6 +376,7 @@ exacarts.register_rail({
 	name="exit",
 	description="Exit rail",
 	texture="default_steelblock.png^[invert:bg",
+	add_groups = {store=200},
 	craft_wood = "group:sand",
 	on_rail=function(pos,self,v)
 		if self.user then
@@ -400,6 +401,7 @@ exacarts.register_rail({
 	description="Wooden rail (breaks if faster then 50)",
 	craft_item = "group:wood",
 	texture = "default_wood.png",
+	add_groups = {store=200},
 	sounds = default.node_sound_wood_defaults(),
 	on_rail=function(pos,self,v)
 		if v > 50 then
@@ -412,6 +414,7 @@ exacarts.register_rail({
 exacarts.register_rail({
 	name="copper",
 	description="Copper rail",
+	add_groups = {store=3000},
 	craft_item = "default:copper_ingot",
 	texture = "default_copperblock.png",
 	sounds = default.node_sound_metal_defaults(),
@@ -432,7 +435,7 @@ exacarts.register_rail({
 	description="Max speed rail",
 	craft_item = "default:diamond",
 	texture="default_diamondblock.png^[invert:g",
-	add_groups = {store=2000},
+	add_groups = {store=5400},
 	on_rail=function(pos,self,v)
 		self.v = minetest.get_meta(pos):get_int("v")
 	end,
@@ -459,7 +462,7 @@ exacarts.register_rail({
 	name="acceleration",
 	description="Acceleration rail",
 	texture="default_electricblock.png",
-	add_groups = {store=400},
+	add_groups = {store=1000},
 	on_rail=function(pos,self,v)
 		local m = minetest.get_meta(pos)
 		local t = m:get_string("type")
