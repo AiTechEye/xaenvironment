@@ -125,6 +125,7 @@ minetest.register_on_joinplayer(function(player)
 	player_style.players[name] = {sounds={},dive_sound={dive=false,time=0}}
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
+	player_style.players[name].wield_item = {}
 
 	if minetest.check_player_privs(name,{ability2d=true}) then
 		player_style.players[name].ability2d = {joining=0}
@@ -465,6 +466,34 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 
+-- ========
+
+		local witem = player:get_wielded_item():get_name()
+
+		if ppr.wield_item.item ~= witem then
+			ppr.wield_item.item = witem
+			local ob = ppr.wield_item.object
+			local node = minetest.registered_nodes[witem]
+			if ob and (witem == "" or node ~= ppr.wield_item.node) then
+				ob:remove()
+				ob = nil
+			end
+			ppr.wield_item.node = node
+			if witem ~= "" then
+				if not (ob and ob:get_luaentity()) then
+					ob = minetest.add_entity(p,"player_style:wielditem")
+					ppr.wield_item.object = ob
+				end
+				if node then
+					ob:set_attach(player, "Bone.003",{x=0, y=6, z=3}, {x=90, y=0,z=270})
+					ob:set_properties({textures={witem},visual_size = {x=0.3,y=0.3}})
+				else
+					ob:set_attach(player, "Bone.003",{x=0, y=3, z=3}, {x=90, y=0,z=270})
+					ob:set_properties({textures={witem},visual_size = {x=0.4,y=0.4}})
+				end
+			end
+			
+		end
 -- ========
 
 		if not attached_players[name] then

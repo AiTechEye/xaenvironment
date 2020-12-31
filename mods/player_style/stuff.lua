@@ -186,3 +186,12 @@ minetest.register_craftitem("player_style:coin", {
 		return itemstack
 	end
 })
+
+minetest.register_entity("player_style:wielditem",{
+	physical = false,
+	pointable = false,
+	visual = "wielditem",
+	visual_size = {x=0.4,y=0.4},
+	textures = {"default:stick"},
+	static_save = false,
+})
