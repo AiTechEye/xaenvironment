@@ -604,7 +604,7 @@ minetest.register_craftitem("examobs:torpedo",{
 	description = "Torpedo (aim to a mob & use, works best in water)",
 	groups = {treasure=1,store=300},
 	inventory_image = "examobs_torpedo.png",
-	wield_scale={x=2,y=2,z=1},
+	wield_scale={x=1,y=1,z=0.5},
 	on_use=function(itemstack, user, pointed_thing)
 		local name = user:get_player_name()
 		local p1 = user:get_pos()
@@ -630,7 +630,7 @@ minetest.register_craftitem("examobs:torpedo",{
 minetest.register_entity("examobs:torpedo",{
 	hp_max = 1,
 	visual = "wielditem",
-	visual_size={x=0.2,y=0.2,z=1},
+	visual_size={x=0.4,y=0.4,z=2},
 	pointable = false,
 	textures={"examobs:torpedo"},
 	on_activate=function(self, staticdata)
