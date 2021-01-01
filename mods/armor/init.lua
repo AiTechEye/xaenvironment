@@ -23,6 +23,8 @@ armor.show=function(player)
 		"listcolors[#77777777;#777777aa;#000000ff]"..
 		"list[detached:armor;main;2,0.5;5,1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
+		"listring[current_player;main]" ..
+		"listring[detached:armor;main]" ..
 		"item_image[2,0.5;1,1;armor:iron_chestplate]" ..
 		"item_image[3,0.5;1,1;armor:iron_helmet]" ..
 		"item_image[4,0.5;1,1;armor:iron_gloves]" ..
