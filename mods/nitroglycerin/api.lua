@@ -298,8 +298,7 @@ if node.velocity==1 then
 		end
 	end
 end
-	minetest.sound_play("nitroglycerin_explode2", {pos=pos, gain = 20, max_hear_distance = node.radius*8})
-	minetest.sound_play("nitroglycerin_explode3", {pos=pos, gain = 20, max_hear_distance = node.radius*8})
+	minetest.sound_play("nitroglycerin_explode4", {pos=pos, gain = 20, max_hear_distance = node.radius*8})
 	if node.radius>9 then
 		minetest.sound_play("nitroglycerin_nuke", {pos=pos, gain = 0.5, max_hear_distance = node.radius*30})
 	end
