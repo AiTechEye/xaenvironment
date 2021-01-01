@@ -9,6 +9,13 @@ protect = {
 
 minetest.register_on_mods_loaded(function()
 	protect.areas = minetest.deserialize(protect.storage:get_string("areas")) or {}
+	for i,v in pairs(protect.areas) do
+		if v.game_rule and default.date("d",v.date) > 90 then
+			protect.remove_game_rule_area(v.id)
+		end
+
+	end
+
 end)
 
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
