@@ -166,10 +166,12 @@ minetest.register_on_joinplayer(function(player)
 		on_put = function(inv, listname, index, stack, player)
 			armor.update(player)
 			armor.show(player)
+			player_style.inventory(player)
 		end,
 		on_take = function(inv, listname, index, stack, player)
 			armor.update(player)
 			armor.show(player)
+			player_style.inventory(player)
 		end,
 	})
 	armor.user[name].inv:set_size("main", 5)
