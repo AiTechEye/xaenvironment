@@ -189,6 +189,9 @@ if node.blow_nodes==1 then
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 
+	local affected_nodes = {}
+
+
 	for z = -node.radius, node.radius do
 	for y = -node.radius, node.radius do
 	for x = -node.radius, node.radius do
@@ -198,7 +201,9 @@ if node.blow_nodes==1 then
 
 		if data[v]~=air and node.radius/rad>=1 and minetest.is_protected(p, node.user_name)==false then
 
-			local no=minetest.registered_nodes[minetest.get_node(p).name] or {}
+			local nname = minetest.get_node(p).name
+			local no=minetest.registered_nodes[nname] or {}
+			table.insert(affected_nodes,{pos=p,name=nname})
 
 			if not (no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius and no.on_blast(p,node.radius) == true) then
 				if node.set~="" and not (no.groups and no.groups.unbreakable) then
@@ -229,7 +234,6 @@ if node.blow_nodes==1 then
 	vox:update_map()
 	vox:update_liquids()
 
-
 	for z = -node.radius, node.radius,node.radius do
 	for y = -node.radius, node.radius,node.radius do
 	for x = -node.radius, node.radius,node.radius do
@@ -239,7 +243,37 @@ if node.blow_nodes==1 then
 	end
 	end
 
+	for i,v in pairs(affected_nodes) do
+		local no = minetest.registered_nodes[v.name]
 
+		local img
+		if i < 200 and no then
+			local tiles = no.tiles or no.special_tiles
+			if type(tiles[1]) == "table" and tiles[1].name then
+				img = tiles[1].name
+			elseif type(tiles[1]) == "string" then
+				img = tiles[math.random(1,#tiles)]
+			end
+
+			if type(img) == "string" then
+				local d=math.max(1,vector.distance(pos,v.pos))
+				local dmg=(4/d)*node.radius
+				local vl = {x=(v.pos.x-pos.x)*dmg, y=(v.pos.y-pos.y)*dmg, z=(v.pos.z-pos.z)*dmg}
+
+				minetest.add_particle({
+					pos=v.pos,
+					velocity=vl,
+					acceleration={x=0,y=-10,z=0},
+					expirationtime=50,
+					size=math.random(5,10),
+					collisiondetection=true,
+					collision_removal=true,
+					--vertical=true,
+					texture="[combine:16x16:"..math.random(-16,0)..","..math.random(-16,0).."="..img,
+				})
+			end
+		end
+	end
 
 end
 if node.hurt==1 then
@@ -265,9 +299,8 @@ if node.velocity==1 then
 		if ob:get_luaentity() and not (ob:get_luaentity().nitroglycerine_dust and ob:get_luaentity().nitroglycerine_dust==2) then
 			ob:set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
 			if ob:get_luaentity() and ob:get_luaentity().nitroglycerine_dust then ob:get_luaentity().nitroglycerine_dust=2 end
-
 		elseif ob:is_player() then
-			ob:add_player_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
+			ob:add_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
 		end
 	end
 end
