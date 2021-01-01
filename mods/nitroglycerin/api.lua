@@ -167,7 +167,6 @@ nitroglycerin.explode=function(pos,node)
 
 
 if node.blow_nodes==1 then
-
 	local nodes={}
 	if node.set~="" then node.set=minetest.get_content_id(node.set) end
 
@@ -188,7 +187,6 @@ if node.blow_nodes==1 then
 	local min, max = vox:read_from_map(pos1, pos2)
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
-
 	local affected_nodes = {}
 
 
@@ -200,7 +198,6 @@ if node.blow_nodes==1 then
 		local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
 
 		if data[v]~=air and node.radius/rad>=1 and minetest.is_protected(p, node.user_name)==false then
-
 			local nname = minetest.get_node(p).name
 			local no=minetest.registered_nodes[nname] or {}
 			table.insert(affected_nodes,{pos=p,name=nname})
@@ -245,7 +242,6 @@ if node.blow_nodes==1 then
 
 	for i,v in pairs(affected_nodes) do
 		local no = minetest.registered_nodes[v.name]
-
 		local img
 		if i < 200 and no then
 			local tiles = no.tiles or no.special_tiles
@@ -268,13 +264,11 @@ if node.blow_nodes==1 then
 					size=math.random(5,10),
 					collisiondetection=true,
 					collision_removal=true,
-					--vertical=true,
 					texture="[combine:16x16:"..math.random(-16,0)..","..math.random(-16,0).."="..img,
 				})
 			end
 		end
 	end
-
 end
 if node.hurt==1 then
 	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
