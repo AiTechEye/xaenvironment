@@ -16,23 +16,22 @@ player_style.register_button({
 
 armor.show=function(player)
 	local name = player:get_player_name()
-	minetest.after(0.2, function(name)
+	local skin = player:get_properties().textures[1] or "character.png"
+	minetest.after(0.2, function(name,skin)
 		return minetest.show_formspec(name, "armor",
-		"size[8,5]" ..
+		"size[8,6]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]"..
-		"list[detached:armor;main;1.5,0;5,1;]" ..
-		"list[current_player;main;0,1.3;8,4;]" ..
-		"listring[current_player;main]" ..
-		"listring[detached:armor;main]" ..
-		"item_image[1.5,0;1,1;armor:iron_chestplate]" ..
-		"item_image[2.5,0;1,1;armor:iron_helmet]" ..
-		"item_image[3.5,0;1,1;armor:iron_gloves]" ..
-		"item_image[4.5,0;1,1;armor:iron_boots]" ..
-		"item_image[5.5,0;1,1;armor:iron_leggings]" .. 
-		"label[0,-0.1;Level: "..(armor.user[name].armorlevel or 0).."]"
+		"list[detached:armor;main;2,0.5;5,1;]" ..
+		"list[current_player;main;0,2.3;8,4;]" ..
+		"item_image[2,0.5;1,1;armor:iron_chestplate]" ..
+		"item_image[3,0.5;1,1;armor:iron_helmet]" ..
+		"item_image[4,0.5;1,1;armor:iron_gloves]" ..
+		"item_image[5,0.5;1,1;armor:iron_boots]" ..
+		"item_image[6,0.5;1,1;armor:iron_leggings]" .. 
+		"label[2,-0.2;Level: "..(armor.user[name].armorlevel or 0).."]" ..
+		"model[-0.5,-0.2;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 		)
-	end, name)
-
+	end, name,skin)
 end
 
 armor.update=function(player,wear)
