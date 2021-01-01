@@ -492,7 +492,7 @@ minetest.register_globalstep(function(dtime)
 					ob:set_properties({textures={witem},visual_size = {x=0.4,y=0.4}})
 				end
 			end
-			
+			player_style.inventory(player)
 		end
 -- ========
 

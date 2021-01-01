@@ -101,10 +101,8 @@ player_style.inventory=function(player)
 		invp.backpack:set_list("main", list)
 	end
 
-
 	local skin = player:get_properties().textures[1] or "character.png"
-
-	local model = "" -- later in mt 5.4     "model[0,0;3,3;character_preview;preview_character.obj;"..skin..";0,0;false;true]"
+	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
