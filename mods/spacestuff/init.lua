@@ -100,6 +100,7 @@ spacestuff.wieldsuit=function(user,s)
 		u.user:set_properties({mesh = "character.b3d",textures = u.skin})
 		u.user:hud_remove(u.hud)
 		spacestuff.users[name] = nil
+		player_style.inventory(u.user)
 		return
 	elseif s then
 		local i = user:get_wield_index()
@@ -133,6 +134,7 @@ spacestuff.wieldsuit=function(user,s)
 		}
 
 		user:set_properties({textures = {"spacestuff_spacesuit2.png"}})
+		player_style.inventory(user)
 		u = spacestuff.users[name]
 	end
 
