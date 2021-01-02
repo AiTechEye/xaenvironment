@@ -397,7 +397,6 @@ default.register_tree({
 	},
 	wood={tiles={"plants_oak_wood.png"}},
 	leaves={tiles={"plants_oak_leaves.png"}},
-	schematic=minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
 	sapling_place_schematic=function(pos)
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_oak_tree"..math.random(1,4)..".mts", "random", nil, false,"place_center_x,place_center_z")
 	end,
