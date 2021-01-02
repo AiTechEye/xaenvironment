@@ -244,7 +244,7 @@ if node.blow_nodes==1 then
 		local no = minetest.registered_nodes[v.name]
 		local img
 		if i < 200 and no then
-			local tiles = no.tiles or no.special_tiles
+			local tiles = no.tiles or no.special_tiles or {}
 			if type(tiles[1]) == "table" and tiles[1].name then
 				img = tiles[1].name
 			elseif type(tiles[1]) == "string" then
