@@ -401,7 +401,6 @@ default.register_tree({
 	sapling_place_schematic=function(pos)
 		minetest.place_schematic({x=pos.x-3,y=pos.y,z=pos.z-3}, minetest.get_modpath("plants").."/schematics/plants_oak_tree"..math.random(1,4)..".mts", "random", nil, false,"place_center_x,place_center_z")
 	end,
-	schematic=minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
 	schematics={
 		minetest.get_modpath("plants").."/schematics/plants_oak_tree1.mts",
 		minetest.get_modpath("plants").."/schematics/plants_oak_tree2.mts",
