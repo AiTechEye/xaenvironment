@@ -23,7 +23,7 @@ vexcazer_schematic.a=function(itemstack, user, pointed_thing,input,typ)
 		else
 			u.p = u.p or 1
 			local up = user:get_pos()
-			up.y = up.y +1
+			up.y = up.y +0.5
 			pos = vector.round(up)
 			u["pos"..u.p] = pos
 		end
