@@ -260,7 +260,7 @@ if node.blow_nodes==1 then
 					pos=v.pos,
 					velocity=vl,
 					acceleration={x=0,y=-10,z=0},
-					expirationtime=50,
+					expirationtime=5,
 					size=math.random(5,10),
 					collisiondetection=true,
 					collision_removal=true,
