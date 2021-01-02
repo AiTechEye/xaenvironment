@@ -208,13 +208,26 @@ default.register_tree({
 		minetest.get_modpath("plants").."/schematics/plants_palm2.mts",
 		minetest.get_modpath("plants").."/schematics/plants_palm3.mts",
 		minetest.get_modpath("plants").."/schematics/plants_palm4.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree1.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree2.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree3.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree4.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree5.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree6.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree7.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree8.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree9.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree10.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree11.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree12.mts",
+		minetest.get_modpath("plants").."/schematics/plants_palm_tropictree13.mts",
 	},
 	mapgen={
 		biomes={"tropic",},
 		place_on={"default:dirt_with_grass","default:sand"},
 		noise_params={
-			offset=0.0003,
-			scale=0.00012,
+			offset=0.0006,
+			scale=0.0003,
 		}
 	}
 })
@@ -376,8 +389,8 @@ default.register_tree({
 	mapgen={
 		biomes={"deciduous","deciduous_grassland","coniferous","coniferous_foggy"},
 		noise_params={
-			offset=-0.0002,
-			scale=0.002,
+			offset=-0.00002,
+			scale=0.0002,
 			seed=54657865,
 		},
 		place_on={"default:dirt_with_coniferous_grass","default:dirt_with_grass","plants:grass1"},
