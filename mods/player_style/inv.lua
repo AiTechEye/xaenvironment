@@ -101,7 +101,7 @@ player_style.inventory=function(player)
 		invp.backpack:set_list("main", list)
 	end
 
-	local skin = player:get_properties().textures[1] or "character.png"
+	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
