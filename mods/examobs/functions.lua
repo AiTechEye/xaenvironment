@@ -169,7 +169,7 @@ examobs.environment=function(self)
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), 5)) do
 			local en = ob:get_luaentity()
-			if en and en.examob and en.team ~= self.team and en.examob ~= self.examob and examobs.visiable(self,ob) and examobs.gethp(ob) > 0 then
+			if en and en.examob and en.team ~= self.team and ob ~= self.object and examobs.visiable(self.object,ob) and examobs.gethp(ob) > 0 then
 				en.fight = nil
 				en.team = "infection_poison"
 				en.aggressivity = 2
@@ -192,7 +192,6 @@ examobs.environment=function(self)
 		if def.walkable and v.x+v.z == 0 then
 			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
 				self:hurt(1)
-
 			else
 				examobs.jump(self)
 			end
@@ -431,6 +430,7 @@ end
 
 examobs.fighting=function(self)
 	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self.object,self.fight) then
+
 		if examobs.distance(self.object,self.fight) <= self.reach then
 			examobs.stand(self)
 			examobs.lookat(self,self.fight)
@@ -463,7 +463,7 @@ examobs.fighting=function(self)
 
 		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 			local en = ob:get_luaentity()
-			if en and en.examob and not en.fight and en.team == self.team and en.examob ~= self.examob and examobs.visiable(self,ob) then
+			if en and en.examob and not en.fight and en.team == self.team and ob ~= self.object and examobs.visiable(self.object,ob) then
 				en.fight = self.fight
 				examobs.lookat(en,en.fight)
 			end
@@ -574,7 +574,7 @@ examobs.find_objects=function(self)
 	if not p then return self end
 	for _, ob in pairs(minetest.get_objects_inside_radius(p, self.range)) do
 		local en = ob:get_luaentity()
-		if not (en and (not en.type or (en.examob == self.examob))) and examobs.visiable(self.object,ob) then
+		if ob ~= self.object and (not en or en.type) and examobs.visiable(self.object,ob) then
 			local infield = examobs.viewfield(self,ob)
 			local team = examobs.team(ob)
 			local known = examobs.known(self,ob)
@@ -642,13 +642,9 @@ examobs.known=function(self,ob,type,get)
 	end
 end
 
-examobs.visiable=function(self,pos2)
-	if not self.object or not self.pos then
-		return self
-	end
-	local pos1 = self:pos()
+examobs.visiable=function(ob,pos2)
+	local pos1 = ob:get_pos()
 	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2	
-
 	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
 	v.y=v.y-1
 	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5

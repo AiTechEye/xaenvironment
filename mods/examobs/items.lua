@@ -486,7 +486,7 @@ minetest.register_entity("examobs:icecreamball",{
 		local p
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2.5)) do
 			local en = ob:get_luaentity()
-			if not (en and en.name == "examobs:icecreamball") and examobs.team(ob)~="candy" and not ob:get_attach() and examobs.visiable(self,ob:get_pos()) then
+			if not (en and en.name == "examobs:icecreamball") and examobs.team(ob)~="candy" and not ob:get_attach() and examobs.visiable(self.object,ob:get_pos()) then
 				if examobs.gethp(ob) < 100 then
 					table.insert(self.att,ob)
 					ob:set_attach(self.object, "", {x=0,y=0,z=0}, {x=0,y=0,z=0})

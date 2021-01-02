@@ -140,7 +140,7 @@ examobs.register_mob({
 		if self.fight then
 			if self.snowbtime <= 0 then
 				self.snowbtime = 5
-				if examobs.viewfield(self,self.fight) and examobs.visiable(self,self.fight:get_pos()) then
+				if examobs.viewfield(self,self.fight) and examobs.visiable(self.object,self.fight:get_pos()) then
 					self:use_bow(self.fight)
 				end
 			else

@@ -6,8 +6,13 @@ examobs={
 	storage = minetest.get_mod_storage(),
 --	interact_map = {},
 	interact_map_timer = -60,
-	active = {},
-	active_spawn_mob_limit = tonumber(minetest.settings:get("xaenvironment_active_spawn_mob_limit")) or 100,
+	active = {
+		num=0,
+		ref={},
+		types={},
+		spawn_mob_limit=tonumber(minetest.settings:get("xaenvironment_active_spawn_mob_limit")) or 100,
+		spawn_same_mob_limit=tonumber(minetest.settings:get("xaenvironment_active_spawn_same_mob_limit")) or 20,
+	},
 }
 
 dofile(minetest.get_modpath("examobs") .. "/main.lua")

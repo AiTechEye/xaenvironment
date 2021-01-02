@@ -186,7 +186,7 @@ examobs.npc_setup=function(self)
 					for _, ob in pairs(minetest.get_objects_inside_radius(p, 30)) do
 						local en = ob:get_luaentity()
 						local d = vector.distance(p,ob:get_pos())
-						if en and en.examob and en.type == "npc" and en.examob ~= self.examob and examobs.visiable(self,ob) then
+						if en and en.examob and en.type == "npc" and en.examob ~= self.examob and examobs.visiable(self.object,ob) then
 							if d <= 7 and examobs.gethp(ob) > 0 then
 								self.too_near = (self.too_near or math.random(1,100)) -1
 								if self.too_near < 1 then

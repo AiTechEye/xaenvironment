@@ -221,18 +221,19 @@ examobs.register_mob=function(def)
 		self.storage.inv = self.inv
 		return minetest.serialize(self.storage)
 	end
+	def.on_deactivate=function(self)
+		examobs.active.ref[self.object] = nil
+		examobs.active.num = examobs.active.num - 1
+		examobs.active.types[self.name] = examobs.active.types[self.name] -1
+	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
-		while self.examob ~= nil do
-			local r = math.random(1,9999)
-			if not examobs.active[r] then
-				self.examob = r
-				break
-			end
-		end
 
-		examobs.active[self.examob] = self.object
+		examobs.active.ref[self.object] = self.object
+		examobs.active.num = examobs.active.num + 1
+		examobs.active.types[self.name] = (examobs.active.types[self.name] or 0) + 1
 
+		self.examob = math.random(1,9999)
 		self.dead = self.storage.dead or nil
 		self.dying = self.storage.dying or nil
 		self.hp = self.storage.hp or def.hp
@@ -294,7 +295,7 @@ examobs.register_mob=function(def)
 		local dmg = 0
 		self.last_punched_by = puncher or self.last_punched_by
 
-		if not (en and en.examob == self.examob) then
+		if puncher ~= self.object then
 		
 			if not (self.dying or self.dead) then
 				self:on_expression("punched")
@@ -362,7 +363,6 @@ examobs.register_mob=function(def)
 
 	def.on_death=function(self,killer)
 		examobs.dropall(self)
-		examobs.active[self.examob] = nil
 	end
 	minetest.register_entity(name,def)
 
@@ -433,28 +433,8 @@ examobs.register_mob=function(def)
 			if pos1.y >= def.min_spawn_y and pos2.y <= def.max_spawn_y and examobs.global_lifetime <= 1 and l and math.random(1,def.spawn_chance) == 1 and l >= def.light_min and l <= def.light_max then
 				local n1 = minetest.get_node(pos1).name
 				if (def.spawn_in and (def.spawn_in==n1 and def.spawn_in==minetest.get_node(pos2).name or minetest.get_item_group(n1,def.spawn_in) > 0))  or not (walkable(pos1) and walkable(pos2)) then 
-					local c = 0
-					local ac = 0
-
-					for i, v in pairs(examobs.active) do
-						if not v and v:get_luaentity() then
-							examobs.active[i] = nil
-						else
-							ac = ac +1
-							if ac >= examobs.active_spawn_mob_limit then
-								return
-							end
-						end
-					end
-
-					for _, ob in pairs(minetest.get_objects_inside_radius(pos, 20)) do
-						local en = ob:get_luaentity()
-						if en and en.examob then
-							c = c +1
-							if c >= 5 then
-								return
-							end
-						end
+					if examobs.active.num >= examobs.active.spawn_mob_limit or (examobs.active.types[name] or 0) >= examobs.active.spawn_same_mob_limit then
+						return
 					end
 					local bp = apos(pos1,0,bottom)
 					if not minetest.registered_entities[name].before_spawn(bp) then

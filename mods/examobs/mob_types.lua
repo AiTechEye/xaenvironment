@@ -189,16 +189,16 @@ examobs.register_fish=function(def)
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
-				if en and (en.name == "__builtin:item" or en.examobs_fishing_target) and (minetest.get_node(p).name ~= "air" or minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"water") > 0) and examobs.viewfield(self,ob) and examobs.visiable(self,ob) then
+				if en and (en.name == "__builtin:item" or en.examobs_fishing_target) and (minetest.get_node(p).name ~= "air" or minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"water") > 0) and examobs.viewfield(self,ob) and examobs.visiable(self.object,ob) then
 					self.target =  ob
 					return
-				elseif not examobs.team(ob) and examobs.visiable(self,ob) and not (ob:is_player() and examobs.hiding[ob:get_player_name()]) then
+				elseif not examobs.team(ob) and examobs.visiable(self.object,ob) and not (ob:is_player() and examobs.hiding[ob:get_player_name()]) then
 					self.flee = ob
 					return
 				end
 			end
 		elseif self.target then
-			if examobs.gethp(self.target) <= 0 or not (self.target:get_pos() and examobs.visiable(self,self.target)) then
+			if examobs.gethp(self.target) <= 0 or not (self.target:get_pos() and examobs.visiable(self.object,self.target)) then
 				self.target = nil
 				return
 			elseif examobs.distance(self.object,self.target) <= 1 then
