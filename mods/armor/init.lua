@@ -16,7 +16,7 @@ player_style.register_button({
 
 armor.show=function(player)
 	local name = player:get_player_name()
-	local skin = player:get_properties().textures[1] or "character.png"
+	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	minetest.after(0.2, function(name,skin)
 		return minetest.show_formspec(name, "armor",
 		"size[8,6]" ..
