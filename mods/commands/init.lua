@@ -22,15 +22,6 @@ minetest.register_chatcommand("kill", {
 	end
 })
 
-minetest.register_chatcommand("revokeme", {
-	params = "<priv> or <all>",
-	description = "Revoke privs from yourself",
-	privs = {privs=true},
-	func = function(name, param)
-		minetest.registered_chatcommands["revoke"].func(name,name.." "..param)
-	end
-})
-
 minetest.register_privilege("home", {
 	description = "Can set/go home",
 	give_to_singleplayer = true,
