@@ -225,6 +225,7 @@ examobs.register_mob=function(def)
 		examobs.active.ref[self.object] = nil
 		examobs.active.num = examobs.active.num - 1
 		examobs.active.types[self.name] = examobs.active.types[self.name] -1
+		examobs.terminal_update_users()
 	end
 	def.on_activate=function(self, staticdata)
 		self.storage = minetest.deserialize(staticdata) or {}
@@ -232,6 +233,7 @@ examobs.register_mob=function(def)
 		examobs.active.ref[self.object] = self.object
 		examobs.active.num = examobs.active.num + 1
 		examobs.active.types[self.name] = (examobs.active.types[self.name] or 0) + 1
+		examobs.terminal_update_users()
 
 		self.examob = math.random(1,9999)
 		self.dead = self.storage.dead or nil
@@ -448,3 +450,123 @@ examobs.register_mob=function(def)
 		end
 	})
 end
+
+player_style.register_button({
+	name="mobs",
+	image="examobs:wolf_spawner",
+	type="item_image",
+	info="Mobs (requires the mobs privilege)",
+	action=function(user)
+		local name = user:get_player_name()
+		if minetest.check_player_privs(name, {mobs=true}) then
+			examobs.terminal(name)
+		end
+	end
+})
+
+minetest.register_privilege("mobs", {
+	description = "Can use mobs terminal",
+	give_to_singleplayer= false,
+})
+
+examobs.terminal_update_users=function()
+	for i,v in pairs(examobs.terminal_users) do
+		examobs.terminal(i)
+	end
+end
+
+examobs.terminal=function(name)
+	local list = ""
+	local ix = 0
+	examobs.terminal_users[name] = examobs.terminal_users[name] or {mob="",index=1}
+	local p = examobs.terminal_users[name]
+
+	for i,v in pairs(examobs.active.types) do
+		list = list ..i:gsub("examobs:","")..","
+		ix = ix +1
+		if p.select and ix == p.index then
+			p.select = nil
+			p.mob = i
+		elseif not p.select and i == p.mob then
+			p.index = ix
+		end
+	end
+	list = list:sub(1,-2)
+
+	if p.mob == "" then
+		for i,v in pairs(examobs.active.types) do
+			p.mob=i
+			break
+		end
+	end
+
+	local preview = ""
+	local n = examobs.active.num/examobs.active.spawn_mob_limit
+	n = n < 1 and n or 1
+
+	if p.mob ~= "" then
+		local def = default.def(p.mob.."_spawner")
+		preview = "label[5.5,-0.3;"..examobs.active.types[p.mob] .."/".. examobs.active.spawn_same_mob_limit.."]"
+		preview = preview .."box[4,1;1,1;#f00]item_image_button[4.1,2;1,1;"..p.mob.."_spawner;clean;]tooltip[clean;Remove this active mobs]"
+
+		if def.drawtype == "mesh" then
+			local textures = ""
+			for i,v in pairs(def.tiles) do
+				textures = textures ..v..","
+			end
+			textures = textures:sub(1,-2)
+			preview = preview .."model[5,0;3,3;model;"..def.mesh..";"..minetest.formspec_escape(textures)..";-20,150;false;true;1,1]"
+		else
+			preview = preview .."item_image[5,0;3,3;"..p.mob.."_spawner]"
+		end
+	end
+
+	local form = "size[8,6]" ..
+	"listcolors[#77777777;#777777aa;#000000ff]"..
+	"textlist[0,0;2,7;list;"..list..";"..p.index.."]"..
+	"box[2,1;1,"..n..";#"..(n<0.25 and "07f" or n<=0.5 and "0f0" or n<0.75 and "ff0" or n < 90 and "f70" or n < 100 and "f50" or "f00").."]"..
+	"label[2,0;"..examobs.active.num .."/".. examobs.active.spawn_mob_limit.." spawn limit]"..
+	"box[4,2;1,1;#f00]image_button[4.1,1.1;1,1;default_bucket.png;cleanall;]"..
+	"tooltip[cleanall;Remove active all mobs]"..
+	preview
+
+	minetest.after(0.2, function(name,form)
+		return minetest.show_formspec(name, "mobs",form)
+	end, name,form)
+end
+
+
+minetest.register_on_leaveplayer(function(player)
+	local name = player:get_player_name()
+	examobs.terminal_users[name] = nil
+end)
+
+minetest.register_on_player_receive_fields(function(user, form, pressed)
+	if form=="mobs" then
+		local name = user:get_player_name()
+		local p = examobs.terminal_users[name]
+		if pressed.quit then
+			examobs.terminal_users[name] = nil
+		elseif pressed.list then
+			p.index = minetest.explode_textlist_event(pressed.list).index
+			p.select = true
+			examobs.terminal(name)
+		elseif pressed.clean then
+			for i,v in pairs(examobs.active.ref) do
+				if v:get_luaentity().name == p.mob then
+					v:remove()
+				end
+			end
+			minetest.after(0.2, function(name)
+				examobs.terminal(name)
+			end, name)
+		elseif pressed.cleanall then
+			for i,v in pairs(examobs.active.ref) do
+				v:remove()
+			end
+			minetest.after(0.2, function(name)
+				examobs.terminal(name)
+			end, name)
+		end
+	end
+end)

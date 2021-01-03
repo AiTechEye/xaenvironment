@@ -6,6 +6,7 @@ examobs={
 	storage = minetest.get_mod_storage(),
 --	interact_map = {},
 	interact_map_timer = -60,
+	terminal_users={},
 	active = {
 		num=0,
 		ref={},
