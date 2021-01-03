@@ -35,6 +35,13 @@ armor.register_item("leather",{
 	item="examobs:pelt",
 	groups={treasure=1},
 })
+armor.register_item("leather",{
+	type="shield",
+	image="examobs_meat.png",
+	level=3,
+	item="examobs:pelt",
+	groups={treasure=1},
+})
 
 -- ============== iron
 armor.register_item("iron",{
@@ -72,7 +79,13 @@ armor.register_item("iron",{
 	item="default:iron_ingot",
 	groups={treasure=1},
 })
-
+armor.register_item("iron",{
+	type="shield",
+	image="default_ironblock.png",
+	level=10,
+	item="default:iron_ingot",
+	groups={treasure=1},
+})
 -- ============== steel
 
 armor.register_item("steel",{
@@ -107,6 +120,13 @@ armor.register_item("steel",{
 	type="gloves",
 	image="default_steelblock.png",
 	level=6,
+	item="default:steel_ingot",
+	groups={treasure=2},
+})
+armor.register_item("steel",{
+	type="shield",
+	image="default_steelblock.png",
+	level=12,
 	item="default:steel_ingot",
 	groups={treasure=2},
 })
@@ -148,6 +168,13 @@ armor.register_item("diamond",{
 	item="default:diamond",
 	groups={treasure=3},
 })
+armor.register_item("diamond",{
+	type="shield",
+	image="default_diamondblock.png",
+	level=16,
+	item="default:diamond",
+	groups={treasure=3},
+})
 
 -- ============== quantum
 
@@ -183,6 +210,13 @@ armor.register_item("quantum",{
 	type="gloves",
 	image="armor_quantum.png",
 	level=8,
+	item="default:quantumblock",
+	groups={treasure=3},
+})
+armor.register_item("quantum",{
+	type="shield",
+	image="armor_quantum.png",
+	level=18,
 	item="default:quantumblock",
 	groups={treasure=3},
 })

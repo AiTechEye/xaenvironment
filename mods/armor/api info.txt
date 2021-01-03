@@ -1,6 +1,8 @@
 armor.register_item("",{			-- "chestplate"," helmet", "gloves", "boots", "leggings"
 	type="chestplate",
-	image="default_steelblock.png",	-- material
+	image="default_steelblock.png",	-- material, auto generating textures
+	item_image = "image.png",		-- custom item image, replacing material image
+	armor_image = "image.png",		-- custom armor image, replacing material image, "shield" will use item_image here too
 	level=3,				-- armor_group, 0 and higher, 100 = immortal
 	item="default:steel_ingot",		-- craft item
 	groups={},			-- itemgroups, can be nil

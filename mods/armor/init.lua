@@ -1,5 +1,5 @@
 armor={
-	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5},
+	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5,shield=6},
 	user={},
 	registered_items={}
 }
@@ -21,7 +21,7 @@ armor.show=function(player)
 		return minetest.show_formspec(name, "armor",
 		"size[8,6]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]"..
-		"list[detached:armor;main;2,0.5;5,1;]" ..
+		"list[detached:armor;main;2,0.5;6,1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
 		"listring[current_player;main]" ..
 		"listring[detached:armor;main]" ..
@@ -30,6 +30,7 @@ armor.show=function(player)
 		"item_image[4,0.5;1,1;armor:iron_gloves]" ..
 		"item_image[5,0.5;1,1;armor:iron_boots]" ..
 		"item_image[6,0.5;1,1;armor:iron_leggings]" .. 
+		"item_image[7,0.5;1,1;armor:iron_shield]" ..
 		"label[2,-0.2;Level: "..(armor.user[name].armorlevel or 0).."]" ..
 		"model[-0.5,-0.2;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 		)
@@ -60,16 +61,44 @@ armor.update=function(player,wear)
 	data.playerlevel = data.playerlevel or player:get_armor_groups().fleshy
 	armor.user[name].armorlevel = arml
 
-
 	if player:get_armor_groups().fleshy ~= armor.user[name].playerlevel-arml then
 		player:set_armor_groups({fleshy=data.playerlevel-arml})
 		if not data.skin then
 			data.skin = player:get_properties().textures[1]
 		end
-		local texture =data.skin
-		for i,v in pairs(inv) do
-			if v:get_name() ~= "" then
+		local texture = data.skin
+		for i,v in ipairs(inv) do
+			if v:get_name() ~= "" and i < 6 then
 				texture = texture .. "^("..armor.registered_items[v:get_name()]..")"
+			elseif i == 6 then
+				data.shield = data.shield or {}
+				if data.shield.item ~= v:get_name() then
+					local ob
+					data.shield.item = v:get_name()
+					if data.shield.object and data.shield.object:get_luaentity() then
+						data.shield.object:remove()
+					end
+					data.shield.object = nil
+
+					if data.shield.hud then
+						player:hud_remove(data.shield.hud)
+						data.shield.hud = nil
+					end
+
+					if v:get_name() ~= "" then
+						ob = minetest.add_entity(player:get_pos(),"player_style:wielditem")
+						data.shield.object = ob
+						ob:set_attach(player, "Bone.001",{x=0, y=3, z=2}, {x=170, y=0,z=-20})
+						ob:set_properties({textures={v:get_name()},visual_size = {x=0.4,y=0.4}})
+						data.shield.hud = player:hud_add({
+							hud_elem_type="image",
+							scale = {x=40,y=40},
+							position={x=0.2,y=1},
+							text=armor.registered_items[v:get_name()],
+							offset={x=-125,y=0},
+						})
+					end
+				end
 			end
 		end
 		player:set_properties({textures={texture}})
@@ -78,9 +107,9 @@ end
 
 armor.register_item=function(name,def)
 	if type(def.type) ~= "string" then
-		error('Armor: declare a specific "type" : chestplate, helmet, gloves, boots, leggings')
+		error('Armor: declare a specific "type" : chestplate, helmet, gloves, boots, leggings, shield')
 	elseif not armor.types[def.type] then
-		error("Armor: invaild type ("..def.type..") : chestplate, helmet, gloves, boots, leggings")
+		error("Armor: invaild type ("..def.type..") : chestplate, helmet, gloves, boots, leggings, shield")
 	elseif not def.image then
 		error("Armor: declare a image")
 	end
@@ -88,14 +117,17 @@ armor.register_item=function(name,def)
 	def.groups = def.groups or {}
 	def.groups.level=def.level or 1
 	def.groups.armor=armor.types[def.type]
-
+	def.item_image = def.item_image or def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0"
+	def.armor_image = def.type == "shield" and def.item_image or (def.armor_image or def.image.."^armor_alpha_"..def.type..".png^[makealpha:0,255,0")
 	local mod = minetest.get_current_modname() ..":"
-	armor.registered_items[mod..name.."_"..def.type] =""..def.image.."^armor_alpha_"..def.type..".png^[makealpha:0,255,0"
+
+	armor.registered_items[mod..name.."_"..def.type] = def.armor_image
 	minetest.register_tool(mod..name.."_"..def.type, {
 		description = def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type .." (level "..(def.level or 1)..")",
-		inventory_image = def.image.."^armor_alpha_"..def.type.."_item.png^[makealpha:0,255,0",
+		inventory_image = def.item_image,
 		groups = def.groups
 	})
+
 	if def.item then
 		local recipe = {
 			chestplate={{def.item,"",def.item},{def.item,def.item,def.item},{def.item,def.item,def.item}},
@@ -103,6 +135,7 @@ armor.register_item=function(name,def)
 			leggings={{def.item,def.item,def.item},{def.item,"",def.item},{def.item,"",def.item}},
 			boots={{def.item,"",def.item},{def.item,"",def.item}},
 			gloves={{def.item,"",def.item}},
+			shield={{"",def.item,""},{def.item,def.item,def.item},{"",def.item,""}},
 		}
 		minetest.register_craft({output=mod..name.."_"..def.type,recipe=recipe[def.type]})
 	end
@@ -176,7 +209,7 @@ minetest.register_on_joinplayer(function(player)
 			player_style.inventory(player)
 		end,
 	})
-	armor.user[name].inv:set_size("main", 5)
+	armor.user[name].inv:set_size("main", 6)
 	local list = {}
 	for i,v in pairs(minetest.deserialize(player:get_meta():get_string("armor") or "") or {}) do
 		local g = minetest.get_item_group(v.name,"armor")
@@ -185,5 +218,8 @@ minetest.register_on_joinplayer(function(player)
 		end
 	end
 	armor.user[name].inv:set_list("main", list)
-	armor.update(player)
+
+	minetest.after(0, function(player)
+		armor.update(player)
+	end,player)
 end)
