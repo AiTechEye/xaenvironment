@@ -78,6 +78,7 @@ armor.register_item("iron",{
 	level=5,
 	item="default:iron_ingot",
 	groups={treasure=1},
+	hand_damage=2,
 })
 armor.register_item("iron",{
 	type="shield",
@@ -122,6 +123,7 @@ armor.register_item("steel",{
 	level=6,
 	item="default:steel_ingot",
 	groups={treasure=2},
+	hand_damage=2,
 })
 armor.register_item("steel",{
 	type="shield",
@@ -167,6 +169,7 @@ armor.register_item("diamond",{
 	level=6,
 	item="default:diamond",
 	groups={treasure=3},
+	hand_damage=3,
 })
 armor.register_item("diamond",{
 	type="shield",
@@ -212,11 +215,63 @@ armor.register_item("quantum",{
 	level=8,
 	item="default:quantumblock",
 	groups={treasure=3},
+	hand_damage=4,
 })
 armor.register_item("quantum",{
 	type="shield",
 	image="armor_quantum.png",
 	level=18,
 	item="default:quantumblock",
+	groups={treasure=3},
+})
+
+-- ============== uranium
+
+armor.register_item("uranium",{
+	type="chestplate",
+	image="default_uraniumactiveblock.png",
+	level=10,
+	item="default:uraniumactive_ingot",
+	groups={treasure=3},
+})
+armor.register_item("uranium",{
+	type="helmet",
+	image="default_uraniumactiveblock.png",
+	level=7,
+	item="default:uraniumactive_ingot",
+	groups={treasure=3},
+})
+armor.register_item("uranium",{
+	type="boots",
+	image="default_uraniumactiveblock.png",
+	level=7,
+	item="default:uraniumactive_ingot",
+	groups={treasure=3},
+})
+armor.register_item("uranium",{
+	type="leggings",
+	image="default_uraniumactiveblock.png",
+	level=7,
+	item="default:uraniumactive_ingot",
+	groups={treasure=3},
+})
+armor.register_item("uranium",{
+	type="gloves",
+	image="default_uraniumactiveblock.png",
+	level=5,
+	item="default:uraniumactive_ingot",
+	groups={treasure=3},
+	hand_damage=5,
+
+	after_use=function(itemstack,user,node,digparams)
+
+	end,
+
+})
+armor.register_item("uranium",{
+	type="shield",
+	image="default_uraniumactiveblock.png",
+	level=10,
+	item="default:uraniumactive_ingot",
 	groups={treasure=3},
 })

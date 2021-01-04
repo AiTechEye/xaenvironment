@@ -1,7 +1,37 @@
 armor={
 	types={chestplate=1,helmet=2,gloves=3,boots=4,leggings=5,shield=6},
 	user={},
-	registered_items={}
+	registered_items={},
+	gloves_properties={
+		type = "none",
+		wield_scale={x=1,y=1,z=2},
+		groups={not_in_creative_inventory=1},
+		range = not default.creative and 4 or 15,
+		tool_capabilities = not default.creative and {
+			full_punch_interval = 1,
+			max_drop_level = 0,
+			groupcaps={
+				crumbly = {times={[2]=3, [3]=0.7}, uses=0, maxlevel=1},
+				snappy = {times={[2]=2,[3]=0.7}, uses=0, maxlevel=1},
+				oddly_breakable_by_hand = {times={[1]=5,[2]=4,[3]=3}, uses=0},
+				dig_immediate={times={[1]=2,[2]=1,[3]=0}, uses=0}
+			},
+			damage_groups = {fleshy=1},
+		} or {
+			full_punch_interval = 0.1,
+			max_drop_level = 0,
+			groupcaps = {
+				fleshy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				choppy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				bendy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				cracky={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				crumbly={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				snappy={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+				dig_immediate={times={[1]=0.2,[2]=0.2,[3]=0.2},uses=0},
+			},
+			damage_groups={fleshy=10},
+		}
+	}
 }
 
 player_style.register_button({
@@ -100,6 +130,11 @@ armor.update=function(player,wear)
 					end
 				end
 			end
+			if i == 3 then
+				local def = default.def(v:get_name())
+				player:get_inventory():set_size("hand",1)
+				player:get_inventory():set_stack("hand",1,ItemStack(def.armor_hand))
+			end
 		end
 		player:set_properties({textures={texture}})
 	end
@@ -125,8 +160,17 @@ armor.register_item=function(name,def)
 	minetest.register_tool(mod..name.."_"..def.type, {
 		description = def.description or name.upper(string.sub(name,1,1)) .. string.sub(name,2,string.len(name)).." "..def.type .." (level "..(def.level or 1)..")",
 		inventory_image = def.item_image,
-		groups = def.groups
+		groups = def.groups,
+		armor_type = name,
+		armor_hand = def.type == "gloves" and mod..name.."_hand" or nil,
 	})
+
+	if def.type == "gloves" then
+		local hand = table.copy(armor.gloves_properties)
+		hand.tool_capabilities.damage_groups.fleshy = def.hand_damage or 1
+		hand.wield_image = def.hand_image or def.image.."^armor_alpha_hand.png^[makealpha:0,255,0"
+		minetest.register_item(mod..name.."_hand", hand)
+	end
 
 	if def.item then
 		local recipe = {
