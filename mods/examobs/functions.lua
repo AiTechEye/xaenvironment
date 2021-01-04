@@ -644,7 +644,10 @@ end
 
 examobs.visiable=function(ob,pos2)
 	local pos1 = ob:get_pos()
-	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2	
+	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
+	if not (pos1 and pos2) then
+		return false
+	end	
 	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
 	v.y=v.y-1
 	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5
