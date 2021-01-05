@@ -1,3 +1,8 @@
+default.is_decoration=function(object,item)
+	local en = object:get_luaentity()
+	return en and (en.decoration ~= nil or item and en.name == "__builtin:item")
+end
+
 default.watersplash=function(pos,item)
 	local def = default.def(minetest.get_node(pos).name)
 	local s = math.random(10,20)

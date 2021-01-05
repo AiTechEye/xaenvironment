@@ -211,6 +211,7 @@ minetest.register_entity("default:item",{
 	visual = "wielditem",
 	visual_size = {x=0.3,y=0.3},
 	textures = {"default:stick"},
+	decoration=true,
 	new_itemframe=function(self)
 		local pos = self.object:get_pos()
 		local node = minetest.get_node(pos)
@@ -250,6 +251,16 @@ minetest.register_entity("default:item",{
 	end,
 })
 
+minetest.register_entity("default:wielditem",{
+	physical = false,
+	pointable = false,
+	visual = "wielditem",
+	visual_size = {x=0.4,y=0.4},
+	textures = {"default:stick"},
+	static_save = false,
+	decoration=true,
+})
+
 minetest.register_entity("default:watersplash_ring",{
 	physical = false,
 	pointable=false,
@@ -260,6 +271,7 @@ minetest.register_entity("default:watersplash_ring",{
 	size1 = 0.5,
 	speed = 2,
 	use_texture_alpha=true,
+	decoration=true,
 	on_step=function(self, dtime)
 		self.size1 = self.size1 + dtime*self.speed
 		self.object:set_properties({
