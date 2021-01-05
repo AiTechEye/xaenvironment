@@ -273,7 +273,7 @@ armor.register_item("uranium",{
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos,5)) do
 			local en = ob:get_luaentity()
 			local p = ob:get_pos()
-			if ob ~= e and ob ~= user and not (en and en.name == "__builtin:item" ) then
+			if ob ~= e and ob ~= user and not default.is_decoration(ob,true) then
 				default.punch(ob,user,5)
 			end
 		end

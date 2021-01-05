@@ -116,7 +116,7 @@ armor.update=function(player,wear)
 					end
 
 					if v:get_name() ~= "" then
-						ob = minetest.add_entity(player:get_pos(),"player_style:wielditem")
+						ob = minetest.add_entity(player:get_pos(),"default:wielditem")
 						data.shield.object = ob
 						ob:set_attach(player, "Bone.001",{x=0, y=3, z=2}, {x=170, y=0,z=-20})
 						ob:set_properties({textures={v:get_name()},visual_size = {x=0.4,y=0.4}})
