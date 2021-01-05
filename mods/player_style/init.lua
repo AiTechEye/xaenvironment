@@ -481,7 +481,7 @@ minetest.register_globalstep(function(dtime)
 			ppr.wield_item.node = node
 			if witem ~= "" then
 				if not (ob and ob:get_luaentity()) then
-					ob = minetest.add_entity(p,"player_style:wielditem")
+					ob = minetest.add_entity(p,"default:wielditem")
 					ppr.wield_item.object = ob
 				end
 				if node then
