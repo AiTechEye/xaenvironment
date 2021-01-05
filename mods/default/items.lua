@@ -110,6 +110,15 @@ minetest.register_tool(":", {
 	wield_scale={x=1,y=1,z=2},
 	groups={not_in_creative_inventory=1},
 	range = not default.creative and 4 or 15,
+	on_secondary_use=function(itemstack,user,pointed_thing)
+		if pointed_thing.type == "nothing" then
+			local item = user:get_inventory():get_stack("hand",1):get_name()
+			local def = default.def(item)
+			if def.on_secondary_use then
+				def.on_secondary_use(itemstack,user,pointed_thing)
+			end	
+		end
+	end,
 	tool_capabilities = not default.creative and {
 		full_punch_interval = 1,
 		max_drop_level = 0,
