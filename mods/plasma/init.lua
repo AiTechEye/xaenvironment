@@ -28,7 +28,6 @@ minetest.register_tool("plasma:plasma_cannon",{
 		local en = e:get_luaentity()
 		en.charging = true
 		en.user = user
-		en.user_name = user:get_player_name()
 		return itemstack
 	end
 })
@@ -46,10 +45,11 @@ minetest.register_entity("plasma:orb",{
 	img = 1,
 	timer = 0,
 	start_timeout = 0,
+	decoration=true,
 	plasmaorb = true,
 	get_staticdata = function(self)
 		self:explode(true)
-		return minetest.serialize({power=self.power,user_name=self.user_name})
+		return minetest.serialize({power=self.power})
 	end,
 	anim=function(self)
 		self.img = self.img +1
@@ -61,7 +61,6 @@ minetest.register_entity("plasma:orb",{
 	on_activate=function(self, staticdata)
 		local s = minetest.deserialize(staticdata) or {}
 		self.power = s.power or 1
-		self.user_name = s.user_name
 		self.object:set_properties({visual_size = {x=1+self.power*0.01,y=1+self.power*0.01,z=1+self.power*0.01}})
 	end,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
@@ -96,14 +95,14 @@ minetest.register_entity("plasma:orb",{
 
 		self.power = self.power > 8 and self.power or 8
 
-		if self.user and self.user_name then
+		if self.user then
 			if self.power >= 100 then
 				exaachievements.customize(self.user,"100% Clean")
 			end
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2+(self.power/2))) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
-				if p and not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
+				if p and ob ~= self.user and not default.is_decoration(ob,true) then
 					local d = self.power-vector.distance(pos,p)
 					if d > 90 then
 						d = 1000
@@ -266,8 +265,7 @@ minetest.register_entity("plasma:orb",{
 			return
 		end
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 2+self.power*0.03)) do
-			local en = ob:get_luaentity()
-			if not (ob:is_player() and ob:get_player_name() == self.user_name) and not (en and (en.plasmaorb or en.name == "__builtin:item" )) then
+			if ob ~= self.user and not default.is_decoration(ob,true) then
 				self:explode()
 				return
 			end
