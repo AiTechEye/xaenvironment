@@ -1,12 +1,15 @@
-armor.register_item("",{			-- "chestplate"," helmet", "gloves", "boots", "leggings"
+armor.register_item("",{			-- "chestplate"," helmet", "gloves", "boots", "leggings", "shield"
 	type="chestplate",
-	image="default_steelblock.png",	-- material, auto generating textures
-	item_image = "image.png",		-- custom item image, replacing material image
-	armor_image = "image.png",		-- custom armor image, replacing material image, "shield" will use item_image here too
-	hand_image  = "image",		-- custom wieldhand (used with gloves)
-	hand_damage= 1,			-- custom wieldhand damage (used with gloves)
-
 	level=3,				-- armor_group, 0 and higher, 100 = immortal
 	item="default:steel_ingot",		-- craft item
 	groups={},			-- itemgroups, can be nil
+
+
+	image="default_steelblock.png",	-- material, auto generating textures
+	item_image = "image.png",		-- custom item image, replacing material image
+	armor_image = "image.png",		-- custom armor image, replacing material image, "shield" will use item_image here too
+
+	hand_image  = "image",		-- custom wieldhand (used with gloves)
+	hand_damage= 1,			-- custom wieldhand damage (used with gloves)
+	on_secondary_use = function()	-- custom secondary_use (used with gloves) (right click in air)
 })

@@ -262,11 +262,23 @@ armor.register_item("uranium",{
 	item="default:uraniumactive_ingot",
 	groups={treasure=3},
 	hand_damage=5,
-
-	after_use=function(itemstack,user,node,digparams)
-
+	on_secondary_use=function(itemstack,user,pointed_thing)
+		local pos = apos(user:get_pos(),0,1.5)
+		local e = minetest.add_entity(pos,"plasma:impulse")
+		e:set_properties({textures={"default_cloud.png^[colorize:#deed4caa"}})
+		local en = e:get_luaentity()
+		en.charging = true
+		en.scale= 0
+		en.end_scale = 5
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos,5)) do
+			local en = ob:get_luaentity()
+			local p = ob:get_pos()
+			if ob ~= e and ob ~= user and not (en and en.name == "__builtin:item" ) then
+				default.punch(ob,user,5)
+			end
+		end
+		minetest.sound_play("plasma_shoot", {object=user, gain = 4,max_hear_distance = 10})
 	end,
-
 })
 armor.register_item("uranium",{
 	type="shield",

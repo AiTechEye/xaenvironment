@@ -169,6 +169,7 @@ armor.register_item=function(name,def)
 		local hand = table.copy(armor.gloves_properties)
 		hand.tool_capabilities.damage_groups.fleshy = def.hand_damage or 1
 		hand.wield_image = def.hand_image or def.image.."^armor_alpha_hand.png^[makealpha:0,255,0"
+		hand.on_secondary_use = def.on_secondary_use
 		minetest.register_item(mod..name.."_hand", hand)
 	end
 
