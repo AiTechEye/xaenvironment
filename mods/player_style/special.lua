@@ -34,7 +34,7 @@ special={
 			end
 		},
 		["default:qblock_1c7800"]={i=2,
-			info="\nLook up and jump to fly, walk forward to fly fast, +refill by using feathers",
+			info="\nLook up and jump to fly, walk forward to fly fast, eat feathers to refill",
 			image="examobs_feather.png",
 			meta = "fly_as_a_bird",
 			amount=20,
