@@ -226,6 +226,7 @@ minetest.register_craftitem("examobs:feather",{
 			local c = itemstack:get_count()
 			special.add(user,"fly_as_a_bird",c)
 			itemstack:take_item(c)
+			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
 			return itemstack
 		end
 	end
