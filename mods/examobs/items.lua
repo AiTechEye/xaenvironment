@@ -221,6 +221,14 @@ minetest.register_craftitem("examobs:feather",{
 	groups = {flammable=3,treasure=1},
 	inventory_image = "examobs_feather.png",
 	wield_scale={x=0.5,y=0.5,z=0.2},
+	on_use=function(itemstack, user, pointed_thing)
+		if special.have_ability(user,"fly_as_a_bird") then
+			local c = itemstack:get_count()
+			special.add(user,"fly_as_a_bird",c)
+			itemstack:take_item(c)
+			return itemstack
+		end
+	end
 })
 -- ================ sheep ================
 minetest.register_tool("examobs:shears",{
