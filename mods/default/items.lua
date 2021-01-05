@@ -114,7 +114,7 @@ minetest.register_tool(":", {
 		if pointed_thing.type == "nothing" then
 			local item = user:get_inventory():get_stack("hand",1):get_name()
 			local def = default.def(item)
-			if def.on_secondary_use then
+			if item ~="" and def.on_secondary_use then
 				def.on_secondary_use(itemstack,user,pointed_thing)
 			end	
 		end
