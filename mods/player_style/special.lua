@@ -1,15 +1,23 @@
 special={
 	user={},
 	num = 6,
+	shortcuts={
+		no_hunger="default:qblock_FF0000",
+		fly_as_a_bird="default:qblock_1c7800",
+		fire_resistance="default:qblock_e29f00",
+		immortal="default:qblock_800080",
+		no_water_drowning="default:qblock_0000FF",
+		light_in_darkness="default:qblock_FFFFFF",
+	},
 	blocks = {
 		["default:qblock_FF0000"]={i=1,
 			info="\nWont be hungry or thirsty",
 			image="player_style_hunger_bar.png",
 			meta = "no_hunger",
 			amount=50,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("no_hunger",m:get_int("no_hunger")+50)
+				m:set_int("no_hunger",m:get_int("no_hunger")+(c or 50))
 				special.hud(player,"default:qblock_FF0000")
 			end,
 			use=function(player)
@@ -26,13 +34,13 @@ special={
 			end
 		},
 		["default:qblock_1c7800"]={i=2,
-			info="\nLook up and jump to fly, walk forward to fly fast",
+			info="\nLook up and jump to fly, walk forward to fly fast, +refill by using feathers",
 			image="examobs_feather.png",
 			meta = "fly_as_a_bird",
 			amount=20,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("fly_as_a_bird",m:get_int("fly_as_a_bird")+50)
+				m:set_int("fly_as_a_bird",m:get_int("fly_as_a_bird") + (c or 50))
 				special.hud(player,"default:qblock_1c7800")
 			end,
 			use=function(player)
@@ -53,9 +61,9 @@ special={
 			image="fire_basic_flame.png",
 			meta = "fire_resistance",
 			amount=50,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("fire_resistance",m:get_int("fire_resistance")+50)
+				m:set_int("fire_resistance",m:get_int("fire_resistance")+(c or 50))
 				special.hud(player,"default:qblock_e29f00")
 			end,
 			use=function(player,c)
@@ -78,9 +86,9 @@ special={
 			image="default_steelblock.png^armor_alpha_chestplate_item.png^[makealpha:0,255,0",
 			meta = "immortal",
 			amount=20,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("immortal",m:get_int("immortal")+20)
+				m:set_int("immortal",m:get_int("immortal")+(c or 20))
 				special.hud(player,"default:qblock_800080")
 			end,
 			use=function(player,c)
@@ -102,9 +110,9 @@ special={
 			image="bubble.png",
 			meta = "no_water_drowning",
 			amount=50,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("no_water_drowning",m:get_int("no_water_drowning")+50)
+				m:set_int("no_water_drowning",m:get_int("no_water_drowning")+(c or 50))
 				special.hud(player,"default:qblock_0000FF")
 			end,
 			use=function(player)
@@ -125,9 +133,9 @@ special={
 			image="default_cloud.png^default_alpha_gem_round.png^[makealpha:0,255,0",
 			meta = "light_in_darkness",
 			amount=1000,
-			trigger=function(player)
+			trigger=function(player,c)
 				local m = player:get_meta()
-				m:set_int("light_in_darkness",m:get_int("light_in_darkness")+1000)
+				m:set_int("light_in_darkness",m:get_int("light_in_darkness")+(c or 1000))
 				special.hud(player,"default:qblock_FFFFFF")
 				special.blocks["default:qblock_FFFFFF"].on_load(player)
 			end,
@@ -218,12 +226,26 @@ special.hud=function(player,n)
 	end	
 end
 
+special.have_ability=function(player,ab)
+	local s = special.shortcuts[ab]
+	local name = player:get_player_name()
+	local i = special.blocks[s].i
+	return special.user[name].inv:get_stack("main",i,s):get_count() > 0
+end
+
+special.get_count=function(player,ab)
+	local s = special.shortcuts[ab]
+	return special.blocks[s].count(player)
+end
+
+special.add=function(player,ab,c)
+	local s = special.shortcuts[ab]
+	special.blocks[s].trigger(player,c)
+end
+
 special.use_ability=function(player,ab,c)
-	for i,v in pairs(special.blocks) do
-		if v.meta == ab then
-			return v.use(player,c)
-		end
-	end
+	local s = special.shortcuts[ab]
+	return special.blocks[s].use(player,c)
 end
 
 player_style.register_button({
