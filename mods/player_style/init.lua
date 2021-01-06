@@ -119,6 +119,7 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_on_joinplayer(function(player)
+	player:set_eye_offset({x=0,y=0,z=0},{x=5,y=0,z=5})
 	local profile=player_style.registered_profiles["default"]
 	local name=player:get_player_name()
 
