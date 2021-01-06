@@ -603,7 +603,7 @@ minetest.register_globalstep(function(dtime)
 							player:set_pos(apos(p,0,1,0))
 							a="dive"
 							player_style.player_diveing(name,player,true,nil,{x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)})
-							player:add_player_velocity({x=d.x*20,y=5,z=d.z*20})
+							player:add_velocity({x=d.x*20,y=5,z=d.z*20})
 						end
 					end
 				end
@@ -642,10 +642,10 @@ minetest.register_globalstep(function(dtime)
 
 					if l then
 						local d = player:get_look_dir()
-						player:add_player_velocity({x=d.x+(x2*4),y=1,z=d.z+(z2*4)})
+						player:add_velocity({x=d.x+(x2*4),y=1,z=d.z+(z2*4)})
 					elseif r then
 						local d = player:get_look_dir()
-						player:add_player_velocity({x=d.x+(x1*4),y=1,z=d.z+(z1*4)})
+						player:add_velocity({x=d.x+(x1*4),y=1,z=d.z+(z1*4)})
 					end
 				end
 				if key.left and key.right then
