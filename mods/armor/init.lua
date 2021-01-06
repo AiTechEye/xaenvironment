@@ -118,15 +118,8 @@ armor.update=function(player,wear)
 					if v:get_name() ~= "" then
 						ob = minetest.add_entity(player:get_pos(),"default:wielditem")
 						data.shield.object = ob
-						ob:set_attach(player, "Bone.001",{x=0, y=3, z=2}, {x=170, y=0,z=-20})
+						ob:set_attach(player, "Bone.001",{x=0, y=3, z=2}, {x=170, y=0,z=-20},true)
 						ob:set_properties({textures={v:get_name()},visual_size = {x=0.4,y=0.4}})
-						data.shield.hud = player:hud_add({
-							hud_elem_type="image",
-							scale = {x=40,y=40},
-							position={x=0.2,y=1},
-							text=armor.registered_items[v:get_name()],
-							offset={x=-125,y=0},
-						})
 					end
 				end
 			end
