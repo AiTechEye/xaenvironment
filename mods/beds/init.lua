@@ -32,7 +32,7 @@ end
 beds.lay_and_stand=function(pos,player)
 	local pname = player:get_player_name()
 	if default.player_attached[pname] then
-		player:set_physics_override(1, 1, 1)
+		player:set_physics_override({speed=1, jump=1})
 		minetest.after(0.3, function(player,pname)
 			player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 			default.player_attached[pname]=nil
@@ -44,7 +44,7 @@ beds.lay_and_stand=function(pos,player)
 			return
 		end
 		player:set_pos(pos)
-		player:set_physics_override(0, 0, 1)
+		player:set_physics_override({speed=0, jump=0})
 		minetest.after(0.3, function(player,pname)
 			player:set_eye_offset({x=0,y=-14,z=2}, {x=0,y=0,z=0})
 			default.player_attached[pname]=true
