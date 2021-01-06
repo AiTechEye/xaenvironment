@@ -39,7 +39,7 @@ beds.lay_and_stand=function(pos,player)
 			default.player_set_animation(player, "stand")
 		end,player,pname)
 	else
-		local v = player:get_player_velocity()
+		local v = player:get_velocity()
 		if math.abs(v.x)+math.abs(v.z) > 0 then
 			return
 		end
