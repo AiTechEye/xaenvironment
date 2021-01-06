@@ -157,7 +157,7 @@ multidimensions.apply_dimension=function(player)
 		end
 	end
 	player:set_physics_override({gravity=1})
-	player:set_sky(nil,"regular",nil)
+	player:set_sky({type="regular"})
 	player:set_sun({visible=true,sunrise="",sunrise_visible=true,texture="",tunemap="",scale=1})
 	player:set_moon({visible=true,texture="",tunemap="",scale=1})
 
