@@ -1,8 +1,14 @@
 minetest.register_tool("chakram:chakram", {
-	description = "Chakram",
+	description = "Chakram (Too outdated, use this tool in a later update)",
 	range = 1,
 	inventory_image = "chakram_chakram.png",
 on_use=function(itemstack, user, pointed_thing)
+
+	if true then
+		minetest.chat_send_player(user:get_player_name(), "Too outdated, use this tool in a later update")
+		return
+	end
+
 	if chakram_max()==false or type(user)=="table" then
 		minetest.chat_send_player(user:get_player_name(), "Too many chakrams: (max " .. chakram_max_number .. ")")
 		return itemstack
@@ -21,7 +27,6 @@ on_use=function(itemstack, user, pointed_thing)
 	local m=minetest.add_entity(pos, "chakram:chakr")
 	chakram_max(m)
 	m:set_velocity({x=dir.x*veloc, y=dir.y*veloc, z=dir.z*veloc})
-	m:setyaw(user:get_look_yaw()+math.pi)
 	itemstack:take_item()
 	minetest.sound_play("chakram_throw", {pos=pos, gain = 1.0, max_hear_distance = 5,})
 	return itemstack
@@ -81,7 +86,7 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 				minetest.add_item(self.object:get_pos(), "chakram:chakram")
 				if self.ob then self.ob:set_detach() self.ob:set_acceleration({x=0,y=-8,z=0}) end
 				self.object:set_hp(0)
-				self.object:punch(self.object,10,{full_punch_interval=1,damage_groups={fleshy=4}})
+				default.punch(self.user,ob,4)
 				return
 			else
 				self.timer3=-2
@@ -92,25 +97,16 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		self.timer2=self.timer2+dtime
 		self.object:set_hp(999)
 		local pos=self.object:get_pos()
-			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 2)) do
-				if not ob:get_attach() and ob:get_luaentity() and ob:get_luaentity().name == "__builtin:item" then
-					self.stuck=1
-					self.ob=ob
-					ob:set_attach(self.object, "", {x=0,y=0,z=0}, {x=0,y=0,z=0})
-					self.timer3=-2
-					break
-				end
-				if self.stuck==0 then
-					if (ob:get_luaentity() and (not ob:get_luaentity().chakram_s) and (not ob:get_luaentity().itemstring) ) or ((not ob:get_luaentity()) and ob:get_player_name()~=self.user_name and pvp) then
-						ob:punch(self.user,5,{full_punch_interval=1,damage_groups={fleshy=4}})
-						minetest.sound_play("chakram_hard_punch", {pos=ob:get_pos(), gain = 1.0, max_hear_distance = 5,})
-					end
-				end
+		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 2)) do
+			if not ob:get_attach() and ob ~= self.object and ob ~= self.user then
+				default.punch(self.user,ob,5)
+				minetest.sound_play("chakram_hard_punch", {pos=ob:get_pos(), gain = 1.0, max_hear_distance = 5,})
 			end
+		end
 
 		if self.stuck==0 then
 			local name=minetest.get_node(pos).name
-			if name~="air" and (minetest.get_node_group(name, "snappy")>0 or minetest.get_node_group(name, "dig_immediate")>0 or minetest.get_node_group(name, "oddly_breakable_by_hand")>0) and minetest.is_protected(pos,self.user:get_player_name())==false then
+			if name~="air" and (minetest.get_item_group(name, "snappy")>0 or minetest.get_item_group(name, "dig_immediate")>0 or minetest.get_item_group(name, "oddly_breakable_by_hand")>0) and minetest.is_protected(pos,self.user:get_player_name())==false then
 
 				local meta=minetest.get_meta(pos)
 				if meta and meta:get_string("infotext")~="" then return self end
@@ -141,8 +137,11 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 			self.object:set_velocity(vec)
 
 			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 2)) do
-				if (not ob:get_attach()) and ((ob:get_luaentity() and (not ob:get_luaentity().itemstring) and (not ob:get_luaentity().chakram_s)) or ((not ob:get_luaentity()) and ob:get_player_name()~=self.user_name and pvp)) then
-					ob:punch(self.user,15,{full_punch_interval=1,damage_groups={fleshy=4}})
+				local en = ob:get_luaentity()
+
+
+				if not ob:get_attach() and not (en and en.itemstring) and ob ~= self.object and ob ~= self.user then
+					default.punch(self.user,ob,4)
 					minetest.sound_play("chakram_hard_punch", {pos=ob:get_pos(), gain = 1.0, max_hear_distance = 5,})
 				end
 
@@ -157,7 +156,7 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 					if self.ob and self.ob:get_attach() and self.ob:get_hp()>0 then
 						self.ob:set_detach()
 						self.ob:set_hp(0)
-						self.ob:punch(self.user,1000,{full_punch_interval=1,damage_groups={fleshy=4}})
+						default.punch(self.user,ob,4)
 					end
 					if self.object:get_attach() then self.object:set_detach() return false end
 					self.user:get_inventory():add_item("main", ItemStack("chakram:chakram"))
@@ -166,7 +165,8 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 			end
 			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 3)) do
 				if ob:get_luaentity() and (not ob:get_attach()) and ob:get_luaentity().itemstring and ob:get_luaentity().itemstring~="chakram:chakram" then
-					ob:punch(self.user,5,{full_punch_interval=1,damage_groups={fleshy=4}})
+					self.object:remove()
+					return
 				end
 			end
 		end

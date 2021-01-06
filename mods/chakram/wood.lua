@@ -1,8 +1,15 @@
 minetest.register_tool("chakram:chakram_wood", {
-	description = "Wooden Chakram",
+	description = "Wooden Chakram (Too outdated, use this tool in a later update)",
 	range = 1,
 	inventory_image = "chakram_chakram_w.png",
 on_use=function(itemstack, user, pointed_thing)
+
+	if true then
+		minetest.chat_send_player(user:get_player_name(), "Too outdated, use this tool in a later update")
+		return
+	end
+
+
 	if chakram_max()==false or type(user)=="table" then
 		minetest.chat_send_player(user:get_player_name(), "Too many chakrams: (max " .. chakram_max_number .. ")")
 		return itemstack
@@ -22,7 +29,6 @@ on_use=function(itemstack, user, pointed_thing)
 	local m=minetest.add_entity(pos, "chakram:chakr_w")
 	chakram_max(m)
 	m:set_velocity({x=dir.x*veloc, y=dir.y*veloc, z=dir.z*veloc})
-	m:setyaw(user:get_look_yaw()+math.pi)
 	itemstack:take_item()
 	minetest.sound_play("chakram_throw", {pos=pos, gain = 1.0, max_hear_distance = 5,})
 	return itemstack
@@ -93,7 +99,7 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		self.object:set_hp(999)
 		local pos=self.object:get_pos()
 			local name=minetest.get_node(pos).name
-			if name~="air" and (minetest.get_node_group(name, "snappy")>0 or minetest.get_node_group(name, "dig_immediate")>0) and minetest.is_protected(pos,self.user:get_player_name())==false then
+			if name~="air" and (minetest.get_item_group(name, "snappy")>0 or minetest.get_item_group(name, "dig_immediate")>0) and minetest.is_protected(pos,self.user:get_player_name())==false then
 					local meta=minetest.get_meta(pos)
 					if meta and meta:get_string("infotext")~="" then return self end
 
@@ -105,8 +111,8 @@ on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 				return false
 			end
 			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 2)) do
-				if (not ob:get_attach()) and (ob:get_luaentity() and (not ob:get_luaentity().chakram_w) and (not ob:get_luaentity().itemstring)) or ((not ob:get_luaentity()) and ob:get_player_name()~=self.user_name and pvp) then
-					ob:punch(self.user,2,{full_punch_interval=1,damage_groups={fleshy=4}})
+				if (not ob:get_attach()) and (ob:get_luaentity() and (not ob:get_luaentity().chakram_w) and (not ob:get_luaentity().itemstring)) or ((not ob:get_luaentity()) and ob:get_player_name()~=self.user_name) then
+					default.punch(self.user,ob,4)
 					minetest.sound_play("chakram_hard_punch", {pos=ob:get_pos(), gain = 1.0, max_hear_distance = 5,})
 				end
 			end
