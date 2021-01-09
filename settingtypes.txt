@@ -16,3 +16,5 @@ xaenvironment_active_spawn_mob_limit (Max spawning mobs while active) int 100
 
 xaenvironment_active_spawn_same_mob_limit (Max spawning mobs while active of same kind) int 20
 
+xaenvironment_survivorstart (Start with helpful items) bool false
+
