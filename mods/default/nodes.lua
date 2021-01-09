@@ -816,6 +816,7 @@ minetest.register_node("default:ice", {
 minetest.register_node("default:water_source", {
 	description = "Water source (fresh water)",
 	tiles={
+		tile="default_water.png",
 		{
 			name = "default_water_animated.png",
 			backface_culling = false,
@@ -866,6 +867,7 @@ minetest.register_node("default:water_source", {
 minetest.register_node("default:water_flowing", {
 	description = "Water flowing",
 	special_tiles={
+		tile="default_water.png",
 		{
 			name = "default_water_animated.png",
 			backface_culling = false,
@@ -912,6 +914,7 @@ player_style.register_environment_sound({node="default:water_flowing",sound="def
 minetest.register_node("default:salt_water_source", {
 	description = "Salt water source",
 	tiles={
+		tile="default_salt_water.png",
 		{
 			name = "default_salt_water_animated.png",
 			backface_culling = false,
@@ -955,7 +958,9 @@ minetest.register_node("default:salt_water_source", {
 minetest.register_node("default:salt_water_flowing", {
 	description = "Salt water flowing",
 	special_tiles={
+		tile="default_salt_water.png",
 		{
+
 			name = "default_salt_water_animated.png",
 			backface_culling = false,
 			animation = {
@@ -1004,6 +1009,7 @@ player_style.register_environment_sound({node="default:salt_water_flowing",sound
 minetest.register_node("default:lava_source", {
 	description = "Lava source",
 	tiles={
+		tile = "default_lava.png",
 		{
 			name = "default_lava_animated.png",
 			backface_culling = false,
@@ -1050,7 +1056,9 @@ player_style.register_environment_sound({node="default:lava_flowing",sound="defa
 minetest.register_node("default:lava_flowing", {
 	description = "Lava flowing",
 	special_tiles={
+		tile="default_lava.png",
 		{
+
 			name = "default_lava_animated.png",
 			backface_culling = false,
 			animation = {
@@ -1129,6 +1137,7 @@ minetest.register_node("default:oil_source", {
 
 minetest.register_node("default:oil_flowing", {
 	description = "Oil flowing",
+	tiles={"default_oil.png"},
 	special_tiles={
 		{
 			name = "default_oil.png",
