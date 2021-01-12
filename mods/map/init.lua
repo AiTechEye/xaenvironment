@@ -26,7 +26,7 @@ map = {
 minetest.register_node("map:workbench", {
 	description = "Map workbench",
 	tiles={"default_wood.png^map_map.png","default_wood.png","default_wood.png",},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,used_by_npc=1},
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,not_in_creative_inventory=1}, --,used_by_npc=1
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	drawtype = "nodebox",
@@ -178,7 +178,7 @@ minetest.register_node("map:workbench", {
 
 minetest.register_tool("map:map", {
 	description = "Map",
-	groups = {flammable=3},
+	groups = {flammable=3,not_in_creative_inventory=1},
 	inventory_image = "map_map.png",
 	on_use=function(itemstack, user, pointed_thing)
 		map.user[user] = map.user[user] or {}
