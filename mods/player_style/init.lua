@@ -202,6 +202,15 @@ minetest.register_on_joinplayer(function(player)
 			})
 		}
 	end
+
+
+	local skin = player:get_meta():get_string("skin")
+	if skin ~= "" then
+		local textures = player:get_properties({}).textures
+		textures[1]=skin
+		player:set_properties({textures = textures})
+	end
+
 end)
 
 player_style.register_environment_sound=function(def)

@@ -54,9 +54,11 @@ player_style.inventory=function(player)
 	player_style.players[name].inv = player_style.players[name].inv or {}
 	local invp = player_style.players[name].inv
 
-	if not invp.backpack then
 
---detached inventory
+--detached inventory (backpack)
+
+
+	if not invp.backpack then
 		invp.backpackslot = minetest.create_detached_inventory("backpackslot", {
 			allow_put = function(inv, listname, index, stack, player)
 				return minetest.get_item_group(stack:get_name(),"backpack") > 0 and stack:get_count() or 0
@@ -66,13 +68,30 @@ player_style.inventory=function(player)
 			end,
 			on_put = function(inv, listname, index, stack, player)
 				player:get_meta():set_string("backpackslot",minetest.serialize(stack:to_table()))
+				if not invp.backpack_object then
+					invp.backpack_object = minetest.add_entity(player:get_pos(),"default:wielditem")
+					invp.backpack_object:set_attach(player, "",{x=0, y=11, z=-2}, {x=0, y=0,z=0})
+					invp.backpack_object:set_properties({textures={"player_style:backpack"},visual_size = {x=0.15,y=0.15,z=0.3}})
+				end
 			end,
 			on_take = function(inv, listname, index, stack, player)
+				if invp.backpack_object then
+					invp.backpack_object:remove()
+					invp.backpack_object = nil
+				end
 				player:get_meta():set_string("backpackslot","")
 			end
 		})
 		invp.backpackslot:set_size("main",1)
 		invp.backpackslot:set_stack("main",1,ItemStack(minetest.deserialize(player:get_meta():get_string("backpackslot") or "")) or {})
+
+		if invp.backpackslot:is_empty("main") == false then
+			minetest.after(0.1,function(invp,player)
+				invp.backpack_object = minetest.add_entity(player:get_pos(),"default:wielditem")
+				invp.backpack_object:set_attach(player, "",{x=0, y=11, z=-2}, {x=0, y=0,z=0})
+				invp.backpack_object:set_properties({textures={"player_style:backpack"},visual_size = {x=0.15,y=0.15,z=0.3}})
+			end,invp,player)
+		end
 
 		invp.backpack = minetest.create_detached_inventory("backpack", {
 			on_put = function(inv, listname, index, stack, player)
@@ -101,8 +120,10 @@ player_style.inventory=function(player)
 		invp.backpack:set_list("main", list)
 	end
 
+--inventory
+
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
-	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
+	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]image_button[3,0;1,1;character.png;skins;]"
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
@@ -201,6 +222,18 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if pressed.quit then
 				player_style.players[name].inv.clean = nil
 				return
+			elseif pressed.skins then
+				local skin = player:get_properties().textures
+				if skin[1] == "character.png" then
+					skin[1] = "player_style_dacy.png"
+				elseif skin[1] == "player_style_dacy.png" then
+					skin[1] = "character.png"
+				else
+					return
+				end
+				player:get_meta():set_string("skin",skin[1])
+				player:set_properties({textures=skin})
+				player_style.inventory(player)
 			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
 				invp.index = invp.index + invp.size+1
 				player_style.inventory(player)
