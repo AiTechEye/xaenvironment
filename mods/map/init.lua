@@ -11,22 +11,29 @@ map = {
 		["default_sand.png"] = "map_a.png",
 		["default_snow.png"] = "map_a.png",
 		["default_dry_grass.png"] = "map_a.png",
+	},
+	accepted_drawtypes = {
+		allfaces_optional=true,
+		glasslike=true,
+		normal=true,
+		liquid=true,
+		flowingliquid=true,
 	}
 }
 
---minetest.register_craft({
---	output="map:workbench",
---	recipe={
---		{"group:stick","default:coal_lump","default:gold_ingot"},
---		{"group:wood","group:wood","group:wood"},
---		{"group:wood","group:metalstick","group:wood"},
---	},
---})
+minetest.register_craft({
+	output="map:workbench",
+	recipe={
+		{"group:stick","default:coal_lump","default:gold_ingot"},
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","group:metalstick","group:wood"},
+	},
+})
 
 minetest.register_node("map:workbench", {
 	description = "Map workbench",
 	tiles={"default_wood.png^map_map.png","default_wood.png","default_wood.png",},
-	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,not_in_creative_inventory=1}, --,used_by_npc=1
+	groups = {choppy=3,oddly_breakable_by_hand=3,flammable=2,used_by_npc=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	drawtype = "nodebox",
@@ -41,7 +48,7 @@ minetest.register_node("map:workbench", {
 			{-0.5, -0.5, 0.4375, -0.4375, 0.125, 0.5},
 		}
 	},
-	on_construct=function(pos,but)
+	on_construct=function(pos,gen,lock)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("input_dye", 1)
@@ -52,18 +59,19 @@ minetest.register_node("map:workbench", {
 			"listcolors[#77777777;#777777aa;#000000ff]"..
 			"item_image[2,0;1,1;default:dye]" ..
 			"item_image[3,0;1,1;default:paper]" ..
+			"item_image[5,0;1,1;map:map]" ..
+			 (lock and "image_button[6,0;1,1;synth_"..(lock == 0 and "no" or "").."lock.png;lock"..lock..";]" or "") ..
 			"list[context;input_dye;2,0;1,1;]" ..
 			"list[current_player;main;0,1.3;8,4;]" ..
 			"list[context;input_paper;3,0;1,1;]" ..
 			"list[context;output;5,0;1,1;]" ..
 			"listring[current_player;main]" ..
-			"listring[current_name;input_paper]"
-
-			 ..(but and "item_image_button[4,0;1,1;map:map;gen;]" or "")
+			"listring[current_name;input_paper]"  ..
+			(gen and "image_button[4,0;1,1;map_arrow.png;gen;]" or "")
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		if listname=="input_paper" and stack:get_name() == "default:paper" or listname=="input_dye" and stack:get_name() == "default:dye" then
+		if minetest.get_meta(pos):get_int("running") == 0 and (listname=="input_paper" and stack:get_name() == "default:paper" or listname=="input_dye" and stack:get_name() == "default:dye" or listname=="output" and stack:get_name() == "map:map") then
 			return stack:get_count()
 		end
 		return 0
@@ -76,18 +84,27 @@ minetest.register_node("map:workbench", {
 		if m:get_int("running") == 0 then
 			local inv = m:get_inventory()
 			local ab = inv:get_stack("input_paper",1):get_name() == "default:paper" and inv:get_stack("input_dye",1):get_name() == "default:dye" and inv:get_stack("output",1):get_count() == 0
-			minetest.registered_items["map:workbench"].on_construct(pos,ab)
+
+			local ms = inv:get_stack("output",1)
+			local lock = ms:get_name() == "map:map" and ms:get_meta():get_int("lock") or nil
+
+			minetest.registered_items["map:workbench"].on_construct(pos,ab,lock)
 		end
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
 		if m:get_int("running") == 0 then
 			local inv = m:get_inventory()
+			local lock
 			if listname == "output" then
 				m:set_string("infotext","")
+
+			else
+				local ms = inv:get_stack("output",1)
+				lock = ms:get_name() == "map:map" and ms:get_meta():get_int("lock") or nil
 			end
 			local ab = inv:get_stack("input_paper",1):get_name() == "default:paper" and inv:get_stack("input_dye",1):get_name() == "default:dye" and inv:get_stack("output",1):get_count() == 0
-			minetest.registered_items["map:workbench"].on_construct(pos,ab)
+			minetest.registered_items["map:workbench"].on_construct(pos,ab,lock)
 		end
 	end,
 	can_dig = function(pos, player)
@@ -95,11 +112,28 @@ minetest.register_node("map:workbench", {
 		local inv = m:get_inventory()
 		return m:get_int("running") == 0 and inv:is_empty("input_paper") and inv:is_empty("input_dye") and inv:is_empty("output")
 	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		local m = minetest.get_meta(pos)
+		if m:get_int("running") ~= 0 and not minetest.get_node_timer(pos):is_started() then
+			minetest.get_node_timer(pos):start(0.1)
+		end
+	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
-		local meta = minetest.get_meta(pos)
-		if pressed.gen then
-			local m = minetest.get_meta(pos)
-			local inv = m:get_inventory()
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+
+		if pressed.lock0 then
+			local item = inv:get_stack("output",1)
+			item:get_meta():set_int("lock",1)
+			inv:set_stack("output",1,item)
+			minetest.registered_items["map:workbench"].on_construct(pos,nil,1)
+		elseif pressed.lock1 then
+			local item = inv:get_stack("output",1)
+			item:get_meta():set_int("lock",0)
+			inv:set_stack("output",1,item)
+			minetest.registered_items["map:workbench"].on_construct(pos,nil,0)
+		elseif pressed.gen then
+
 			local paper = inv:get_stack("input_paper",1)
 			local dye = inv:get_stack("input_dye",1)
 			paper:take_item()
@@ -115,7 +149,7 @@ minetest.register_node("map:workbench", {
 		end
 	end,
 	on_timer = function (pos, elapsed)
-		local rad = 10
+		local rad = 5
 		local ds = rad*2
 		local s = 0.4
 
@@ -138,7 +172,7 @@ minetest.register_node("map:workbench", {
 		local index = m:get_int("index")
 		m:set_string("infotext",(math.floor((100/n * index)*10)*0.1).."% ("..index.."/"..n.." images)")
 
-		if index < n then
+		if index <= n then
 
 			local p = parts[index]
 			local t = map.generate_texture(rad,p.pos)
@@ -169,6 +203,7 @@ minetest.register_node("map:workbench", {
 					m:set_string("texture"..i,"")
 				end
 				m:set_int("running",0)
+				minetest.registered_items["map:workbench"].on_construct(pos,nil,0)
 				return false
 			end
 		end
@@ -180,6 +215,8 @@ minetest.register_tool("map:map", {
 	description = "Map",
 	groups = {flammable=3,not_in_creative_inventory=1},
 	inventory_image = "map_map.png",
+	on_drop=function(itemstack, droper, pos)
+	end,
 	on_use=function(itemstack, user, pointed_thing)
 		map.user[user] = map.user[user] or {}
 		local p = map.user[user]
@@ -205,8 +242,8 @@ minetest.register_tool("map:map", {
 		en.textures = minetest.deserialize(m:get_string("textures"))
 		en.item = itemstack
 		en.index = index
-
-		p.ob:set_attach(user, "",{x=0, y=15, z=5}, {x=0, y=0,z=0},true)
+		en.lock = m:get_int("lock") == 1
+		p.ob:set_attach(user, "",{x=0, y=9, z=3}, {x=0, y=0,z=0},true)
 	end
 })
 
@@ -248,8 +285,8 @@ minetest.register_entity("map:map",{
 	load=function(self)
 		self.time = 1000
 		local pos = self.user:get_pos()
-		local rad = 10
-		local s = 0.4
+		local rad = 5
+		local s = 0.8
 		local ds = rad*2
 
 		local i = 0
@@ -266,6 +303,14 @@ minetest.register_entity("map:map",{
 			p.ob:set_attach(self.object, "",p.lpos, {x=0, y=0,z=0},true)
 			p.ob:set_properties({textures={t}})
 		end
+
+		if self.lock then
+			local l = minetest.add_entity(pos,"map:part")
+			l:set_properties({visual_size = {x=0.1,y=0.1,z=1}})
+			l:set_attach(self.object, "",{x=4.8, y=4.8,z=-0.0105}, {x=0, y=0,z=0},true)
+			l:set_properties({textures={"synth_lock.png"}})
+		end
+
 		self.time = 0.1
 		self.loaded = true
 	end,
@@ -284,29 +329,34 @@ minetest.register_entity("map:map",{
 		if not (self.object:get_attach() and self.user and self.pos) then
 			self.object:remove()
 		else
-
 			local pos = self.user:get_pos()
-
 --cursor
-
 			if not self.cursor then
 				self.cursor = minetest.add_entity(pos,"map:part")
 				self.cursor:set_properties({visual_size = {x=0.04,y=0.04,z=1},textures={"map_cursor.png"}})
 			end
 			local x = self.pos.x-pos.x
 			local z = self.pos.z-pos.z
-			local ux = math.abs(x) < 210 and x*0.0199 or (210*x/math.abs(x))*0.0199
-			local uz = math.abs(z) < 210 and z*0.0199 or (210*z/math.abs(z))*0.0199
-			self.cursor:set_attach(self.object, "",{x=ux,y=uz,z=-0.011}, {x=0, y=0,z=(self.user:get_look_horizontal() * 180 / math.pi)+180},true)
---map update
 
+			local ux = math.abs(x) < 55 and x*0.08055 or (55*x/math.abs(x))*0.08055
+			local uz = math.abs(z) < 55 and z*0.08055 or (55*z/math.abs(z))*0.08055
+			self.cursor:set_attach(self.object, "",{x=ux,y=uz,z=-0.011}, {x=0, y=0,z=(self.user:get_look_horizontal() * 180 / math.pi)+180},true)
+
+--map attach
+			local lv = self.user:get_look_vertical()
+
+			
+			lv = lv < 1 and lv > 0 and lv or lv > 1 and 1 or lv < 0 and 0
+			self.object:set_attach(self.user, "",{x=0, y=9.5+(lv*3), z=3}, {x=(lv * 180 / math.pi), y=0,z=0},true)
+
+--map update
 			self.timer2 = self.timer2 + 0.1
-			if self.timer2 < 1 then
+			if self.lock or self.timer2 < 1 then
 				return
 			end
 
 			self.timer2 = 0
-			local rad = 10
+			local rad = 5
 
 			if self.index > #self.parts then
 				self.index = 1
@@ -321,7 +371,7 @@ minetest.register_entity("map:map",{
 			self.textures[self.index] = t
 			local itname = self.user:get_wielded_item():get_name()
 			if itname == "map:map" then
-				if self.saver > 100 then
+				if self.saver > 10 then
 					local item = self.user:get_wielded_item()
 					local meta = item:get_meta()
 					if meta:get_string("pos") == self.posid then
@@ -329,6 +379,7 @@ minetest.register_entity("map:map",{
 						meta:set_string("textures",minetest.serialize(self.textures))
 						meta:set_int("index",self.index)
 						self.user:set_wielded_item(item)
+
 					else
 						self.user = nil
 						return
@@ -340,7 +391,6 @@ minetest.register_entity("map:map",{
 			end
 			p.ob:set_properties({textures={t}})
 			self.index = self.index +1
-
 		end
 	end
 })
@@ -350,7 +400,6 @@ minetest.register_entity("map:map",{
 --		map.t=tonumber(param)
 --	end
 --})
-
 
 map.generate_texture=function(rad,pos,maxram)
 	pos=vector.round(pos)
@@ -368,12 +417,6 @@ map.generate_texture=function(rad,pos,maxram)
 	local data = vox:get_data()
 	local imgmap = {}
 	local texture = "[combine:"..map_size.."x"..map_size
-	local accepted_drawtypes = {
-		allfaces_optional=true,
-		glasslike=true,
-		normal=true,
-		liquid=true,
-	}
 
 	for x = -rad,rad do
 	for z = -rad,rad do
@@ -382,6 +425,7 @@ map.generate_texture=function(rad,pos,maxram)
 		local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
 		local i = x..","..z
 		local id = data[v]
+
 		if not imgmap[i] and id ~= air then
 			if maxram < tonumber(memory_mb()) then
 				print(memory_mb())
@@ -403,7 +447,7 @@ map.generate_texture=function(rad,pos,maxram)
 				img = tiles.tile
 			end
 
-			if img and accepted_drawtypes[def.drawtype] then
+			if img and map.accepted_drawtypes[def.drawtype] then
 				img = map.shortcut_textures[img] or img
 
 				if not reg then
