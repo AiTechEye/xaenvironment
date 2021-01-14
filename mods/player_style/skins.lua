@@ -4,7 +4,7 @@ player_style.skins = {
 		{name="Dacy",skin="player_style_dacy.png",cost=0,info="Another default character, random made npc for aliveai",origin="Aliveai"},
 		{name="Villager",skin="examobs_villager.png",cost=100,info="Just another fool",origin="XaEnvironment"},
 		{name="Spacesuit",skin="spacestuff_spacesuit2.png",cost=200,info="Suit used to protect against non breathable areas",origin="Marssurvive"},
-		{name="Underground npc",skin="examobs_underground_npc.png",cost=300,info="Underground npc",origin="Just another fool, trying to breakout from its house"},
+		{name="Underground npc",skin="examobs_underground_npc.png",cost=300,info="An underground living thing",origin="XaEnvironment"},
 		{name="Tomato NPC",skin="examobs_tomato_npc.png",cost=500,info="Tomato farmer that is farming its own family",origin="XaEnvironment"},
 		{name="Terminator",skin="examobs_terminator.png",cost=2000,info="Destruction machine",origin="Aliveai"},
 		{name="Gassman",skin="examobs_gassman.png",cost=1500,info="High explosive machine",origin="Aliveai"},
