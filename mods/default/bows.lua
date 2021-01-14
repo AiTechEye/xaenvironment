@@ -171,11 +171,11 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 				y=pos.y+((user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.5 or 1.5)+y,
 				z=pos.z+z
 			}, "default:arrow")
-			e:set_velocity({x=dir.x*level, y=dir.y*level, z=dir.z*level})
-			e:set_acceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
+			e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+			e:set_acceleration({x=num(dir.x*-3), y=-10, z=num(dir.z*-3)})
 			e:set_yaw(user:get_look_horizontal()-math.pi/2)
 			e:get_luaentity().on_dropitem=on_dropitem or function() end
-			e:get_luaentity().dir ={x=dir.x/2,y=dir.y/2,z=dir.z/2,}
+			e:get_luaentity().dir ={x=num(dir.x/2),y=num(dir.y/2),z=num(dir.z/2),}
 			minetest.sound_play("default_bow_shoot", {pos=pos})
 		end,level,user,meta)
 	end
