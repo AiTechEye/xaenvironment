@@ -1,13 +1,14 @@
 player_style.register_button=function(def)
 	local b = (def.type and (def.type .. "_button") or "button")
 	.. (def.exit and "_exit" or "")
-	.. "["..player_style.buttons.num..",7.2;1,1;"
+	.. "["..player_style.buttons.num..",0;1,1;" -- ",7.2;1,1;"
 	.. (((def.type == "image" or def.type == "item_image") and def.image and (def.image .. ";")) or "")
 	.. def.name ..";"
 	.. (def.label or "") .."]"
 	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
 	player_style.buttons.text = player_style.buttons.text .. b
 	player_style.buttons.num = player_style.buttons.num + 0.8
+	player_style.buttons.num_of_buttons = player_style.buttons.num_of_buttons + 1
 	player_style.buttons.action[def.name]=def.action
 end
 
@@ -36,7 +37,6 @@ player_style.register_button({
 		local invp = player_style.players[name].inv
 		local bn = invp.backpackslot:get_stack("main",1):get_name()
 		if minetest.get_item_group(bn,"backpack") > 0 then
-
 			return minetest.show_formspec(player:get_player_name(), "backpack",
 				"size[8,8]" 
 				.."listcolors[#77777777;#777777aa;#000000ff]"
@@ -123,7 +123,11 @@ player_style.inventory=function(player)
 --inventory
 
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
-	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]image_button[3,0;1,1;character.png;skins;]"
+	local model = "model[0,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
+	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10)..";]scrollbar[0,8;8,0.5;horizontal;scrollbar;]scroll_container[0,8.2;11,1.5;scrollbar;horizontal]"
+		..player_style.buttons.text
+		.."scroll_container_end[scrollbar]"
+
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
@@ -137,7 +141,7 @@ player_style.inventory=function(player)
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
 			..model
-			..player_style.buttons.text
+			..buttons
 		)
 	else
 --creative inventory items
@@ -188,7 +192,9 @@ player_style.inventory=function(player)
 			.."list[detached:backpackslot;main;7,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
-			..player_style.buttons.text
+
+			..buttons
+
 			.."image_button[8,7;1,1;default_crafting_arrowleft.png;creinvleft;]"
 			.."image_button[9,7;1,1;default_crafting_arrowright.png;creinvright;]"
 			.."image_button[10,7;1,1;synth_repeat.png;reset;]"
@@ -222,18 +228,6 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if pressed.quit then
 				player_style.players[name].inv.clean = nil
 				return
-			elseif pressed.skins then
-				local skin = player:get_properties().textures
-				if skin[1] == "character.png" then
-					skin[1] = "player_style_dacy.png"
-				elseif skin[1] == "player_style_dacy.png" then
-					skin[1] = "character.png"
-				else
-					return
-				end
-				player:get_meta():set_string("skin",skin[1])
-				player:set_properties({textures=skin})
-				player_style.inventory(player)
 			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
 				invp.index = invp.index + invp.size+1
 				player_style.inventory(player)
@@ -278,7 +272,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				if i:sub(1,8) == "itembut_" then
 					local t = i:sub(9,-1)
 					player:get_inventory():add_item("main",t.." "..minetest.registered_items[t].stack_max)
+					break
 				end
+	
 			end
 		end
 	end

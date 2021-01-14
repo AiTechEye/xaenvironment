@@ -1,6 +1,6 @@
 player_style={
 	players={},
-	buttons={text="",num=0,action={}},
+	buttons={text="",num=0,num_of_buttons=0,action={}},
 	registered_profiles={},
 	player_attached={},
 	player_dive = {},
@@ -24,7 +24,7 @@ dofile(minetest.get_modpath("player_style") .. "/inv.lua")
 dofile(minetest.get_modpath("player_style") .. "/stuff.lua")
 dofile(minetest.get_modpath("player_style") .. "/store.lua")
 dofile(minetest.get_modpath("player_style") .. "/special.lua")
-
+dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 
 
 player_style.drinkable=function(pos,player)
