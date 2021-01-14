@@ -274,7 +274,7 @@ if node.hurt==1 then
 	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
 		if not (ob:get_luaentity() and (ob:get_luaentity().itemstring or ob:get_luaentity().nitroglycerine_dust)) then
 			local pos2=ob:get_pos()
-			local d=math.max(1,vector.distance(pos,pos2))
+			local d=math.max(1,vector.distance(pos,pos2 or pos))
 			local dmg=(8/d)*node.radius
 			if ob:get_luaentity() and ob:get_luaentity().on_blow then
 				ob:get_luaentity().on_blow(ob:get_luaentity())
@@ -288,7 +288,7 @@ end
 if node.velocity==1 then
 	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
 		local pos2=ob:get_pos()
-		local d=math.max(1,vector.distance(pos,pos2))
+		local d=math.max(1,vector.distance(pos,pos2 or pos))
 		local dmg=(8/d)*node.radius
 		if ob:get_luaentity() and not (ob:get_luaentity().nitroglycerine_dust and ob:get_luaentity().nitroglycerine_dust==2) then
 			ob:set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
