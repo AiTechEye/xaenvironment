@@ -52,3 +52,11 @@ player_style.register_environment_sound({
 	max_y = 50,			nil,number (default: 31000)
 	count = 5,			nil,number (default: 1) [min count of nodes]
 })
+
+=============================
+	-- returns player skin
+player_style.get_player_skin(player)
+	-- set player skin texture (set_properties)
+player_style.set_player_skin(player,texture)
+	-- restore to the player's selected skin
+player_style.restore_player_skin(player)

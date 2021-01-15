@@ -78,6 +78,32 @@ player_style.register_button({
 	end
 })
 
+player_style.get_player_skin=function(player)
+	local skin = player:get_meta():get_string("skin")
+	return skin ~= "" and skin or "charcacter.png"
+end
+
+player_style.set_player_skin=function(player,newskin)
+	local skin = player:get_meta():get_string("skin")
+	local textures = player:get_properties().textures
+	if textures[1] == skin or skin == "" then
+		textures[1] = newskin
+		player:set_properties({textures=textures})
+		player_style.inventory(player)
+		return true
+	end
+	return false
+end
+
+player_style.restore_player_skin=function(player)
+	local skin = player:get_meta():get_string("skin")
+	local textures = player:get_properties().textures
+	textures[1] = skin ~= "" and skin or "charcacter.png"
+	player:set_properties({textures=textures})
+	player_style.inventory(player)
+end
+
+
 player_style.skins.store=function(player,scroll)
 	local text = ""
 	local m = player:get_meta()
