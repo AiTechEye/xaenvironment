@@ -95,21 +95,9 @@ player_style.add_player_skin=function(player,texture,level)
 	local p = player_style.players[player:get_player_name()].skin
 	p[level] = p[level] or {}
 	table.insert(p[level],texture)
-	for i,v in ipairs(p) do
-		for i2,v2 in ipairs(v) do
-			skin = skin .."^"..v2
-		end
-	end
-	local textures = player:get_properties().textures
-	textures[1] = skin
-	player:set_properties({textures=textures})
-	player_style.inventory(player)
-end
 
-player_style.update_player_skin=function(player)
-	local skin = player:get_meta():get_string("skin")
-	local p = player_style.players[player:get_player_name()].skin
-	for i,v in ipairs(p) do
+
+	for i,v in pairs(p) do
 		for i2,v2 in ipairs(v) do
 			skin = skin .."^"..v2
 		end
@@ -121,17 +109,34 @@ player_style.update_player_skin=function(player)
 end
 
 player_style.remove_player_skin=function(player,texture,level)
+	if texture == "" then
+		return
+	end
 	local skin = player:get_meta():get_string("skin")
 	local p = player_style.players[player:get_player_name()].skin
 	if p[level] then
-		for i,v in ipairs(p) do
-			for i2,v2 in ipairs(v) do
+		for i,v in pairs(p) do
+			for i2,v2 in pairs(v) do
 				if v2 == texture then
 					p[level][i2] = nil
 				else
 					skin = skin .."^"..v2
 				end
 			end
+		end
+	end
+	local textures = player:get_properties().textures
+	textures[1] = skin
+	player:set_properties({textures=textures})
+	player_style.inventory(player)
+end
+
+player_style.update_player_skin=function(player)
+	local skin = player:get_meta():get_string("skin")
+	local p = player_style.players[player:get_player_name()].skin
+	for i,v in pairs(p) do
+		for i2,v2 in ipairs(v) do
+			skin = skin .."^"..v2
 		end
 	end
 	local textures = player:get_properties().textures
