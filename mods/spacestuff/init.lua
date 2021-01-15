@@ -86,6 +86,13 @@ minetest.register_tool("spacestuff:spacesuit", {
 	end
 })
 
+minetest.register_tool("spacestuff:backpack", {
+	description = "Backpack",
+	inventory_image = "spacestuff_backpack.png",
+	wield_scale={x=2,y=2,z=3},
+	groups={not_in_creative_inventory=1},
+})
+
 spacestuff.wieldsuit=function(user,s)
 	if not user then
 		return
@@ -97,10 +104,12 @@ spacestuff.wieldsuit=function(user,s)
 	if u == nil and s == nil then
 		return
 	elseif (u and s) or user:get_hp() <= 0 then
-		u.user:set_properties({mesh = "character.b3d",textures = u.skin})
+		player_style.remove_player_skin(user,"spacestuff_spacesuit3.png",3)
 		u.user:hud_remove(u.hud)
+		if spacestuff.users[name].backpack then
+			spacestuff.users[name].backpack:remove()
+		end
 		spacestuff.users[name] = nil
-		player_style.inventory(u.user)
 		return
 	elseif s then
 		local i = user:get_wield_index()
@@ -118,11 +127,19 @@ spacestuff.wieldsuit=function(user,s)
 				return
 			end
 		end
+
+		local backpack
+		if player_style.players[name].inv.backpack_object then
+			backpack = minetest.add_entity(user:get_pos(),"default:wielditem")
+			backpack:set_attach(user, "",{x=0, y=11, z=-2}, {x=0, y=0,z=0})
+			backpack:set_properties({textures={"spacestuff:backpack"},visual_size = {x=0.151,y=0.151,z=0.301}})
+		end
+
 		spacestuff.users[name] = {
 			air=100,
 			user=user,
 			index=i,
-			skin = user:get_properties().textures,
+			backpack = backpack,
 			hud=user:hud_add({
 				hud_elem_type = "image",
 				text ="spacestuff_scene.png",
@@ -133,8 +150,7 @@ spacestuff.wieldsuit=function(user,s)
 			})
 		}
 
-		user:set_properties({textures = {"spacestuff_spacesuit2.png"}})
-		player_style.inventory(user)
+		player_style.add_player_skin(user,"spacestuff_spacesuit3.png",3)
 		u = spacestuff.users[name]
 	end
 
