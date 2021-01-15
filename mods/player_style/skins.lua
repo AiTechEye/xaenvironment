@@ -41,7 +41,7 @@ player_style.skins = {
 
 		{name="Acidman",skin="player_style_acidman.png",cost=200,info="Acid machine",origin="Aliveai"},
 		{name="Negative gassman",skin="player_style_negativegassman.png",cost=200,info="Came to life through a dream",origin="Aliveai"},
-		{name="Uranium",skin="player_style_uranium.png",cost=1000,info="Massdestruction machine",origin="Pollution"},
+		{name="Uranium",skin="player_style_uranium.png",cost=1000,info="Massdestruction machine",origin="Aliveai"},
 		{name="Nuker",skin="player_style_nuker.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
 		{name="Blackhole bot",skin="player_style_blackholebot.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
 		{name="Nitrogen bomb",skin="player_style_nitrogenbomb.png",cost=200,info="Nitrogen bomb",origin="Aliveai"},
