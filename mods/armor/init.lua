@@ -93,13 +93,12 @@ armor.update=function(player,wear)
 
 	if player:get_armor_groups().fleshy ~= armor.user[name].playerlevel-arml then
 		player:set_armor_groups({fleshy=data.playerlevel-arml})
-		if not data.skin then
-			data.skin = player:get_properties().textures[1]
-		end
-		local texture = data.skin
+		local texture = ""
+		local c = ""
 		for i,v in ipairs(inv) do
 			if v:get_name() ~= "" and i < 6 then
-				texture = texture .. "^("..armor.registered_items[v:get_name()]..")"
+				texture = texture .. c .."("..armor.registered_items[v:get_name()]..")"
+				c = "^"
 			elseif i == 6 then
 				data.shield = data.shield or {}
 				if data.shield.item ~= v:get_name() then
@@ -129,7 +128,9 @@ armor.update=function(player,wear)
 				player:get_inventory():set_stack("hand",1,ItemStack(def.armor_hand))
 			end
 		end
-		player:set_properties({textures={texture}})
+		player_style.remove_player_skin(player,data.texture,2)
+		player_style.add_player_skin(player,texture,2)
+		data.texture = texture
 	end
 end
 
@@ -256,7 +257,7 @@ minetest.register_on_joinplayer(function(player)
 		end
 	end
 	armor.user[name].inv:set_list("main", list)
-
+	armor.user[name].texture = ""
 	minetest.after(0, function(player)
 		armor.update(player)
 	end,player)
