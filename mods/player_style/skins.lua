@@ -83,26 +83,62 @@ player_style.get_player_skin=function(player)
 	return skin ~= "" and skin or "charcacter.png"
 end
 
-player_style.set_player_skin=function(player,newskin)
-	local skin = player:get_meta():get_string("skin")
-	local textures = player:get_properties().textures
-	if textures[1] == skin or skin == "" then
-		textures[1] = newskin
-		player:set_properties({textures=textures})
-		player_style.inventory(player)
-		return true
-	end
-	return false
+player_style.get_current_player_skin=function(player)
+	return player:get_properties().textures[1]
 end
 
-player_style.restore_player_skin=function(player)
+player_style.add_player_skin=function(player,texture,level)
+	if texture == "" then
+		return
+	end
 	local skin = player:get_meta():get_string("skin")
+	local p = player_style.players[player:get_player_name()].skin
+	p[level] = p[level] or {}
+	table.insert(p[level],texture)
+	for i,v in ipairs(p) do
+		for i2,v2 in ipairs(v) do
+			skin = skin .."^"..v2
+		end
+	end
 	local textures = player:get_properties().textures
-	textures[1] = skin ~= "" and skin or "charcacter.png"
+	textures[1] = skin
 	player:set_properties({textures=textures})
 	player_style.inventory(player)
 end
 
+player_style.update_player_skin=function(player)
+	local skin = player:get_meta():get_string("skin")
+	local p = player_style.players[player:get_player_name()].skin
+	for i,v in ipairs(p) do
+		for i2,v2 in ipairs(v) do
+			skin = skin .."^"..v2
+		end
+	end
+	local textures = player:get_properties().textures
+	textures[1] = skin
+	player:set_properties({textures=textures})
+	player_style.inventory(player)
+end
+
+player_style.remove_player_skin=function(player,texture,level)
+	local skin = player:get_meta():get_string("skin")
+	local p = player_style.players[player:get_player_name()].skin
+	if p[level] then
+		for i,v in ipairs(p) do
+			for i2,v2 in ipairs(v) do
+				if v2 == texture then
+					p[level][i2] = nil
+				else
+					skin = skin .."^"..v2
+				end
+			end
+		end
+	end
+	local textures = player:get_properties().textures
+	textures[1] = skin
+	player:set_properties({textures=textures})
+	player_style.inventory(player)
+end
 
 player_style.skins.store=function(player,scroll)
 	local text = ""
@@ -163,15 +199,11 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local textures = player:get_properties().textures
 				local skin = m:get_string("skin")
 				local v = player_style.skins.skins[tonumber(i:sub(9,-1))]
-				if textures[1] == skin or skin == "" then
-					textures[1] = v.skin
-					player:set_properties({textures=textures})
-				elseif index == "skinuse_after_buy" then
-					minetest.chat_send_player(player:get_player_name(),"Please take off your suit/armor/stuff that effects your skin and try again (to avoid bugs) or wait until next restart")
-				end
+				textures[1] = v.skin
+				player:set_properties({textures=textures})
 				m:set_string("skin",v.skin)
 				local scbv = minetest.explode_scrollbar_event(pressed.scrollbar).value or 0
-				player_style.inventory(player)
+				player_style.update_player_skin(player)
 				player_style.skins.store(player,scbv)
 				break
 			end

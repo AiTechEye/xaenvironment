@@ -56,7 +56,11 @@ player_style.register_environment_sound({
 =============================
 	-- returns player skin
 player_style.get_player_skin(player)
-	-- set player skin texture (set_properties) returns true/false if it success (if the property not used by something else)
-player_style.set_player_skin(player,texture)
-	-- restore to the player's selected skin
-player_style.restore_player_skin(player)
+	-- returns the current player's basic skin (return player:get_properties().textures[1])
+player_style.get_current_player_skin(player)
+	-- add player texture (set_properties) adds the texture to lists that will merged with other textures to avoid conflicts (layer_list1 .. layer_list2 ...). armor is added to layer 2, spacesuit 3.
+player_style.add_player_skin(player,texture,layer)
+	-- remove the texture from the list
+player_style.remove_player_skin(player,texture,layer)
+	-- update the texture list, only usefull after changed the player's basic skin
+player_style.update_player_skin(player)

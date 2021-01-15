@@ -127,6 +127,7 @@ minetest.register_on_joinplayer(function(player)
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 	player_style.players[name].wield_item = {}
+	player_style.players[name].skin = {}
 
 	if minetest.check_player_privs(name,{ability2d=true}) then
 		player_style.players[name].ability2d = {joining=0}
@@ -202,7 +203,6 @@ minetest.register_on_joinplayer(function(player)
 			})
 		}
 	end
-
 
 	local skin = player:get_meta():get_string("skin")
 	if skin ~= "" then
