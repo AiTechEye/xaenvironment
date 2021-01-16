@@ -48,7 +48,7 @@ minetest.register_on_item_eat(function(hp_change,replace_with_item,itemstack,use
 	player_style.hunger(user,hp_change)
 	local wet = minetest.get_item_group(itemstack:get_name(),"wet") - minetest.get_item_group(itemstack:get_name(),"dry")
 	if wet ~= 0 then
-		 player_style.thirst(user,wet)
+		player_style.thirst(user,wet)
 	end
 end)
 

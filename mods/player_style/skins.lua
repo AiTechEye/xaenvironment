@@ -53,7 +53,7 @@ player_style.skins = {
 		{name="Pull",skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
 		{name="Storm",skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
 		{name="Ninja",skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
-		{name="Quantum",skin="player_style_quantum_monster.png",cost=500,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
+		{name="Quantum",skin="player_style_quantum_monster.png",cost=1000,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
 			on_step=function(self,player,dtime)
 				self.timer = self.timer + dtime
 				if self.timer > 0.1 then
@@ -82,8 +82,7 @@ player_style.skins = {
 			end,
 			on_use_join=function(self,player)
 				self.timer = 0
-				local adr = player:get_player_name().."-Quantum-skin"
-				default.hand_on_secondary_use[adr] = function(itemstack,user,pointed_thing)
+				default.hand_on_secondary_use[player:get_player_name().."-Quantum-skin"] = function(itemstack,user,pointed_thing)
 					local pos = vector.round(user:get_pos())
 					local name = user:get_player_name()
 					local a = {}
@@ -91,13 +90,38 @@ player_style.skins = {
 						local pos2 = apos(pos,math.random(-15,15),math.random(-15,15),math.random(-15,15))
 						if (default.defpos(pos2,"walkable") or ((default.defpos(pos2,"liquid_viscosity") or 0)) > 0) and not default.defpos(apos(pos2,0,1),"walkable") and not default.defpos(apos(pos2,0,2),"walkable") and not minetest.is_protected(pos2,name) then
 							user:set_pos(apos(pos2,0,1))
+							player_style.hunger(player,-1)
 							return
 						end
 					end
 				end
 			end,
 		},
-
+		{name="Snowman",skin="player_style_snowman.png",cost=1000,info="Just a snowman\nRight click to throw snowballs",origin="XaEnvironment",
+			on_stop_using=function(self,player)
+				default.hand_on_secondary_use[player:get_player_name().."-Snowman-skin"]  = nil
+				if self.hat and self.hat:get_luaentity() then
+					self.hat:remove()
+				end
+			end,
+			on_use_join=function(self,player)
+				minetest.after(0,function(self,player)
+					self.hat = minetest.add_entity(player:get_pos(),"default:wielditem")
+					self.hat:set_attach(player, "Bone",{x=0, y=7, z=0}, {x=0, y=0,z=0})
+					self.hat:set_properties({textures={"examobs:hat"},visual_size = {x=0.5,y=0.5,z=0.5}})
+				end,self,player)
+				default.hand_on_secondary_use[player:get_player_name().."-Snowman-skin"] = function(itemstack,user,pointed_thing)
+					local item = ItemStack({
+						name="default:bow_wood_loaded",
+						metadata=minetest.serialize({arrow="examobs:arrow_snowball",shots=1})
+					})
+					bows.shoot(item, user,nil,function(item)
+						item:remove()
+					end)
+					player_style.thirst(user,-0.1)
+				end
+			end
+		},
 		{name="Slimy",skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
 		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive"},
 		{name="Alien1",skin="player_style_alien1.png",cost=200,info="Alien from space",origin="Aliveai"},
