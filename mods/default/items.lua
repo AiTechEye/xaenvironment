@@ -111,6 +111,9 @@ minetest.register_tool(":", {
 	groups={not_in_creative_inventory=1},
 	range = not default.creative and 4 or 15,
 	on_secondary_use=function(itemstack,user,pointed_thing)
+		for i,v in pairs(default.hand_on_secondary_use) do
+			v(itemstack,user,pointed_thing)
+		end
 		if pointed_thing.type == "nothing" then
 			local item = user:get_inventory():get_stack("hand",1):get_name()
 			local def = default.def(item)
