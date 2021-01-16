@@ -131,7 +131,7 @@ spacestuff.wieldsuit=function(user,s)
 		local backpack
 		if player_style.players[name].inv.backpack_object then
 			backpack = minetest.add_entity(user:get_pos(),"default:wielditem")
-			backpack:set_attach(user, "",{x=0, y=11, z=-2}, {x=0, y=0,z=0})
+			backpack:set_attach(user, "body2",{x=2, y=0, z=0}, {x=180,y=90,z=0})
 			backpack:set_properties({textures={"spacestuff:backpack"},visual_size = {x=0.151,y=0.151,z=0.301}})
 		end
 
