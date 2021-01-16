@@ -97,7 +97,7 @@ player_style.skins = {
 				end
 			end,
 		},
-		{name="Snowman",skin="player_style_snowman.png",cost=1000,info="Just a snowman\nRight click to throw snowballs",origin="XaEnvironment",
+		{name="Snowman",skin="player_style_snowman.png",cost=1000,info="Just a snowman\nIt thrive in snow\nRight click to throw snowballs",origin="XaEnvironment",
 			on_stop_using=function(self,player)
 				default.hand_on_secondary_use[player:get_player_name().."-Snowman-skin"]  = nil
 				if self.hat and self.hat:get_luaentity() then
@@ -105,6 +105,7 @@ player_style.skins = {
 				end
 			end,
 			on_use_join=function(self,player)
+				self.timer = 0
 				minetest.after(0,function(self,player)
 					self.hat = minetest.add_entity(player:get_pos(),"default:wielditem")
 					self.hat:set_attach(player, "head",{x=0, y=7, z=0}, {x=0, y=0,z=0})
@@ -120,7 +121,22 @@ player_style.skins = {
 					end)
 					player_style.thirst(user,-0.1)
 				end
-			end
+			end,
+			on_step=function(self,player,dtime)
+				self.timer = self.timer + dtime
+				if self.timer > 1 then
+					self.timer = 0
+					local pos = player:get_pos()
+					if minetest.get_item_group(minetest.get_node(apos(pos,0,-1)).name,"snowy") > 0 then
+						player_style.hunger(player,1)
+						player_style.thirst(player,1)
+						player:set_hp(player:get_hp()+1)
+					else
+						player_style.hunger(player,-0,1)
+						player_style.thirst(player,-0.1)
+					end
+				end
+			end,
 		},
 		{name="Slimy",skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
 		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive"},
