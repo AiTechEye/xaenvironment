@@ -53,7 +53,7 @@ player_style.skins = {
 		{name="Pull",skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
 		{name="Storm",skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
 		{name="Ninja",skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
-		{name="Quantum",skin="player_style_quantum_monster.png",cost=500,info="Teleporting monster\nSpawns particles around the player",origin="Aliveai",
+		{name="Quantum",skin="player_style_quantum_monster.png",cost=500,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
 			on_step=function(self,player,dtime)
 				self.timer = self.timer + dtime
 				if self.timer > 0.1 then
@@ -77,8 +77,24 @@ player_style.skins = {
 					})
 				end
 			end,
+			on_stop_using=function(self,player)
+				default.hand_on_secondary_use[player:get_player_name().."-Quantum-skin"]  = nil
+			end,
 			on_use_join=function(self,player)
 				self.timer = 0
+				local adr = player:get_player_name().."-Quantum-skin"
+				default.hand_on_secondary_use[adr] = function(itemstack,user,pointed_thing)
+					local pos = vector.round(user:get_pos())
+					local name = user:get_player_name()
+					local a = {}
+					for i=0,100 do
+						local pos2 = apos(pos,math.random(-15,15),math.random(-15,15),math.random(-15,15))
+						if (default.defpos(pos2,"walkable") or ((default.defpos(pos2,"liquid_viscosity") or 0)) > 0) and not default.defpos(apos(pos2,0,1),"walkable") and not default.defpos(apos(pos2,0,2),"walkable") and not minetest.is_protected(pos2,name) then
+							user:set_pos(apos(pos2,0,1))
+							return
+						end
+					end
+				end
 			end,
 		},
 
