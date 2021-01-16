@@ -64,3 +64,19 @@ player_style.add_player_skin(player,texture,layer)
 player_style.remove_player_skin(player,texture,layer)
 	-- update the texture list, only usefull after changed the player's basic skin
 player_style.update_player_skin(player)
+
+	-- adds a skin to the skin list
+
+player_style.register_skin({
+	name = "name"			required
+	skin = "texture.png"		required	
+	cost = 500			nil = "Free"
+	info = "text"			nil
+	origin = "name"			nil = using mod's name
+					self is a table that is circuits through the skin functions
+	on_use=function(self,player)		when a player starts to use the skin.
+	on_stop_using=function(self,player)	when a player stop to use the skin
+	on_join=function(self,player)		called when a player joins
+	on_use_join=function(self,player)	called on both when a player joins and starts to use the skin, instead of make same function for on_join and on_use
+	on_step=function(self,player,dtime)	on global step
+})
