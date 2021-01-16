@@ -206,11 +206,34 @@ minetest.register_on_joinplayer(function(player)
 
 	local skin = player:get_meta():get_string("skin")
 	if skin ~= "" then
-		local textures = player:get_properties({}).textures
-		textures[1]=skin
-		player:set_properties({textures = textures})
-	end
+		local skin_prop
+		local ppr = player_style.players[name]
+		ppr.skin_self = {}
+		for i,v in ipairs(player_style.skins.skins) do
+			if v.skin == skin then
+				skin_prop = v
+				break
+			end
+		end
+		if skin_prop then
 
+			local textures = player:get_properties().textures
+			textures[1]=skin
+			player:set_properties({textures = textures})
+			if skin_prop.on_join then
+				skin_prop.on_join(ppr.skin_self,player)
+			end
+			if skin_prop.on_use_join then
+				skin_prop.on_use_join(ppr.skin_self,player)
+			end
+			if skin_prop.on_step then
+				player_style.players[name].on_step_skin = skin_prop.on_step
+			end
+		else
+			player:get_meta():set_string("skin","")
+			minetest.chat_send_player(name,"Your skin where removed, your are reset to the default")
+		end
+	end
 end)
 
 player_style.register_environment_sound=function(def)
@@ -736,6 +759,11 @@ minetest.register_globalstep(function(dtime)
 			player_style.thirst(player,hunger*2)
 			player_style.tired(name,player)
 
+			if ppr.on_step_skin then
+				ppr.on_step_skin(ppr.skin_self,player,dtime)
+			else
+				ppr.on_step_skin = nil
+			end
 		end
 	end
 end)

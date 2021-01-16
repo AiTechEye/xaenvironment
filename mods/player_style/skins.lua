@@ -1,5 +1,5 @@
 player_style.skins = {
-	skins={	--property	achtor
+	skins={
 		{name="ASDASD",skin="character.png",cost=0,info="Default character, random made npc from aliveai",origin="Aliveai"},
 		{name="Dacy",skin="player_style_dacy.png",cost=0,info="Another default character, random made npc from aliveai",origin="Aliveai"},
 		{name="Villager",skin="examobs_villager.png",cost=100,info="Just another fool",origin="XaEnvironment"},
@@ -53,7 +53,34 @@ player_style.skins = {
 		{name="Pull",skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
 		{name="Storm",skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
 		{name="Ninja",skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
-		{name="Quantum",skin="player_style_quantum_monster.png",cost=500,info="Teleporting monster",origin="Aliveai"},
+		{name="Quantum",skin="player_style_quantum_monster.png",cost=500,info="Teleporting monster\nSpawns particles around the player",origin="Aliveai",
+			on_step=function(self,player,dtime)
+				self.timer = self.timer + dtime
+				if self.timer > 0.1 then
+					self.timer = 0
+					local p=apos(player:get_pos(),0,1)
+					minetest.add_particlespawner({
+						amount = 20,
+						time =1,
+						minpos = {x=p.x+1,y=p.y+1,z=p.z+1},
+						maxpos = {x=p.x-1,y=p.y-1,z=p.z-1},
+						minvel = {x=0, y=0, z=0},
+						maxvel = {x=0, y=0, z=0},
+						minacc = {x=0, y=0, z=0},
+						maxacc = {x=0, y=0, z=0},
+						minexptime = 0.5,
+						maxexptime = 1,
+						minsize = 0.4,
+						maxsize = 0.8,
+						glow=13,
+						texture = "player_style_quantum_monster_lights.png",
+					})
+				end
+			end,
+			on_use_join=function(self,player)
+				self.timer = 0
+			end,
+		},
 
 		{name="Slimy",skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
 		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive"},
@@ -77,6 +104,20 @@ player_style.register_button({
 		player_style.skins.store(player)
 	end
 })
+
+player_style.register_skin=function(def)
+	if not def.name then
+		minetest.log("warning","Register skin is unamed")
+		return
+	elseif not def.skin then
+		minetest.log("warning","Register skin"..def.name.." skin is missing skin texture")
+		return
+	end
+	def.cost = def.cost or 0
+	def.info = def.info or ""
+	def.origin = def.origin or minetest.get_current_modname()
+	table.insert(player_style.skins.skins,def)
+end
 
 player_style.get_player_skin=function(player)
 	local skin = player:get_meta():get_string("skin")
@@ -152,19 +193,23 @@ player_style.skins.store=function(player,scroll)
 	local own = minetest.deserialize(m:get_string("skins")) or {}
 	local y = 0
 	for i,v in ipairs(player_style.skins.skins) do
+		local functional = (v.on_step or v.on_use or v.on_join or v.on_stop_using or v.on_use_join)
+
 		text = text
 		.."label[2,"..y..";"..v.name..(v.origin and (" - " ..v.origin) or "").."]"
 		.."label[2,"..y..";"..v.name..(v.origin and (" - " ..v.origin) or "").."]"
-		.."textarea[2.3,"..(y+0.5)..";6,2.7;;;"..v.info.."]"
+		..(functional and "box[2,"..(y+0.5)..";2.1,0.5;#222]label[2,"..(y+0.5)..";"..minetest.colorize("#0f0","Functional skin").."]" or "")
+		..(functional and "textarea[2.3,"..(y+1)..";5.7,2.3;;;"..v.info.."]" or "textarea[2.3,"..(y+0.5)..";5.7,2.5;;;"..v.info.."]")
 		.."model[-0.5,"..y..";2,3;preskin;character.b3d;"..v.skin..";0,180;false;true;1,31]"
+
+		.."box[2,"..(y+2.8)..";5.5,0.2;#222]"
+
 		if skin == v.skin then
 		elseif own[v.name] then
 			text = text .."button[1.2,"..y..";1,1;skinuse="..i..";Use]"
 		else
 			text = text .."image_button[1.2,"..y..";1,1;player_style_coin.png;skinbuy="..i..";"..(v.cost > 0 and v.cost or "Free").."]"
 		end
-
---property
 
 		y = y +3
 	end
@@ -196,10 +241,10 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					own[v.name] = true
 					m:set_string("skins", minetest.serialize(own))
 					m:set_int("coins",m:get_int("coins")-v.cost)
-					index = "skinuse_after_buy"
+					index = "skinuse="
 				end
 			end
-			if index == "skinuse=" or index == "skinuse_after_buy" then
+			if index == "skinuse=" then
 				local m = player:get_meta()
 				local textures = player:get_properties().textures
 				local skin = m:get_string("skin")
@@ -210,6 +255,28 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local scbv = minetest.explode_scrollbar_event(pressed.scrollbar).value or 0
 				player_style.update_player_skin(player)
 				player_style.skins.store(player,scbv)
+				local p = player_style.players[name]
+				for i,v in ipairs(player_style.skins.skins) do
+					if v.skin == skin then
+						if v.on_stop_using then
+							v.on_stop_using(p.skin_self,player)
+						end
+						break
+					end
+				end
+
+				p.skin_self = {}
+				if v.on_use then
+					v.on_use(p.skin_self,player)
+				end
+				if v.on_use_join then
+					v.on_use_join(p.skin_self,player)
+				end
+				if v.on_step then
+					p.on_step_skin=v.on_step
+				else
+					p.on_step_skin = nil
+				end
 				break
 			end
 		end
