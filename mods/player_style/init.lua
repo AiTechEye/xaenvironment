@@ -518,10 +518,10 @@ minetest.register_globalstep(function(dtime)
 					ppr.wield_item.object = ob
 				end
 				if node then
-					ob:set_attach(player, "Bone.003",{x=0, y=6, z=3}, {x=90, y=0,z=270})
+					ob:set_attach(player, "rarm2",{x=0, y=3, z=3}, {x=90, y=0,z=270})
 					ob:set_properties({textures={witem},visual_size = {x=0.3,y=0.3}})
 				else
-					ob:set_attach(player, "Bone.003",{x=0, y=3, z=3}, {x=90, y=0,z=270})
+					ob:set_attach(player, "rarm2",{x=0, y=0, z=3}, {x=90, y=0,z=270})
 					ob:set_properties({textures={witem},visual_size = {x=0.4,y=0.4}})
 				end
 			end

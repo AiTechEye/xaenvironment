@@ -107,7 +107,7 @@ player_style.skins = {
 			on_use_join=function(self,player)
 				minetest.after(0,function(self,player)
 					self.hat = minetest.add_entity(player:get_pos(),"default:wielditem")
-					self.hat:set_attach(player, "Bone",{x=0, y=7, z=0}, {x=0, y=0,z=0})
+					self.hat:set_attach(player, "head",{x=0, y=7, z=0}, {x=0, y=0,z=0})
 					self.hat:set_properties({textures={"examobs:hat"},visual_size = {x=0.5,y=0.5,z=0.5}})
 				end,self,player)
 				default.hand_on_secondary_use[player:get_player_name().."-Snowman-skin"] = function(itemstack,user,pointed_thing)
