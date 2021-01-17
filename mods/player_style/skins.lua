@@ -139,7 +139,21 @@ player_style.skins = {
 			end,
 		},
 		{name="Slimy",skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
-		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive"},
+		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive",
+			on_step=function(self,player,dtime)
+				self.timer = self.timer + dtime
+				if self.timer > 0.5 then
+					self.timer = math.random(0,10)*0.05
+					local rgb = math.random(0,10)
+					player_style.update_player_skin(player,"player_style_alienglitch.png^[transform"..self.t[math.random(1,8)]..(rgb > 0 and "^[invert:"..self.r[rgb] or ""))
+				end
+			end,
+			on_use_join=function(self,player)
+				self.timer = 0
+				self.t = {"I","R90","R180","R270","FX","FXR90","FY","FYR90"}
+				self.r = {"r","g","b","a","rb","gr","gb","br","bg","rgb"}
+			end,
+		},
 		{name="Alien1",skin="player_style_alien1.png",cost=200,info="Alien from space",origin="Aliveai"},
 		{name="Alien2",skin="player_style_alien2.png",cost=200,info="Alien from space",origin="Aliveai"},
 		{name="Alien3",skin="player_style_alien3.png",cost=200,info="Alien from space",origin="Aliveai"},
@@ -228,8 +242,8 @@ player_style.remove_player_skin=function(player,texture,level)
 	player_style.inventory(player)
 end
 
-player_style.update_player_skin=function(player)
-	local skin = player:get_meta():get_string("skin")
+player_style.update_player_skin=function(player,newskin)
+	local skin = newskin or player:get_meta():get_string("skin")
 	local p = player_style.players[player:get_player_name()].skin
 	for i,v in pairs(p) do
 		for i2,v2 in ipairs(v) do
