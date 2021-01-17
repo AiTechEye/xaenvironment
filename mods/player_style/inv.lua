@@ -70,7 +70,7 @@ player_style.inventory=function(player)
 				player:get_meta():set_string("backpackslot",minetest.serialize(stack:to_table()))
 				if not invp.backpack_object then
 					invp.backpack_object = minetest.add_entity(player:get_pos(),"default:wielditem")
-					invp.backpack_object:set_attach(user, "body2",{x=2, y=0, z=0}, {x=180,y=90,z=0})
+					invp.backpack_object:set_attach(player, "body2",{x=2, y=0, z=0}, {x=180,y=90,z=0})
 					invp.backpack_object:set_properties({textures={"player_style:backpack"},visual_size = {x=0.15,y=0.15,z=0.3}})
 				end
 			end,
