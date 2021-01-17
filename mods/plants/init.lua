@@ -444,7 +444,7 @@ default.register_plant({
 		name = "glowing" .. i,
 		light_source = 7,
 		tiles={default.dye_texturing(v,{opacity=200})},
-		groups = {store=30},
+		groups = {store=1,crystal=1},
 		dye_colors = {palette=v},
 		alpha = 150,
 		decoration = {
@@ -456,7 +456,59 @@ default.register_plant({
 			scale = 0.0012,
 			flags = "all_floors",
 		},
-		
+	})
+	default.register_pebble({
+		name = "crystal" .. i,
+		mesh="default_crystal.obj",
+		light_source = 7,
+		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
+		groups = {store=1,crystal=1},
+		dye_colors = {palette=v},
+		alpha = 150,
+		selection_box = {type="fixed",fixed={-0.4,-0.5,-0.4,0.4,0.5,0.4}},
+		collision_box = {type = "fixed",fixed = {-0.4, -0.5, -0.4, 0.4, 0.5, 0.4}},
+		decoration = {
+			place_on = {"default:stone"},
+			y_max = -50,
+			y_min = -30000,
+			seed = 80*v,
+			offset = 0.0011,
+			scale = 0.0012,
+			flags = "all_floors",
+		},
+	})
+	minetest.register_node("plants:crystal_block"..i, {
+		description = "Crystal block "..i,
+		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
+		groups = {cracky=3,crystal=1},
+		sunlight_propagates = true,
+		drawtype = "glasslike",
+		paramtype = "light",
+		light_source = 7,
+		dye_colors = {palette=v},
+		alpha = 150,
+		sounds = default.node_sound_glass_defaults(),
+	})
+	minetest.register_decoration({
+		deco_type = "simple",
+		decoration = "plants:crystal_block"..i,
+
+		place_on = {"default:stone"},
+		sidelen = 16,
+		noise_params = {
+			offset =  0.002,
+			scale = 0.004,
+			spread = {x = 100, y = 100, z = 100},
+			octaves = 3,
+			persist = 0.6
+
+		--seed = 80*v,
+		},
+		y_max = -50,
+		y_min = -30000,
+		flags = "all_floors",
+		height = 1,
+		height_max = 20,
 	})
 end
 
