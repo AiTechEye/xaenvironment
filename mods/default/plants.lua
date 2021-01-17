@@ -160,17 +160,17 @@ default.register_pebble=function(def)
 	def.description =			def.description or			string.gsub(name,"_"," ")
 	def.tiles =			def.tiles or			{"default_stone.png"}
 	def.sounds =			def.sounds or			default.node_sound_stone_defaults()
-	def.drawtype =			"mesh"
-	def.mesh =			"default_pebble.obj"
+	def.drawtype =			def.drawtype or			"mesh"
+	def.mesh =			def.mesh or			"default_pebble.obj"
 	def.visual_scale =			0.3
 	def.paramtype =			"light"
 	def.paramtype2 =			"facedir"
 	def.sunlight_propagates =		def.sunlight_propagates or		true
-	def.collision_box = {
+	def.collision_box = 			def.collision_box or {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
 	}
-	def.selection_box = {
+	def.selection_box = 		def.selection_box or {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
 	}
