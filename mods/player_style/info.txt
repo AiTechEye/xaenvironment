@@ -62,8 +62,8 @@ player_style.get_current_player_skin(player)
 player_style.add_player_skin(player,texture,layer)
 	-- remove the texture from the list
 player_style.remove_player_skin(player,texture,layer)
-	-- update the texture list, only usefull after changed the player's basic skin
-player_style.update_player_skin(player)
+	-- update the texture list, "newskin" if you want to tempoary change the skin
+player_style.update_player_skin(player,newskin)
 
 	-- adds a skin to the skin list
 
