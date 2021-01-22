@@ -1,7 +1,7 @@
 minetest.register_node("default:sign", {
 	description = "Sign",
 	tiles={"default_wood.png"},
-	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3},
+	groups = {choppy=3,oddly_breakable_by_hand=3,treasure=1,flammable=3,on_load=1},
 	sounds =  default.node_sound_wood_defaults(),
 	paramtype = "light",
 	paramtype2 = "wallmounted",
@@ -18,6 +18,7 @@ minetest.register_node("default:sign", {
 		m:set_string("formspec","size[12,11]"
 		.."button_exit[-0.2,-0.2;1,1;save;Save]"
 		.."textarea[0,1;12.5,12;text;;]"
+		.."field[1,0;3,1;color;;]tooltip[color;Text color, eg: ff00ffaa, 0f5, 5f25 ...]"
 		)
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
@@ -27,11 +28,36 @@ minetest.register_node("default:sign", {
 		local name = sender:get_player_name()
 		if pressed.save and sender and not minetest.is_protected(pos, name) then
 			local m = minetest.get_meta(pos)
-			m:set_string("infotext",pressed.text .." - " ..name)
+			m:set_string("infotext",name)
+			m:set_string("text",pressed.text)
+			m:set_string("last_user",name)
+			m:set_string("color",pressed.color)
 			m:set_string("formspec","size[12,11]"
 			.."button_exit[-0.2,-0.2;1,1;save;Save]"
-			.."textarea[0,1;12.5,12;text;;"..pressed.text.."]"
+			.."textarea[0,1;12.5,12;text;;"..(pressed.text or m:get_string("text")).."]"
+			.."field[1,0;3,1;color;;"..(pressed.color or m:get_string("color")).."]tooltip[color;Text color, eg: ff00ffaa, 0f5, 5f25 ...]"
 			)
+
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "sign:text" then
+					ob:remove()
+				end
+			end
+			default.def("default:sign").on_load(pos)
+		end
+	end,
+	on_load=function(pos)
+		local m = minetest.get_meta(pos)
+		local ob = minetest.add_entity(pos,"sign:text")
+		ob:get_luaentity():text({s=m:get_string("text"),color=m:get_string("color"),size_x=0.8,size_y=0.6,x=200,y=200,pos=0.445})
+	end,
+	on_destruct = function(pos)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "sign:text" then
+				ob:remove()
+			end
 		end
 	end,
 })

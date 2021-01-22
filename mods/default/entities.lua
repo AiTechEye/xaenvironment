@@ -272,6 +272,7 @@ minetest.register_entity("default:watersplash_ring",{
 	speed = 2,
 	use_texture_alpha=true,
 	decoration=true,
+	static_save = false,
 	on_step=function(self, dtime)
 		self.size1 = self.size1 + dtime*self.speed
 		self.object:set_properties({
