@@ -98,13 +98,6 @@ sign={
 	},
 }
 
-asd = 0
-minetest.register_chatcommand("a", {
-	func = function(name, param)
-		asd = tonumber(param)
-	end
-})
-
 sign.to_texture=function(def)
 	if not def and def.s then
 		return ""
@@ -153,14 +146,6 @@ sign.to_texture=function(def)
 	text = (def.background and def.background.."^" or "") .. text .. c
 	return #text > 1 and text or ""
 end
-
---asd = {x=0,y=0,z=0}
---minetest.register_chatcommand("a", {
---	func = function(name, param)
---		local a = param.split(param," ")
---		asd = {x=tonumber(a[1]) or 0,y=tonumber(a[2]) or 0,z=tonumber(a[3]) or 0}
---	end
---})
 
 minetest.register_entity("sign:text",{
 	physical = false,
