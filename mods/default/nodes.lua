@@ -18,7 +18,9 @@ minetest.register_node("default:sign", {
 		m:set_string("formspec","size[12,11]"
 		.."button_exit[-0.2,-0.2;1,1;save;Save]"
 		.."textarea[0,1;12.5,12;text;;]"
-		.."field[1,0;3,1;color;;]tooltip[color;Text color, eg: ff00ffaa, 0f5, 5f25 ...]"
+		.."field[1,0;3,1;color;;]tooltip[color;Text color, eg: fff, 0a5, 09f ...]"
+		.."field[4,0;3,1;size;;100]tooltip[size;Text size,10 - 200]"
+		.."field[7,0;3,1;bg;;]tooltip[bg;Background image/color, eg default_goldblock.png or, eg: fff, 0a5, 09f ...]"
 		)
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
@@ -28,14 +30,24 @@ minetest.register_node("default:sign", {
 		local name = sender:get_player_name()
 		if pressed.save and sender and not minetest.is_protected(pos, name) then
 			local m = minetest.get_meta(pos)
+			local text = sign.unallowed_characters(pressed.text or "")
+			local s = tonumber(pressed.size) or m:get_int("size")
+			local bg = sign.unallowed_characters(pressed.bg or "")
+			s = s < 10 and 10 or s > 200 and 200 or s
+
+
+			m:set_int("size",s)
 			m:set_string("infotext",name)
-			m:set_string("text",pressed.text)
+			m:set_string("text",text)
 			m:set_string("last_user",name)
 			m:set_string("color",pressed.color)
+			m:set_string("bg",bg)
 			m:set_string("formspec","size[12,11]"
 			.."button_exit[-0.2,-0.2;1,1;save;Save]"
-			.."textarea[0,1;12.5,12;text;;"..(pressed.text or m:get_string("text")).."]"
-			.."field[1,0;3,1;color;;"..(pressed.color or m:get_string("color")).."]tooltip[color;Text color, eg: ff00ffaa, 0f5, 5f25 ...]"
+			.."textarea[0,1;12.5,12;text;;"..(text or m:get_string("text")).."]"
+			.."field[1,0;3,1;color;;"..(pressed.color or m:get_string("color")).."]tooltip[color;Text color, eg: fff, 0a5, 09f ...]"
+			.."field[4,0;3,1;size;;"..s.."]tooltip[size;Text size,10 - 200]"
+			.."field[7,0;3,1;bg;;"..bg.."]tooltip[bg;Background image/color, eg default_goldblock.png or, eg: fff, 0a5, 09f ...]"
 			)
 
 			for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
@@ -50,7 +62,7 @@ minetest.register_node("default:sign", {
 	on_load=function(pos)
 		local m = minetest.get_meta(pos)
 		local ob = minetest.add_entity(pos,"sign:text")
-		ob:get_luaentity():text({s=m:get_string("text"),color=m:get_string("color"),size_x=0.8,size_y=0.6,x=200,y=200,pos=0.445})
+		ob:get_luaentity():text({s=m:get_string("text"),color=m:get_string("color"),size_x=0.8,size_y=0.6,pos=0.440,size=m:get_int("size"),bg=m:get_string("bg")})
 	end,
 	on_destruct = function(pos)
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
