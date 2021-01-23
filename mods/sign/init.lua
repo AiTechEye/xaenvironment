@@ -1,4 +1,5 @@
 sign={
+	allow_characters = "asdfghjklqwertyuiopzxcvbnm0987654321 \n_()&'*@:,.=!>#<-\"+/%?",
 	characters = {
 		[" "]={s=4},
 		["\n"]={s=0},
@@ -56,7 +57,7 @@ sign={
 		["Z"]={tex="sign_z2.png",s=5},
 		["_"]={tex="sign__.png",s=5},
 		["("]={tex="sign_abra.png",s=3},
-		[")"]={tex="sign_abra2.png.png",s=3},
+		[")"]={tex="sign_abra2.png",s=3},
 		["&"]={tex="sign_and.png",s=7},
 		["'"]={tex="sign_apostrof.png",s=1},
 		["*"]={tex="sign_asterisk.png",s=5},
@@ -98,13 +99,17 @@ sign={
 	},
 }
 
+sign.unallowed_characters=function(s)
+	return s:gsub("%^",""):gsub("%[",""):gsub("%]","")
+end
+
 sign.to_texture=function(def)
 	if not def and def.s then
 		return ""
 	end
 
-	def.x = def.x or 100
-	def.y = def.y or 50
+	def.x = def.size or 100
+	def.y = def.size or 100
 	local x = 0
 	local y = 0
 	local text = "[combine:"..def.x.."x"..def.y
@@ -113,7 +118,7 @@ sign.to_texture=function(def)
 		local a = def.s:sub(i,i)
 		local p = sign.characters[a]
 		if p then
-			if x >= def.x or a == "\n" then
+			if x >= def.x+p.s or a == "\n" then
 				x = 0
 				y = y +12
 				if y >= def.y then
@@ -127,19 +132,16 @@ sign.to_texture=function(def)
 		end
 	end
 	local c = ""
-	if def.color and def.color ~= "" then
-		local n = #def.color
-		local color = def.color:lower()	
-		if n == 3 or n == 4 or n == 6 or n == 8 then
-			local chr = "0123456789abcdef"
-			for i=1,n do
-				if not chr:find(color:sub(i,i)) then
-					goto nocolor
-					break
-				end
+	if def.color and def.color ~= "" and #def.color == 3 then
+		local color = def.color:lower()
+		local chr = "0123456789abcdef"
+		for i=1,3 do
+			if not chr:find(color:sub(i,i)) then
+				goto nocolor
+				break
 			end
-			c = "^[colorize:#"..color
 		end
+		c = "^[colorize:#"..color
 		::nocolor::
 	end
 
@@ -180,9 +182,36 @@ minetest.register_entity("sign:text",{
 		self.object:set_rotation({x=r.x,y=r.y,z=0})
 		local w = minetest.wallmounted_to_dir(n.param2)
 		self.object:set_pos({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)})
+
+
+		if def.bg and def.bg ~= "" and def.bg:find("%.") then
+			d = d +0.001
+			local ob = minetest.add_entity({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)},"sign:text")
+			self.object:set_rotation({x=r.x,y=r.y,z=0})
+			ob:set_properties({
+				textures={def.bg},
+				visual_size = {x=def.size_x or 1,y=def.size_y or 1,z=1},
+				backface_culling = false,
+			})
+		elseif def.bg and def.bg ~= "" and #def.bg == 3 then
+			local color = def.bg:lower()
+			local chr = "0123456789abcdef"
+			for i=1,3 do
+				if not chr:find(color:sub(i,i)) then
+					return
+				end
+			end
+
+			d = d +0.001
+			local ob = minetest.add_entity({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)},"sign:text")
+			self.object:set_rotation({x=r.x,y=r.y,z=0})
+			ob:set_properties({
+				textures={"default_cloud.png^[colorize:#"..def.bg},
+				visual_size = {x=def.size_x or 1,y=def.size_y or 1,z=1},
+				backface_culling = false,
+			})
+		end
 	end,
 	on_activate=function(self, staticdata)
-
 	end,
-
 })
