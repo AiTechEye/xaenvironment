@@ -480,7 +480,7 @@ default.register_plant({
 	minetest.register_node("plants:crystal_block"..i, {
 		description = "Crystal block "..i,
 		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
-		groups = {store=200,crystal=1},
+		groups = {store=200,crystal=1,cracky=3},
 		sunlight_propagates = true,
 		drawtype = "glasslike",
 		paramtype = "light",
