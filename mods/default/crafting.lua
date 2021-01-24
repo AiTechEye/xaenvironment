@@ -653,7 +653,7 @@ local recycling_mill_items = {}
 minetest.register_node("default:recycling_mill", {
 	description = "Recycling mill",
 	tiles={"default_ironblock.png^synth_repeat.png"},
-	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube_connected=1},
+	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,store=1000},
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
@@ -680,9 +680,7 @@ minetest.register_node("default:recycling_mill", {
 		local inv = m:get_inventory()
 		if listname == "input" and inv:is_empty("output") and inv:is_empty("input") and stack:get_wear() == 0 then
 			local i = stack:get_name()
-
 			if m:get_int(i) == 1 or minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, listname, index, stack, player,stack) then
-				--recycling_mill_items[i] = true
 				m:set_int(i,1)
 				return 1
 			end
@@ -708,10 +706,7 @@ minetest.register_node("default:recycling_mill", {
 		local input_item = test and test:get_name() or inv:get_stack("input",1):get_name()
 
 		if inv:is_empty("output") then
-
 			local craft = minetest.get_craft_recipe(input_item)
-
-
 			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
 				local same_items = false
 

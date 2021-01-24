@@ -221,7 +221,7 @@ minetest.register_tool("default:cudgel", {
 		},
 		damage_groups = {fleshy=3,treasure=1},
 	},
-	groups = {flammable = 2,stick=1},
+	groups = {flammable = 2},
 	sound=default.tool_breaks_defaults()
 })
 
