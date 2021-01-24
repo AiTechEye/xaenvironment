@@ -444,7 +444,7 @@ default.register_plant({
 		name = "glowing" .. i,
 		light_source = 7,
 		tiles={default.dye_texturing(v,{opacity=200})},
-		groups = {store=1,crystal=1},
+		groups = {store=100,crystal=1},
 		dye_colors = {palette=v},
 		alpha = 150,
 		decoration = {
@@ -462,7 +462,7 @@ default.register_plant({
 		mesh="default_crystal.obj",
 		light_source = 7,
 		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
-		groups = {store=1,crystal=1},
+		groups = {store=200,crystal=1},
 		dye_colors = {palette=v},
 		alpha = 150,
 		selection_box = {type="fixed",fixed={-0.4,-0.5,-0.4,0.4,0.5,0.4}},
@@ -480,7 +480,7 @@ default.register_plant({
 	minetest.register_node("plants:crystal_block"..i, {
 		description = "Crystal block "..i,
 		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
-		groups = {cracky=3,crystal=1},
+		groups = {store=200,crystal=1},
 		sunlight_propagates = true,
 		drawtype = "glasslike",
 		paramtype = "light",
