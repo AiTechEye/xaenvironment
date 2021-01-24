@@ -121,51 +121,6 @@ minetest.register_on_mods_loaded(function()
 	exacarts.map = minetest.deserialize(exacarts.storage:get_string("map")) or {}
 end)
 
-
---remove this later, made if someone using it before the change
-
-for i,v in pairs({"detector","max","acceleration"}) do
-minetest.register_node("exacarts:"..v, {
-	description="just place or use to recover your item, necessary change :)",
-	groups = {on_load=1,not_in_creative_inventory=1},
-	on_load = function(pos,node)
-		minetest.set_node(pos,{name="exacarts:"..v.."_rail"})
-	end,
-	on_construct = function(pos)
-		minetest.set_node(pos,{name="exacarts:"..v.."_rail"})
-	end,
-	on_use=function(itemstack, user, pointed_thing)
-		local t = itemstack:to_table()
-		t.name = "exacarts:"..v.."_rail"
-		return t
-	end
-})
-end
-minetest.register_entity("exacarts:dotr",{
-	on_step=function(self, dtime)
-		self.object:remove()
-	end,
-})
-minetest.register_entity("exacarts:dotb",{
-	use_texture_alpha=true,
-	on_step=function(self, dtime)
-		self.object:remove()
-	end,
-})
-minetest.register_entity("exacarts:dotr",{
-	on_step=function(self, dtime)
-		self.object:remove()
-	end,
-})
-
-
-
-
-
-
-
-
-
 minetest.register_craft({
 	output="exacarts:cart",
 	recipe={
@@ -175,7 +130,7 @@ minetest.register_craft({
 	},
 })
 
-exacarts.register_rail({full_custom_name="rail"})
+exacarts.register_rail({full_custom_name="rail",add_groups={store=100}})
 
 exacarts.register_rail({
 	name="derail",
