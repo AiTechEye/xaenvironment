@@ -1,14 +1,23 @@
 default.pickupable=function(self,player)
 	local name = player:get_player_name()
 	local au = armor.user[name]
-	if not (au.shield and au.shield.object) and not default.pickup_object[name] then
+	local po = default.pickup_object[name]
+	if po then
+		if po:get_attach() then
+			po:set_detach()
+			po:set_properties({physical=false})
+		end
+		default.pickup_object[name] = nil
+	end
+	if not (au.shield and au.shield.object) then
 		self.object:set_attach(player, "fixed",{x=0, y=2, z=5}, {x=180, y=0,z=0},true)
 		default.pickup_object[name] = self.object
 		self.object:set_properties({physical=false})
 		default.set_on_player_death(name,"pickupable",function()
-			if default.pickup_object[name] then
-				default.pickup_object[name]:set_detach()
-				default.pickup_object[name]:set_properties({physical=true})
+			local p = default.pickup_object[name]
+			if p then
+				p:set_detach()
+				p:set_properties({physical=true})
 				default.pickup_object[name] = nil
 			end
 		end)

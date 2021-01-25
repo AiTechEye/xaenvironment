@@ -52,8 +52,10 @@ local item = {
 		builtin_item.on_punch(self,hitter)
 	end,
 	on_step = function(self,dtime,moveresult)
-		self.old_moveresult = moveresult or self.old_moveresult
-		builtin_item.on_step(self,dtime,moveresult or self.old_moveresult)
+		if moveresult then
+			builtin_item.on_step(self,dtime,moveresult)
+		end
+		
 		local pos = self.object:get_pos()
 		if not pos then
 			self.object:remove()
