@@ -1,970 +1,1022 @@
-default.is_decoration=function(object,item)
-	local en = object:get_luaentity()
-	return en and (en.decoration ~= nil or item and en.name == "__builtin:item")
-end
+minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
+	if minetest.get_item_group(node.name,"dirt") == 0 and minetest.get_item_group(node.name,"sand") == 0 then
+		examobs.register_interact(pos)
+	end
+end)
+--minetest.register_on_dignode(function(pos,oldnode,node,placer) -- wont work very well
+--	examobs.register_interact(pos)
+--end)
 
-default.watersplash=function(pos,item)
-	local def = default.def(minetest.get_node(pos).name)
-	local s = math.random(10,20)
-	if item then
-		minetest.sound_play("default_item_watersplash", {pos=pos, gain = 4,max_hear_distance = 10})
-	else
-		minetest.sound_play("default_object_watersplash", {pos=pos, gain = 4,max_hear_distance = 10})
+examobs.register_interact_timeout=function()
+	local save
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+
+	for i,v in pairs(examobs.interact_map) do
+		if default.date("d",v.date) >= 3 then
+			examobs.interact_map[i] = nil
+			save = true
+		end
 	end
 
-	if minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0  then
-		return false
-	elseif def and def.liquidtype == "source" and def.groups and def.groups.water then
-		pos.y = math.ceil(pos.y)-0.49
-		minetest.add_entity(pos,"default:watersplash_ring")
-		for i=math.random(1,10),20 do
-			minetest.after(math.random(5,8)*0.1,function(pos)
-				local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
-				local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
-				if d and d.liquidtype == "source" and d.groups and d.groups.water then
-					local e = minetest.add_entity(p,"default:watersplash_ring")
-					local en = e:get_luaentity()
-					en.size1 = 0.05
-					en.size2 = 0.15
-					en.speed = 0.2
-				end
-			end,pos)
+	if save then
+		examobs.storage:set_string("interact_map",minetest.serialize(examobs.interact_map))
+	end
+end
+
+examobs.get_interacts=function(pos)
+	local p = {
+		x=math.floor(pos.x*0.1)*10,
+		y=math.floor(pos.y*0.1)*10,
+		z=math.floor(pos.z*0.1)*10
+	}
+	local r = minetest.pos_to_string(p)
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+	local r = examobs.interact_map[r]
+	return r and r.amount or 0
+end
+
+examobs.register_interact=function(pos)
+	local p = {
+		x=math.floor(pos.x*0.1)*10,
+		y=math.floor(pos.y*0.1)*10,
+		z=math.floor(pos.z*0.1)*10
+	}
+	local r = minetest.pos_to_string(p)
+	examobs.interact_map = examobs.interact_map or minetest.deserialize(examobs.storage:get_string("interact_map")) or {}
+	examobs.interact_map[r] = examobs.interact_map[r] or {}
+	local reg = examobs.interact_map[r]
+	reg.amount = (reg.amount or 0) +1
+	reg.date = default.date("get")
+	examobs.storage:set_string("interact_map",minetest.serialize(examobs.interact_map))
+end
+
+
+minetest.register_on_dieplayer(function(player)
+	local e = minetest.add_item(apos(player:get_pos(),0,1),"examobs:flesh")
+	if e then
+		e:set_velocity({
+			x=math.random(-1.5,1.5),
+			y=math.random(0.5,1),
+			z=math.random(-1.5,1.5)
+		})
+	end
+end)
+
+minetest.register_globalstep(function(dtime)
+	if examobs.global_timer <= os.clock() then
+		examobs.global_lifetime = (math.floor(examobs.global_time*100) / 100) + 1
+		examobs.global_lifetime = examobs.global_lifetime <= 1.1 and examobs.global_lifetime or examobs.global_lifetime * 10
+		examobs.global_timer = os.clock() + 1
+		examobs.global_time = 0
+
+		examobs.interact_map_timer = examobs.interact_map_timer +1
+		if examobs.interact_map_timer >= 10 then
+			examobs.interact_map_timer = 0
+			examobs.register_interact_timeout()
 		end
-		if not item then
-			for i=math.random(1,10),40 do
-				minetest.after(math.random(5,8)*0.1,function(pos)
-					local p = apos(pos,math.random(-10,10)*0.1,0,math.random(-10,10)*0.1)
-					local d = default.def(minetest.get_node(apos(p,0,-0.2)).name)
-					if d and d.liquidtype == "source" and d.groups and d.groups.water then
-						local e = minetest.add_entity(p,"default:watersplash_ring")
-						local en = e:get_luaentity()
-						en.size1 = 0.1
-						en.size2 = 0.3
-						en.speed = 0.4
-					end
-				end,pos)
+	end
+end)
+
+examobs.on_step=function(self, dtime)
+	local time = os.clock()
+	self.timer1 = self.timer1 + dtime
+	self.timer2 = self.timer2 + dtime
+	self.lifetimer = self.lifetimer - (dtime*examobs.global_lifetime)
+	examobs.main(self, dtime)
+	examobs.global_time = examobs.global_time + os.clock() - time
+end
+
+exaachievements.register({
+	type="customize",
+	name="Hunter",
+	count=100,
+	description="Kill 100 animals",
+	skills=5,
+	hide_until=10,
+})
+
+exaachievements.register({
+	type="customize",
+	name="Monsters_nightmare",
+	count=100,
+	description="Kill 100 monsters",
+	skills=10,
+	hide_until=10,
+})
+
+walkable=function(pos)
+	local n = minetest.get_node(pos).name
+	return (n ~= "air" and false) or examobs.def(n).walkable
+end
+
+examobs.jump=function(self,y)
+	local v = self.object:get_velocity() or {x=0, y=0, z=0}
+	if v.y == 0 then
+		y = y or self.jump or 5.5
+		self.object:set_velocity({x=v.x, y=y, z=v.z})
+	end
+end
+
+examobs.environment=function(self)
+	self.environment_timer = 0
+	if (self.flee or self.fight or self.folow or self.target) and not (self.dead or self.dying) then
+		self.lifetimer = self.lifetime
+		if not (self.updatetime_reset or self.folow) then
+			self.updatetime_reset = self.updatetime
+			self.updatetime = self.updatetime*0.1
+		end
+	elseif self.updatetime_reset then
+		self.updatetime = self.updatetime_reset
+		self.updatetime_reset = nil
+	elseif self.lifetimer < 0 then
+		if self:on_lifedeadline() then
+			self.lifetimer = self.lifetime
+		else
+			if not (self.dead or self.dying) and math.random(1,100) then
+				self:on_expression("leave")
+			end
+			self.object:remove()
+		end
+		return self
+	end
+
+	local pos = self:pos()
+	local posf = examobs.pointat(self)
+	pos = apos(pos,0,self.bottom)
+	posf = apos(posf,0,self.bottom)
+	local def = examobs.defpos(pos)
+	local deff = examobs.defpos(posf)
+	local v = self.object:get_velocity()
+
+--Infected
+
+	if self.storage.infected then
+		if self.fight then
+			if examobs.team(self.fight) == self.team then 
+				self.fight = nil
+			else
+				local en = self.fight:get_luaentity()
+				if en and en.examob then
+					en.fight = nil
+					self.fight = nil
+					en.team = "infection_poison"
+					en.aggressivity = 2
+					en.type = "monster"
+					en.storage.infected = 101
+				end
+			end
+		end
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), 5)) do
+			local en = ob:get_luaentity()
+			if en and en.examob and en.team ~= self.team and ob ~= self.object and examobs.visiable(self.object,ob) and examobs.gethp(ob) > 0 then
+				en.fight = nil
+				en.team = "infection_poison"
+				en.aggressivity = 2
+				en.type = "monster"
+				en.storage.infected = 101
+			end
+		end
+		self.storage.infected = self.storage.infected -1
+		if self.storage.infected <= 0 then
+			self:hurt(1)
+		else
+			examobs.showtext(self,"Infected ("..self.storage.infected..")","ff00ff")
+		end
+	end
+
+--jumping
+
+	if not (self.dying or self.dead or self.is_floating) then
+		local target = self.fight or self.flee or self.folow
+		if def.walkable and v.x+v.z == 0 then
+			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
+				self:hurt(1)
+			else
+				examobs.jump(self)
+			end
+		elseif v.x+v.z ~= 0 and deff.walkable or (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y >= pos.y) then
+			examobs.jump(self)
+		elseif (deff.damage_per_second or 0) > 0 then
+			examobs.stand(self)
+		end
+	end
+
+--drowning & breath
+
+	if self.breathing > 0 and not self.dead and self.environment_timer2 > 1 then
+		if (def.drowning or 0) > 0 then
+			self.breath = (self.breath or 20) -1
+			if self.breath <= 0 then
+				self.breath = 0
+				self:hurt(1)
+			else
+				examobs.showtext(self,self.breath .."/20","0000ff")
+			end
+		else
+			self.breath = 20
+		end	
+	end
+
+--damage
+
+	if self.environment_timer2 > 1 and (def.damage_per_second or 0) > 0 and not self.resist_nodes[def.name] then
+		self:hurt(def.damage_per_second)
+		if not (self.dying or self.dead) then
+			self.object:set_yaw(math.random(0,6.28))
+			examobs.jump(self)
+			examobs.walk(self,true)
+		end
+
+		if minetest.get_item_group(def.name, "igniter") > 0 then
+			minetest.add_particlespawner({
+				amount = 5,
+				time =0.2,
+				minpos = {x=pos.x-0.5, y=pos.y, z=pos.z-0.5},
+				maxpos = {x=pos.x+0.5, y=pos.y, z=pos.z+0.5},
+				minvel = {x=0, y=0, z=0},
+				maxvel = {x=0, y=math.random(3,6), z=0},
+				minacc = {x=0, y=2, z=0},
+				maxacc = {x=0, y=0, z=0},
+				minexptime = 1,
+				maxexptime = 3,
+				minsize = 3,
+				maxsize = 8,
+				texture = "default_item_smoke.png",
+				collisiondetection = true,
+			})
+		end
+	end
+
+-- timer = 0
+
+	if self.environment_timer2 > 1 then
+		self.environment_timer2 = 0
+	end
+
+--floating
+
+	if self.floating_in_group and minetest.get_item_group(def.name,self.floating_in_group) > 0 or self.floating[def.name] then
+		if not self.is_floating then
+			self.is_floating = true
+			local v = self.object:get_velocity() or {x=0, y=0, z=0}
+			self.object:set_acceleration({x =0, y=0, z =0})
+			self.object:set_velocity({x=v.x, y=0, z =v.y})
+		elseif def.liquid_viscosity > 0 then
+			default.flowing(self.object)
+		end
+		return
+	elseif self.is_floating then
+		self.is_floating = nil
+		local v = self.object:get_velocity()
+		self.object:set_acceleration({x =0, y=-10, z =0})
+	elseif not self.is_floating then
+		if v.y < 0 and not self.falling then
+			self.falling = pos.y
+		end
+
+		if self.falling then
+			if v.y < -10 and not self.falling_expression then
+				self.falling_expression = true
+				self:on_expression("fall")
+			elseif v.y >= 0 and walkable(apos(pos,0,-1)) then
+				local d = math.floor(self.falling+0.5) - math.floor(pos.y+0.5)
+				if d >= 10 then
+					self:hurt(d)
+				end
+				self.falling = nil
+				self.falling_expression = nil
 			end
 		end
 	end
-	for i=1,item and math.random(80,100) or math.random(100,140) do
-		if i <= s then
-			minetest.add_particle({
-				pos=pos,
-				time = 0.1,
-				velocity={x=math.random(-1,1),y=math.random(4,5),z=math.random(-1,1)},
-				acceleration={x=0,y=-9,z=0},
-				size=math.random(2,3)*0.1,
-				texture = "default_item_smoke.png^[colorize:#dddddd",
-				expirationtime=1,
-				collision_removal=true,
-				vertical=true,
-			})
+
+--liquid and viscosity
+
+	if def.liquid_viscosity > 0 then
+		if not self.in_liquid and v.y <= 0 then
+			if minetest.get_item_group(def.name,"water") > 0 then
+				default.watersplash(pos)
+			elseif minetest.get_item_group(def.name,"lava") > 0 then
+				minetest.sound_play("default_clay_step", {object=self.object, gain = 4,max_hear_distance = 10})
+			end
 		end
-		if item then
-			minetest.add_particle({
-				pos=pos,
-				time = 0.1,
-				velocity={x=math.random(-50,50)*0.01,y=math.random(10,40)*0.1,z=math.random(-50,50)*0.01},
-				acceleration={x=0,y=-9,z=0},
-				size=math.random(5,7)*0.1,
-				texture = "default_item_smoke.png^[colorize:#dddddd",
-				expirationtime=1,
-				collision_removal=true,
-				vertical=true,
-			})
+		self.in_liquid = true
+		local s=1
+		local v = self.object:get_velocity() or {x=0,y=0,z=0}
+		if self.dying or self.dead or self.swiming < 1 then s=-1 end
+
+		if self.swiming < 1 and self.breathing > 0 and s == 1 then
+
+			s = -1
+			self:hurt(1)
+			if not (self.dying or self.dead) then
+				examobs.stand(self)
+				examobs.anim(self,"run")
+				if math.random(1,2) == 1 then
+					self.object:set_yaw(math.random(0,6.28))
+				end
+			end
+			if v.y < 0 then
+				self.object:set_acceleration({x =0, y=20, z =0})
+				self.object:set_velocity({x =0, y=v.y/2, z =0})
+			elseif v.y > 0 then
+				self.object:set_velocity({x =0, y=0, z =0})
+				self.object:set_acceleration({x =0, y=0, z =0})
+			end
+			return true
+		end
+
+		self.object:set_acceleration({x =0, y =0.1*s, z =0})
+
+		if default.flowing(self.object) then
+			return
+		elseif v.y<-0.1 then
+			self.object:set_velocity({x = v.x, y =v.y/2, z =v.z})
+			return self
+		end
+		self.object:set_velocity({x = v.x, y =1*s - (def.liquid_viscosity*0.1), z = v.z})
+		return self
+	elseif self.in_liquid and (examobs.defpos(apos(pos,0,-1)).liquid_viscosity or 0) > 0 then
+		local v=self.object:get_velocity() or {x=0, y=0, z=0}
+		self.object:set_acceleration({x=0, y=0, z=0})
+		self.object:set_velocity({x=v.x, y=0, z=v.z})
+		if not default.flowing(self.object) and walkable(apos(posf,0,-1)) then
+			examobs.jump(self)
+			self.object:set_acceleration({x=0, y=-10, z=0})
+		end
+	elseif self.in_liquid then
+		self.in_liquid = nil
+		self.object:set_acceleration({x =0, y = -10, z =0})
+	end
+end
+
+examobs.defpos=function(pos)
+	return minetest.registered_items[minetest.get_node(pos).name] or {}
+end
+
+examobs.def=function(name)
+	return minetest.registered_items[name] or {}
+end
+
+examobs.following=function(self)
+	if self.folow and examobs.visiable(self.object,self.folow) then
+		local d = examobs.distance(self.object,self.folow)
+		if d > self.range/2 then
+			examobs.lookat(self,self.folow)
+			examobs.walk(self,true)
+			return true
+		elseif d > self.reach then
+			examobs.lookat(self,self.folow)
+			examobs.walk(self)
+			return true
+		end
+	elseif self.folow then
+		self.folow = nil
+	end
+end
+
+examobs.exploring=function(self)
+	if math.random(1,2) == 1 and examobs.find_objects(self) then return end
+
+	local r = math.random(1,10)
+	if r <= 5 and self.walking then		-- keep walk
+		examobs.walk(self)
+	elseif r <= 2 then					-- rnd walk
+		self.object:set_yaw(math.random(0,6.28))
+		self.walking = true
+		examobs.walk(self)
+	elseif r == 3 then					-- rnd look
+		self.walking = nil
+		examobs.stand(self)
+		self.object:set_yaw(math.random(0,6.28))
+	else						-- stand
+		self.walking = nil
+		examobs.stand(self)
+	end
+end
+
+examobs.fleeing=function(self)
+	if self.flee and examobs.gethp(self.flee) > 0 and (examobs.viewfield(self,self.flee) or examobs.distance(self.object,self.flee) <= self.range) then
+		local p = examobs.pointat(self)
+		if walkable(p) and walkable(apos(p,0,1)) then
+			if  self.aggressivity > -2 and examobs.distance(self.object,self.flee) <= self.reach then
+				examobs.lookat(self,self.flee)
+				local flee = self.flee
+				self.fight = self.flee
+				minetest.after(2, function(self,flee)
+					if self and self.object and flee then
+						self.fight = nil
+						self.flee = flee
+					end
+				end, self,flee)
+			else
+				self.object:set_yaw(math.random(0,6.28))
+				examobs.jump(self)
+				examobs.walk(self,true)
+				
+			end
+			return self
+		end
+
+		examobs.lookat(self,self.flee)
+		local yaw=examobs.num(self.object:get_yaw())
+		self.object:set_yaw(yaw+math.pi)
+		examobs.walk(self,true)
+		return self
+	elseif self.flee then
+		self.flee = nil
+	end
+end
+
+examobs.fighting=function(self)
+	if self.fight and examobs.gethp(self.fight) > 0 and examobs.visiable(self.object,self.fight) then
+
+		if examobs.distance(self.object,self.fight) <= self.reach then
+			examobs.stand(self)
+			examobs.lookat(self,self.fight)
+			if math.random(1,self.punch_chance) == 1 then
+				if self.fight:get_pos().y > self:pos().y then
+					examobs.jump(self)
+				end
+				local en = self.fight:get_luaentity()
+				if en and en.name == "__builtin:item" then
+					self:on_expression("eat")
+					self:eat_item(en.itemstring)
+				end
+				self:before_punching()
+				examobs.punch(self.object,self.fight,self.dmg)
+				self:on_punching()
+				examobs.anim(self,"attack")
+				if examobs.gethp(self.fight) < 1 then
+					self.fight = nil
+					self:on_expression("kill")
+				end
+			end
 		else
-			minetest.add_particle({
-				pos=pos,
-				time = 0.1,
-				velocity={x=math.random(-70,70)*0.01,y=math.random(20,60)*0.1,z=math.random(-70,70)*0.01},
-				acceleration={x=0,y=-9,z=0},
-				size=math.random(6,9)*0.1,
-				texture = "default_item_smoke.png^[colorize:#dddddd",
-				expirationtime=1.3,
-				collision_removal=true,
-				vertical=true,
-			})
+			examobs.lookat(self,self.fight)
+			examobs.walk(self,true)
+
+			if not self.is_floating and math.abs(self.fight:get_pos().y)-5 > math.abs(self:pos().y) then
+				self.fight = nil
+			end
+		end
+
+		for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
+			local en = ob:get_luaentity()
+			if en and en.examob and not en.fight and en.team == self.team and ob ~= self.object and examobs.visiable(self.object,ob) then
+				en.fight = self.fight
+				examobs.lookat(en,en.fight)
+			end
+		end
+		return true
+	else
+		self.fight = nil
+		examobs.stand(self)
+	end
+end
+
+examobs.stand=function(self)
+	local v = self.object:get_velocity() or {x=0,y=0,z=0}
+	self.object:set_velocity({
+		x = 0,
+		y = v.y,
+		z = 0})
+	if not self.on_stand(self) then
+		examobs.anim(self,"stand")
+	end
+	return self
+end
+
+examobs.fly=function(self,run)
+	if self.fight or self.folow or self.flee or self.target then
+		local pos1 = self:pos()
+		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos()) or (self.target and self.target:get_pos())
+		run = run and self.walk_run*2 or self.walk_speed
+		if not self.flee then
+			run = run *-1
+		end
+		if not pos2 then return end
+		local d = examobs.distance(pos1,pos2)
+		local x = ((pos1.x-pos2.x)/d)*run
+		local y = ((pos1.y-pos2.y)/d)*run
+		local z = ((pos1.z-pos2.z)/d)*run
+		self.object:set_velocity({x=examobs.num(x),y=examobs.num(y),z=examobs.num(z)})
+		self.on_fly(self,x,y,z)
+		return true
+	end
+end
+
+examobs.walk=function(self,run)
+	if self.is_floating and examobs.fly(self,run) then return end
+	local yaw=examobs.num(self.object:get_yaw())
+	local running = run
+	self.movingspeed = run and self.run_speed or self.walk_speed
+	local v = self.object:get_velocity() or {x=0,y=0,z=0}
+	local x = (math.sin(yaw) * -1) * self.movingspeed
+	local z = (math.cos(yaw) * 1) * self.movingspeed
+	self.object:set_velocity({
+		x = x,
+		y = v.y,
+		z = z
+	})
+
+	if self.on_walk(self,x,v.yy,z) then return end
+
+	if running then
+		examobs.anim(self,"run")
+	else
+		examobs.anim(self,"walk")
+	end
+
+	return self
+end
+
+examobs.lookat=function(self,pos2)
+	if type(pos2) == "userdata" then
+		pos2=pos2:get_pos()
+	end
+	if not (pos2 and pos2.z) then
+		return
+	end
+	local pos1=self:pos()
+	local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+	local yaw = examobs.num(math.atan(vec.z/vec.x)-math.pi/2)
+	if pos1.x >= pos2.x then yaw = yaw+math.pi end
+	self.object:set_yaw(yaw)
+end
+
+examobs.num=function(a)
+	return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
+end
+
+examobs.anim=function(self,type)
+	if self.visual ~= "mesh" or type == self.anim or not self.animation then return end
+	local a=self.animation[type]
+	if not a then return end
+	self.object:set_animation({x=a.x, y=a.y,},a.speed,0.1,a.loop)
+	self.anim=type
+	return self
+end
+
+examobs.team=function(target)
+	if not target then return "" end
+	local en = target:get_luaentity()
+	return (en and (en.team or en.type or "")) or target:is_player() and "default"
+end
+
+examobs.find_objects=function(self)
+	if self.aggressivity == 0 or self.fight or self.flee then return end
+	local flee = self.aggressivity == -2
+	local fight = self.aggressivity == 2
+	local obs = {}
+	local hungry = self.hp < self.hp_max
+	local p = self:pos()
+	if not p then return self end
+	for _, ob in pairs(minetest.get_objects_inside_radius(p, self.range)) do
+		local en = ob:get_luaentity()
+		if ob ~= self.object and (not en or en.type) and examobs.visiable(self.object,ob) then
+			local infield = examobs.viewfield(self,ob)
+			local team = examobs.team(ob)
+			local known = examobs.known(self,ob)
+			local player = ob:is_player()
+			local hiding
+			if player then
+				self.lifetimer = self.lifetime
+				local invtool = examobs.hiding[ob:get_player_name()]
+				local inv = ob:get_inventory()
+				if invtool == "" then
+					hiding = true
+				elseif invtool and inv:get_stack("main",invtool):get_name() == "examobs:hiding_poison" then
+					local item = inv:get_stack("main",invtool)
+					local w = item:get_wear()
+					if w >= 60000 then
+						inv:set_stack("main",invtool,nil)
+						examobs.hiding[ob:get_player_name()] = nil
+					else
+						item:add_wear(600)
+						inv:set_stack("main",invtool,item)
+						hiding = true
+					end
+				elseif invtool then
+					examobs.hiding[ob:get_player_name()] = nil
+				end
+			end
+			if hiding then
+			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
+				self.fight = ob
+				return
+			elseif known == "flee" or (flee and team ~= self.team and (self.flee_from_threats_only == 0 or player)) or (self.aggressivity == -1 and en and en.type == "monster") then
+				self.flee = ob
+				return
+			elseif known == "folow" then
+				self.folow = ob
+				return
+			elseif infield and ((self.aggressivity == 1 and en and en.type == "monster") or self.aggressivity == 2) and team ~= self.team then
+				table.insert(obs,ob)
+			end
+		elseif hungry and en and en.name == "__builtin:item" and examobs.visiable(self.object,ob) and examobs.viewfield(self,ob) then
+			if minetest.get_item_group(string.split(en.itemstring," ")[1],"eatable") > 0 and self.is_food(self,string.split(en.itemstring," ")[1]) then
+				self.fight = ob
+				return
+			end
+		end
+	end
+	if #obs > 0 then
+		self.fight = obs[#obs]
+		examobs.known(self,self.fight,"fight")
+		return true
+	end
+end
+
+examobs.known=function(self,ob,type,get)
+	if not ob then return end
+	self.storage.known = self.storage.known or {}
+	local en = ob:get_luaentity()
+	local name = (en and (en.examob or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
+	if not type then
+		return self.storage.known[name]
+	elseif get then
+		return self.storage.known[name] == type
+	else
+		self.storage.known[name] = type
+	end
+end
+
+examobs.visiable=function(ob,pos2)
+	local pos1 = ob:get_pos()
+	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
+	if not (pos1 and pos2) then
+		return false
+	end	
+	local v = {x = pos1.x - pos2.x, y = pos1.y - pos2.y-1, z = pos1.z - pos2.z}
+	v.y=v.y-1
+	local amount = (v.x ^ 2 + v.y ^ 2 + v.z ^ 2) ^ 0.5
+	local d=vector.distance(pos1,pos2)
+	v.x = (v.x  / amount)*-1
+	v.y = (v.y  / amount)*-1
+	v.z = (v.z  / amount)*-1
+	for i=1,d,1 do
+		local node = minetest.registered_nodes[minetest.get_node({x=pos1.x+(v.x*i),y=pos1.y+(v.y*i),z=pos1.z+(v.z*i)}).name]
+		if node and node.walkable then
+			return false
 		end
 	end
 	return true
 end
 
-default.flowing=function(object)
-	local pos = object:get_pos()
-	if not pos then
-		return
+examobs.gethp=function(ob,even_dead)
+	if not (ob and ob:get_pos()) then
+		return 0
+	elseif ob:is_player() then
+		return ob:get_hp()
 	end
-	local def = default.def(minetest.get_node(pos).name)
-	local flow
-	local typ
-	local self
-	local name
+	local en = ob:get_luaentity()
+	return en and ((even_dead and en.examob and en.dead and en.hp) or (en.examob and en.dead and 0) or en.hp or en.health) or ob:get_hp() or 0
+end
 
-	if object:is_player() then
-		name = object:get_player_name()
-		flow = default.get_on_player_death(name,"flowing") or {}
-		typ = "player"
+examobs.viewfield=function(self,ob2)
+	local ob1 = self and self.object or self
+
+	local p1 = ob1 and ob1:get_pos()
+	local p2 = ob2 and ob2:get_pos()
+	if not (ob1 and ob2 and p2 and p1) then return false end
+
+	local a = vector.normalize(vector.subtract(p2, p1))
+	local b
+	if ob1:get_luaentity() then
+		local yaw = math.floor(ob1:get_yaw()*100)/100
+		b = {x=math.sin(yaw)*-1,y=0,z=math.cos(yaw)*1}
+	elseif ob1:is_player() then
+		b=ob1:get_look_dir()
 	else
-		self = object:get_luaentity()
-		flow = self.flowing or {}
-		typ = self.itemstring and "item" or "object"
+		return false
 	end
-
-	local defp = minetest.get_node(pos).param2
-	if typ == "item" and def.drawtype ~= "flowingliquid" and flow.flowing_pos and def.drawtype ~= "liquid" then
-		minetest.add_item(vector.round(pos),self.itemstring)
-		object:remove()
-		return true
-	elseif defp == 15 and def.drawtype == "flowingliquid" then
-		local r = vector.round(pos)
-		object:set_pos({x=r.x,y=pos.y,z=r.z})
-		if typ == "player" then
-			if object:get_velocity().y > -10 then
-				object:add_velocity({x=0, y=-7, z=0})
-			end
-		else	
-			object:set_velocity({x=0, y=-10, z=0})
-		end
-		flow.flowing_v = nil
-		flow.flowing_pos = nil
-	else
-		for i,v in pairs({{1,0},{-1,0},{0,1},{0,-1}}) do
-			local x = v[1]
-			local z = v[2]
-			for xz=-7,7 do
-				local u = {x=pos.x+x,y=pos.y-1,z=pos.z+z}
-				if default.defpos({x=pos.x+x,y=pos.y,z=pos.z+z},"drawtype") == "flowingliquid" then
-					if default.defpos(u,"drawtype") == "flowingliquid" then
-						flow.flowing_pos = vector.round(u)
-						goto setv
-					end
-				else
-					break
-				end
-			end
-		end
-
-		for x=-1,1 do
-		for z=-1,1 do
-		for y=0,-1,-1 do
-			local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
-			local n = minetest.get_node(p)
-			if flow.flowing_pos and (defp == 0 or  n.name == "air"  and defp == 0 and def.drawtype == "flowingliquid") then
-				goto kg
-			elseif default.def(n.name).drawtype == "flowingliquid" and (defp == 0 or defp-1 == n.param2 or y == -1 and defp+2 < n.param2) then
-				if not flow.flowing_dir or (y== -1 or x ~= 0 or z ~= 0) and ( x*-1 ~= flow.flowing_dir.x or z*-1 ~= flow.flowing_dir.z) then
-					flow.flowing_dir = {x=x,y=y,z=z}
-					flow.flowing_pos = vector.round(p)
-					goto setv
-				end
-			end
-		end
-		end
-		end
-	end
-
-	::kg::
-	if flow.flowing_v then
-		if typ == "player" then
-			object:add_velocity(flow.flowing_v)
-			default.set_on_player_death(name,"flowing",flow)
-		else	
-			self.flowing = flow
-			object:set_velocity(flow.flowing_v)
-		end
-		return true
-	end
-	::setv::
-	if flow.flowing_pos then
-		if not flow.flowing_v and typ ~= "player" then
-			object:set_acceleration({x=0, y=-1, z=0})
-		end
-		local p = flow.flowing_pos
-		local v = {x=p.x-pos.x,y=p.y-pos.y,z=p.z-pos.z}
-		local yaw = num(math.atan(v.z/v.x)-math.pi/2)
-		if p.x >= pos.x then yaw = yaw+math.pi end
-		local x = math.sin(yaw) * 2
-		local z = math.cos(yaw) * -2
-		flow.flowing_v = {x = x,y = flow.flowing_dir and flow.flowing_dir.y*2 or 0,z = z}
-
-		if typ == "player" then
-			object:add_velocity(flow.flowing_v)
-			default.set_on_player_death(name,"flowing",flow)
-		else	
-			self.flowing = flow
-			object:set_velocity(flow.flowing_v)
-		end
-		return true
-	end
+	local deg = math.acos((a.x*b.x)+(a.y*b.y)+(a.z*b.z)) * (180 / math.pi)
+	return not (deg < 0 or deg > 50) --45
 end
 
-Coin=function(player,count)
-	local m = player:get_meta()
-	m:set_int("coins",m:get_int("coins")+count)
+examobs.faceside=function(self,ob)
+	if not (self and self.object and ob) then return false end
+	local pos1=self:pos()
+	local pos2 = type(ob) == "userdata" and ob:get_pos() or ob
+	return examobs.distance(pos1,pos2)>examobs.distance(examobs.pointat(self,0.1),pos2)
 end
 
-default.register_on_item_drop=function(f)
-	--pos, itemstring, object, dropper
-	table.insert(default.registered_item_drops,f)
+examobs.pointat=function(self,d)
+	local pos=self:pos()
+	local yaw=examobs.num(self.object:get_yaw())
+	d=d or 1
+	local x =math.sin(yaw) * -d
+	local z =math.cos(yaw) * d
+	return {x=pos.x+x,y=pos.y,z=pos.z+z}
 end
 
-minetest.register_on_newplayer(function(player)
-	player:get_inventory():add_item("main","default:craftguide")
-	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
-end)
-
-num=function(a)
-	return (a == math.huge or a == -math.huge or a ~= a) == false and a or 0
+examobs.distance=function(pos1,pos2)
+	pos1 = type(pos1) == "userdata" and pos1:get_pos() or pos1
+	pos2 = type(pos2) == "userdata" and pos2:get_pos() or pos2
+	return pos2 and pos1.z and pos2.z and vector.distance(pos1,pos2) or 0
 end
 
-apos=function(pos,x,y,z)
-	return {x=pos.x+(x or 0),y=pos.y+(y or 0),z=pos.z+(z or 0)}
-end
-
-memory_mb=function()
-	return string.format("%.03f",collectgarbage("count")/1000)
-end
-
-minetest.register_on_dieplayer(function(player)
-	local name = player:get_player_name()
-	if default.on_player_death[name] then
-		for i,v in pairs(default.on_player_death[name]) do
-			if type(v) == "function" then
-				v(player)
-			end
-		end
-	end
-	default.on_player_death[name] = nil
-end)
-
-minetest.register_on_leaveplayer(function(player)
-	local name = player:get_player_name()
-	if default.on_player_death[name] then
-		if type(default.on_player_death[name]) == "function" then
-			default.on_player_death[name]()
-		end
-		default.on_player_death[name] = nil
-	end
-end)
-
-minetest.register_on_respawnplayer(function(player)
-	minetest.after(0, function(player)
-		player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
-	end,player)
-end)
-
-default.respawn_player=function(player,drop_bones)
-	if drop_bones then
-		bones.corpses[player:get_player_name()] = nil
-		bones.drop(player)
-	end
-	player:set_hp(20)
-	player:set_breath(11)
-	player_style.respawn(player)
-	local p = player:get_pos()
-	beds.respawn(player)
-	if vector.distance(p,player:get_pos()) < 0.1 then
-		local ssp = minetest.settings:get("static_spawnpoint")
-		if ssp then
-			player:set_pos(minetest.string_to_pos(ssp))
-			return
-		else
-			local sp = player:get_meta():get_string("spawn_position")
-			if sp ~= "" then
-				player:set_pos(minetest.string_to_pos(sp))
-			else
-				player:set_hp(0)
-			end
-		end
-	end
-end
-
-if default.creative then
-	local ohnd = minetest.handle_node_drops
-	minetest.handle_node_drops=function(pos,drops,digger)
-		if not (digger and digger:is_player()) then
-			return ohnd(pos,drops,digger)
-		end
-		local inv = digger:get_inventory()
-		for i,v in pairs(drops) do
-			if not inv:contains_item("main",v) then
-				inv:add_item("main",v)
-			end
-		end
-	end
-end
-
-minetest.register_on_placenode(function(pos,node,placer,pointed_thing)
-	return default.creative
-end)
-
-default.get_on_player_death=function(name,event)
-	local a = default.on_player_death[name] or {}
-	return a[event]
-end
-
-default.set_on_player_death=function(name,event,value)
-	default.on_player_death[name] = default.on_player_death[name] or {}
-	default.on_player_death[name][event]=value
-end
-
-
---||||||||||||||||
--- ======================= Sounds
---||||||||||||||||
-
-default.node_sound_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "", gain = 1}
-	a.dig =		a.dig or {name = "", gain = 1}
-	a.dug =		a.dig or {name = "", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-default.node_sound_stone_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_stone_step", gain = 1}
-	a.dig =		a.dig or {name = "default_stone_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_stone_dug", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
-	return a
-end
-
-default.node_sound_wood_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_wood_step", gain = 1}
-	a.dig =		a.dig or {name = "default_wood_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_wood_dug", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
-	return a
-end
-
-default.node_sound_water_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_water_step", gain = 1}
-	return a
-end
-
-default.node_sound_metal_defaults=function(a)
-	a = a or {}
-	a.dig =		a.dig or {name = "default_metal_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_metal_dug", gain = 1}
-	a.place =		a.place or {name = "default_metal_place", gain = 1}
-	return default.node_sound_stone_defaults(a)
-end
-
-default.node_sound_dirt_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dig =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dug =		a.dug or {name = "default_leaves_dug", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-
-default.node_sound_leaves_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dig =		a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dug =		a.dug or {name = "default_leaves_dug", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-default.node_sound_gravel_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_gravel_step", gain = 1}
-	a.dig =		a.dig or {name = "default_gravel_step", gain = 1}
-	a.dug =		a.dug or {name = "default_gravel_place", gain = 1}
-	a.place =		a.place or {name = "default_gravel_place", gain = 1}
-	return a
-end
-
-default.node_sound_glass_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_stone_step", gain = 1}
-	a.dig =		a.dig or {name = "default_glass_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_break_glass", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
-	return a
-end
-
-default.node_sound_clay_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_clay_step", gain = 1}
-	a.dig =		a.dig or {name = "default_clay_step", gain = 1}
-	a.dug =		a.dug or {name = "default_clay_step", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-default.node_sound_snow_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_snow_step", gain = 1}
-	a.dig =		a.dig or {name = "default_snow_step", gain = 1}
-	a.dug =		a.dug or {name = "default_snow_step", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-default.node_sound_sand_defaults=function(a)
-	a = a or {}
-	a.footstep =	a.footstep or {name = "default_sand_step", gain = 1}
-	a.dig =		a.dig or {name = "default_sand_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_sand_dig", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
-	return a
-end
-
-default.tool_breaks_defaults=function(a)
-	a = a or {}
-	a.breaks =	"default_tool_breaks"
-	return a
-end
-
-default.date=function(a,c)
-	if a=="get" then
-		return os.time()
-	else
-		if a=="s" then
-			return os.difftime(os.time(), c)
-		elseif a=="m" then
-			return os.difftime(os.time(), c) / 60
-		elseif a=="h" then
-			return os.difftime(os.time(), c) / (60 * 60)
-		elseif a=="d" then
-			return os.difftime(os.time(), c) / (24 * 60 * 60)
-		end
-	end
-end
-
-default.defpos=function(pos,n)
-	local no = minetest.registered_nodes[minetest.get_node(pos).name]
-	return no and no[n] or nil
-end
-
-default.def=function(name)
-	return minetest.registered_items[name] or {}
-end
-
-default.defname=function(name,n)
-	local no = minetest.registered_items[name]
-	return no and no[n] or nil
-end
-
-default.register_eatable=function(kind,name,hp,gaps,def)
-	def.groups = def.groups or {}
-	def.groups.eatable=hp
-	def.groups.gaps=gaps
-	def.groups.wet=def.wet or -0.1
-	local on_eat = def.on_eat or function() end
-	if gaps > 1 then
-		def.on_use=function(itemstack, user, pointed_thing)
-			local eat = 65536/gaps
-			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
-			if not minetest.registered_tools[itemstack:get_name()] then
-				local item = ItemStack(itemstack:get_name() .."_eaten")
-				local c = itemstack:get_count()
-				item = item:to_table()
-				item.metadata = minetest.serialize({eat = eat})
-				item.wear = eat
-				minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
-				if c > 1 then
-					user:get_inventory():add_item("main",item)
-				else
-					itemstack:replace(item)
-				end
-				on_eat(itemstack, user, pointed_thing)
-				return itemstack
-			else
-				local item = itemstack:to_table()
-				local meta = minetest.deserialize(item.metadata)
-				if not meta then
-					meta = {eat = eat}
-					item.metadata = minetest.serialize({eat = eat})
-					itemstack:replace(item)
-				end
-				minetest.do_item_eat(hp,nil,ItemStack(itemstack:get_name()),user,pointed_thing)
-				itemstack:add_wear(meta.eat)
-				on_eat(itemstack, user, pointed_thing)
-				return itemstack
-			end
-		end
-
-	else
-		def.on_use=function(itemstack, user, pointed_thing)
-			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
-			on_eat(itemstack, user, pointed_thing)
-			itemstack:take_item()
-			return itemstack
-		end
-	end
-
-	if kind == "node" then
-		def.groups.dig_immediate=3
-	end
-
-	minetest["register_" .. kind](name, def)
-
-	if gaps > 1 then
-		if kind ~= "tool" then
-			local groups = table.copy(def.groups)
-			groups.not_in_creative_inventory = 1
-			groups.store = nil
-
-			minetest.register_tool(def.name .. "_eaten", {
-				description = def.description,
-				inventory_image = def.inventory_image or def.tiles[1],
-				groups = groups,
-				on_use = def.on_use
-			})	
-		end
-	end
-end
-
-default.registry_mineral=function(def)
-	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
-	local mod = minetest.get_current_modname() ..":"
-	if not def.not_lump then
-		def.lump = def.lump or {}
-		def.drop = mod .. def.name .. "_lump"
-		def.lump.description = def.lump.description or 		uname .." lump"
-		def.lump.inventory_image = def.lump.inventory_image or def.texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
-		minetest.register_craftitem(mod .. def.name .. "_lump", def.lump)
-	elseif def.drop then
-		if def.drop.name then
-			def.drop.name = mod .. def.drop.name
-		else
-			def.drop.name =  mod .. def.name
-		end
-		if not def.drop.inventory_image:find(".png") then
-			def.drop.inventory_image = def.texture .. "^default_alpha_gem_" .. def.drop.inventory_image ..".png^[makealpha:0,255,0"
-		end
-		def.dropingot = def.drop.name
-		def.drop.description = def.drop.description or 		uname
-		minetest.register_craftitem(def.drop.name, def.drop)
-		def.drop = def.drop.name
-	end
---ingot
-	if not def.not_ingot then
-		def.ingot = def.ingot or {}
-		def.dropingot = mod .. def.name .. "_ingot"
-		def.ingot.description = def.ingot.description or 		uname .." ingot"
-		def.ingot.inventory_image = def.texture .. "^default_alpha_ingot.png^[makealpha:0,255,0"
-		minetest.register_craftitem(mod .. def.name .. "_ingot", def.ingot)
-		if not def.not_ingot_craft and def.lump then
-			minetest.register_craft({
-				type = "cooking",
-				output = mod .. def.name .. "_ingot",
-				recipe = mod .. def.name .. "_lump",
-				cooktime = 10,
-			})
-		end
-	end
-
-	if def.craftitem then
-		def.dropingot = def.craftitem
-	end
-
---block
-	if not def.not_block then
-		def.block = def.block or {}
-		def.block.tiles =	def.block.tiles or	{def.texture}
-		def.block.description =	def.block.description or	uname .. "block"
-		def.block.sounds =	def.block.sounds or	default.node_sound_metal_defaults()
-		def.block.groups =	def.block.groups or	{cracky=2}
-		minetest.register_node(mod .. def.name .."block", def.block)
-		if not def.not_block_craft and def.dropingot then
-			minetest.register_craft({
-				output=mod .. def.name .."block",
-				recipe={
-					{def.dropingot,def.dropingot,def.dropingot},
-					{def.dropingot,def.dropingot,def.dropingot},
-					{def.dropingot,def.dropingot,def.dropingot},
-				},
-			})
-			minetest.register_craft({
-				output=def.dropingot .. " 9",
-				recipe={{mod .. def.name .."block"},},
-			})
-		end
-	end
---ore
-	if not def.not_ore then
-		def.ore = def.ore or {}
-		def.ore.drop = def.ore.drop or def.drop
-		def.ore.tiles =	def.ore.tiles or			{def.texture .. "^default_alpha_ore.png"}
-		def.ore.description =	def.ore.description or	uname .. " ore"
-		def.ore.sounds =	def.ore.sounds or	default.node_sound_stone_defaults()
-		def.ore.groups =	def.ore.groups or	{cracky=2}
-
-		minetest.register_node(mod .. def.name .. "_ore", def.ore)
-	end
---ore settings
-	if not def.not_ore or (def.ore_settings and def.ore_settings.ore) then
-		def.ore_settings = def.ore_settings or {}
-		minetest.register_ore({
-			ore_type		=	"scatter",
-			ore		=	def.ore_settings.ore or		mod .. def.name .. "_ore",
-			wherein		=	def.ore_settings.wherein or		"default:stone",
-			clust_scarcity	=	def.ore_settings.clust_scarcity or	8 * 8 * 8,
-			clust_num_ores	=	def.ore_settings.clust_num_ores or	5,
-			clust_size		=	def.ore_settings.clust_size	or	5,
-			y_min		=	def.ore_settings.y_min	or	-31000,
-			y_max		=	def.ore_settings.y_max	or	-50,
-		})
-	end
-
-
---pick
-	if not def.not_pick then
-		def.pick = def.pick or {}
-		def.pick.groups = def.pick.groups or {not_regular_craft=1}
-		def.pick.sound = default.tool_breaks_defaults()
-		def.pick.description = def.pick.description or 		 uname .." pickaxe"
-		def.pick.inventory_image = def.pick.inventory_image or	def.texture .. "^default_alpha_pick.png^[makealpha:0,255,0"
-		def.pick.tool_capabilities = def.pick.tool_capabilities or		{
-			full_punch_interval = 1,
-			max_drop_level = 0,
-			groupcaps = {
-				cracky={times={[3]=1.5},uses=20,maxlevel=1}
-			},
-			damage_groups={fleshy=2}
-		}
-		minetest.register_tool(mod .. def.name .. "_pick", def.pick)
-		minetest.register_craft({
-			output=mod .. def.name .. "_pick",
-			recipe={
-				{def.dropingot,def.dropingot,def.dropingot},
-				{"","group:stick",""},
-				{"","group:stick",""},
-			},
-		})
-	end
---shovel
-	if not def.not_shovel then
-		def.shovel = def.shovel or {}
-		def.shovel.groups = def.shovel.groups or {not_regular_craft=1}
-		def.shovel.description = def.shovel.description or 			uname .." shovel"
-		def.shovel.inventory_image = def.shovel.inventory_image or	def.texture .. "^default_alpha_shovel.png^[makealpha:0,255,0"
-		def.shovel.sound = default.tool_breaks_defaults()
-		def.shovel.tool_capabilities = def.shovel.tool_capabilities or		{
-			full_punch_interval = 1.1,
-			max_drop_level = 0,
-			groupcaps = {
-				crumbly={times={[1]=1.9,[2]=1.4,[3]=0.6},uses=20,maxlevel=1},
-			},
-			damage_groups={fleshy=1},
-		}
-		minetest.register_tool(mod .. def.name .. "_shovel", def.shovel)
-		minetest.register_craft({
-			output=mod .. def.name .. "_shovel",
-			recipe={
-				{"",def.dropingot,""},
-				{"","group:stick",""},
-				{"","group:stick",""},
-			},
-		})
-	end
---axe
-	if not def.not_axe then
-		def.axe = def.axe or {}
-		def.axe.groups = def.axe.groups or {not_regular_craft=1}
-		def.axe.sound = default.tool_breaks_defaults()
-		def.axe.description = def.axe.description or 			uname .." axe"
-		def.axe.inventory_image = def.axe.inventory_image or	def.texture .. "^default_alpha_axe.png^[makealpha:0,255,0"
-		def.axe.tool_capabilities = def.axe.tool_capabilities or		{
-			full_punch_interval = 1,
-			max_drop_level = 0,
-			groupcaps = {
-				choppy={times={[1]=2,[2]=1.9,[3]=1.2},uses=20,maxlevel=1},
-			},
-			damage_groups={fleshy=2},
-		}
-		minetest.register_tool(mod .. def.name .. "_axe", def.axe)
-		minetest.register_craft({
-			output=mod .. def.name .. "_axe",
-			recipe={
-				{def.dropingot,def.dropingot,""},
-				{def.dropingot,"group:stick",""},
-				{"","group:stick",""},
-			},
-		})
-	end
---vineyardknife
-	if not def.not_vineyardknife then
-		def.vineyardknife = def.vineyardknife or {}
-		def.vineyardknife.groups = def.vineyardknife.groups or {not_regular_craft=1}
-		def.vineyardknife.sound = default.tool_breaks_defaults()
-		def.vineyardknife.description = def.vineyardknife.description or 		uname .." vineyardknife"
-		def.vineyardknife.inventory_image = def.vineyardknife.inventory_image or	def.texture .. "^default_alpha_vineyardknife.png^[makealpha:0,255,0"
-		def.vineyardknife.tool_capabilities = def.vineyardknife.tool_capabilities or		{
-			full_punch_interval = 0.5,
-			max_drop_level = 0,
-			groupcaps = {
-				snappy={times={[1]=1.5,[2]=1,[3]=0.5},uses=20,maxlevel=1},
-			},
-			damage_groups={fleshy=2},
-		}
-		minetest.register_tool(mod .. def.name .. "_vineyardknife", def.vineyardknife)
-		minetest.register_craft({
-			output=mod .. def.name .. "_vineyardknife",
-			recipe={
-				{"",def.dropingot,def.dropingot},
-				{"","",def.dropingot},
-				{"","group:stick",""},
-			},
-		} )
-	end
---hoe
-	if not def.not_hoe then
-		def.hoe = def.hoe or {}
-		def.hoe.groups = def.hoe.groups or {not_regular_craft=1}
-		def.hoe.sound = default.tool_breaks_defaults()
-		def.hoe.description = def.hoe.description or 		uname .." hoe"
-		def.hoe.inventory_image = def.hoe.inventory_image or	def.texture .. "^default_alpha_hoe.png^[makealpha:0,255,0"
-		def.hoe.tool_capabilities = def.tool_capabilities or		{
-			full_punch_interval = 2,
-			damage_groups={fleshy=5},
-		}
-		local uses = (def.hoe.uses or 5) - 1
-		def.hoe.on_place=function(itemstack, user, pointed_thing)
-			local pos = pointed_thing.under
-			if pos
-			and not minetest.is_protected(pos,user:get_player_name())
-			and minetest.get_item_group(minetest.get_node(pos).name,"soil") > 0
-			and minetest.find_node_near(pos,7,{"group:water"}) then
-				minetest.set_node(pos,{name="default:wet_soil"})
-				local pos2 = {x=pos.x,y=pos.y+1,z=pos.z}
-				local n2 = minetest.get_node(pos2).name
-				if minetest.get_item_group(n2,"plant") > 0 and not minetest.is_protected(pos2,user:get_player_name()) then
-					minetest.add_item(pos2,n2)
-					minetest.remove_node(pos2)
-				end
-				itemstack:add_wear(math.floor(65535/uses))
-				return itemstack
-			end
-		end
-
-		minetest.register_tool(mod .. def.name .. "_hoe", def.hoe)
-		minetest.register_craft({
-			output=mod .. def.name .. "_hoe",
-			recipe={
-				{def.dropingot,def.dropingot,""},
-				{"","group:stick",""},
-				{"","group:stick",""},
-			},
-		})
-	end
---bow
-	if not def.not_bow then
-		def.bow = def.bow or {}
-
-		local item = def.dropingot or (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")
-
-		bows.register_bow(def.bow.name or def.name,{
-			description=def.bow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." bow",
-			texture=def.texture,
-			groups = def.bow.groups or {not_regular_craft=1},
-			uses=def.bow.uses or 50,
-			level=def.bow.level or 1,
-			shots=def.bow.shots or 1,
-			craft = def.bow.craft or {{"",item,"materials:string"},{item,"","materials:string"},{"",item,"materials:string"}},
-		})
-	end
---arrow
-	if not def.not_arrow then
-		def.arrow = def.arrow or {}
-		bows.register_arrow(def.arrow.name or def.name,{
-			description=def.arrow.description or def.name.upper(def.name:sub(1,1)) .. def.name:sub(2,-1) .." arrow",
-			texture=def.texture,
-			damage=def.arrow.damage or 1,
-			craft_count=def.arrow.craft_count or 8,
-			groups = def.arrow.groups,
-			on_hit_node=def.arrow.on_hit_node,
-			on_hit_object=def.arrow.on_hit_object,
-			craft=def.arrow.craft or {{"group:arrow", def.dropingot or (not def.not_ingot and mod .. def.name .. "_ingot") or (not def.not_lump and mod .. def.name .. "_lump") or (not def.not_block and mod .. def.name .."block")}}
-		})
-	end
-
-	if def.additional_craft then
-		for _,c in pairs(def.additional_craft) do
-			minetest.register_craft(c)
-		end
-	end
-end
-
-default.registry_bucket=function(node_name)
-	local mod = minetest.get_current_modname() ..":"
-	local def = minetest.registered_nodes[node_name]
-	if not def then
-		error("bucket: " .. node_name .." is not a valid node")
-		return
-	end
-	local tan = mod .. "tankstorage_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
-	local buk = mod .. "bucket_with_" .. string.sub(node_name,string.find(node_name,":")+1,-1)
-	local tex = (def.inventory_image ~="" and def.inventory_image) or (type(def.tiles[1]) == "string" and def.tiles[1]) or (type(def.tiles[1])=="table" and def.tiles[1].name) or "default_grass.png"
-
-	minetest.register_tool(buk, {
-		description = "Bucket of " .. def.description,
-		inventory_image = tex .. "^default_alpha_bucket.png^[makealpha:0,255,0",
-		groups = {bucket=1,bucket_water=minetest.get_item_group(node_name,"water") > 0 and 1 or nil},
-		liquids_pointable = true,
-		on_place = function(itemstack, user, pointed_thing)
-			local p = pointed_thing
-			local n = user:get_player_name()
-			if p.type == "node" then
-				local no = minetest.get_node(p.under)
-				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(p.under,n) then
-					minetest.set_node(p.under,{name=node_name})
-				elseif (no.name == "default:tankstorage" or no.name == tan) and no.param2 < 56 then
-					minetest.set_node(p.under,{name=tan,param2=no.param2+7})
-					minetest.get_meta(p.under):set_string("bucket",buk)
-				elseif default.defpos(p.above,"buildable_to") and not minetest.is_protected(p.above,n) then
-					minetest.set_node(p.above,{name=node_name})
-				else
-					return itemstack
-				end
-				itemstack:replace(ItemStack("default:bucket"))
-				return itemstack
-			end
-		end,
-	})
-	default.bucket[node_name] = buk
-
-	minetest.register_node(tan, {
-		description = "Tankstorage of ".. def.description,
-		drop = "default:tankstorage",
-		tiles={"default_glass_with_frame.png","default_glass.png"},
-		special_tiles={tex},
-		groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,tankstorage=2,not_in_creative_inventory=1,used_by_npc=1},
-		sounds = default.node_sound_glass_defaults(),
-		drawtype = "glasslike_framed",
-		sunlight_propagates = true,
-		paramtype = "light",
-		paramtype2 = "glasslikeliquidlevel",
-		light_source = def.light_source,
-		can_dig = function(pos, player)
-			return minetest.get_node(pos).param2 == 0
-		end
-	})
-
-end
-
-default.wieldlight=function(name,i,item)
-	local user = minetest.get_player_by_name(name)
-	if user then
-		local pos = user:get_pos()
-		pos.y = pos.y + 0.5
-		local n = minetest.get_node(pos)
-		if (n.name == "air" or n.name == "default:lightsource") and user:get_wield_index() == i and user:get_wielded_item():get_name() == item and (minetest.get_node_light(pos) or 0) < 11 then
-			minetest.set_node(pos,{name="default:lightsource"})
-			minetest.after(0.3, function(name,i,item)
-				default.wieldlight(name,i,item)
-			end,name,i,item)
-		end
-	end
-end
-
-default.punch_pos=function(pos,damage,even_items)
-	for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
-		local en = ob:get_luaentity()
-		if even_items or not (en and en.itemstring) then
-			default.punch(ob,ob,damage)
-		end
-	end
-end
-
-default.punch=function(target,puncher,damage)
-	if type(puncher)=="table" and puncher.object then puncher=puncher.object end
+examobs.punch=function(puncher,target,damage)
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}},{x=0,y=0,z=0})
 end
 
-default.take_item=function(clicker)
-	local i = clicker:get_wield_index()
-	local item = clicker:get_inventory():get_stack("main",i)
-	item:take_item()
-	clicker:get_inventory():set_stack("main",i,item)
+examobs.showtext=function(self,text,color)
+	self.delstatus=math.random(0,1000) 
+	local del=self.delstatus
+	color=color or "ff0000"
+	self.object:set_properties({nametag=text,nametag_color="#" ..  color})
+	minetest.after(1.5, function(self,del)
+		if self and self.object and self.delstatus==del then
+			self.delstatus = nil
+			if self.storage.npcname then
+				self.object:set_properties({nametag=self.storage.npcname,nametag_color="#FFF"})
+			else
+				self.object:set_properties({nametag="",nametag_color=""})
+			end
+		end
+	end, self,del)
+	return self
 end
 
-default.dye_texturing=function(i,def)
-	def = def or {}
-	def.opacity = def.opacity or 150
-	def.image_w = def.image_w or 16
-	def.image_h = def.image_h or 16
-	def.palette_w = def.palette_w or 7
-	def.palette = def.palette or "default_palette.png"
-	i = i or 1
-	local x = 1
-	local y = 0
-	local gx = def.palette_w*-1
-	for ii=0,i do
-		x = x - 1
-		if x == gx then
-			x = 0
-			y = y -1
+examobs.dropall=function(self)
+	local pos = self:pos()
+	if not pos then
+		return
+	end
+	for i,v in pairs(self.inv) do
+		if minetest.registered_items[i] then
+			local e = minetest.add_item(pos,i .. " " .. v)
+			if e then
+				e:set_velocity({
+					x=math.random(-1.5,1.5),
+					y=math.random(0.5,1),
+					z=math.random(-1.5,1.5)
+				})
+			end
+		end
+		self.inv[i] = nil
+	end
+	if self.coin > 0 then
+		minetest.add_item(pos,"player_style:coin "..self.coin):set_velocity({
+			x=math.random(-1.5,1.5),
+			y=math.random(0.5,1),
+			z=math.random(-1.5,1.5)
+		})
+		self.coin = 0
+	end
+end
+
+examobs.dying=function(self,set)
+	if self.lay_on_death ~= 1 then return end
+	if set==1 then
+		examobs.anim(self,"lay")
+		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.object:set_velocity({x=0,y=-3,z =0})
+		if self.hp<=self.hp_max*-1 then
+			examobs.dying(self,2)
+			return self
+		end
+		self.dying={step=self.hp_max+self.hp,try=self.hp+self.hp_max/2}
+		self.hp=self.hp_max/2
+		self.object:set_hp(self.hp)
+	elseif set==2 then
+		minetest.after(0.1, function(self)
+			if self.object:get_luaentity() then
+				examobs.anim(self,"lay")
+			end
+		end, self)
+		self.object:set_properties({nametag=""})
+		self.type=""
+		self.hp=self.hp_max
+		self.object:set_hp(self.hp)
+		self.dying=nil
+		self.dead=20
+		self.death(self)
+		examobs.dropall(self)
+	elseif set==3 and (self.dying or self.dead) then
+		self.dying={step=0,try=self.hp_max*2}
+		self.dead=nil
+	end
+
+	if self.dying then
+		local v = self.object:get_velocity() or {x=0,y=0,z=0}
+		self.object:set_velocity({x=0,y=v.y,z=0})
+		if self.hp<=self.hp_max*-1 then
+			examobs.dying(self,2)
+			return self
+		end
+		self.dying.try=self.dying.try+math.random(-1,1)
+		self.dying.step=self.dying.step-1
+		examobs.showtext(self,(self.dying.try+self.hp) .."/".. self.hp_max,"ff5500")
+		self.on_dying(self)
+
+		if self.dying.step<1 and self.dying.try+self.hp>=self.hp_max then
+			local h=math.random(1,5)
+			self.dying=nil
+			self.hp=h
+			self.object:set_hp(h)
+			examobs.stand(self)
+			examobs.showtext(self,"")
+			return self
+		elseif self.dying.step<1 and self.dying.try+self.hp<self.hp_max then
+			examobs.dying(self,2)
+			return self
+		end
+		return self
+	elseif self.dead then
+		self.dead=self.dead-1
+		self:achievements()
+		if self.dead<0 then
+			examobs.dropall(self)
+			self.object:remove()
+		end
+		return self
+	end
+end
+
+examobs.generate_npc_house=function(pos)
+	local s = math.random(2,7)
+	local h = math.random(2,4)
+	local sa = 0
+	local n=0
+	local wood
+
+	s = math.floor(s/2) ~= s/2 and s or s + 1
+
+-- if param2 ~=0 return
+--on_place param2 = 1
+
+	for x=-s,s do
+	for z=-s,s do
+	for y=-1,h do
+		sa = sa +1
+		local p = apos(pos,x,y,z)
+		if walkable(p) then
+			n=n+1
 		end
 	end
-	return "([combine:1x1:"..x..","..y.."="..def.palette.."^[opacity:"..def.opacity.."^[resize:"..def.image_w.."x"..def.image_h..")"
-end
-
-default.dye_coloring=function(pos, node, player, pointed_thing)
-	if not minetest.is_protected(pos,player:get_player_name()) and player:get_wielded_item():get_name() == "default:dye" then
-		local color = player:get_wielded_item():to_table()
-		default.take_item(player)
-		if not color.meta.palette_index then
-			return
-		end
-		minetest.swap_node(pos,{name=node.name,param2=color.meta.palette_index or 1})
 	end
-end
+	end
 
-default.treasure=function(def)
-	local items={}
-	def.node = def.node or "default:chest"
-	def.level = def.level or 1
+	if n > sa/2 or n < sa/10 then
+		return
+	end
 
-	if def.levels then
-		for i,v in pairs(minetest.registered_items) do
-			if v.groups and v.groups.treasure then
-				for i1,v2 in pairs(def.levels) do
-					if v.groups.treasure == v2 then
-						table.insert(items,i)
+	for i,v in pairs(minetest.find_nodes_in_area(apos(pos,-20,-1,-20),apos(pos,20,5,20),"group:tree")) do
+		local it = minetest.get_craft_result({method = "normal",width = 1, items = {minetest.get_node(v).name}})
+		if it.item:get_count() > 0 then
+			wood = it.item:get_name()
+			break
+		end
+	end
+
+	local door_item = minetest.get_craft_result({method = "normal",width = 3, items = {wood,wood,"",wood,wood,"",wood,wood,""}})
+	local door_wood = door_item.item:get_count() > 0 and door_item.item:get_name() or nil
+	local wall = "default:cobble"
+	local window = "default:glass"
+	local wint = math.random(0,3)
+	local door_rnd = math.random(1,2)
+	local door = {-s,s}
+	door = door[math.random(1,2)]
+
+	local furn_floor = {}
+	local furn_wall = {}
+	local items = {}
+	local items2 = {}
+	local mirror = {[0]=2,[1]=3,[2]=0,[3]=1}
+	local wallmounted=function(x,z,s)
+		if z==-s+1 then
+			return 5
+		elseif z==s-1 then
+			return 4
+		elseif x==-s+1 then
+			return 3
+		elseif x==s-1 then
+			return 2
+		else
+			return 0
+		end
+	end
+
+	for i,v in pairs(minetest.registered_items) do
+		if v.groups then
+			if v.groups.treasure == 1 then
+				table.insert(items,i)
+			elseif v.groups.treasure == 2 then
+				table.insert(items2,i)
+			end
+		end
+	end
+
+	for i,v in pairs(minetest.registered_nodes) do
+		if v.groups and v.groups.used_by_npc then
+			if v.groups.used_by_npc == 1 then
+				table.insert(furn_floor,i)
+			elseif v.groups.used_by_npc == 2 then
+				table.insert(furn_wall,i)
+			end
+		end
+	end
+
+	for x=-s,s do
+	for z=-s,s do
+	for y=-1,h do
+		local nset
+		local p
+		local plpos = apos(pos,x,y,z)
+		if y >-1 and y< h and ((x==-s+1 or x==s-1 or z==-s+1 or z==s-1)) and x ~= 0 and z ~= 0 and math.abs(x)~=s and math.abs(z)~=s and (y==0 and math.random(1,s) == 1 or math.random(1,s*h*2) == 1) then
+			if y==0 then
+				nset = furn_floor[math.random(1,#furn_floor)]
+			else
+					nset = furn_wall[math.random(1,#furn_wall)]
+			end
+
+			if default.def(nset).paramtype2 == "wallmounted" then
+				p = wallmounted(x,z,s)
+			elseif x == s-1 then
+				p = 1
+			elseif x == -s+1 then
+				p = 3
+			elseif z == s-1 then
+				p = 0
+			elseif x == -s+1 then
+				p = 2
+			end
+			p = minetest.get_item_group(nset,"bed") > 0 and mirror[p] or p
+			p = minetest.get_item_group(nset,"tankstorage") > 0 and 0 or p
+		elseif (y==0 or y== 1) and ((wint == 2 and x == 0 and (z==door)) or (wint == 1 and z == 0 and x == door)
+		or ((wint == 0 or wint == 3) and ((door_rnd == 1 and z == 0 and x == door) or (door_rnd == 2 and x == 0 and z == door)))) then
+--door
+			if y == 0 then
+				if wint == 1 or wint ~= 2 and door_rnd == 1 then
+					p = {1,3}
+					p = p[math.random(1,2)]
+				elseif wint == 2 or wint ~= 1 and door_rnd == 2 then
+					p = {0,2}
+					p = p[math.random(1,2)]
+				end
+				nset = door_wood
+			end
+
+		elseif y > 0 and y < h/1.5 and (((wint == 0 or wint == 1) and (z == -s or z == s) and (x > -s/2 and x < s/2)) or ((wint == 0 or wint == 2) and (x == -s or x == s) and (z > -s/2 and z < s/2))) then
+-- window
+			nset = window 
+		elseif y ==- 1 or y == h or x == -s or x == s or z == -s or z == s then
+-- wall & floor & ceiling
+			nset = wood or wall
+		end
+
+		minetest.set_node(plpos,{name=nset or "air",param2 = p or 0})
+
+		if nset and nset ~= wood and nset ~= wall and minetest.get_meta(plpos):get_inventory():get_size("main") > 0 then
+--items
+			local m = minetest.get_meta(plpos):get_inventory()
+			local size = m:get_size("main")
+
+
+			if nset == "examobs:woodbox" then
+				for i=1,size do
+					if math.random(1,math.floor(size/2)) == 1 then
+						m:set_stack("main",i,items2[math.random(1,size)].." ".. math.random(1,10))
+					end
+				end
+			else
+				for i=1,size do
+					if math.random(1,math.floor(size/2)) == 1 then
+						m:set_stack("main",i,items[math.random(1,size)].." ".. math.random(1,10))
 					end
 				end
 			end
 		end
-	elseif def.level > 1 then
-		for i,v in pairs(minetest.registered_items) do
-			if v.groups and v.groups.treasure and v.groups.treasure == def.level then
-				table.insert(items,i)
-			end
-		end
-	elseif not def.items then
-		for i,v in pairs(minetest.registered_items) do
-			if v.groups and v.groups.treasure and v.groups.treasure == 1 then
-				table.insert(items,i)
-			end
-		end
-	else
-		items = def.items
 	end
-	if type(def.node) == "table" then
-		minetest.set_node(def.pos,def.node)
-	else
-		minetest.set_node(def.pos,{name=def.node})
 	end
-	local m = minetest.get_meta(def.pos):get_inventory()
-	local size = m:get_size("main")
-	local its = #items
-
-	for i=1,size do
-		if math.random(1,def.chance or math.floor(size/4)) == 1 then
-			m:set_stack(def.list or "main",i,items[math.random(1,its)].." ".. math.random(1,10))
-		elseif def.level > 1 then
-			m:set_stack(def.list or "main",i,"player_style:coin ".. math.random(1,10))
-		end
 	end
+	minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity().storage.npc_generated = true
 end
+
+minetest.register_ore({
+	ore_type = "scatter",
+	ore = "examobs:npc_house_spawner",
+	wherein = "group:spreading_dirt_type",
+	clust_scarcity = 30 * 30 * 30,
+	clust_num_ores = 1,
+	clust_size	 = 1,
+	y_min= 1,
+	y_max = 200,
+})
+
+minetest.register_node("examobs:npc_house_spawner", {
+	drawtype = "airlike",
+	groups = {dig_immediate=3,not_in_creative_inventory=1,not_in_craftguide=1},
+})
+
+minetest.register_lbm({
+	name="examobs:npchouse_spawner",
+	nodenames={"examobs:npc_house_spawner"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		minetest.remove_node(pos)
+		examobs.generate_npc_house(pos)
+	end
+})
