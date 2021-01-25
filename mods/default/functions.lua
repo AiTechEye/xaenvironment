@@ -5,7 +5,7 @@ default.pickupable=function(self,player)
 	if po then
 		if po:get_attach() then
 			po:set_detach()
-			po:set_properties({physical=false})
+			po:set_properties({physical=true})
 		end
 		default.pickup_object[name] = nil
 	end
