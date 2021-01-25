@@ -13,6 +13,7 @@ examobs.register_mob({
 	walk_speed = 1,
 	run_speed = 4,
 	spawn_chance = 50,
+	pickupable = true,
 	animation = {
 		stand={x=1,y=10,speed=0,loop=false},
 		walk={x=15,y=25,speed=30},
@@ -512,6 +513,7 @@ examobs.register_mob({
 	inv={["examobs:flesh_piece"]=1},
 	collisionbox={-0.2,-0.1,-0.2,0.2,0.1,0.2},
 	spawn_on={"group:wood","group:stone","group:spreading_dirt_type"},
+	pickupable = true,
 	on_spawn=function(self)
 		local a = {"examobs_wolf.png","examobs_golden_wolf.png","examobs_arctic_wolf.png","examobs_bear.png","examobs_blackbear.png"}
 		self.storage.skin = a[math.random(1,5)] .. "^[combine:0x0:-15,-15=examobs_skin.png"
@@ -1772,6 +1774,7 @@ examobs.register_mob({
 	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
+	pickupable = true,
 	animation = {
 		stand = {x=0,y=10,speed=0},
 		walk = {x=20,y=30},
@@ -2003,6 +2006,7 @@ examobs.register_mob({
 	inv={["examobs:chickenleg"]=1,["examobs:feather"]=1},
 	walk_speed=2,
 	run_speed=4,
+	pickupable = true,
 	animation = {
 		stand = {x=0,y=6,speed=0},
 		walk = {x=10,y=20,speed=20},
@@ -2089,6 +2093,7 @@ examobs.register_mob({
 })
 
 examobs.register_bird({
+	pickupable = true,
 	visual_size= {x=0.5,y=0.5,z=0.5},
 	collisionbox={-0.2,-0.13,-0.2,0.2,0.2,0.2},
 	coin = 1,
@@ -2111,6 +2116,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	pickupable = true,
 	name = "magpie",
 	coin = 1,
 	textures={"examobs_magpie.png"},
@@ -2156,6 +2162,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	pickupable = true,
 	name = "crow",
 	coin = 1,
 	aggressivity = -2,
@@ -2166,6 +2173,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	pickupable = true,
 	name = "gull",
 	coin = 1,
 	textures={"examobs_gull.png"},
@@ -2184,6 +2192,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	pickupable = true,
 	name = "coalcrow",
 	coin = 2,
 	aggressivity = 2,
@@ -2263,6 +2272,7 @@ examobs.register_bird({
 })
 
 examobs.register_fish({
+	pickupable = true,
 	color = true,
 	coin = 1,
 	on_spawn=function(self)
@@ -2298,6 +2308,7 @@ examobs.register_fish({
 })
 
 examobs.register_fish({
+	pickupable = true,
 	name = "perch",
 	coin = 1,
 	textures = {"examobs_perch.png"},

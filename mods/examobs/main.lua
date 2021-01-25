@@ -105,7 +105,7 @@ examobs.register_mob=function(def)
 	def.lifetime =			def.lifetime or			300
 	def.add_wear =			def.add_wear or			10000
 	def.coin = 			def.coin or			2
-
+	def.pickupable =			def.pickupable or			nil
 	def.animation =			def.animation == "default" and 
 	{
 		stand={x=1,y=39,speed=30},
@@ -193,6 +193,9 @@ examobs.register_mob=function(def)
 	def.on_step=examobs.on_step
 
 	def.on_rightclick=function(self, clicker)
+		if self.pickupable then
+			default.pickupable(self,clicker)
+		end
 		if self.fight or self.dead or self.dying then
 			return
 		elseif self.newspawned then
@@ -211,6 +214,9 @@ examobs.register_mob=function(def)
 		--		clicker:set_wielded_item(nil)
 		--	end
 		--end
+	end
+	def.on_detach=function(self,child)
+		self.is_floating = true
 	end
 	def.get_staticdata = function(self)
 		self.storage = self.storage or {}
