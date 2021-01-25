@@ -1813,14 +1813,8 @@ examobs.register_mob({
 		return false
 	end,
 	on_click=function(self,clicker)
-		if math.random(1,5) == 1 and not self.fight then
-			clicker:get_inventory():add_item("main","examobs:chicken_spawner")
-			self.folow = clicker
-			self.object:remove()
-		else
-			self.flee = clicker
-			examobs.known(self,clicker,"flee")
-		end
+		self.flee = clicker
+		examobs.known(self,clicker,"flee")
 	end,
 })
 
@@ -2036,10 +2030,6 @@ examobs.register_mob({
 				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
-			elseif math.random(1,5) == 1 and not self.fight then
-				clicker:get_inventory():add_item("main","examobs:duck_spawner")
-				self.folow = clicker
-				self.object:remove()
 			else
 				self.flee = clicker
 				examobs.known(self,clicker,"flee")
