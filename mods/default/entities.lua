@@ -7,6 +7,7 @@ local item = {
 		s2.just_spawned = self.just_spawned
 		return minetest.serialize(s2)
 	end,
+	on_rightclick=default.pickupable,
 	on_activate=function(self,staticdata,dtime_s)
 		builtin_item.on_activate(self,staticdata,dtime_s)
 		local pos = self.object:get_pos()
@@ -51,7 +52,8 @@ local item = {
 		builtin_item.on_punch(self,hitter)
 	end,
 	on_step = function(self,dtime,moveresult)
-		builtin_item.on_step(self,dtime,moveresult)
+		self.old_moveresult = moveresult or self.old_moveresult
+		builtin_item.on_step(self,dtime,moveresult or self.old_moveresult)
 		local pos = self.object:get_pos()
 		if not pos then
 			self.object:remove()
