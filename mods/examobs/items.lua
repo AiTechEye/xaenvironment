@@ -251,6 +251,7 @@ minetest.register_entity("examobs:fishing_string",{
 	physical = false,
 	visual = "cube",
 	pointable = false,
+	decoration = true,
 	textures={"examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png","examobs_wool.png"},
 	on_activate=function(self, staticdata)
 		for _, ob in pairs(minetest.get_objects_inside_radius(self.object:get_pos(), 1)) do
@@ -275,6 +276,7 @@ minetest.register_entity("examobs:fishing_string",{
 
 minetest.register_entity("examobs:fishing_float",{
 	physical = false,
+	decoration = true,
 	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1,},
 	visual = "cube",
 	visual_size={x=0.1,y=0.1,z=0.1},
@@ -481,6 +483,7 @@ minetest.register_tool("examobs:icecreamball", {
 
 minetest.register_entity("examobs:icecreamball",{
 	hp_max = 10,
+	decoration = true,
 	physical =false,
 	visual = "mesh",
 	mesh="examobs_icecreamball.b3d",
@@ -615,23 +618,17 @@ minetest.register_craftitem("examobs:torpedo",{
 	inventory_image = "examobs_torpedo.png",
 	wield_scale={x=1,y=1,z=0.5},
 	on_use=function(itemstack, user, pointed_thing)
-		local name = user:get_player_name()
 		local p1 = user:get_pos()
 		local d = user:get_look_dir()
-		local pointat = {x=p1.x+(d.x*2),y=p1.y+(d.y*2)+1.5,z=p1.z+(d.z*2)}
-		local p2 = {x=p1.x+(d.x*50),y=p1.y+1.5+(d.y*50)+1.5,z=p1.z+(d.z*50)}
-		for v in minetest.raycast(pointat,p2) do
-			if v.type == "node" then
-				return itemstack
-			elseif v.type == "object" then
-				local en = v.ref:get_luaentity()
-				if en and en.examob then
-					local e = minetest.add_entity(pointat,"examobs:torpedo")
-					e:get_luaentity().target = v.ref
-					itemstack:take_item()
-					return itemstack
-				end
-			end
+		local dir = {x=d.x*2,y=(d.y*2)+1.5,z=d.z*2}
+		local p = {x=p1.x+(d.x*2),y=p1.y+(d.y*2)+1.5,z=p1.z+(d.z*2)}
+		local pd = {x=d.x*50,y=d.y*50,z=d.z*50}
+		local hit = {}
+		for i=1,20 do
+			local e = minetest.add_entity({x=p1.x+(d.x*(i*1.1)),y=p1.y+(d.y*(i*1.1))+1.5,z=p1.z+(d.z*(i*1.1))},"examobs:torpedo_ray")
+			e:get_luaentity().user = user
+			e:get_luaentity().hit = hit
+			e:set_velocity(pd)
 		end
 	end
 })
@@ -642,6 +639,8 @@ minetest.register_entity("examobs:torpedo",{
 	visual_size={x=0.4,y=0.4,z=2},
 	pointable = false,
 	textures={"examobs:torpedo"},
+	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
+	physical=true,
 	on_activate=function(self, staticdata)
 		self.torpedo = math.random(1,9999)
 		self.object:set_acceleration({x=0,y=-10,z=0})
@@ -665,8 +664,8 @@ minetest.register_entity("examobs:torpedo",{
 			end,p)
 		end
 	end,
-	on_step=function(self,dtime)
-		if self.target then
+	on_step=function(self,dtime, moveresult)
+		if self.target and moveresult then
 			self.timer = (self.timer or 0) + dtime
 			local pos1 = self.object:get_pos()
 			local pos2 = self.target:get_pos()
@@ -684,7 +683,7 @@ minetest.register_entity("examobs:torpedo",{
 
 			if def.liquidtype == "none" then
 				local vy = self.object:get_velocity() or {x=0,y=0,z=0}
-				self.object:set_velocity({x=v.x*-1,y=vy.y,z=v.z*-1})
+				self.object:set_velocity({x=math.cos(y)*10,y=vy.y,z=math.sin(y)*10})
 				if self.splash then
 					self.splash = nil
 					self.object:set_acceleration({x=0,y=-10,z=0})
@@ -697,7 +696,7 @@ minetest.register_entity("examobs:torpedo",{
 					end
 				end
 				self.object:set_acceleration({x=0,y=0,z=0})
-				self.object:set_velocity(vector.multiply(v,-1))
+				self.object:set_velocity({x=math.cos(y)*10,y=-math.tan(z)*10,z=math.sin(y)*10})
 			end
 
 			if self.timer < 0.5 then
@@ -706,15 +705,58 @@ minetest.register_entity("examobs:torpedo",{
 				self:blow()
 				return self
 			end
-			for _, ob in pairs(minetest.get_objects_inside_radius(pos1,1)) do
-				local en = ob:get_luaentity()
-				if not (en and (en.torpedo == self.torpedo or en.name == "default:watersplash_ring")) then
-					self:blow()
-					return self
-				end
+
+			if moveresult.collides then
+				self:blow()
 			end
 		elseif not self.blowed then
 			self:blow()
 		end
 	end,
+})
+
+minetest.register_entity("examobs:torpedo_ray",{
+	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
+	visual_size={x=1,y=0.1,z=0.1},
+	visual = "cube",
+	physical=true,
+	textures={"default_stone.png^[colorize:#f00","default_stone.png^[colorize:#f00","default_stone.png^[colorize:#f00","default_stone.png^[colorize:#f00","default_stone.png^[colorize:#f00","default_stone.png^[colorize:#f00"},
+	static_save = false,
+	decoration = true,
+	pointable = false,
+	on_step=function(self, dtime, moveresult)
+		if self.hit and self.hit.hit then
+			self.object:remove()
+		elseif moveresult and moveresult.collides and self.hit then
+			for i,v in pairs(moveresult.collisions) do
+				if v.type == "object" and self.user and v.object ~= self.user and not default.is_decoration(v.object,true) then
+					if self.user:is_player() then
+						local inv = self.user:get_inventory()
+						if inv then
+							local item = inv:remove_item("main",ItemStack("examobs:torpedo"))
+							if item:get_count() == 0 then
+								break
+							end
+						end
+					end
+					self.hit.hit = true
+					local pos=self.user:get_pos()
+					local e = minetest.add_entity(pos,"examobs:torpedo")
+					e:get_luaentity().target = v.object
+					break
+				end
+			end
+			self.object:remove()
+		elseif not self.rot then
+			local pos1=self.object:get_pos()
+			local dir = self.user:get_look_dir()
+			local pos2={x=pos1.x+(dir.x*100),y=pos1.y+(dir.y*100),z=pos1.z+(dir.z*100)}
+			local v = {x=pos1.x-pos2.x, y=(pos1.y+1.4)-pos2.y, z=pos1.z-pos2.z}
+			local y = math.atan(v.z/v.x)
+			local z = math.atan(v.y/math.sqrt(v.x^2+v.z^2))
+			if pos1.x >= pos2.x then y = y+math.pi end
+			self.object:set_rotation({x=0,y=y,z=z})
+			self.rot = true
+		end
+	end
 })
