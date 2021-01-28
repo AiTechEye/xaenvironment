@@ -256,7 +256,6 @@ minetest.register_entity("default:arrow",{
 	on_step=function(self, dtime, moveresult)
 		self.timer=self.timer-dtime
 		local pos=self.object:get_pos()
-		local no=minetest.registered_nodes[minetest.get_node(pos).name]
 		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,self.oldpos or pos)
 		if not self.user or self.timer < 16 then
 			self:drop()
