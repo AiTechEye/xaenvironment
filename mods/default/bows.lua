@@ -209,8 +209,8 @@ minetest.register_entity("default:arrow",{
 	hp_max = 10,
 	visual="wielditem",
 	visual_size={x=0.20,y=0.20},
-	collisionbox = {0,0,0,0,0,0},
-	physical=false,
+	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
+	physical=true,
 	textures={"air"},
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		if not self.target then return self end
@@ -243,49 +243,43 @@ minetest.register_entity("default:arrow",{
 	end,
 	bow_arrow=true,
 	timer=20,
-	on_step=function(self, dtime)
+	drop=function(self)
+		if not self.removed then
+			local pos=self.object:get_pos()
+			local e = minetest.add_item(pos,self.name)
+			e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
+			self.on_dropitem(e)
+			self.removed = true
+			self.object:remove()
+		end
+	end,
+	on_step=function(self, dtime, moveresult)
 		self.timer=self.timer-dtime
 		local pos=self.object:get_pos()
 		local no=minetest.registered_nodes[minetest.get_node(pos).name]
-		if (self.user==nil or self.timer<16 ) or no and no.walkable then
-			minetest.check_for_falling(pos)
-			bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
-			minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
-			if not self.removed then
-				local e = minetest.add_item(self.oldpos or pos,self.name)
-				e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
-				self.on_dropitem(e)
-				self.object:remove()
-			end
-			return self
-		end
 		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,self.oldpos or pos)
-		for i, ob in pairs(minetest.get_objects_inside_radius(pos, 3)) do
-			if self:is_hit(pos,ob) then
-				bows.on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
-				bows.registed_arrows[self.name].on_hit_object(self,ob,self.dmg,self.user,self.oldpos or pos)
-				minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
-				if not self.removed then
-					local e = minetest.add_item(self.oldpos or pos,self.name .." 1")
-					e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
-					self.on_dropitem(e)
-					self.object:remove()
+		if not self.user or self.timer < 16 then
+			self:drop()
+			return
+		elseif moveresult and moveresult.collides then
+			for i,v in pairs(moveresult.collisions) do
+				if v.type == "node" then
+					minetest.check_for_falling(pos)
+					bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
+					minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+					self:drop()
+					return
+				elseif v.type == "object" and v.object ~= self.object and not default.is_decoration(v.object,true) then
+					bows.on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
+					bows.registed_arrows[self.name].on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
+					minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+					self:drop()
+					return
 				end
-				return self
 			end
-
 		end
 		self.oldpos = vector.new(pos)
 		return self
-	end,
-	is_hit=function(self,p,ob)
-		local en  = ob:get_luaentity()
-		if self.dir and ((bows.pvp and ob:is_player() and ob:get_player_name() ~= self.user:get_player_name()) or (en and en.physical and (not en.bow_arrow and en.name ~= "__builtin:item" and self.user.examob ~= en.examob))) then
-			local c = ob:get_properties().collisionbox
-			local o = ob:get_pos()
-			local pp = {x=p.x+self.dir.x,y=p.y+self.dir.y,z=p.z+self.dir.z}
-			return vector.distance(p,o) <= 1 or math.max(p.x,o.x+c[1],o.x+c[4])~=p.x and math.min(p.x,o.x+c[1],o.x+c[4])~=p.x and math.max(p.z,o.z+c[3],o.z+c[6])~=p.z and math.min(p.z,o.z+c[3],o.z+c[6])~=p.z and math.max(p.y,o.y+c[2],o.y+c[5])~=p.y and math.min(p.y,o.y+c[2],o.y+c[5])~=p.y or           math.max(pp.x,o.x+c[1],o.x+c[4])~=pp.x and math.min(pp.x,o.x+c[1],o.x+c[4])~=pp.x and math.max(pp.z,o.z+c[3],o.z+c[6])~=pp.z and math.min(pp.z,o.z+c[3],o.z+c[6])~=pp.z and math.max(pp.y,o.y+c[2],o.y+c[5])~=pp.y and math.min(pp.y,o.y+c[2],o.y+c[5])~=pp.y
-		end
 	end,
 })
 
