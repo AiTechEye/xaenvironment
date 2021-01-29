@@ -37,10 +37,10 @@ default={
 		offset=0,
 		scale=1,
 		spread={x=200,y=200,z=200},
-		seeddiff=15,
+		seeddiff=25,
 		octaves=3,
 		persist=0.6,
-		lacunarity=2,
+		lacunarity=1,
 		flags="eased"
 	},
 	water_land_map={

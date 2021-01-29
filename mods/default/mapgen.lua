@@ -532,7 +532,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local id=area:index(minp.x,y,z)
 		for x=minp.x,maxp.x do
 			local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
-			if data[id] == air and  den > 0.7 then
+			if data[id] == air and y >= height-depth and y <= height+depth and den > 0.7 then
 				data[id] = cloud
 			end
 			cindx=cindx+1
