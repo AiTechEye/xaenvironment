@@ -23,15 +23,25 @@ default={
 		lacunarity=2,
 		flags="eased",
 	},
+	crack_map={
+		offset=0,
+		scale=1,
+		spread={x=500,y=100,z=500},
+		seeddiff=15,
+		octaves=5,
+		persist=1.6,
+		lacunarity=1,
+		flags="eased",
+	},
 	deepocean_map={
 		offset=0,
 		scale=1,
 		spread={x=200,y=200,z=200},
-		seeddiff=25,
+		seeddiff=15,
 		octaves=3,
 		persist=0.6,
-		lacunarity=1,
-		flags="eased",
+		lacunarity=2,
+		flags="eased"
 	},
 	water_land_map={
 		offset=0,

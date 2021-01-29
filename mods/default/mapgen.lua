@@ -321,6 +321,46 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 --||||||||||||||||
 
 minetest.register_on_generated(function(minp, maxp, seed)
+
+	if minp.y> -12000 and maxp.y< 50 then
+-- ground cracks
+		local height = 0
+		local lenth = maxp.x-minp.x+1
+		local cindx = 1
+		default.crack_perlin_map = default.crack_perlin_map or minetest.get_perlin_map(default.crack_map,{x=lenth,y=lenth,z=lenth})
+		local map = default.crack_perlin_map:get_3d_map_flat(minp)
+		local air = minetest.get_content_id("air")
+		local water= minetest.get_content_id("default:salt_water_source")
+		local floor = minp.y < 0 and maxp.y > 0 and minetest.get_content_id("default:sand") or maxp.y < 0 and minetest.get_content_id("default:stone_spike") or air
+
+		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vm:get_data()
+
+		for z=minp.z,maxp.z do
+		local id=area:index(minp.x,height,z)
+		for x=minp.x,maxp.x do
+			local d = math.abs(map[cindx])
+			if d < 0.1 then
+				local d2 = minp.y < 0 and math.ceil(d*100) or 0
+				for i=maxp.y,minp.y+d2,-1 do
+					local y = id+(i*area.ystride)
+					if data[y] ~= water then
+						data[y] = air
+					end
+				end
+				if data[id+(minp.y+d2-1)*area.ystride] ~= air then
+					data[id+(minp.y+d2)*area.ystride] = floor
+				end
+			end
+			cindx=cindx+1
+			id=id+1
+		end
+		end
+		vm:set_data(data)
+		vm:write_to_map()
+	end
+
 	if minp.y> -50 and maxp.y< 50 then
 --waterland
 		local depth = 10
@@ -387,6 +427,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		vm:set_data(data)
 		vm:write_to_map()
 	end
+
 
 	if minp.y< 0 and maxp.y> 0 then
 -- deep ocean
@@ -469,7 +510,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		vm:write_to_map()
 	end
 
-
 	if minp.y> 200 and maxp.y< 300 then
 --cloudland
 		local depth = 18
@@ -492,7 +532,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local id=area:index(minp.x,y,z)
 		for x=minp.x,maxp.x do
 			local den = math.abs(map[cindx]) - math.abs(height-y)/(depth*2) or 0
-			if data[id] == air and y >= height-depth and y <= height+depth and den > 0.7 then
+			if data[id] == air and  den > 0.7 then
 				data[id] = cloud
 			end
 			cindx=cindx+1
