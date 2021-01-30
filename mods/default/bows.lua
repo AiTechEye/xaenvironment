@@ -235,7 +235,7 @@ minetest.register_entity("default:arrow",{
 	drop=function(self)
 		if not self.removed then
 			local pos=self.object:get_pos()
-			local e = minetest.add_item(pos,self.name)
+			local e = minetest.add_item({x=pos.x, y=math.floor(pos.y+0.5), z=pos.z},self.name)
 			e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
 			self.on_dropitem(e)
 			self.removed = true

@@ -125,15 +125,7 @@ minetest.register_tool(":", {
 			if puo then
 				local pos = user:get_pos()
 				local dir = user:get_look_dir()
-				local en = puo:get_luaentity()
-				if en then
-					if en.name == "__builtin:item" then
-						en.physical_state = false
-						en:enable_physics()
-					else
-						puo:set_properties({physical=true})
-					end
-				end
+				puo:set_properties({physical=true})
 				puo:set_detach()
 				puo:set_pos({x=pos.x+dir.x,y=pos.y+1.5+dir.y,z=pos.z+dir.z})
 				default.pickup_object[name] = nil

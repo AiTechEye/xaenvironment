@@ -51,8 +51,13 @@ local item = {
 		end
 		builtin_item.on_punch(self,hitter)
 	end,
+	on_detach = function(self,parent)
+		self.physical_state = false
+		self:enable_physics()
+	end,
 	on_step = function(self,dtime,moveresult)
-		if moveresult then
+
+		if not self.object:get_attach() then
 			builtin_item.on_step(self,dtime,moveresult)
 		end
 		
