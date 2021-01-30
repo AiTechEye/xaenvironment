@@ -153,12 +153,6 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 	end
 	for i=0,shots-1,1 do
 		minetest.after(0.05*i, function(level,user,meta)
-			bows.tmp = {}
-			bows.tmp.arrow = meta.arrow
-			bows.tmp.user = user
-			bows.tmp.name=meta.arrow
-			bows.tmp.shots=shots
-
 			local pos = user:get_pos()
 			local dir = user:get_look_dir()
 
@@ -166,16 +160,21 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 			local y=math.random(-1,1)*0.1
 			local z=math.random(-1,1)*0.1
 
-			local e=minetest.add_entity(
+			local e = minetest.add_entity(
 				{x=pos.x+x,
 				y=pos.y+((user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.5 or 1.5)+y,
 				z=pos.z+z
 			}, "default:arrow")
+			local self = e:get_luaentity()
 			e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
 			e:set_acceleration({x=num(dir.x*-3), y=-10, z=num(dir.z*-3)})
 			e:set_yaw(user:get_look_horizontal()-math.pi/2)
-			e:get_luaentity().on_dropitem=on_dropitem or function() end
-			e:get_luaentity().dir ={x=num(dir.x/2),y=num(dir.y/2),z=num(dir.z/2),}
+			e:set_properties({textures={meta.arrow}})
+			self.on_dropitem=on_dropitem or function() end
+			self.dir ={x=num(dir.x/2),y=num(dir.y/2),z=num(dir.z/2)}
+			self.arrow = meta.arrow
+			self.user = user
+			self.name=meta.arrow
 			minetest.sound_play("default_bow_shoot", {pos=pos})
 		end,level,user,meta)
 	end
@@ -209,9 +208,10 @@ minetest.register_entity("default:arrow",{
 	hp_max = 10,
 	visual="wielditem",
 	visual_size={x=0.20,y=0.20},
-	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
+	collisionbox = {-0.01,-0.01,-0.01,0.01,0.01,0.01},
 	physical=true,
 	textures={"air"},
+	static_save = false,
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		if not self.target then return self end
 		if not self.hp then self.hp=self.object:get_hp() end
@@ -228,18 +228,6 @@ minetest.register_entity("default:arrow",{
 			bows.arrow_remove(self)
 		end
 		return self
-	end,
-	on_activate = function(self, staticdata)
-		if bows.tmp and bows.tmp.arrow ~= nil then
-			self.arrow=bows.tmp.arrow
-			self.user=bows.tmp.user
-			self.name=bows.tmp.name
-			self.dmg=bows.registed_arrows[self.name].damage
-			bows.tmp=nil
-			self.object:set_properties({textures={self.arrow}})
-		else
-			self.object:remove()
-		end
 	end,
 	bow_arrow=true,
 	timer=20,
@@ -268,12 +256,15 @@ minetest.register_entity("default:arrow",{
 					minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 					self:drop()
 					return
-				elseif v.type == "object" and v.object ~= self.object and not default.is_decoration(v.object,true) then
-					bows.on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
-					bows.registed_arrows[self.name].on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
-					minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
-					self:drop()
-					return
+				elseif v.type == "object" and not default.is_decoration(v.object,true) then
+					local en = v.object:get_luaentity()
+					if not (en and en.user and en.user == self.user) then
+						bows.on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
+						bows.registed_arrows[self.name].on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
+						minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+						self:drop()
+						return
+					end
 				end
 			end
 		end
