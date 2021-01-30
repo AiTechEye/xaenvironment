@@ -53,6 +53,8 @@ player_style.skins = {
 		{name="Pull",skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
 		{name="Storm",skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
 		{name="Ninja",skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
+		{name="UjE",skin="player_style_uje.png",cost=1000,info="AiTechEye's first skin for minetest"},
+
 		{name="Quantum",skin="player_style_quantum_monster.png",cost=1000,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
 			on_step=function(self,player,dtime)
 				self.timer = self.timer + dtime
