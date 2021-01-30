@@ -119,8 +119,12 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_on_joinplayer(function(player)
+	player_style.set_profile(player,"default")
+end)
+
+player_style.set_profile=function(player,pr)
 	player:set_eye_offset({x=0,y=0,z=0},{x=5,y=0,z=5})
-	local profile=player_style.registered_profiles["default"]
+	local profile=player_style.registered_profiles[pr]
 	local name=player:get_player_name()
 
 	player_style.players[name] = {sounds={},dive_sound={dive=false,time=0}}
@@ -234,7 +238,7 @@ minetest.register_on_joinplayer(function(player)
 			minetest.chat_send_player(name,"Your skin where removed, your are reset to the default")
 		end
 	end
-end)
+end
 
 player_style.register_environment_sound=function(def)
 	if not def.node then

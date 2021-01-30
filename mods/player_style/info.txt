@@ -1,3 +1,15 @@
+#############################
+#############################
+player style
+#############################
+#############################
+
+	-- get, edit, add players data through
+local profile = player_style.players[player:get_player_name()]
+
+=============================
+	-- Controls:
+
 crawl		sneak
 run		special/aux1
 wallrun		run + jump into a wall (requires a few of attempts to success)
@@ -8,6 +20,7 @@ crawl to a edge to come higher
 =============================
 	-- register player style profile
 player_style.register_profile({
+	name = "profile name",
 	texture =	{"character.png"},
 	visual = "mesh",
 	visual_size = {x=1,y=1},
@@ -24,6 +37,10 @@ player_style.register_profile({
 	hotbar = "player_api_hotbar.png",
 	hotbar_selected = "player_api_hotbar_selected.png",
 })
+	-- and set the profile
+	-- if name is nil or "default" this will be default for everyone
+player_style.set_profile(player,"profile name")
+
 =============================
 	-- hurts until death or if the player drinks enough
 player_style.thirst_to_death(player)
