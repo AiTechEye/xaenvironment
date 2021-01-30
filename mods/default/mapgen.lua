@@ -322,12 +322,26 @@ default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",
 
 minetest.register_on_generated(function(minp, maxp, seed)
 
-	if minp.y> -12000 and maxp.y< 50 then
+	if minp.y> -30000 and maxp.y< 50 then
 -- ground cracks
+
 		local height = 0
 		local lenth = maxp.x-minp.x+1
 		local cindx = 1
-		default.crack_perlin_map = default.crack_perlin_map or minetest.get_perlin_map(default.crack_map,{x=lenth,y=lenth,z=lenth})
+
+		if not default.crack_perlin_map then
+			default.crack_perlin_map = minetest.get_perlin_map(default.crack_map,{x=lenth,y=lenth,z=lenth})
+
+			default.crack_dirt = {}
+			for i,v in pairs(minetest.registered_nodes) do
+				if v.groups and (v.groups.spreading_dirt_type or v.groups.sand or v.groups.snowy) then
+					default.crack_dirt[minetest.get_content_id(i)] = i
+				end
+			end
+		end
+
+
+
 		local map = default.crack_perlin_map:get_3d_map_flat(minp)
 		local air = minetest.get_content_id("air")
 		local water= minetest.get_content_id("default:salt_water_source")
@@ -336,17 +350,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local vm,min,max = minetest.get_mapgen_object("voxelmanip")
 		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 		local data = vm:get_data()
-
+local a=0
+local b=1
 		for z=minp.z,maxp.z do
 		local id=area:index(minp.x,height,z)
 		for x=minp.x,maxp.x do
 			local d = math.abs(map[cindx])
-			if d < 0.1 then
+			if d < 0.07 then
+b=d<b and d or b
+a=d>a and d or a
 				local d2 = minp.y < 0 and math.ceil(d*100) or 0
 				for i=maxp.y,minp.y+d2,-1 do
 					local y = id+(i*area.ystride)
-					if data[y] ~= water then
+					local n = data[y]
+					if n ~= water then
 						data[y] = air
+						if maxp.y > height and default.crack_dirt[n] then
+							floor = n
+						end
 					end
 				end
 				if data[id+(minp.y+d2-1)*area.ystride] ~= air then
@@ -357,6 +378,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			id=id+1
 		end
 		end
+print(a,b)
 		vm:set_data(data)
 		vm:write_to_map()
 	end
