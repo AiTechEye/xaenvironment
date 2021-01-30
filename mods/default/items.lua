@@ -27,24 +27,29 @@ minetest.register_tool("default:wrench", {
 })
 
 minetest.register_tool("default:telescopic", {
-	description = "Telescopic (zoom key, sneak)",
+	description = "Telescopic",
 	groups = {treasure=1,store=800},
 	inventory_image = "default_telescopic.png",
+	range = 0,
 	on_use=function(itemstack, user, pointed_thing)
 		local z = user:get_fov()
 		local key=user:get_player_control()
-
-		if z == 0 and key.sneak == false then
+		if z == 0 then
 			z = 30
-		elseif z == 0 and key.sneak then
+		elseif z <= 5 then
 			z = 5
-		elseif z <= 5 and key.sneak == false then
-			z = 0
-		elseif z <= 30 and key.sneak == false then
+		else
 			z = z - 5
-		elseif z >= 30 and key.sneak then
-			z = 0
-		elseif z >= 5 and key.sneak then
+		end
+		user:set_fov(z,false,0.1)
+		default.telescopic_check(user)
+	end,
+	on_secondary_use=function(itemstack,user,pointed_thing)
+		local z = user:get_fov()
+		local key=user:get_player_control()
+		if z >= 30 then
+			z = 30
+		else
 			z = z + 5
 		end
 		user:set_fov(z,false,0.1)
