@@ -10,7 +10,6 @@ bows={
 
 bows.register_arrow=function(name,def)
 	if name==nil or name=="" then return false end
-
 	def.damage = def.damage or 1
 	def.name = minetest.get_current_modname() ..":arrow_".. name
 	def.on_hit_object = def.on_hit_object or bows.nothing
@@ -143,6 +142,7 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 	local wear=bows.registed_bows[name].uses
 	local level=19 + bows.registed_bows[name].level
 	local shots=meta.shots or 1
+	local dmg = bows.registed_arrows[meta.arrow].damage
 
 	item.arrow=""
 	item.metadata=minetest.serialize(meta)
@@ -152,7 +152,7 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 		itemstack:add_wear(65535/wear)
 	end
 	for i=0,shots-1,1 do
-		minetest.after(0.05*i, function(level,user,meta)
+		minetest.after(0.05*i, function(level,user,meta,dmg)
 			local pos = user:get_pos()
 			local dir = user:get_look_dir()
 
@@ -174,9 +174,10 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 			self.dir ={x=num(dir.x/2),y=num(dir.y/2),z=num(dir.z/2)}
 			self.arrow = meta.arrow
 			self.user = user
+			self.dmg = dmg
 			self.name=meta.arrow
 			minetest.sound_play("default_bow_shoot", {pos=pos})
-		end,level,user,meta)
+		end,level,user,meta,dmg)
 	end
 
 	return itemstack
