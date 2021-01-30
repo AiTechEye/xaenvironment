@@ -352,3 +352,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		end
 	end
 end)
+
+minetest.register_on_newplayer(function(player)
+	player:get_meta():set_string("skin","character.png")
+end)
