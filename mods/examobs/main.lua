@@ -138,6 +138,7 @@ examobs.register_mob=function(def)
 	def.on_walk =			def.on_walk or			function() end
 	def.on_fly =			def.on_fly or			function() end
 	def.on_stand =			def.on_stand or			function() end
+	def.damage_texture_modifier =	def.damage_texture_modifier or	"^[colorize:#F005"
 
 	def.before_spawn =		def.before_spawn or		function(pos)
 		return examobs.get_interacts(pos) < 5

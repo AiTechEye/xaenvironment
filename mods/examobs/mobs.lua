@@ -2452,13 +2452,14 @@ examobs.register_mob({
 	dmg = 1,
 	run_speed = 4,
 	lay_on_death=0,
+	glow = 14,
 	animation = {
 		stand={x=136,y=156,speed=0},
 		walk={x=136,y=156,speed=30},
 		run={x=136,y=156,speed=60},
 		attack={x=136,y=156,speed=60},
 	},
-	spawn_chance = 800,
+	spawn_chance = 500,
 	spawn_on={"default:desert_sand","group:spreading_dirt_type","group:stone"},
 	step=function(self)
 		self.is_floating = true
@@ -2471,6 +2472,10 @@ examobs.register_mob({
 				z=pos2.z+(pos1.z-pos2.z)*-1
 			}
 			self.object:set_pos(p)
+		elseif walkable(self.object:get_pos()) then
+			self.object:set_velocity({x=0,y=1,z=0})
+		elseif self.object:get_velocity().y == 1 then
+			self.object:set_velocity({x=0,y=0,z=0})
 		end
 	end
 })
