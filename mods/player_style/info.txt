@@ -97,3 +97,10 @@ player_style.register_skin({
 	on_use_join=function(self,player)	called on both when a player joins and starts to use the skin, instead of make same function for on_join and on_use
 	on_step=function(self,player,dtime)	on global step
 })
+=============================
+	--Add to hat item to make it valid as a hat, properties used while attaching the item
+hat_properties={
+	pos = {x=0, y=6, z=0},		nil
+	rotation = {x=0,y=90,z=0},		nil
+	size = {x=0.5,y=0.5,z=0.5}		nil
+}

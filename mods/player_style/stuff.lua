@@ -186,3 +186,122 @@ minetest.register_craftitem("player_style:coin", {
 		return itemstack
 	end
 })
+minetest.register_craft({
+	output="player_style:top_hat",
+	recipe={
+		{"","materials:piece_of_cloth",""},
+		{"","exatec:tube_teleport",""},
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+	},
+})
+minetest.register_node("player_style:top_hat", {
+	description = "Top hat (use on blocks/chests ... teleports items/players/objects)",
+	tiles = {"default_coalblock.png^[colorize:#000000aa"},
+	groups = {dig_immediate = 3,flammable=3,hat=1},
+	hat_properties={pos={x=0, y=7, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
+	after_place_node=function(pos, placer, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		local meta2 = itemstack:get_meta()
+		local pos2 = meta2:get_string("pos2")
+		meta:set_string("pos1",meta2:get_string("pos1"))
+		meta:set_string("pos2",pos2)
+		meta:set_string("description",meta2:get_string("description"))
+		if pos2 ~= "" then
+			minetest.swap_node(pos,{name="player_style:top_hat_upside_down"})
+			minetest.get_node_timer(pos):start(0.2)
+		end
+	end,
+	on_use=function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		if pointed_thing.type ~= "node" or minetest.is_protected(pointed_thing.above,name) or minetest.is_protected(pointed_thing.under,name) then
+			return itemstack
+		end
+		local meta = itemstack:get_meta()
+		meta:set_string("pos2",minetest.pos_to_string(pointed_thing.above))
+		if exatec.test_input(pointed_thing.under,ItemStack("default:unknown"),pointed_thing.under,pointed_thing.under) then
+			meta:set_string("pos1",minetest.pos_to_string(pointed_thing.under))
+			local r = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+			local d = r and r.description and ("("..r.description..") ") or ""
+			meta:set_string("description","Top hat "..d.. minetest.pos_to_string(pointed_thing.under).." "..minetest.pos_to_string(pointed_thing.above))
+		else
+			meta:set_string("pos1","")
+			meta:set_string("description","Top hat ".. minetest.pos_to_string(pointed_thing.above))
+		end
+		return itemstack
+	end,
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.375, -0.5, -0.375, 0.375, -0.4375, 0.375},
+			{-0.22, -0.4375, -0.22, 0.22, 0.0625, 0.22}
+		}
+	}
+})
+
+minetest.register_node("player_style:top_hat_upside_down", {
+	description = "Top hat",
+	tiles = {"default_coalblock.png^[colorize:#000000aa"},
+	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1},
+	on_timer = function(pos, elapsed)
+		local pos2
+		for i, ob in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
+			if not default.is_decoration(ob,true) then
+				pos2 = pos2 or minetest.string_to_pos(minetest.get_meta(pos):get_string("pos2"))
+				ob:set_pos(pos2)
+			end
+		end
+		return true
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		if not npos then
+			return
+		end
+		local name = player:get_player_name()
+		local nmeta = minetest.get_meta(npos)
+		--:get_inventory():set_size("main", 32)
+		minetest.show_formspec(name, "default.tophat",
+			"size[8,8]" ..
+			"listcolors[#77777777;#777777aa;#000000ff]" ..
+			"list[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main]"
+		)
+	end,
+	on_item_stand_on=function(pos,object)
+		local meta = minetest.get_meta(pos)
+		local pos1 = minetest.string_to_pos(meta:get_string("pos1"))
+		local pos2 = minetest.string_to_pos(meta:get_string("pos2"))
+		local item = ItemStack(object:get_luaentity().itemstring)
+		if pos1 and exatec.test_input(pos1,item,pos1,pos1) then
+			exatec.input(pos1,item,pos1,pos1)
+			object:remove()
+		elseif pos2 then
+			object:set_pos(pos2)
+		end
+	end,
+	on_punch=function(pos, node, puncher,pounted_thing)
+		if minetest.is_protected(pos,puncher:get_player_name()) then
+			return itemstack
+		end
+		local meta2 = minetest.get_meta(pos)
+		local itemstack = ItemStack("player_style:top_hat")
+		local meta = itemstack:get_meta()
+		meta:set_string("pos1",meta2:get_string("pos1"))
+		meta:set_string("pos2",meta2:get_string("pos2"))
+		meta:set_string("description",meta2:get_string("description"))
+		puncher:get_inventory():add_item("main",itemstack)
+		minetest.remove_node(pos)
+	end,
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.375, 0, -0.375, 0.375, -0.0375, 0.375},
+			{-0.22, -0.0375, -0.22, 0.22, -0.5, 0.22}
+		}
+	}
+})

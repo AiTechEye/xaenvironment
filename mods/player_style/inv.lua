@@ -54,11 +54,10 @@ player_style.inventory=function(player)
 	player_style.players[name].inv = player_style.players[name].inv or {}
 	local invp = player_style.players[name].inv
 
-
 --detached inventory (backpack)
 
-
 	if not invp.backpack then
+-- backpack
 		invp.backpackslot = minetest.create_detached_inventory("backpackslot", {
 			allow_put = function(inv, listname, index, stack, player)
 				return minetest.get_item_group(stack:get_name(),"backpack") > 0 and stack:get_count() or 0
@@ -118,6 +117,43 @@ player_style.inventory=function(player)
 			list[i]=ItemStack(v)
 		end
 		invp.backpack:set_list("main", list)
+
+--hat
+
+		invp.hat = minetest.create_detached_inventory("hat", {
+			allow_put = function(inv, listname, index, stack, player)
+				return minetest.get_item_group(stack:get_name(),"hat") > 0 and stack:get_count() or 0
+			end,
+			on_put = function(inv, listname, index, stack, player)
+				player:get_meta():set_string("hat",minetest.serialize(stack:to_table()))
+				local def = minetest.registered_items[stack:get_name()]
+				if not invp.hat_object and def and def.hat_properties then
+					invp.hat_object = minetest.add_entity(player:get_pos(),"default:wielditem")
+					invp.hat_object:set_attach(player, "head",def.hat_properties.pos or {x=0, y=6, z=0}, def.hat_properties.rotation or {x=0,y=90,z=0})
+					invp.hat_object:set_properties({textures={stack:get_name()},visual_size = def.hat_properties.size or {x=0.5,y=0.5,z=0.5}})
+				end
+			end,
+			on_take = function(inv, listname, index, stack, player)
+				if invp.hat_object then
+					invp.hat_object:remove()
+					invp.hat_object = nil
+				end
+				player:get_meta():set_string("hat","")
+			end
+		})
+		invp.hat:set_size("main",1)
+		local item = ItemStack(minetest.deserialize(player:get_meta():get_string("hat") or ""))
+		invp.hat:set_stack("main",1,item or {})
+		local def = minetest.registered_items[item:get_name()]
+
+		if invp.hat:is_empty("main") == false and def and def.hat_properties then
+			minetest.after(0.1,function(invp,player)
+				invp.hat_object = minetest.add_entity(player:get_pos(),"default:wielditem")
+				invp.hat_object:set_attach(player, "head",def.hat_properties.pos or {x=0, y=6, z=0}, def.hat_properties.rotation or {x=0,y=90,z=0})
+				invp.hat_object:set_properties({textures={item:get_name()},visual_size = def.hat_properties.size or {x=0.5,y=0.5,z=0.5}})
+			end,invp,player)
+		end
+
 	end
 
 --inventory
@@ -138,6 +174,7 @@ player_style.inventory=function(player)
 			.."list[current_player;craft;4,0;3,3;]"
 			.."list[current_player;craftpreview;7,1;1,1;]"
 			.."list[detached:backpackslot;main;7,0;1,1;]"
+			.."list[detached:hat;main;3,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
 			..model
@@ -189,7 +226,13 @@ player_style.inventory=function(player)
 			.."list[current_player;main;0,3;8,4;]"
 			.."list[current_player;craft;4,0;3,3;]"
 			.."list[current_player;craftpreview;7,1;1,1;]"
+
+
+			.."item_image[7,0;1,1;player_style:backpack]"
+			.."item_image[3,0;1,1;player_style:top_hat]"
+
 			.."list[detached:backpackslot;main;7,0;1,1;]"
+			.."list[detached:hat;main;3,0;1,1;]"
 			.."listring[current_player;main]"
 			.."listring[current_player;craft]"
 
