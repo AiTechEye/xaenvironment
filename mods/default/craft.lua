@@ -5,6 +5,14 @@ minetest.register_craft({
 --||||||||||||||||
 -- ======================= Tools
 --||||||||||||||||
+minetest.register_craft({
+	output="default:top_hat",
+	recipe={
+		{"","materials:piece_of_cloth",""},
+		{"","exatec:tube_teleport",""},
+		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
+	},
+})
 
 minetest.register_craft({
 	output="default:knuckles",

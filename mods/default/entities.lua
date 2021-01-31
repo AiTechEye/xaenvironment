@@ -54,10 +54,26 @@ local item = {
 	on_detach = function(self,parent)
 		self.physical_state = false
 		self:enable_physics()
+		self.nodetriggerd = nil
 	end,
 	on_step = function(self,dtime,moveresult)
-
 		if not self.object:get_attach() then
+			if not self.nodetriggerd and moveresult.touching_ground then
+				self.nodetriggerd = true
+				for i,v in pairs(moveresult.collisions) do
+					if v.type == "node" then
+						local def = default.def(minetest.get_node(v.node_pos).name)
+						if def.on_item_stand_on then
+							def.on_item_stand_on(v.node_pos,self.object)
+							if not self.object:get_luaentity() then
+								return
+							else
+								break
+							end
+						end
+					end
+				end
+			end
 			builtin_item.on_step(self,dtime,moveresult)
 		end
 		

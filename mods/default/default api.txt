@@ -1,5 +1,15 @@
 
 ======================
+==== methods for minetest.register_node
+======================
+
+	-- called when a item lands on the node
+on_item_stand_on=function(pos,object)
+
+
+
+
+======================
 ==== default.register_chest(def)
 ======================
 
