@@ -58,7 +58,7 @@ local item = {
 	end,
 	on_step = function(self,dtime,moveresult)
 		if not self.object:get_attach() then
-			if not self.nodetriggerd and moveresult.touching_ground then
+			if not self.nodetriggerd and moveresult and moveresult.touching_ground then
 				self.nodetriggerd = true
 				for i,v in pairs(moveresult.collisions) do
 					if v.type == "node" then
