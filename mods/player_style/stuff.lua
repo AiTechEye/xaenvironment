@@ -197,7 +197,7 @@ minetest.register_craft({
 minetest.register_node("player_style:top_hat", {
 	description = "Top hat (use on blocks/chests ... teleports items/players/objects)",
 	tiles = {"default_coalblock.png^[colorize:#000000aa"},
-	groups = {dig_immediate = 3,flammable=3,hat=1},
+	groups = {dig_immediate = 3,flammable=3,hat=1,fall_damage_add_percent=-100},
 	hat_properties={pos={x=0, y=7, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
 	after_place_node=function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
@@ -242,12 +242,13 @@ minetest.register_node("player_style:top_hat", {
 minetest.register_node("player_style:top_hat_upside_down", {
 	description = "Top hat",
 	tiles = {"default_coalblock.png^[colorize:#000000aa"},
-	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1},
+	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1,fall_damage_add_percent=-100},
 	on_timer = function(pos, elapsed)
 		local pos2
 		for i, ob in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
 			if not default.is_decoration(ob,true) then
 				pos2 = pos2 or minetest.string_to_pos(minetest.get_meta(pos):get_string("pos2"))
+				minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
 				ob:set_pos(pos2)
 			end
 		end
@@ -261,7 +262,6 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		end
 		local name = player:get_player_name()
 		local nmeta = minetest.get_meta(npos)
-		--:get_inventory():set_size("main", 32)
 		minetest.show_formspec(name, "default.tophat",
 			"size[8,8]" ..
 			"listcolors[#77777777;#777777aa;#000000ff]" ..
@@ -276,6 +276,7 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		local pos1 = minetest.string_to_pos(meta:get_string("pos1"))
 		local pos2 = minetest.string_to_pos(meta:get_string("pos2"))
 		local item = ItemStack(object:get_luaentity().itemstring)
+		minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
 		if pos1 and exatec.test_input(pos1,item,pos1,pos1) then
 			exatec.input(pos1,item,pos1,pos1)
 			object:remove()
