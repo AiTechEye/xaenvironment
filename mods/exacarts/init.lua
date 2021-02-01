@@ -158,6 +158,7 @@ exacarts.register_rail({
 	description="Direction rail",
 	inventory_image="(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png",
 	tiles = {"(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png"},
+	use_texture_alpha = true,
 	add_groups = {exatec_wire_connected=1,store=200},
 	paramtype2 = "facedir",
 	drawtype = "nodebox",
