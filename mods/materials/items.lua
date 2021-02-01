@@ -183,6 +183,7 @@ minetest.register_node("materials:cup", {
 	description = "Cup",
 	tiles={"materials_cup.png"},
 	drawtype = "plantlike",
+	use_texture_alpha = true,
 	sounds = default.node_sound_glass_defaults(),
 	groups = {dig_immediate = 3,treasure=1},
 	sunlight_propagates = true,
@@ -199,6 +200,7 @@ minetest.register_node("materials:cup_plate", {
 	description = "Cup plate",
 	tiles= {"default_snow.png^[colorize:#5556","default_snow.png^[colorize:#5556","default_air.png","default_air.png","default_air.png","default_air.png"},
 	drawtype = "nodebox",
+	use_texture_alpha = true,
 	sounds = default.node_sound_glass_defaults(),
 	groups = {dig_immediate = 3,treasure=1},
 	sunlight_propagates = true,
@@ -213,6 +215,7 @@ minetest.register_node("materials:cup_plate", {
 minetest.register_node("materials:plate", {
 	description = "Plate",
 	tiles= {"default_snow.png^[colorize:#5556^default_alpha_gem_round.png^[makealpha:0,255,0","default_snow.png^[colorize:#5556^default_alpha_gem_round.png^[makealpha:0,255,0","default_air.png","default_air.png","default_air.png","default_air.png"},
+	use_texture_alpha = true,
 	drawtype = "nodebox",
 	sounds = default.node_sound_glass_defaults(),
 	groups = {dig_immediate = 3,treasure=1},
