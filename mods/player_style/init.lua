@@ -587,9 +587,6 @@ minetest.register_globalstep(function(dtime)
 					return true
 				end
 			end
-
-
-
 			if key.up or key.down or key.left or key.right then
 				hunger = -0.0002
 				a="walk"

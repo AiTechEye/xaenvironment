@@ -213,7 +213,7 @@ minetest.register_node("player_style:top_hat", {
 	description = "Top hat (use on blocks/chests ... teleports items/players/objects)",
 	stack_max = 1,
 	tiles = {"default_coalblock.png^[colorize:#000000aa"},
-	groups = {dig_immediate = 3,flammable=3,hat=1,fall_damage_add_percent=-100},
+	groups = {dig_immediate = 3,flammable=3,hat=1,fall_damage_add_percent=-100,store=1000},
 	hat_properties={pos={x=0, y=7, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
 	after_place_node=function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
