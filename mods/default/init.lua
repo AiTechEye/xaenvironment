@@ -13,6 +13,17 @@ default={
 	hand_on_secondary_use={},
 	creative = minetest.settings:get_bool("creative_mode") == true,
 	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit")),
+	ore_noise_params = function(def)
+		def = def or {}
+		return {
+			offset = def.offset or 0,
+			scale = def.scale or 1,
+			spread = def.spread or {x=100,y=100,z=100},
+			seed = def.seed or math.random(1,1000000),
+			octaves = def.octaves or 3,
+			persist = def.persist or 0.6
+		}
+	end,
 	cloud_land_map={
 		offset=0,
 		scale=1,

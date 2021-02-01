@@ -2,7 +2,6 @@ minetest.register_alias("mapgen_stone","default:stone")
 minetest.register_alias("mapgen_water_source","default:salt_water_source")
 minetest.register_alias("mapgen_river_water_source","default:water_source")
 minetest.register_alias("mapgen_lava_source","default:lava_source")
-
 minetest.register_alias("mapgen_mossycobble","default:mossycobble")
 minetest.register_alias("mapgen_cobble","default:cobble")
 
@@ -29,6 +28,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 31000,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -39,6 +39,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 31000,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -49,6 +50,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 31000,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -59,6 +61,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 31000,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -69,6 +72,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -20,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -79,6 +83,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -10,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -89,6 +94,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -10,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -99,6 +105,7 @@ minetest.register_ore({
 	clust_size = 15,
 	y_min= -10,
 	y_max= 1,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_ore({
@@ -109,6 +116,7 @@ minetest.register_ore({
 	clust_size = 15,
 	y_min= -10,
 	y_max= 1,
+	noise_params = default.ore_noise_params()
 })
 
 minetest.register_decoration({
@@ -203,6 +211,7 @@ minetest.register_ore({
 	clust_size = 5,
 	y_min= -31000,
 	y_max= 0,
+	noise_params = default.ore_noise_params()
 })
 
 --||||||||||||||||
