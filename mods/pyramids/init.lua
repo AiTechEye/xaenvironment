@@ -425,6 +425,7 @@ minetest.register_ore({
 	clust_size = 1,
 	y_min= -10,
 	y_max= 5,
+	noise_params = default.ore_noise_params()
 })
 
 local dis={
