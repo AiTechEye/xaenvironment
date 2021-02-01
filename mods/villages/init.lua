@@ -377,6 +377,7 @@ minetest.register_ore({
 	clust_size = 1,
 	y_min= -200,
 	y_max= -25,
+	noise_params = default.ore_noise_params()
 })
 minetest.register_ore({
 	ore_type = "blob",
@@ -386,6 +387,7 @@ minetest.register_ore({
 	clust_size = 1,
 	y_min= 0,
 	y_max= 50,
+	noise_params = default.ore_noise_params()
 })
 minetest.register_ore({
 	ore_type = "blob",
@@ -395,6 +397,7 @@ minetest.register_ore({
 	clust_size = 1,
 	y_min= 0,
 	y_max= 50,
+	noise_params = default.ore_noise_params()
 })
 minetest.register_ore({
 	ore_type = "blob",
@@ -404,4 +407,5 @@ minetest.register_ore({
 	clust_size = 1,
 	y_min= 0,
 	y_max= 50,
+	noise_params = default.ore_noise_params()
 })
