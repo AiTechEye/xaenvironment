@@ -70,6 +70,7 @@ examobs.register_mob=function(def)
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
 	def.makes_footstep_sound =		def.makes_footstep_sound == nil
+	def.use_texture_alpha =		def.use_texture_alpha ~= false
 
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
@@ -387,6 +388,7 @@ examobs.register_mob=function(def)
 			visual_scale=0.1,
 			walkable = true,
 			pointable = false,
+			use_texture_alpha = def.use_texture_alpha,
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
 					local p = pointed_thing.above
@@ -411,6 +413,7 @@ examobs.register_mob=function(def)
 			sunlight_propagates = true,
 			walkable = false,
 			visual_scale = 0.3,
+			use_texture_alpha = def.use_texture_alpha,
 			drop = "",
 			groups = {dig_immediate=3,not_in_craftguide=1},
 			on_place = function(itemstack, user, pointed_thing)
