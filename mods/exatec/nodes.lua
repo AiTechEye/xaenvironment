@@ -27,6 +27,7 @@ minetest.register_craftitem("exatec:list", {
 minetest.register_node("exatec:tube", {
 	description = "Tube",
 	tiles = {"exatec_glass.png"},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -55,6 +56,7 @@ minetest.register_node("exatec:tube", {
 minetest.register_node("exatec:tube_detector", {
 	description = "Detector tube",
 	tiles = {"exatec_glass.png^[colorize:#ffff00cc"},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -86,6 +88,7 @@ minetest.register_node("exatec:tube_detector", {
 minetest.register_node("exatec:tube_gate", {
 	description = "Gate tube",
 	tiles = {"exatec_glass.png^[colorize:#00ff00cc"},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -123,9 +126,8 @@ minetest.register_node("exatec:tube_gate", {
 
 minetest.register_node("exatec:tube_teleport", {
 	description = "Teleport tube",
-	tiles = {
-		"exatec_glass.png^[colorize:#00e1ffcc"
-	},
+	tiles = {"exatec_glass.png^[colorize:#00e1ffcc"},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -195,6 +197,7 @@ minetest.register_node("exatec:tube_dir", {
 		"exatec_glass.png^[colorize:#ff00ffcc",
 		"exatec_glass.png^[colorize:#ff00ffcc",
 	},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -257,6 +260,7 @@ minetest.register_node("exatec:recycling_dir_filter", {
 		"exatec_glass.png^[colorize:#007700cc",
 		"exatec_glass.png^[colorize:#007700cc",
 	},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -314,6 +318,7 @@ minetest.register_node("exatec:fuel_dir_filter", {
 		"exatec_glass.png^[colorize:#555555cc",
 		"exatec_glass.png^[colorize:#555555cc",
 	},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -369,6 +374,7 @@ minetest.register_node("exatec:cookable_dir_filter", {
 		"exatec_glass.png^[colorize:#ff6600cc",
 		"exatec_glass.png^[colorize:#ff6600cc",
 	},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -426,6 +432,7 @@ minetest.register_node("exatec:tube_filter", {
 		"exatec_glass.png^[colorize:#0000ff",
 		"exatec_glass.png^[colorize:#ffff00",
 	},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype = "light",
 	sunlight_propagates=true,
@@ -554,6 +561,7 @@ minetest.register_node("exatec:wire", {
 	description = "Wire",
 	tiles = {{name="default_cloud.png"}},
 	wield_image="exatec_wire.png",
+	use_texture_alpha = true,
 	inventory_image="exatec_wire.png",
 	drop="exatec:wire",
 	drawtype="nodebox",
@@ -585,6 +593,7 @@ minetest.register_node("exatec:wire", {
 minetest.register_node("exatec:datawire", {
 	description = "Data wire",
 	tiles = {{name="default_cloud.png"}},
+	use_texture_alpha = true,
 	wield_image="exatec_wire.png^[colorize:#fff",
 	inventory_image="exatec_wire.png^[colorize:#fff",
 	drop="exatec:datawire",
@@ -1105,6 +1114,7 @@ minetest.register_node("exatec:object_detector", {
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png",
 		"default_steelblock.png^exatec_glass.png^default_chest_top.png^(default_crafting_arrowleft.png^default_crafting_arrowright.png^[colorize:#00ff00)"
 	},
+	use_texture_alpha = true,
 	groups = {dig_immediate = 2,exatec_wire=1,exatec_data_wire_connected=1,store=300},
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = function(pos)
@@ -1387,6 +1397,7 @@ minetest.register_node("exatec:light_detector", {
 		"default_steelblock.png^[colorize:#0000ffaa",
 		"default_steelblock.png^[colorize:#0000ffaa"
 	},
+	use_texture_alpha = true,
 	groups = {dig_immediate = 2,exatec_data_wire_connected=1,exatec_wire_connected=1,store=250},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype="nodebox",
