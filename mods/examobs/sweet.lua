@@ -68,6 +68,7 @@ minetest.register_node("examobs:candy" .. i, {
 	description = "Candy",
 	groups = {snappy=3,flora=1},
 	tiles = {"default_stone.png^[colorize:#" .. candycolor[i] .."55"},
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	walkable=false,
 	buildable_to=true,
