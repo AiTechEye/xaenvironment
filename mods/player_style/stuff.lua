@@ -186,6 +186,20 @@ minetest.register_craftitem("player_style:coin", {
 		return itemstack
 	end
 })
+
+
+
+minetest.register_on_cheat(function(ob,cheat)
+	if cheat.type == "interacted_too_far" then
+		local np = minetest.find_node_near(ob:get_pos(),5,"player_style:top_hat_upside_down")
+		if np then
+			return ob
+		end
+	end
+end)
+
+
+
 minetest.register_craft({
 	output="player_style:top_hat",
 	recipe={
@@ -194,6 +208,7 @@ minetest.register_craft({
 		{"materials:piece_of_cloth","materials:piece_of_cloth","materials:piece_of_cloth"},
 	},
 })
+
 minetest.register_node("player_style:top_hat", {
 	description = "Top hat (use on blocks/chests ... teleports items/players/objects)",
 	tiles = {"default_coalblock.png^[colorize:#000000aa"},
@@ -202,13 +217,31 @@ minetest.register_node("player_style:top_hat", {
 	after_place_node=function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		local meta2 = itemstack:get_meta()
+		meta:set_string("inputlist",meta2:get_string("inputlist"))
+		local pos1 = meta2:get_string("pos1")
 		local pos2 = meta2:get_string("pos2")
-		meta:set_string("pos1",meta2:get_string("pos1"))
+		meta:set_string("pos1",pos1)
 		meta:set_string("pos2",pos2)
 		meta:set_string("description",meta2:get_string("description"))
 		if pos2 ~= "" then
 			minetest.swap_node(pos,{name="player_style:top_hat_upside_down"})
 			minetest.get_node_timer(pos):start(0.2)
+			if pos1 ~= "" then
+				meta:get_inventory():set_size("main", 32)
+				local npos = minetest.string_to_pos(pos1)
+				minetest.forceload_block(npos)
+				local nmeta = minetest.get_meta(npos)
+				meta:get_inventory():set_list("main",nmeta:get_inventory():get_list(meta:get_string("inputlist")))
+
+				meta:set_string("formspec",
+					"size[8,8]" ..
+					"listcolors[#77777777;#777777aa;#000000ff]" ..
+					"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+					"list[current_player;main;0,4.2;8,4;]" ..
+					"listring[current_player;main]" ..
+					"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+				)
+			end
 		end
 	end,
 	on_use=function(itemstack, user, pointed_thing)
@@ -219,7 +252,9 @@ minetest.register_node("player_style:top_hat", {
 		local meta = itemstack:get_meta()
 		meta:set_string("pos2",minetest.pos_to_string(pointed_thing.above))
 		if exatec.test_input(pointed_thing.under,ItemStack("default:unknown"),pointed_thing.under,pointed_thing.under) then
+			local inputlist = exatec.def(pointed_thing.under).input_list
 			meta:set_string("pos1",minetest.pos_to_string(pointed_thing.under))
+			meta:set_string("inputlist",inputlist)
 			local r = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
 			local d = r and r.description and ("("..r.description..") ") or ""
 			meta:set_string("description","Top hat "..d.. minetest.pos_to_string(pointed_thing.under).." "..minetest.pos_to_string(pointed_thing.above))
@@ -243,12 +278,24 @@ minetest.register_node("player_style:top_hat_upside_down", {
 	description = "Top hat",
 	tiles = {"default_coalblock.png^[colorize:#000000aa"},
 	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1,fall_damage_add_percent=-100},
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.375, 0, -0.375, 0.375, -0.0375, 0.375},
+			{-0.22, -0.0375, -0.22, 0.22, -0.5, 0.22}
+		}
+	},
 	on_timer = function(pos, elapsed)
 		local pos2
 		for i, ob in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
 			if not default.is_decoration(ob,true) then
 				pos2 = pos2 or minetest.string_to_pos(minetest.get_meta(pos):get_string("pos2"))
+				if ob:is_player() then
+					minetest.sound_play("default_pipe", {to_player=ob:get_player_name(), gain = 2, max_hear_distance = 10})
+				end
 				minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
+				
 				ob:set_pos(pos2)
 			end
 		end
@@ -260,16 +307,29 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		if not npos then
 			return
 		end
+		minetest.forceload_block(npos)
+
 		local name = player:get_player_name()
 		local nmeta = minetest.get_meta(npos)
-		minetest.show_formspec(name, "default.tophat",
+
+		meta:get_inventory():set_list("main",nmeta:get_inventory():get_list("main"))
+		meta:set_string("formspec",
 			"size[8,8]" ..
 			"listcolors[#77777777;#777777aa;#000000ff]" ..
-			"list[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main;0,0;8,4;]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
 			"list[current_player;main;0,4.2;8,4;]" ..
 			"listring[current_player;main]" ..
-			"listring[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main]"
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 		)
+
+		--minetest.show_formspec(name, "default.tophat",
+		--	"size[8,8]" ..
+		--	"listcolors[#77777777;#777777aa;#000000ff]" ..
+		--	"list[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main;0,0;8,4;]" ..
+		--	"list[current_player;main;0,4.2;8,4;]" ..
+		--	"listring[current_player;main]" ..
+		--	"listring[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main]"
+		--)
 	end,
 	on_item_stand_on=function(pos,object)
 		local meta = minetest.get_meta(pos)
@@ -291,18 +351,63 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		local meta2 = minetest.get_meta(pos)
 		local itemstack = ItemStack("player_style:top_hat")
 		local meta = itemstack:get_meta()
+
+		meta:set_string("inputlist",meta2:get_string("inputlist"))
 		meta:set_string("pos1",meta2:get_string("pos1"))
 		meta:set_string("pos2",meta2:get_string("pos2"))
 		meta:set_string("description",meta2:get_string("description"))
 		puncher:get_inventory():add_item("main",itemstack)
 		minetest.remove_node(pos)
 	end,
-	drawtype="nodebox",
-	node_box ={
-		type = "fixed",
-		fixed = {
-			{-0.375, 0, -0.375, 0.375, -0.0375, 0.375},
-			{-0.22, -0.0375, -0.22, 0.22, -0.5, 0.22}
-		}
-	}
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local nmeta = minetest.get_meta(npos)
+		nmeta:get_inventory():set_list(meta:get_string("inputlist"),meta:get_inventory():get_list("main"))
+	end,
+	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local nmeta = minetest.get_meta(npos)
+		nmeta:get_inventory():set_list(meta:get_string("inputlist"),meta:get_inventory():get_list("main"))
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local nmeta = minetest.get_meta(npos)
+		nmeta:get_inventory():set_list(meta:get_string("inputlist"),meta:get_inventory():get_list("main"))
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local inputlist = meta:get_string("inputlist")
+		local def = minetest.registered_nodes[minetest.get_node(npos).name]
+		if def and def.allow_metadata_inventory_put then
+			return def.allow_metadata_inventory_put(npos, inputlist, index, stack, player)
+		else
+			return stack:get_count()
+		end
+	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local inputlist = meta:get_string("inputlist")
+		local def = minetest.registered_nodes[minetest.get_node(npos).name]
+		if def and def.allow_metadata_inventory_take then
+			return def.allow_metadata_inventory_take(npos, listname, index, stack, player)
+		else
+			return stack:get_count()
+		end
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		local meta = minetest.get_meta(pos)
+		local npos = minetest.string_to_pos(meta:get_string("pos1"))
+		local inputlist = meta:get_string("inputlist")
+		local def = minetest.registered_nodes[minetest.get_node(npos).name]
+		if def and def.allow_metadata_inventory_move then
+			return def.allow_metadata_inventory_move(npos, from_list, from_index, to_list, to_index, count, player)
+		else
+			return count
+		end
+	end,
 })
