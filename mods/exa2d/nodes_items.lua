@@ -20,6 +20,7 @@ minetest.register_node("exa2d:inactive_item", {
 minetest.register_node("exa2d:coin", {
 	description = "Coin",
 	pointable=false,
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype="light",
 	paramtype2="facedir",
@@ -46,6 +47,7 @@ minetest.register_node("exa2d:coin", {
 minetest.register_node("exa2d:coin_effect", {
 	description = "Coin effect",
 	pointable=false,
+	use_texture_alpha = true,
 	drawtype="nodebox",
 	paramtype="light",
 	paramtype2="facedir",
