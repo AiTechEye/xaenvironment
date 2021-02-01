@@ -203,6 +203,7 @@ minetest.register_node("default:furnace", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sounds = default.node_sound_stone_defaults(),
+	use_texture_alpha = true,
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
 	end,
@@ -240,6 +241,7 @@ minetest.register_node("default:furnace_active", {
 	tiles = {"default_cobble.png","default_fire.png"},
 	groups = {stone=2,cracky=2,not_in_creative_inventory=1,exatec_tube_connected = 1},
 	drawtype="mesh",
+	use_texture_alpha = true,
 	mesh="default_furnace.b3d",
 	light_source = 10,
 	paramtype = "light",

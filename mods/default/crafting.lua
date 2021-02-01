@@ -407,6 +407,7 @@ minetest.register_node("default:workbench", {
 minetest.register_node("default:craftguide", {
 	description = "Craftguide",
 	tiles={"default_craftgreed.png^default_unknown.png"},
+	use_texture_alpha = true,
 	wield_image="default_craftgreed.png^default_unknown.png",
 	inventory_image="default_craftgreed.png^default_unknown.png",
 	groups = {dig_immediate=3,flammable=2,used_by_npc=2},

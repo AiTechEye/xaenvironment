@@ -19,6 +19,7 @@ default.register_bush=function(def)
 	def.groups = def.groups or				{leaves=1,snappy=3,flammable=2}
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
 	def.drop = def.drop or 				{max_items = 1,items = {{items = {"default:stick"}, rarity = 10},{items = {nname}}}}
+	def.use_texture_alpha = true
 	minetest.register_node(nname, def)
 
 	minetest.register_node(nname.."_spawner",{
@@ -91,6 +92,7 @@ default.register_blockdetails=function(def)
 	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1,not_in_creative_inventory=1,not_in_craftguide=1}
 	def.node.drowning = def.node.drowning or 1
 	def.paramtype2 = def.paramtype2 or "facedir"
+	def.node.use_texture_alpha = true
 	def.node.after_destruct = def.node.block and function(pos)
 		minetest.set_node(pos,{name=def.node.block})
 	end or nil
@@ -134,6 +136,7 @@ default.register_blockdetails=function(def)
 			def.item.paramtype2 = def.item.paramtype2 or "wallmounted"
 			def.item.paramtype = def.item.paramtype or "light"
 			def.item.sunlight_propagates = def.item.sunlight_propagates==true
+			def.item.use_texture_alpha = true
 			def.item.after_place_node = def.item.after_place_node or function(pos, placer, itemstack)
 				minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
 			end
@@ -166,6 +169,7 @@ default.register_pebble=function(def)
 	def.paramtype =			"light"
 	def.paramtype2 =			"facedir"
 	def.sunlight_propagates =		def.sunlight_propagates or		true
+	def.use_texture_alpha = true
 	def.collision_box = 			def.collision_box or {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.-0.25, 0.3}
@@ -253,7 +257,7 @@ default.register_plant=function(def)
 	def.drawtype = def.drawtype or			"plantlike"
 	def.tiles = def.tiles or				{"default_leaves.png"}
 	def.waving = def.waving or				1
-
+	def.use_texture_alpha = true
 	def.groups = def.groups or				{}
 	def.groups.plant = def.groups.plant or			1
 	def.groups.attached_node = def.groups.attached_node or	1
@@ -329,8 +333,9 @@ default.register_tree=function(def)
 	def.tree.tiles = def.tree.tiles or				{"default_wood.png","default_wood.png","default_tree.png"}
 	def.tree.paramtype2 = def.tree.paramtype2 or			"facedir"
 	def.tree.on_place = def.tree.on_place or 			minetest.rotate_node
-	def.tree.groups = def.tree.groups or				 {tree=1,choppy=2,flammable=1}
+	def.tree.groups = def.tree.groups or				{tree=1,choppy=2,flammable=1}
 	def.tree.sounds = def.tree.sounds or 				default.node_sound_wood_defaults()
+	def.tree.use_texture_alpha =					true
 	def.tree.on_construct = def.tree.on_construct or 			function(pos, placer)
 									minetest.get_meta(pos):set_int("placed",1)
 								end
@@ -393,6 +398,7 @@ default.register_tree=function(def)
 	def.leaves.groups = def.leaves.groups or			{leaves=1,snappy=3,leafdecay=5,flammable=2}
 	def.leaves.sounds = def.leaves.sounds or 			default.node_sound_leaves_defaults()
 	def.leaves.drop = def.leaves.drop or 				{max_items = 1,items = {{items = {mod .. def.name .. "_sapling"}, rarity = 25},{items = {"default:stick"}, rarity = 10},{items = {mod .. def.name .. "_leaves"}}}}
+	def.leaves.use_texture_alpha =				true
 	minetest.register_node(mod .. def.name .. "_leaves", def.leaves)
 
 -- sapling
@@ -416,6 +422,7 @@ default.register_tree=function(def)
 	def.sapling.sounds = def.sapling.sounds or 			default.node_sound_leaves_defaults()
 	def.sapling.attached_node = def.sapling.attached_node or		1
 	def.sapling.walkable = def.sapling.walkable or			false
+	def.sapling.use_texture_alpha = true
 	def.sapling.after_place_node = def.sapling.after_place_node or function(pos, placer)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"soil") > 0 then
 			local meta = minetest.get_meta(pos)

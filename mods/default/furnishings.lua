@@ -56,6 +56,7 @@ default.register_door=function(def)
 		paramtype2 = "facedir",
 		tiles = {def.texture.."^[colorize:#1112"},
 		paramtype = "light",
+		use_texture_alpha = true,
 		sounds = def.sounds or default.node_sound_wood_defaults(),
 		selection_box={
 			type="fixed",
