@@ -1,10 +1,10 @@
 
 ======================
-==== methods for minetest.register_node
+==== nodedef methods (for minetest.register_node)
 ======================
 
 	-- called when a item lands on the node
-on_item_stand_on=function(pos,object)
+on_item_touch=function(pos,object)
 
 
 
