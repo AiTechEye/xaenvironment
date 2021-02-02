@@ -117,7 +117,7 @@ examobs.jump=function(self,y)
 	end
 end
 
-examobs.environment=function(self,moveresult)
+examobs.environment=function(self)
 	self.environment_timer = 0
 	if (self.flee or self.fight or self.folow or self.target) and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
