@@ -212,8 +212,7 @@ minetest.register_craft({
 minetest.register_node("player_style:top_hat", {
 	description = "Top hat (use on blocks/chests ... teleports items/players/objects)",
 	stack_max = 1,
-	tiles = {"default_coalblock.png^[colorize:#000000aa"},
-	use_texture_alpha = true,
+	tiles = {"default_coalblock.png^[colorize:#111"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,fall_damage_add_percent=-100,store=1000},
 	hat_properties={pos={x=0, y=7, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
 	after_place_node=function(pos, placer, itemstack, pointed_thing)
@@ -286,8 +285,7 @@ minetest.register_node("player_style:top_hat", {
 minetest.register_node("player_style:top_hat_upside_down", {
 	description = "Top hat",
 	stack_max = 1,
-	tiles = {"default_coalblock.png^[colorize:#000000aa"},
-	use_texture_alpha = true,
+	tiles = {"default_coalblock.png^[colorize:#111"},
 	groups = {dig_immediate = 3,flammable=3,not_in_creative_inventory=1,fall_damage_add_percent=-100},
 	drawtype="nodebox",
 	node_box ={
@@ -341,7 +339,7 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		--	"listring[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main]"
 		--)
 	end,
-	on_item_stand_on=function(pos,object)
+	on_item_touch=function(pos,object)
 		local meta = minetest.get_meta(pos)
 		local pos1 = minetest.string_to_pos(meta:get_string("pos1"))
 		local pos2 = minetest.string_to_pos(meta:get_string("pos2"))
