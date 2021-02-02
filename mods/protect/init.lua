@@ -13,9 +13,7 @@ minetest.register_on_mods_loaded(function()
 		if v.game_rule and default.date("d",v.date) > 90 then
 			protect.remove_game_rule_area(v.id)
 		end
-
 	end
-
 end)
 
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
@@ -259,6 +257,7 @@ protect.add_game_rule_area=function(pos1,pos2,title)
 	pos1,pos2 = protect.sort(pos1,pos2)
 	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
+	return id
 end
 
 protect.remove_game_rule_area=function(id)
