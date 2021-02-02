@@ -77,12 +77,12 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-examobs.on_step=function(self, dtime)
+examobs.on_step=function(self, dtime,moveresult)
 	local time = os.clock()
 	self.timer1 = self.timer1 + dtime
 	self.timer2 = self.timer2 + dtime
 	self.lifetimer = self.lifetimer - (dtime*examobs.global_lifetime)
-	examobs.main(self, dtime)
+	examobs.main(self, dtime,moveresult)
 	examobs.global_time = examobs.global_time + os.clock() - time
 end
 
@@ -117,7 +117,7 @@ examobs.jump=function(self,y)
 	end
 end
 
-examobs.environment=function(self)
+examobs.environment=function(self,moveresult)
 	self.environment_timer = 0
 	if (self.flee or self.fight or self.folow or self.target) and not (self.dead or self.dying) then
 		self.lifetimer = self.lifetime
@@ -147,7 +147,7 @@ examobs.environment=function(self)
 	local def = examobs.defpos(pos)
 	local deff = examobs.defpos(posf)
 	local v = self.object:get_velocity()
-
+			
 --Infected
 
 	if self.storage.infected then

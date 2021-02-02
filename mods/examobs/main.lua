@@ -1,7 +1,8 @@
-examobs.main=function(self, dtime)
+examobs.main=function(self, dtime,moveresult)
 	if not self:pos() then
 		return
 	end
+	self.moveresult = moveresult or {}
 	if self.timer1 > 0.1 then
 		self.environment_timer = self.environment_timer + self.timer1
 		self.environment_timer2 = self.environment_timer2 + self.timer1
