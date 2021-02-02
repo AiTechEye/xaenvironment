@@ -1,9 +1,10 @@
 weather.while_rain=function(pos)
 	for i, w in pairs(weather.currweather) do
 		if vector.distance(pos,w.pos) <= w.size and w.bio == 1 then
-			minetest.registered_nodes[minetest.get_node(pos).name].on_rain(pos)
+			return true
 		end
 	end
+	return false
 end
 
 minetest.register_node("weather:woodenbarrel", {
@@ -24,15 +25,15 @@ minetest.register_node("weather:woodenbarrel", {
 			{-0.5, -0.5, -0.5, 0.5, -0.4375, 0.5},
 		}
 	},
-	on_rain=function(pos)
-		minetest.set_node(pos,{name="weather:woodenbarrel2"})
-	end,
 	on_construct=function(pos)
 		minetest.get_node_timer(pos):start(30)
 	end,
 	on_timer = function (pos, elapsed)
-		weather.while_rain(pos)
-		return true
+		if weather.while_rain(pos) then
+			minetest.set_node(pos,{name="weather:woodenbarrel2"})
+		else
+			return true
+		end
 	end,
 })
 
