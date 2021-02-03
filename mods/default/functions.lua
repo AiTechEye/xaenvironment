@@ -905,7 +905,7 @@ end
 
 default.punch=function(target,puncher,damage)
 	if type(puncher)=="table" and puncher.object then puncher=puncher.object end
-	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}},{x=0,y=0,z=0})
+	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage or 1}},{x=0,y=0,z=0})
 end
 
 default.take_item=function(clicker)
