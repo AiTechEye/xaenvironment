@@ -71,7 +71,7 @@ examobs.register_mob=function(def)
 	def.visual_size =			def.visual_size or			{x=1,y=1}
 	def.mesh =			def.mesh or			"character.b3d"
 	def.makes_footstep_sound =		def.makes_footstep_sound == nil
-	def.use_texture_alpha =		def.use_texture_alpha ~= false
+--	def.use_texture_alpha =		def.use_texture_alpha ~= false
 
 	def.walk_speed =			def.walk_speed or			2
 	def.walk_run =			def.walk_run or			4
