@@ -42,15 +42,18 @@ minetest.register_tool("hook:pchest", {
 		end
 		local p=minetest.dir_to_facedir(user:get_look_dir())
 		local item=itemstack:to_table()
+		local m = minetest.get_meta(pointed_thing.above)
 		minetest.set_node(pointed_thing.above, {name = "hook:pchest_node",param1="",param2=p})
 		minetest.sound_play("default_place_node_hard", {pos=pointed_thing.above, gain = 1.0, max_hear_distance = 5})
 
-		if not (item.meta or item.metadata) then
+		if not item.meta then
 			itemstack:take_item()
 			return itemstack
 		end
 
 		pchest.setpchest(pointed_thing.above,user,item.meta.label)
+
+		m:set_string("label",item.meta.label or "")
 
 		if item.meta.items then
 			local its = minetest.deserialize(item.meta.items or "") or {}
@@ -58,18 +61,7 @@ minetest.register_tool("hook:pchest", {
 			for i,it in pairs(its) do
 				table.insert(items,ItemStack(it))
 			end
-
-			minetest.get_meta(pointed_thing.above):get_inventory():set_list("main",items)
-		elseif item.metadata ~= "" then
-			local meta=minetest.deserialize(item["metadata"])
-			local s=meta.stuff
-			local its=meta.stuff.split(meta.stuff,",",",")
-			local nmeta=minetest.get_meta(pointed_thing.above)
-			for i,it in pairs(its) do
-				if its~="" then
-					nmeta:get_inventory():set_stack("main",i, ItemStack(it))
-				end
-			end
+			m:get_inventory():set_list("main",items)
 		end
 		itemstack:take_item()
 
