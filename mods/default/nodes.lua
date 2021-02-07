@@ -103,7 +103,6 @@ minetest.register_node("default:lamp_off", {
 	drawtype = "nodebox",
 	node_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.3, 0.2}},
 	paramtype = "light",
-	use_texture_alpha = true,
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	exatec={
@@ -891,6 +890,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	alpha =165,
+	use_texture_alpha = "clip",
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1,on_load=1},
 	drawtype = "liquid",
 	paramtype = "light",
