@@ -308,7 +308,7 @@ minetest.register_node("hook:rope", {
 	sunlight_propagates = false,
 	walkable = false,
 	is_ground_content = false,
-	groups = {not_in_creative_inventory=1,fleshy = 3, dig_immediate = 3,},
+	groups = {not_in_creative_inventory=1, dig_immediate = 3,rope=1},
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(3)
 	end,
@@ -344,18 +344,28 @@ minetest.register_node("hook:rope2", {
 	sunlight_propagates = false,
 	walkable = false,
 	is_ground_content = false,
-	groups = {not_in_creative_inventory=1,fleshy = 3, dig_immediate = 3,},
+	groups = {not_in_creative_inventory=1,dig_immediate = 3,rope=1},
 	on_punch = function(pos, node, puncher, pointed_thing)
 		if minetest.is_protected(pos,puncher:get_player_name()) then
 			return false
 		end
 		puncher:get_inventory():add_item("main", ItemStack("hook:climb_rope"))
-		local name=puncher:get_player_name()
-		for i=0,20,1 do
-			if minetest.get_node({x=pos.x,y=pos.y-i,z=pos.z}).name=="hook:rope2" or minetest.get_node({x=pos.x,y=pos.y-i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y-i,z=pos.z},{name = "air"}) else break end
+		local n2d = {["hook:rope2"]=true,["hook:hooking"]=true}
+		for i=0,21 do
+			local p = {x=pos.x,y=pos.y+i,z=pos.z}
+			if n2d[minetest.get_node(p).name] then
+				minetest.remove_node(p)
+			else
+				break
+			end
 		end
-		for i=0,20,1 do
-			if minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:rope2" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:hooking" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y+i,z=pos.z},{name = "air"}) else return false end
+		for i=1,21 do
+			local p = {x=pos.x,y=pos.y-i,z=pos.z}
+			if n2d[minetest.get_node(p).name] then
+				minetest.remove_node(p)
+			else
+				break
+			end
 		end
 	end,
 	sounds = {footstep = {name = "hook_rope", gain = 1}}
@@ -390,18 +400,29 @@ minetest.register_node("hook:rope3", {
 		end
 		return true
 	end,
-	groups = {not_in_creative_inventory=1,fleshy = 3, dig_immediate = 3,},
+	groups = {not_in_creative_inventory=1, dig_immediate = 3,rope=1},
 	on_punch = function(pos, node, puncher, pointed_thing)
 		if minetest.get_meta(pos):get_string("owner")~=puncher:get_player_name() then
 			minetest.chat_send_player(puncher:get_player_name(), "This rope is owned by: ".. minetest.get_meta(pos):get_string("owner"))
 			return false
 		end
 		puncher:get_inventory():add_item("main", ItemStack("hook:climb_rope_locked"))
-		for i=0,20,1 do
-			if minetest.get_node({x=pos.x,y=pos.y-i,z=pos.z}).name=="hook:rope3" or minetest.get_node({x=pos.x,y=pos.y-i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y-i,z=pos.z},{name = "air"}) else break end
+		local n2d = {["hook:rope3"]=true,["hook:hooking"]=true}
+		for i=0,21 do
+			local p = {x=pos.x,y=pos.y+i,z=pos.z}
+			if n2d[minetest.get_node(p).name] then
+				minetest.remove_node(p)
+			else
+				break
+			end
 		end
-		for i=0,20,1 do
-			if minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:rope3" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="hook:hooking" or minetest.get_node({x=pos.x,y=pos.y+i,z=pos.z}).name=="air" then minetest.set_node({x=pos.x,y=pos.y+i,z=pos.z},{name = "air"}) else return false end
+		for i=1,21 do
+			local p = {x=pos.x,y=pos.y-i,z=pos.z}
+			if n2d[minetest.get_node(p).name] then
+				minetest.remove_node(p)
+			else
+				break
+			end
 		end
 	end,
 	sounds = {footstep = {name = "hook_rope", gain = 1}}
@@ -415,18 +436,25 @@ minetest.register_node("hook:hooking", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	walkable=false,
-	pointable=false,
 	drop = "",
 	sunlight_propagates = false,
-	groups = {not_in_creative_inventory=1},
+	groups = {not_in_creative_inventory=1, dig_immediate=3,rope=1},
+	can_dig = function(pos, player)
+		return minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"rope") == 0
+	end,
 	on_timer = function (pos, elapsed)
-		local r=minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name
-		if r~="hook:rope" then
+		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"rope") == 0 then
 			minetest.remove_node(pos)
-			return false
+		else
+			return true
 		end
-		return true
-	end
+	end,
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.0625, -0.5, -0.5, 0.0625, -0.49, -0.375}
+		}
+	},
 })
 
 
