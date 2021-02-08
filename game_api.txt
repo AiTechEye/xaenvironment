@@ -1,9 +1,13 @@
 Controls ##########################################################
-crawl		sneak
-run		special/aux1
-wallrun		run + jump into a wall (requires a few of attempts to success)
-edge climb	walk above the ground into a edge
-crawl to a edge to come higher
+Crawl		sneak
+Run		special/aux1
+Wallrun		run + jump into a wall (requires a few of attempts to success)
+Edge climb	touch an edge above the ground
+Kong		run into a block
+Cat leap		jump backwards in edge climbing
+Tic tac/walljump	run + jump side of a wall
+Double wall climb	hold left & right
+Backflip		hold jump & press back/down
 Commands ##########################################################
 /protect 1		select position 1, reselect by punch the node
 /protect 2		select position 2, reselect by punch the node
