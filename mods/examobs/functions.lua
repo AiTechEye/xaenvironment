@@ -553,7 +553,7 @@ examobs.anim=function(self,type)
 	if self.visual ~= "mesh" or type == self.anim or not self.animation then return end
 	local a=self.animation[type]
 	if not a then return end
-	self.object:set_animation({x=a.x, y=a.y,},a.speed,0.1,a.loop)
+	self.object:set_animation({x=a.x, y=a.y,},a.speed,0,a.loop)
 	self.anim=type
 	return self
 end
