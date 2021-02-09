@@ -144,6 +144,16 @@ depends = player_style
 	on_step=function(self,player,dtime)		-- on global step
 })
 
+player_style.register_manual_page({				-- adds an manual page
+	name = "Name",					-- required, showed in the list
+	text = "information",				-- required, text or formspec text
+	tags = {"default:dirt","default:dirt_with_grass","snowy"}	-- used when looking for page content, when the player is looking at a node, object or wieldied item
+	label = "Page label",				-- adds a label to the page
+	action=function(player)				-- called when the page will be viewed
+	end,
+})
+
+
 Armor ##########################################################
 depends = armor
 
