@@ -16,6 +16,36 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
+player_style.register_manual_page({
+	name = "Workbench",
+	itemstyle = "default:workbench",
+	text = "The workbench contains a craft guide and a crafting grid that makes things less messy to craft.\nSome items like steel lumps can only be crafted in this way.",
+	tags = {"default:workbench"},
+})
+
+
+player_style.register_manual_page({
+	name = "Dye workbench",
+	itemstyle = "default:dye_workbench",
+	text = "Use this workbench to craft dye.\nAdd a bucket of water or water source, and colored items to mix the dye",
+	tags = {"default:dye_workbench"},
+})
+
+player_style.register_manual_page({
+	name = "Paper compressor",
+	itemstyle = "default:paper_compressor",
+	text = "Use the paper compressor to craft paper.\nAdd a bucket of water and pieces of wood",
+	tags = {"default:paper_compressor"},
+})
+
+player_style.register_manual_page({
+	name = "Recycling mill",
+	itemstyle = "default:recycling_mill",
+	text = "The recycling mill is used to recycling items / demount items so you get the items it is made of",
+	tags = {"default:recycling_mill"},
+})
+
+
 
 minetest.register_craft_predict(function(itemstack, player, old_craft_grid, craft_inv)
 	if minetest.get_item_group(itemstack:get_name(),"not_regular_craft") > 0 then
