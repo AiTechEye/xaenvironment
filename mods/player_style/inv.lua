@@ -20,11 +20,7 @@ player_style.register_manual_page=function(def)
 	end
 
 	local t = def.text:find("%[") and def.text or "label[0,"..(def.label and 1 or 0)..";"..def.text.."]"
-	t = t .. def.label and "label[0,0;"..def.label.."]" or ""
-
-	if def.label then
-		t = t .. "label[0,0;"..def.label.."]"
-	end
+	t = t .. (def.label and "label[0,0;"..def.label.."]" or "")
 
 	table.insert(player_style.manual_pages,{name=def.name,text=t,tags=def.tags,action=def.action})
 end
@@ -68,7 +64,7 @@ player_style.register_button({
 
 player_style.register_button({
 	name="Manual",
-	image="player_style_manual.png",
+	image="default_unknown.png",
 	type="image",
 	info="User manual",
 	action=function(player)
