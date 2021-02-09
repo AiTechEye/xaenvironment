@@ -25,7 +25,6 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 |Cat leap|jump backwards in edge climbing|
 |Tic tac/walljump|run + jump side of a wall|
 |Double wall climb|hold left & right|
-|Backflip|hold jump & press back/down|
-|Backflip|hold jump, (hold) place/RMB & press back/down|
+|Backflip|jump, (hold) place/RMB & press back/down|
 |Frontflip|jump, (hold) place/RMB & press forward/up|
 
