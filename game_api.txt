@@ -8,6 +8,7 @@ Cat leap		jump backwards in edge climbing
 Tic tac/walljump	run + jump side of a wall
 Double wall climb	hold left & right
 Backflip		hold jump & press back/down
+Frontflip		jump, (hold) place/RMB & press forward/up
 Commands ##########################################################
 /protect 1		select position 1, reselect by punch the node
 /protect 2		select position 2, reselect by punch the node
