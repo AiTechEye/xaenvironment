@@ -422,7 +422,7 @@ end
 player_style.register_manual_page({
 	name = "Controls",
 	label = "Controls",
-	text = "table[0,0;2,8;a,s,d;0]tablecolumns[text]",
+	text = "",
 	tags = {"default:dirt","default:dirt_with_grass","snowy"},
 	action=function(player)
 		local y = 1
@@ -436,12 +436,12 @@ player_style.register_manual_page({
 			["Cat leap"]="jump backwards in edge climbing",
 			["Tic tac/walljump"]="run + jump side of a wall",
 			["Double wall climb"]="hold left & right",
-			["Backflip	"]="jump, (hold) place/RMB & press back/down",
-			["Frontflip"]="jump, (hold) place/RMB & press forward/up"
+			["Backflip	"]="jump, (hold) place/RMB & press back",
+			["Frontflip"]="jump, (hold) place/RMB & press forward"
 		}
 		table.sort(l)
 		for i,v in pairs(l) do
-			t = t .. "label[0,"..y..";"..i.."]label[3,"..y..";"..v.."]"
+			t = t .. "label[-0.2,"..y..";"..i.."]label[2.5,"..y..";"..v.."]"
 			y = y + 0.5
 		end
 		return t
