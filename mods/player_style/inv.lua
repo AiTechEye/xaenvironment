@@ -353,6 +353,8 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		if pressed.manuallist then
 			local i = minetest.explode_textlist_event(pressed.manuallist).index
 			player_style.manual(player,i)
+		elseif pressed.close then
+			player_style.manual(player)
 		else
 			for i,v in pairs(pressed) do
 				if i:sub(1,7) == "manual_" then
@@ -417,12 +419,15 @@ player_style.manual=function(player,page)
 		text = text .. "textlist[0,0;2,7;manuallist;".. items .."]"
 		return minetest.show_formspec(name, "player_style.manual",text)
 	else
+
 		local p = player_style.manual_pages[page]
-		text = text .. p.text
+		text = text .. (p.text or "")
 		if p.action then
 			text = text .. p.action(player) or ""
 		end
-		return minetest.show_formspec(name, "player_style_manual_page",text)
+
+		text = text .. "button[7.2,-0.3;1,1;close;X]"
+		return minetest.show_formspec(name, "player_style.manual",text)
 	end
 end
 
