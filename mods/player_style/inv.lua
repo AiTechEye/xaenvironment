@@ -12,6 +12,23 @@ player_style.register_button=function(def)
 	player_style.buttons.action[def.name]=def.action
 end
 
+player_style.register_manual_page=function(def)
+	if type(def.name) ~= "string" then
+		error("name (string) required!")
+	elseif type(def.text) ~= "string" then
+		error("text (string) required!")
+	end
+
+	local t = def.text:find("%[") and def.text or "label[0,"..(def.label and 1 or 0)..";"..def.text.."]"
+	t = t .. def.label and "label[0,0;"..def.label.."]" or ""
+
+	if def.label then
+		t = t .. "label[0,0;"..def.label.."]"
+	end
+
+	table.insert(player_style.manual_pages,{name=def.name,text=t,tags=def.tags,action=def.action})
+end
+
 minetest.register_privilege("creative", {
 	description = "Creative",
 	give_to_singleplayer= false,
@@ -46,6 +63,16 @@ player_style.register_button({
 				.."listring[detached:backpack;main]"
 			)
 		end
+	end
+})
+
+player_style.register_button({
+	name="Manual",
+	image="player_style_manual.png",
+	type="image",
+	info="User manual",
+	action=function(player)
+		player_style.manual(player)
 	end
 })
 
@@ -317,8 +344,110 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					player:get_inventory():add_item("main",t.." "..minetest.registered_items[t].stack_max)
 					break
 				end
-	
+			end
+		end
+	elseif form == "player_style.manual" then
+		if pressed.manuallist then
+			local i = minetest.explode_textlist_event(pressed.manuallist).index
+			player_style.manual(player,i)
+		else
+			for i,v in pairs(pressed) do
+				if i:sub(1,7) == "manual_" then
+					player_style.manual(player,tonumber(i:sub(8,-1)))
+					break
+				end
 			end
 		end
 	end
 end)
+
+player_style.manual=function(player,page)
+	local name = player:get_player_name()
+	local ppr = player_style.players[name]
+	ppr.manual = ppr.manual or {}
+	local text = "size[8,8]listcolors[#77777777;#777777aa;#000000ff]"
+
+	if not page then
+		local dir = player:get_look_dir()
+		local pos = player:get_pos()
+		local p1 = {x=pos.x+dir.x,y=pos.y+1.4,z=pos.z+dir.z}
+		local p2 = {x=pos.x+(dir.x*5),y=pos.y+1.4+(dir.y*5),z=pos.z+(dir.z*5)}
+
+		local node
+		local object
+		local sh
+
+		for v in minetest.raycast(p1,p2,true,true) do
+			if v.type == "node" then
+				node = minetest.get_node(v.under).name
+			elseif v.type == "object" then
+				local en = v.ref:get_luaentity()
+				if en then
+					object = en.name
+				end
+			end
+			break
+		end
+
+		local item = object or node or player:get_wielded_item():get_name()
+		local items = ""
+		local c = ""
+		for i,v in ipairs(player_style.manual_pages) do
+			items = items .. c .. v.name
+			c = ","
+			if not sh and v.tags and item then
+				local def = minetest.registered_items[item] or {}
+				local groups = def.groups or {}
+				for i1,v1 in ipairs(v.tags) do
+					if item == v1 or groups[v1] then
+						sh = true
+						if def then
+							text = text .. "item_image_button[7,0;1,1;"..item..";manual_"..i..";]"
+						else
+							text = text .. "image_button[7,0;1,1;default_unknown.png;manual_"..i..";]"
+						end
+						break
+					end
+				end
+			end
+		end
+		text = text .. "textlist[0,0;2,7;manuallist;".. items .."]"
+		return minetest.show_formspec(name, "player_style.manual",text)
+	else
+		local p = player_style.manual_pages[page]
+		text = text .. p.text
+		if p.action then
+			text = text .. p.action(player) or ""
+		end
+		return minetest.show_formspec(name, "player_style_manual_page",text)
+	end
+end
+
+player_style.register_manual_page({
+	name = "Controls",
+	label = "Controls",
+	text = "table[0,0;2,8;a,s,d;0]tablecolumns[text]",
+	tags = {"default:dirt","default:dirt_with_grass","snowy"},
+	action=function(player)
+		local y = 1
+		local t = ""
+		local l = {
+			["Crawl"]="sneak",
+			["Run"]="special/aux1",
+			["Wallrun"]="run + jump into a wall (can be hard)",
+			["Edge climb"]="touch an edge above the ground",
+			["Kong"]="run into a block",
+			["Cat leap"]="jump backwards in edge climbing",
+			["Tic tac/walljump"]="run + jump side of a wall",
+			["Double wall climb"]="hold left & right",
+			["Backflip	"]="jump, (hold) place/RMB & press back/down",
+			["Frontflip"]="jump, (hold) place/RMB & press forward/up"
+		}
+		table.sort(l)
+		for i,v in pairs(l) do
+			t = t .. "label[0,"..y..";"..i.."]label[3,"..y..";"..v.."]"
+			y = y + 0.5
+		end
+		return t
+	end
+})

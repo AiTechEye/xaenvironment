@@ -344,13 +344,15 @@ minetest.register_node("player_style:top_hat_upside_down", {
 		local pos1 = minetest.string_to_pos(meta:get_string("pos1"))
 		local pos2 = minetest.string_to_pos(meta:get_string("pos2"))
 		local item = ItemStack(object:get_luaentity().itemstring)
-		minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
 		if pos1 and exatec.test_input(pos1,item,pos1,pos1) then
 			exatec.input(pos1,item,pos1,pos1)
 			object:remove()
 		elseif pos2 then
 			object:set_pos(pos2)
+		else
+			return
 		end
+		minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
 	end,
 	on_punch=function(pos, node, puncher,pounted_thing)
 		if minetest.is_protected(pos,puncher:get_player_name()) then

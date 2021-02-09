@@ -2,6 +2,7 @@ player_style={
 	players={},
 	buttons={text="",num=0,num_of_buttons=0,action={}},
 	registered_profiles={},
+	manual_pages = {},
 	player_attached={},
 	player_dive = {},
 	player_running = {},
@@ -386,9 +387,9 @@ player_style.register_profile=function(def)
 		mesh =		def.mesh or "character.b3d",
 		diving =		def.dive or true,
 		flying =		def.flying or true,
-		backflip =	def.backflip or true,
+		flip =		def.flip or true,
 		animation = 	def.animation or {
-					stand={x=1,y=39,speed=30,blend=0.2},
+					stand={x=1,y=39,speed=30},
 					walk={x=41,y=60,speed=30},
 					run={x=41,y=61,speed=60},
 					sneak={x=41,y=61,speed=15},
@@ -399,7 +400,7 @@ player_style.register_profile=function(def)
 					fly={x=125,y=135,speed=0},
 					dive={x=136,y=155,speed=30},
 					backflip={x=157,y=170,speed=30,loop=false},
-					backflipfreeze={x=157,y=170,speed=0,blend=0.1},
+					frontflip={x=170,y=181,speed=30,loop=false},
 				},
 		eye_height =	def.eye_height or 1.6,
 		stepheight =	def.stepheight or 0.7,
@@ -591,20 +592,21 @@ minetest.register_globalstep(function(dtime)
 				end
 			end
 
-
-			if ppr.flip or key.jump and key.down and default.defpos(apos(p,0,-1),"walkable") then
+--flips
+			if ppr.flip or key.jump and key.RMB and (key.down or key.up) and not default.defpos(apos(p,0,-0.5),"walkable") then
 				if ppr.flip then
 					ppr.flip.time = ppr.flip.time -dtime
 					if ppr.flip.time <= 0 then
-						if key.jump and key.down and not ppr.flip.lay and minetest.get_item_group(minetest.get_node(p).name,"liquid") == 0 then
-							ppr.flip.time = 0.3
+						if key.jump and key.RMB and not ppr.flip.lay and minetest.get_item_group(minetest.get_node(p).name,"liquid") == 0 then
+							ppr.flip.time = 0.4
 							ppr.flip.flips = ppr.flip.flips + 1
-							player_style.set_animation(name,"backflipfreeze")
-							player_style.set_animation(name,"backflip")
+							ppr.current = ""
+							player_style.set_animation(name,ppr.flip.type.."flip")
 						else
-							local lab = {"Backflip","Double Backflip","Triple Backflip","Quadruple Backflip"}
+							local f = ppr.flip.type:sub(1,1):upper()..ppr.flip.type:sub(2,-1)
+							local lab = {f.."flip","Double "..f.."flip","Triple "..f.."flip","Quadruple "..f.."flip"}
 							if not ppr.flip.lay then
-								minetest.chat_send_player(name,lab[ppr.flip.flips] or (ppr.flip.flips.."x Backflips"))
+								minetest.chat_send_player(name,lab[ppr.flip.flips] or (ppr.flip.flips.."x "..f.."flips"))
 							end
 							ppr.flip = nil
 						end
@@ -612,12 +614,14 @@ minetest.register_globalstep(function(dtime)
 						local r = math.random(1,10)
 						player:set_hp(player:get_hp()-(r < 10 and 1 or r*3))
 						player_style.set_animation(name,"lay")
-						ppr.flip = {time=0.5,lay=true,flips=0}
+						ppr.flip.time = 0.5
+						ppr.flip.lay = true
+						ppr.flip.flips = 0
 						player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
 					end
 				else
-					ppr.flip = {time=0.4,flips=1}
-					player_style.set_animation(name,"backflip")
+					ppr.flip = {time=0.4,flips=1,type=key.down and "back" or key.up and "front"}
+					player_style.set_animation(name,ppr.flip.type.."flip")
 				end
 				goto setp
 			elseif key.up or key.down or key.left or key.right then
