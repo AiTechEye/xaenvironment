@@ -295,7 +295,7 @@ minetest.register_entity("default:watersplash_ring",{
 	size2 = 1.5,
 	size1 = 0.5,
 	speed = 2,
-	use_texture_alpha=true,
+	object_use_texture_alpha="blend",
 	decoration=true,
 	static_save = false,
 	on_step=function(self, dtime)
