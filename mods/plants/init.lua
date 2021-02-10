@@ -1014,7 +1014,6 @@ default.register_plant({
 	name="cabbage",
 	tiles={"plants_cabbage.png"},
 	drawtype = "mesh",
-	use_texture_alpha = true,
 	inventory_image="plants_cabbage_broken.png",	
 	mesh = "plants_cabbage.obj",
 	waving =  0,
@@ -1033,7 +1032,6 @@ default.register_eatable("node","plants:cabbage_broken",1,4,{
 	inventory_image="plants_cabbage_broken.png",	
 	name="plants_cabbage",
 	tiles={"plants_cabbage.png"},
-	use_texture_alpha = true,
 	drawtype = "mesh",
 	mesh = "plants_cabbage.obj",
 	groups = {dig_immediate = 3,flammable=1},
@@ -1056,7 +1054,6 @@ minetest.register_craft({
 
 default.register_eatable("node","plants:tomato",1,2,{
 	description = "Tomato",
-	use_texture_alpha = true,
 	inventory_image="plants_tomato.png",	
 	name="plants_tomato",
 	tiles={"plants_tomato.png"},
