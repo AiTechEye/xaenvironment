@@ -1,3 +1,50 @@
+player_style.register_manual_page({
+	name = "Tree/Wood",
+	itemstyle = "plants:apple_tree",
+	text = "In this game you cant break natural tree or wood by hand, you need a kind of tool, like an axe",
+	tags = {"wood","tree"},
+})
+player_style.register_manual_page({
+	name = "Wrench",
+	itemstyle = "default:wrench",
+	text = "This is very useful if you want to rotate blocks without by breaking them, but especially for the tech mod where you cant rotate them vertical by placing those.",
+	tags = {"default:wrench"},
+})
+
+player_style.register_manual_page({
+	name = "Gold flakes",
+	itemstyle = "default:gold_flake",
+	text = "This gold can be found by diging sand under water.\n9x micro gold flakes -->1x gold flake\n9x gold flakes -->1x gold lump.\nThat means you need 81 micro gold flakes to craft a gold lump, this speaks for itself, dont waste you time by collecting them!.\nWalk down in a cave 50- blocks under the ground and find real gold instead.",
+	tags = {"default:gold_flake","default:micro_gold_flake"},
+})
+player_style.register_manual_page({
+	name = "Quantum pick",
+	itemstyle = "default:quantum_pick",
+	text = "The quantum pickaxe have an amazing ability to dig up to 20 blocks of same kind at same time.",
+	tags = {"default:quantum_pick"},
+})
+
+player_style.register_manual_page({
+	name = "Cloud",
+	itemstyle = "default:cloud",
+	text = "Clouds are a very strong materials used for tools and portals to other dimensions.\nThis blocks can be found at 250 blocks height as clouds.",
+	tags = {"default:cloud"},
+})
+
+player_style.register_manual_page({
+	name = "Uranium",
+	itemstyle = "default:uranium_lump",
+	text = "Uranium is a very powerful materials that can be used to craft things like quantum and bombs, active uranium ingots can also be used as a losvng-lasting fuel]item_image[1,0.5;1,1;default:uraniumactive_ingot]",
+	tags = {"default:uraniumactive_ingot","default:uranium_lump"},
+})
+
+player_style.register_manual_page({
+	name = "Bows",
+	itemstyle = "default:bow_wood",
+	text = "Bows are usualy crafted by 1 kind of material and 3 strings, load the bow by adding arrows in the left slot of the bow as the images shows and use.\nAll bows also have an auto arrow detection function you can activate by right click/placing the bow, that automatic finds arrows in your inventory.\nSome bows also have a multy shooting ability, that makes the bow can shoot multiply arrows from same kind at once, electric and silver are examples of those.]item_image[2,0.5;1,1;default:arrow_arrow]item_image[3,0.5;1,1;default:bow_steel]",
+	tags = {"default:uraniumactive_ingot","default:uranium_lump"},
+})
+
 minetest.register_tool("default:wrench", {
 	description = "Wrench (rotate blocks)",
 	groups = {treasure=1},
