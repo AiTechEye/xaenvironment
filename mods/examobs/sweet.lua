@@ -68,7 +68,6 @@ minetest.register_node("examobs:candy" .. i, {
 	description = "Candy",
 	groups = {snappy=3,flora=1},
 	tiles = {"default_stone.png^[colorize:#" .. candycolor[i] .."55"},
-	use_texture_alpha = true,
 	drawtype="nodebox",
 	walkable=false,
 	buildable_to=true,
@@ -104,6 +103,7 @@ minetest.register_node("examobs:gel", {
 	description = "Gel",
 	drawtype = "liquid",
 	tiles = {"default_water.png^[colorize:#00ff1155"},
+	use_texture_alpha = "clip",
 	alpha=200,
 	paramtype = "light",
 	walkable = false,
@@ -122,6 +122,7 @@ minetest.register_node("examobs:gel", {
 minetest.register_node("examobs:gel_flowing", {
 	description = "Gel flowing",
 	drawtype = "flowingliquid",
+	use_texture_alpha = "clip",
 	tiles = {"default_water.png^[colorize:#00ff1155"},
 	special_tiles = {
 		{
@@ -153,6 +154,7 @@ minetest.register_node("examobs:gel_flowing", {
 minetest.register_node("examobs:gel2", {
 	description = "Gel 2",
 	drawtype = "liquid",
+	use_texture_alpha = "clip",
 	tiles = {"default_stone.png^[colorize:#00ff0055"},
 	alpha=200,
 	paramtype = "light",
@@ -172,6 +174,7 @@ minetest.register_node("examobs:gel2", {
 minetest.register_node("examobs:gel_flowing2", {
 	description = "Gel flowing",
 	drawtype = "flowingliquid",
+	use_texture_alpha = "clip",
 	tiles = {"default_stone.png^[colorize:#00ff0055"},
 	special_tiles = {
 		{

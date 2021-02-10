@@ -2412,7 +2412,7 @@ examobs.register_fish({
 
 examobs.register_mob({
 	name = "gass_man",
-	type = "npc",
+	type = "monster",
 	coin = 2,
 	team = "gass",
 	textures = {"examobs_gassman.png"},

@@ -237,7 +237,6 @@ examobs.register_fish=function(def)
 	minetest.register_node(mobname, {
 		description = "Dead " .. def2.name,
 		wield_scale = {x=0.3,y=0.3,z=0.3},
-		use_texture_alpha = true,
 		visual_scale=0.1,
 		selection_box = {
 			type = "fixed",

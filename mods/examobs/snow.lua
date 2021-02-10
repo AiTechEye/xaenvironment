@@ -1,7 +1,6 @@
 minetest.register_node("examobs:hat", {
 	tiles = {"default_coalblock.png^[colorize:#333333aa"},
 	groups = {dig_immediate = 3,not_in_creative_inventory=1},
-	use_texture_alpha = true,
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(math.random(1,10))
 	end,
