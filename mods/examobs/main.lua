@@ -62,6 +62,7 @@ end
 examobs.register_mob=function(def)
 
 	local name = minetest.get_current_modname() ..":" .. def.name
+	examobs.registered_num = examobs.registered_num + 1
 
 	def.hp =				def.hp or				20
 	def.hp_max = 			def.hp

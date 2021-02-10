@@ -1,4 +1,5 @@
 examobs={
+	registered_num = 0,
 	global_timer=0,
 	global_time=0,
 	global_lifetime=0,

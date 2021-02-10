@@ -760,3 +760,216 @@ minetest.register_entity("examobs:torpedo_ray",{
 		end
 	end
 })
+
+minetest.register_craft({
+	output = "examobs:book",
+	recipe = {
+		{"group:metalstick","group:stick","default:coal_lump"},
+		{"default:paper","default:paper","default:paper"},
+		{"default:paper","default:paper","default:paper"}
+	}
+})
+
+minetest.register_tool("examobs:book", {
+	description = "Mob Book",
+	range=15,
+	inventory_image = "examobs_book.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local pos=user:get_pos()
+		local name=user:get_player_name()
+		local save
+		local meta = itemstack:get_meta() 
+
+		local mobs = minetest.deserialize(meta:get_string("mobs")) or {}
+		local pages = meta:get_int("pages")
+		local username = meta:get_string("username")
+		local selected = meta:get_string("selected")
+		local selected_num = meta:get_int("selected_num")
+
+		if username == "" then
+			username = name
+			meta:set_string("username",name)
+			meta:set_string("description","Ai Book by ".. name)
+		end
+
+		if username == name then
+			local m={}
+			local en = pointed_thing.ref and pointed_thing.ref:get_luaentity()
+
+			for i, b in ipairs(mobs) do
+				m[b]=1
+			end
+			
+			if en and en.examob and not m[en.name] then
+				m[en.name]=1
+				selected=en.name
+				save=true
+			else
+				for _, ob in ipairs(minetest.get_objects_inside_radius(pos,5)) do
+					local en = ob:get_luaentity()
+					if en and en.examob and not m[en.name] and examobs.visiable(user,ob) then
+						m[en.name]=1
+						selected=en.name
+						save=true
+					end
+				end
+			end
+			if save then
+				local sm={}
+				local num=0
+				for b, n in pairs(m) do
+					num=num+1
+					table.insert(sm,b)
+					if selected_num==0 and b==selected then
+						selected_num=num
+					end
+					pages=num
+				end
+				mobs=sm
+				minetest.chat_send_player(name, "Book: New content added")
+
+				meta:set_string("mobs",minetest.serialize(mobs))
+				meta:set_int("pages",pages)
+				meta:set_string("selected",selected)
+				meta:set_int("selected_num",selected_num)
+
+
+				--if aliveai.grant_invisiable==true and not meta.finished and pages>=aliveai.loaded_objects then
+				--	local p=minetest.get_player_privs(name)
+				--	p.aliveai_invisibility=true
+				--	minetest.set_player_privs(name, p)
+				--	meta.finished=1
+				--	minetest.chat_send_player(name, "Book: You have been granted aliveai_invisibility")
+				--	minetest.chat_send_player(name, "Book: Ai's will not detect you when you are sneaking")
+				--end
+			end
+		end
+		examobs.view_book(user,itemstack)
+		return itemstack
+	end,
+})
+
+examobs.view_book=function(user,itemstack)
+	local meta = itemstack:get_meta()
+	local mobs = minetest.deserialize(meta:get_string("mobs")) or {}
+	local pages = meta:get_int("pages")
+	local username = meta:get_string("username")
+	local selected = meta:get_string("selected")
+	local selected_num = meta:get_int("selected_num")
+
+	table.sort(mobs)
+	local list=""
+	local c=""
+	local name=user:get_player_name()
+
+	for i, bot in ipairs(mobs) do
+		list=list .. c .. bot
+		c=","
+	end
+
+	local gui="size[10,8]"
+	.."listcolors[#77777777;#777777aa;#000000ff]"
+	.."background[-0.2,-0.2;10.4,8.6;default_stone.png]"
+	.. "label[7.5,0;Page: " .. selected_num.. "/" .. pages .. " (" .. examobs.registered_num ..")]"
+	.."dropdown[0,-0.1;3,1;list;" .. list.. ";" .. selected_num .."]"
+	.."button[3,-0.2;1,1;bac;<]"
+	.."button[4,-0.2;1,1;fro;>]"
+
+	local e = minetest.registered_entities[selected]
+
+	if pages == 0 then
+		gui=gui .. "label[0,0.5;\nEmpty mob Book\n\nPunch one or use the book near mobs to add.]"
+	elseif not e then
+		gui=gui .. "label[0,0.5;\nThis is not a valid mob]"
+	else
+
+		local light = e.light_min >= 9 and "light" or "darknes"
+		local aggressive = e.aggressivity > 0 and "true" or e.aggressivity == 0 and "neutral" or "false"
+		local flying_or_floating = "false"
+		local drops=""
+
+		if e.floating_in_group then
+			flying_or_floating = "true"
+		else
+			for i,v in pairs(e.floating) do
+				flying_or_floating = "true"
+				break
+			end
+		end
+
+		for it, c in pairs(e.inv) do
+			local r = minetest.registered_items[it] or {}
+			drops = drops .. (r.description or it) .." " .. c ..", "
+		end
+		drops = drops ~= "" and drops or "none"
+
+
+		gui=gui
+		.. "label[0,0.5;Name:\nType:\nTeam:\nHealth:\nDamage:\nDrops:\nFlying/Floating:\nAggressive:\nThrive in]"
+		.. "label[2.5,0.5;"..e.name.."\n"..e.type.."\n"..e.team.."\n"..e.hp.."\n"..e.dmg.."\n"..drops.."\n"..flying_or_floating.."\n"..aggressive.."\n"..light.."]"
+
+		local def = default.def(e.name.."_spawner")
+		if def.drawtype == "mesh" then
+			local textures = ""
+			for i,v in pairs(def.tiles) do
+				textures = textures ..v..","
+			end
+			textures = textures:sub(1,-2)
+			gui=gui .."model[6,0.5;3,3;model;"..def.mesh..";"..minetest.formspec_escape(textures)..";-20,150;false;true;1,1]"
+		elseif e.visual == "mesh" then
+			local textures = ""
+			for i,v in pairs(e.textures) do
+				textures = textures ..v..","
+			end
+			textures = textures:sub(1,-2)
+			gui=gui .."model[6,0.5;3,3;model;"..e.mesh..";"..minetest.formspec_escape(textures)..";-20,150;false;true;1,1]"
+		else
+			gui=gui .. "label[6,0.5;Preview unable]"
+		end
+
+	end
+	minetest.after(0, function(gui)
+		return minetest.show_formspec(name, "examobs.book",gui)
+	end, gui)
+end
+
+minetest.register_on_player_receive_fields(function(player, form, pressed)
+	if form=="examobs.book" and not pressed.quit then
+		local item = player:get_wielded_item()
+		local meta = item:get_meta()
+		local mobs = minetest.deserialize(meta:get_string("mobs")) or {}
+		local pages = meta:get_int("pages")
+		local selected = meta:get_string("selected")
+		local selected_num = meta:get_int("selected_num")
+
+		if not pages == 0 then
+			return
+		end
+		table.sort(mobs)
+		if pressed.fro then
+			selected_num=selected_num+1
+			if selected_num>pages then
+				selected_num=1
+			end
+			selected=mobs[selected_num]
+		elseif pressed.bac then
+			selected_num=selected_num-1
+			if selected_num<1 then
+				selected_num=pages
+			end
+			selected=mobs[selected_num]
+		elseif pressed.list then
+			selected=pressed.list
+			for i, b in ipairs(mobs) do
+				if b==selected then
+					selected_num=i
+					break
+				end
+			end
+		end
+		meta:set_string("selected",selected)
+		meta:set_int("selected_num",selected_num)
+		player:get_inventory():set_stack("main", player:get_wield_index(),item)
+		examobs.view_book(player,item)
+	end
+end)
