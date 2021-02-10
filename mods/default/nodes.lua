@@ -122,7 +122,6 @@ minetest.register_node("default:cloud", {
 	light_source = 13,
 	post_effect_color = {a = 220, r = 255, g = 255, b = 255},
 	drowning = 1,
-	alpha=240,
 })
 
 minetest.register_node("default:dye", {
@@ -215,7 +214,6 @@ minetest.register_node("default:gas", {
 	post_effect_color = {a = 20, r = 213, g = 255, b = 0},
 	drowning = 1,
 	buildable_to = true,
-	alpha=10,
 	drop = "",
 	on_update = function(pos)
 		minetest.after(0.1,function(pos)
@@ -1367,7 +1365,7 @@ minetest.register_node("default:emerald", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	drowning = 1,
-	alpha=220,
+	use_texture_alpha = "blend",
 	sounds = default.node_sound_glass_defaults(),
 })
 
