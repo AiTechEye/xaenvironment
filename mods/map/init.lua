@@ -255,7 +255,6 @@ minetest.register_entity("map:part",{
 	backface_culling=false,
 	textures = {"default_air.png"},
 	static_save = false,
-	use_texture_alpha=true,
 	decoration=true,
 	time = 5,
 	on_step=function(self, dtime)
