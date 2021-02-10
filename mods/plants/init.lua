@@ -446,7 +446,7 @@ default.register_plant({
 		tiles={default.dye_texturing(v,{opacity=200})},
 		groups = {store=100,crystal=1},
 		dye_colors = {palette=v},
-		alpha = 150,
+		use_texture_alpha = "blend",
 		decoration = {
 			place_on = {"default:stone","default:sand"},
 			y_max = -10,
@@ -464,7 +464,7 @@ default.register_plant({
 		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
 		groups = {store=200,crystal=1},
 		dye_colors = {palette=v},
-		alpha = 150,
+		use_texture_alpha = "blend",
 		selection_box = {type="fixed",fixed={-0.4,-0.5,-0.4,0.4,0.5,0.4}},
 		collision_box = {type = "fixed",fixed = {-0.4, -0.5, -0.4, 0.4, 0.5, 0.4}},
 		decoration = {
@@ -486,14 +486,14 @@ default.register_plant({
 		paramtype = "light",
 		light_source = 7,
 		dye_colors = {palette=v},
-		alpha = 150,
+		use_texture_alpha = "blend",
 		sounds = default.node_sound_glass_defaults(),
 	})
 	minetest.register_decoration({
 		deco_type = "simple",
 		decoration = "plants:crystal_block"..i,
-
 		place_on = {"default:stone"},
+		use_texture_alpha = "blend",
 		sidelen = 16,
 		noise_params = {
 			offset =  0.002,
@@ -501,8 +501,6 @@ default.register_plant({
 			spread = {x = 100, y = 100, z = 100},
 			octaves = 3,
 			persist = 0.6
-
-		--seed = 80*v,
 		},
 		y_max = -50,
 		y_min = -30000,
