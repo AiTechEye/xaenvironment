@@ -121,6 +121,13 @@ minetest.register_on_mods_loaded(function()
 	exacarts.map = minetest.deserialize(exacarts.storage:get_string("map")) or {}
 end)
 
+player_style.register_manual_page({
+	name = "Carts",
+	itemstyle = "exacarts:cart",
+	text = "The industryal vehicle is used to transport players and items. It is also made to be an extremly stunt vehicle then can reach its top speed 1000 blocks/s.\n\nHow to use:\nRighclick to enter/exit a cart\nPunch speed it up / pick up\nHold right/left to turn right/left\n\nYou can throw items into a cart to add them, the carts have a 100 slots inventory.\nYou can sit in a cart with items, punch it to move it away, right click it drop the items.]item_image[1,0.5;1,1;exacarts:rail]item_image[2,0.5;1,1;exacarts:derail_rail]item_image[3,0.5;1,1;exacarts:detector_rail]item_image[4,0.5;1,1;exacarts:dir_rail]item_image[5,0.5;1,1;exacarts:stop_start_rail]item_image[6,0.5;1,1;exacarts:exit_rail]item_image[7,0.5;1,1;exacarts:max_rail]",
+	tags = {"exacarts:cart","rail"},
+})
+
 minetest.register_craft({
 	output="exacarts:cart",
 	recipe={
@@ -904,6 +911,7 @@ minetest.register_entity("exacarts:cart",{
 					if exacarts.on_rail(opos,self) then
 						return
 					end
+
 					for _, ob in pairs(minetest.get_objects_inside_radius(opos, 1)) do
 						local en = ob:get_luaentity()
 						if not (en and (en.exacart or en.name == "__builtin:item")) and not (self.user and ob:get_attach()) then
