@@ -452,7 +452,7 @@ minetest.register_node("pyramids:diamond" .. i, {
 	paramtype = "light",
 	sunlight_propagates = true,
 	wield_scale = {x=2, y=2, z=2},
-	alpha = 20,
+	use_texture_alpha = "blend",
 	selection_box = {type = "fixed",fixed={-0.2, -0.5, -0.2, 0.2, -0.2, 0.2}},
 	mesh="pyramids_diamond.obj",
 })
