@@ -22,10 +22,6 @@ player_style.register_manual_page=function(def)
 	if def.itemstyle then
 		t = "label[0,0;"..def.name.."]item_image[0,0.5;1,1;"..def.itemstyle.."]textarea[0,1.5;8.5,8.0;;;"..(def.text or "").."]"
 	else
---label[0,1.5;"..(def.text or "").."]"
-
-
-
 		t = def.text:find("%[") and def.text or "label[0,"..(def.label and 1 or 0)..";"..def.text.."]"
 		t = t .. (def.label and "label[0,0;"..def.label.."]" or "")
 	end
