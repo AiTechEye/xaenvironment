@@ -907,6 +907,7 @@ examobs.view_book=function(user,itemstack)
 		gui=gui
 		.. "label[0,0.5;Name:\nType:\nTeam:\nHealth:\nDamage:\nDrops:\nFlying/Floating:\nAggressive:\nThrive in]"
 		.. "label[2.5,0.5;"..e.name.."\n"..e.type.."\n"..e.team.."\n"..e.hp.."\n"..e.dmg.."\n"..drops.."\n"..flying_or_floating.."\n"..aggressive.."\n"..light.."]"
+		.. (e.description and "textarea[0,4.2;9.5,8.0;;;"..e.description.."]" or "")
 
 		local def = default.def(e.name.."_spawner")
 		if def.drawtype == "mesh" then

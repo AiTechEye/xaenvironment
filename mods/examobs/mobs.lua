@@ -1,4 +1,5 @@
 examobs.register_mob({
+	description = "A little animal that usually hides in sand",
 	name = "crab",
 	team = "crab",
 	type = "animal",
