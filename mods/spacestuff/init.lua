@@ -424,7 +424,7 @@ minetest.register_node("spacestuff:air", {
 	buildable_to = true,
 	drawtype = "glasslike",
 	post_effect_color = {a = 180, r = 120, g = 120, b = 120},
-	alpha = 20,
+	use_texture_alpha = "blend",
 	tiles = {"default_cloud.png^[colorize:#E0E0E099"},
 	groups = {not_in_creative_inventory=0},
 	paramtype = "light",
