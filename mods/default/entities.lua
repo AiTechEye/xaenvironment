@@ -19,6 +19,21 @@ local item = {
 		end
 		local d = minetest.deserialize(staticdata) or {}
 		self.just_spawned = d.just_spawned
+
+		for i,v in pairs(multidimensions.registered_dimensions) do
+			if pos.y >= v.dim_y and pos.y <= v.dim_y+v.dim_height then
+				local acc = self.object:get_acceleration({x=0, y=0, z=0})
+				acc.y = acc.y*v.gravity
+				self.object:set_acceleration(acc)
+				break
+			end
+		end
+
+
+
+
+
+
 	end,
 	burn = function(self)
 		local pos = self.object:get_pos()
