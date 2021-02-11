@@ -3,6 +3,7 @@ pyramids={
 }
 
 examobs.register_mob({
+	description = "This odd and mindless monster that mainly consisting of paper have an extreme durability which is very inexplicable due its consistence, the easiest way to get it away is simply to trick it down in the deep pyramid traps.",
 	name = "mummy",
 	type = "monster",
 	team = "pyramid",
