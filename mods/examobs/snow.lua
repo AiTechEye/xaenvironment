@@ -106,21 +106,21 @@ bows.register_arrow("snowball",{
 })
 
 examobs.register_mob({
-		description="A monster consisting of snow without face, also spitting snow",
-		name="snowman",
-		aggressivity = 2,
-		walk_speed = 1,
-		team="snow",
-		textures={"default_snow.png"},
-		swiming = 0,
-		type="monster",
-		hp=10,
-		range=2,
-		collisionbox={-0.5,-0.45,-0.5,0.5,2.0,0.5},
-		visual="cube",
-		lay_on_death = 0,
-		inv={["default:snow"]=1,["default:snowblock"]=3,["examobs:hat"]=1},
-		spawn_on={"group:snowy","default:dirt_with_snow"},
+	description="A monster consisting of snow without face, also spitting snow",
+	name="snowman",
+	aggressivity = 2,
+	walk_speed = 1,
+	team="snow",
+	textures={"default_snow.png"},
+	swiming = 0,
+	type="monster",
+	hp=10,
+	range=2,
+	collisionbox={-0.5,-0.45,-0.5,0.5,2.0,0.5},
+	visual="cube",
+	lay_on_death = 0,
+	inv={["default:snow"]=1,["default:snowblock"]=3,["examobs:hat"]=1},
+	spawn_on={"group:snowy","default:dirt_with_snow"},
 	on_spawn=function(self)
 		self.object:set_properties({visual="wielditem",visual_size={x=0.6,y=0.6},textures={"examobs:snowman"}})
 		local e=minetest.add_entity(self.object:get_pos(), "examobs:hat")
@@ -135,6 +135,126 @@ examobs.register_mob({
 	end,
 	on_load=function(self)
 		self.on_spawn(self)
+	end,
+	snowbtime = 0,
+	step=function(self)
+		if self.fight then
+			if self.snowbtime <= 0 then
+				self.snowbtime = 5
+				if examobs.viewfield(self,self.fight) and examobs.visiable(self.object,self.fight:get_pos()) then
+					self:use_bow(self.fight)
+				end
+			else
+				self.snowbtime=self.snowbtime -1
+			end
+		end
+	end,
+	use_bow=function(self,target)
+		local pos1 = apos(self.object:get_pos(),0,-1)
+		pos1 = examobs.pointat(self,2)
+		local pos2 = target:get_pos()
+		local d=math.floor(vector.distance(pos1,pos2)+0.5)
+		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
+		local user = {
+			get_look_dir=function()
+				return dir
+			end,
+			punch=function()
+			end,
+			get_pos=function()
+				return pos1
+			end,
+			set_pos=function(pos)
+				return self.object:set_pos(pos)
+			end,
+			get_player_control=function()
+				return {}
+			end,
+			get_look_horizontal=function()
+				return self.object:get_yaw() or 0
+			end,
+			get_player_name=function()
+				return self.examob ..""
+			end,
+			is_player=function()
+				return true
+			end,
+			examob=self.examob,
+			object=self.object,
+		}
+		local item = ItemStack({
+			name="default:bow_wood_loaded",
+			metadata=minetest.serialize({arrow="examobs:arrow_snowball",shots=1})
+		})
+		bows.shoot(item, user,nil,function(item)
+			item:remove()
+		end)
+	end,
+	death=function(self,puncher,pos)
+		if self.hat and self.hat:get_attach() then
+			self.hat:set_detach()
+			self.hat:remove()
+		end
+		minetest.add_particlespawner({
+			amount = 30,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-5, y=0, z=-5},
+			maxvel = {x=5, y=5, z=5},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 2,
+			maxsize = 4,
+			texture = "default_snowball.png",
+			collisiondetection = true,
+		})
+		minetest.sound_play("default_snow_footstep", {pos=pos, gain = 1.0, max_hear_distance = 5,})
+	end,
+	on_punched=function(self,puncher)
+		local pos=self.object:get_pos()
+		minetest.add_particlespawner({
+			amount = 5,
+			time =0.05,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-5, y=0, z=-5},
+			maxvel = {x=5, y=5, z=5},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.2,
+			maxsize = 2,
+			texture = "default_snow.png",
+			collisiondetection = true,
+		})
+	end
+})
+
+examobs.register_mob({
+	description="A monster consisting of snow, also spitting snow",
+	name="snowman_like",
+	aggressivity = 2,
+	team="snow",
+	textures = {"player_style_snowman.png"},
+	swiming = 0,
+	type="monter",
+	hp=10,
+	lay_on_death = 0,
+	inv={["default:snow"]=1,["default:snowblock"]=3,["examobs:hat"]=1},
+	spawn_on={"group:snowy","default:dirt_with_snow"},
+	animation = {
+		stand={x=1,y=39,speed=30,loop=false},
+		walk={x=41,y=61,speed=30,loop=false},
+		run={x=80,y=99,speed=60},
+		lay={x=113,y=123,speed=0,loop=false},
+		attack={x=80,y=99,speed=60},
+	},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
 	end,
 	snowbtime = 0,
 	step=function(self)
