@@ -125,6 +125,36 @@ exaachievements.register({
 
 exaachievements.register({
 	type="customize",
+	name="Circus artist",
+	count=20,
+	description="Do 20 backflips",
+	skills=10,
+	hide_until=10,
+})
+
+exaachievements.register({
+	type="customize",
+	name="Freerunner",
+	count=20,
+	description="Do 20 frontflips",
+	skills=10,
+	hide_until=10,
+})
+
+exaachievements.register({
+	type="customize",
+	name="artist",
+	count=#player_style.skins.skins,
+	description="buy all skins",
+	skills=1000,
+	hide_until=10,
+	completed=function(player)
+		Coin(player,10000)
+	end
+})
+
+exaachievements.register({
+	type="customize",
 	name="Mob_book_completely",
 	count=1,
 	description="Completely a mob book",
@@ -266,11 +296,47 @@ exaachievements.register({
 exaachievements.register({
 	type="dig",
 	count=100,
+	name="Crystals",
+	item="crystal",
+	image="plants:pebble_crystal4",
+	description="Dig 100 crystals",
+	skills=10,
+	hide_until=20,
+	approve=function(user,item,pos)
+		return minetest.get_item_group(item:get_name(),"crystal") > 0
+	end
+})
+exaachievements.register({
+	type="dig",
+	count=100,
+	name="Pro diver",
+	item="materials:granite_orb",
+	description="Dig 100 granite orbs in deep oceans",
+	skills=100,
+	hide_until=20,
+	approve=function(user,item,pos)
+		return minetest.get_item_group(minetest.get_node(apos(pos,0,1)).name,"water") > 0 and pos.y < 20
+	end
+})
+
+exaachievements.register({
+	type="dig",
+	count=100,
 	name="Moon caveman",
 	item="default:space_stone",
 	description="Dig 100 space stone",
 	skills=10,
 	hide_until=20,
+})
+
+exaachievements.register({
+	type="customize",
+	count=10,
+	name="Space guy",
+	item="spacestuff:spacesuit",
+	description="Empty 10 air bottles in vacuum",
+	skills=100,
+	hide_until=50,
 })
 
 exaachievements.do_a({item="multidimensions:teleporter_candyland",skills=100})
