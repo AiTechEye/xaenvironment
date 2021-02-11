@@ -833,15 +833,10 @@ minetest.register_tool("examobs:book", {
 				meta:set_string("selected",selected)
 				meta:set_int("selected_num",selected_num)
 
-
-				--if aliveai.grant_invisiable==true and not meta.finished and pages>=aliveai.loaded_objects then
-				--	local p=minetest.get_player_privs(name)
-				--	p.aliveai_invisibility=true
-				--	minetest.set_player_privs(name, p)
-				--	meta.finished=1
-				--	minetest.chat_send_player(name, "Book: You have been granted aliveai_invisibility")
-				--	minetest.chat_send_player(name, "Book: Ai's will not detect you when you are sneaking")
-				--end
+				if not meta:get_int("finished") == 1 and pages >= examobs.registered_num then
+					meta:set_int("finished",1)
+					exaachievements.customize(self.user,"Mob_book_completely")
+				end
 			end
 		end
 		examobs.view_book(user,itemstack)
