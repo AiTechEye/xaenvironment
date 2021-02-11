@@ -166,8 +166,14 @@ spacestuff.wieldsuit=function(user,s)
 		if inv:contains_item("main","spacestuff:air_gassbotte") then
 			inv:remove_item("main",ItemStack("spacestuff:air_gassbotte"))
 			stack:set_wear(0)
-			minetest.sound_play("spacestuff_pff", {pos=user:get_pos(), gain = 1, max_hear_distance = 8}) 
+			local pos = user:get_pos()
+			minetest.sound_play("spacestuff_pff", {pos=pos, gain = 1, max_hear_distance = 8}) 
 			user:get_inventory():add_item("main","spacestuff:air_gassbotte_empty")
+
+			if minetest.get_node(pos).name == "default:vacuum" then
+				exaachievements.customize(user,"Space guy")
+			end
+
 		else
 			minetest.chat_send_player(name,"Have 'Air gassbottes' in your inventory to reload")
 			spacestuff.wieldsuit(user,true)
