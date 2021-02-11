@@ -1,5 +1,5 @@
 examobs.register_mob({
-	description = "A little animal that usually hides in sand",
+	description = "A little animal that usually hides in sand W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W W",
 	name = "crab",
 	team = "crab",
 	type = "animal",
@@ -76,6 +76,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A very powerful monster that creates paths by lava, due its heat it is not water resistant and dies in water, it also eats its enemies or whatever it is",
 	name = "titan_lava",
 	type = "monster",
 	team = "titan",
@@ -190,6 +191,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "The most powerful monster in XaEnvironmen and destroys everything around with lava, fire and extreme heat, it also eats its enemies or whatever it is\nWhen you hears its typyal roar its not time to think or explore, just evacuate before it detects you.",
 	name = "titan_magma",
 	type = "monster",
 	team = "titan",
@@ -320,6 +322,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "The second most powerful monster in XaEnvironment and just destroys everything is it its way and spitting fragments of stone, it also eats its enemies or whatever it is\nWhen you hears its typyal roar its not time to think or explore, just evacuate before it detects you.",
 	name = "titan_stone",
 	type = "monster",
 	team = "titan",
@@ -459,6 +462,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A classic murder machine that with its strength punch targets over great distances.",
 	name = "terminator",
 	type = "monster",
 	team = "metal",
@@ -502,6 +506,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A little animal that brings some life in caes and buildings of wood.",
 	name = "mouse",
 	team = "mouse",
 	type = "animal",
@@ -533,6 +538,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Simply dangerous animal,, made to a monster just to clear out other animals and it self.\nWas done primarily to clear away wolves and create more action in the forest.",
 	name = "brown_bear",
 	team = "bear",
 	hp = 50,
@@ -569,6 +575,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Simply dangerous animal\nWas done primarily to compete with brown bears and create more action in the forest",
 	name = "black_bear",
 	team = "blackbear",
 	hp = 50,
@@ -605,6 +612,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Simply dangerous animal\nWas done primarily to bring some more life in cold biometrics",
 	name = "ice_bear",
 	team = "icebear",
 	hp = 50,
@@ -641,6 +649,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Simply very dangerous animal that area made of lava and spreads fire",
 	name = "lava_bear",
 	team = "lavabear",
 	hp = 50,
@@ -686,6 +695,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Ice cream ball from the candy dimension.",
 	name = "ball",
 	hp=60,
 	reach=2,
@@ -732,6 +742,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A little cookie from the candy dimension, hangs around with it countless family members spread over all kind of worlds.\nThis monster is especially exposed to traditions.",
 	name = "gingerbread",
 	hp=40,
 	coin = 2,
@@ -776,6 +787,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Dangerous ice cream who throws ice cream in large loads",
 	name = "icecreammonstermaster",
 	hp=300,
 	coin = 80,
@@ -891,6 +903,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Living sweet appear in many different colors",
 	name = "candycane",
 	hp=40,
 	coin = 5,
@@ -951,6 +964,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Living sweet whose hobby is to play the clock's ding dong game",
 	name = "lollipop",
 	hp=40,
 	coin = 5,
@@ -995,6 +1009,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Explosive TNT box",
 	name = "tntbox",
 	type = "monster",
 	team = "box",
@@ -1040,6 +1055,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Ores that comes to life by a yet unknown reason",
 	name = "stoneblock",
 	type = "monster",
 	team = "box",
@@ -1103,6 +1119,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "People that grows on stone and have there life and civilization in the underground for ages",
 	name = "underground_npc",
 	type = "monster",
 	team = "unpc",
@@ -1132,6 +1149,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Just another murder machine the cooperating with the terminators, also called terminators skeletons",
 	name = "skeleton",
 	type = "monster",
 	team="metal",
@@ -1253,6 +1271,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A random person without mind",
 	name = "npc",
 	type = "npc",
 	dmg = 1,
@@ -1283,6 +1302,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Just an another random person without mind",
 	name = "villager_npc",
 	type = "npc",
 	textures = {"examobs_villager.png"},
@@ -1315,6 +1335,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Another kind of humanity that farming its own relatives",
 	name = "tomato_npc",
 	type = "npc",
 	speaking = 0,
@@ -1465,6 +1486,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A common form of animal, made to a monster just to clear out other animals and it self\nGive it meat to bring it to bring yourself a friend",
 	name = "wolf",
 	textures = {"examobs_wolf.png"},
 	mesh = "examobs_wolf.b3d",
@@ -1523,6 +1545,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A arctic wolf that competing with other wolfies\nGive it meat to bring it to bring yourself a friend",
 	name = "arctic_wolf",
 	textures = {"examobs_arctic_wolf.png"},
 	mesh = "examobs_wolf.b3d",
@@ -1581,6 +1604,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A savanna wolf that competing with other wolfies.\nGive it meat to bring it to bring yourself a friend",
 	name = "golden_wolf",
 	textures = {"examobs_golden_wolf.png"},
 	mesh = "examobs_wolf.b3d",
@@ -1639,6 +1663,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Underground living wolf that consisting of carbon.",
 	name = "underground_wolf",
 	textures = {"uexamobs_underground_wolf.png"},
 	mesh = "examobs_wolf.b3d",
@@ -1694,6 +1719,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A bunch of stones",
 	name = "stonemonster",
 	textures = {"examobs_stonemonster.png"},
 	mesh = "examobs_stonemonster.b3d",
@@ -1721,6 +1747,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A bunch of mud",
 	name = "mudmonster",
 	textures = {"examobs_mudmonster.png"},
 	mesh = "examobs_mudmonster.b3d",
@@ -1759,6 +1786,7 @@ examobs.register_mob({
 	end,
 })
 examobs.register_mob({
+	description = "A little bird that strange enough only lives on ground",
 	name = "chicken",
 	bird=true,
 	swiming = 0,
@@ -1823,6 +1851,7 @@ examobs.register_mob({
 
 
 examobs.register_mob({
+	description = "A new discover but yet unknown creature that farmers using as food source",
 	name = "pig",
 	textures = {"examobs_pig.png"},
 	mesh = "examobs_pig.b3d",
@@ -1867,6 +1896,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A very common form of animal used as wool source, you can also color it by punch it with dye in your hand",
 	name = "sheep",
 	spawner_egg = true,
 	textures = {"examobs_wool.png^examobs_sheep.png"},
@@ -1987,6 +2017,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A common type of birdthat whose dedicate their lives to living on land and water but have a tendency to drown those it self",
 	name = "duck",
 	bird=true,
 	coin = 1,
@@ -2084,6 +2115,7 @@ examobs.register_mob({
 })
 
 examobs.register_bird({
+	description = "Random colored birds",
 	pickupable = true,
 	visual_size= {x=0.5,y=0.5,z=0.5},
 	collisionbox={-0.2,-0.13,-0.2,0.2,0.2,0.2},
@@ -2107,6 +2139,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	description = "The bird that dedicate their lives to collect all kind of items",
 	pickupable = true,
 	name = "magpie",
 	coin = 1,
@@ -2153,6 +2186,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	description = "A black bird",
 	pickupable = true,
 	name = "crow",
 	coin = 1,
@@ -2164,6 +2198,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	description = "A creaking kind of bird",
 	pickupable = true,
 	name = "gull",
 	coin = 1,
@@ -2183,6 +2218,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	description = "A kind of underground living bird that consisting of coal",
 	pickupable = true,
 	name = "coalcrow",
 	coin = 2,
@@ -2219,6 +2255,7 @@ examobs.register_bird({
 })
 
 examobs.register_bird({
+	description = "A bigger kind of bird where the main purpose is to clear the air from birds. However those have a tendency to drown themselves in water",
 	name = "hawk",
 	coin = 2,
 	aggressivity = 1,
@@ -2263,6 +2300,7 @@ examobs.register_bird({
 })
 
 examobs.register_fish({
+	description = "Random colored fish",
 	pickupable = true,
 	color = true,
 	coin = 1,
@@ -2299,6 +2337,7 @@ examobs.register_fish({
 })
 
 examobs.register_fish({
+	description = "A common kind of fish",
 	pickupable = true,
 	name = "perch",
 	coin = 1,
@@ -2313,6 +2352,7 @@ examobs.register_fish({
 	end
 })
 examobs.register_fish({
+	description = "A monster some is calling fish",
 	name = "pike",
 	team = "pike",
 	coin = 2,
@@ -2333,6 +2373,7 @@ examobs.register_fish({
 	end
 })
 examobs.register_fish({
+	description = "A very dangerous kind of fish that cooperting with its family members in an effective way to clear the oceans of life",
 	name = "piranha",
 	team = "piranha",
 	coin = 2,
@@ -2367,6 +2408,7 @@ examobs.register_fish({
 	end
 })
 examobs.register_fish({
+	description = "Fish made of clouds",
 	name = "cloud",
 	floating = {["default:cloud"]=1,["air"]=1},
 	floating_in_group = "cloud",
@@ -2412,6 +2454,7 @@ examobs.register_fish({
 })
 
 examobs.register_mob({
+	description = "A classic terrorist",
 	name = "gass_man",
 	type = "monster",
 	coin = 2,
@@ -2440,6 +2483,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A yet unknown phenomenon without collision that floats around, even through materials.\nThe yet only known way to affect this mod is to blow it up",
 	name = "airmonster",
 	type = "monster",
 	physical = false,
@@ -2482,6 +2526,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Mob consisting of sand",
 	name = "sandmonster",
 	type = "monster",
 	dmg = 2,

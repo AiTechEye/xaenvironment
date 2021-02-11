@@ -106,6 +106,7 @@ bows.register_arrow("snowball",{
 })
 
 examobs.register_mob({
+		description="A monster consisting of snow without face, also spitting snow",
 		name="snowman",
 		aggressivity = 2,
 		walk_speed = 1,

@@ -869,7 +869,7 @@ examobs.view_book=function(user,itemstack)
 
 	local gui="size[10,10]"
 	.."listcolors[#77777777;#777777aa;#000000ff]"
-	.."background[-0.2,-0.2;10.4,10.4;default_stone.png]"
+	.."background[-0.2,-0.2;10.4,10.7;default_stone.png]"
 	.. "label[7.5,0;Page: " .. selected_num.. "/" .. pages .. " (" .. examobs.registered_num ..")]"
 	.."dropdown[0,-0.1;3,1;list;" .. list.. ";" .. selected_num .."]"
 	.."button[3,-0.2;1,1;bac;<]"
@@ -912,7 +912,7 @@ examobs.view_book=function(user,itemstack)
 		gui=gui
 		.. "label[0,0.5;Name:\nType:\nTeam:\nHealth:\nDamage:\nDrops:\nDrop coin:\nFlying/Floating:\nAggressive:\nThrive in\nWalk speed:\nRun speed:\nView range:\nReach range:\nBreathing:\nCan be picked up:\nSpawn chance:\nMax spawn height:\nMin spawn height:\nSpawns on:]"
 		.. "label[3,0.5;"..e.name.."\n"..e.type.."\n"..e.team.."\n"..e.hp.."\n"..e.dmg.."\n"..drops.."\n"..e.coin.."\n"..flying_or_floating.."\n"..aggressive.."\n"..light.."\n"..e.walk_speed.."\n"..e.run_speed.."\n"..e.range.."\n"..e.reach.."\n"..(e.breathing == 1 and "true" or "false").."\n"..(e.pickupable and "true" or "false").."\n"..e.spawn_chance.."\n"..e.max_spawn_y.."\n"..e.min_spawn_y.."\n"..spawn_on.."\n]"
-		.. (e.description and "textarea[0,8.5;8.6,8.0;;;"..e.description.."]" or "")
+		.. (e.description and "textarea[0,8.5;10.5,2.4;;;"..e.description.."]" or "")
 
 		local def = default.def(e.name.."_spawner")
 		if def.drawtype == "mesh" then
