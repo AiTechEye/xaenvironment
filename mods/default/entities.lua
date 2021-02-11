@@ -28,12 +28,6 @@ local item = {
 				break
 			end
 		end
-
-
-
-
-
-
 	end,
 	burn = function(self)
 		local pos = self.object:get_pos()
