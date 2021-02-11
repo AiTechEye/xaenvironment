@@ -264,6 +264,16 @@ player_style.skins.store=function(player,scroll)
 	local skin = m:get_string("skin")
 	local own = minetest.deserialize(m:get_string("skins")) or {}
 	local y = 0
+
+	local achskins = m:get_int("exaachievements_artist")
+	if achskins == 0 then
+		for i,v in pairs(own) do
+			achskins = achskins +1
+		end
+		m:set_int("exaachievements_artist",achskins-1)
+		exaachievements.customize(player,"artist")
+	end
+
 	for i,v in ipairs(player_style.skins.skins) do
 		local functional = (v.on_step or v.on_use or v.on_join or v.on_stop_using or v.on_use_join)
 
@@ -314,6 +324,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					m:set_string("skins", minetest.serialize(own))
 					m:set_int("coins",m:get_int("coins")-v.cost)
 					index = "skinuse="
+					exaachievements.customize(player,"artist")
 				end
 			end
 			if index == "skinuse=" then
