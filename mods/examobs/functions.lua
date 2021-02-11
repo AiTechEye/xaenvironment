@@ -491,7 +491,7 @@ examobs.fly=function(self,run)
 	if self.fight or self.folow or self.flee or self.target then
 		local pos1 = self:pos()
 		local pos2 = (self.fight and self.fight:get_pos()) or (self.folow and self.folow:get_pos()) or (self.flee and self.flee:get_pos()) or (self.target and self.target:get_pos())
-		run = run and self.walk_run*2 or self.walk_speed
+		run = run and self.run_speed*2 or self.walk_speed
 		if not self.flee then
 			run = run *-1
 		end

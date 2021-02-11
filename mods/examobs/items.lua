@@ -867,9 +867,9 @@ examobs.view_book=function(user,itemstack)
 		c=","
 	end
 
-	local gui="size[10,8]"
+	local gui="size[10,10]"
 	.."listcolors[#77777777;#777777aa;#000000ff]"
-	.."background[-0.2,-0.2;10.4,8.6;default_stone.png]"
+	.."background[-0.2,-0.2;10.4,10.4;default_stone.png]"
 	.. "label[7.5,0;Page: " .. selected_num.. "/" .. pages .. " (" .. examobs.registered_num ..")]"
 	.."dropdown[0,-0.1;3,1;list;" .. list.. ";" .. selected_num .."]"
 	.."button[3,-0.2;1,1;bac;<]"
@@ -899,15 +899,20 @@ examobs.view_book=function(user,itemstack)
 
 		for it, c in pairs(e.inv) do
 			local r = minetest.registered_items[it] or {}
-			drops = drops .. (r.description or it) .." " .. c ..", "
+			drops = drops .. (r.description or it) ..", "
 		end
-		drops = drops ~= "" and drops or "none"
-
+		drops = drops ~= "" and drops:gsub("group:","") or "none"
+		local spawn_on = ""
+		for i, it in ipairs(e.spawn_on) do
+			local r = minetest.registered_nodes[it] or {}
+			spawn_on = spawn_on .. (r.description or it) ..", "
+		end
+		spawn_on = spawn_on ~= "" and spawn_on:lower():gsub("group:",""):gsub("dirt with ",""):gsub("_"," ") or "nowhere"
 
 		gui=gui
-		.. "label[0,0.5;Name:\nType:\nTeam:\nHealth:\nDamage:\nDrops:\nFlying/Floating:\nAggressive:\nThrive in]"
-		.. "label[2.5,0.5;"..e.name.."\n"..e.type.."\n"..e.team.."\n"..e.hp.."\n"..e.dmg.."\n"..drops.."\n"..flying_or_floating.."\n"..aggressive.."\n"..light.."]"
-		.. (e.description and "textarea[0,4.2;9.5,8.0;;;"..e.description.."]" or "")
+		.. "label[0,0.5;Name:\nType:\nTeam:\nHealth:\nDamage:\nDrops:\nDrop coin:\nFlying/Floating:\nAggressive:\nThrive in\nWalk speed:\nRun speed:\nView range:\nReach range:\nBreathing:\nCan be picked up:\nSpawn chance:\nMax spawn height:\nMin spawn height:\nSpawns on:]"
+		.. "label[3,0.5;"..e.name.."\n"..e.type.."\n"..e.team.."\n"..e.hp.."\n"..e.dmg.."\n"..drops.."\n"..e.coin.."\n"..flying_or_floating.."\n"..aggressive.."\n"..light.."\n"..e.walk_speed.."\n"..e.run_speed.."\n"..e.range.."\n"..e.reach.."\n"..(e.breathing == 1 and "true" or "false").."\n"..(e.pickupable and "true" or "false").."\n"..e.spawn_chance.."\n"..e.max_spawn_y.."\n"..e.min_spawn_y.."\n"..spawn_on.."\n]"
+		.. (e.description and "textarea[0,8.5;8.6,8.0;;;"..e.description.."]" or "")
 
 		local def = default.def(e.name.."_spawner")
 		if def.drawtype == "mesh" then

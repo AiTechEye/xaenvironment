@@ -74,7 +74,7 @@ examobs.register_mob=function(def)
 	def.makes_footstep_sound =		def.makes_footstep_sound == nil
 
 	def.walk_speed =			def.walk_speed or			2
-	def.walk_run =			def.walk_run or			4
+	def.run_speed =			def.run_speed or			4
 	def.jump =			def.jump
 	def.lay_on_death =			def.lay_on_death or		1
 	def.textures =			def.textures or			{"character.png"}
