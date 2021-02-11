@@ -1545,6 +1545,59 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "A rare form of machine, and an unusual dangerous alien, also called terminator wolf",
+	name = "space_wolf",
+	textures = {"examobs_space_wolf.png"},
+	mesh = "examobs_wolf.b3d",
+	type = "monster",
+	dmg = 5,
+	coin = 20,
+	hp = 200,
+	aggressivity = 2,
+	run_speed = 8,
+	breathing = 0,
+	inv={["default:ironstick"]=4,["default:iron_ingot"]=2,["default:steel_ingot"]=1},
+	punch_chance=3,
+	animation = {
+		stand = {x=0,y=9},
+		walk = {x=11,y=31},
+		run = {x=32,y=52,speed=60},
+		lay = {x=66,y=75},
+		attack = {x=53,y=65},
+	},
+	collisionbox={-0.6,-0.8,-0.6,0.6,0.3,0.6,},
+	spawn_on={"default:space_stone","default:space_dust"},
+	spawn_in="default:vacuum",
+	max_spawn_y = 4000,
+	min_spawn_y = 2000,
+	is_food=function(self,item)
+		return item == "default:iron_ingot" or item == "default:iron_lump"
+	end,
+	step=function(self)
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
+	end,
+	on_spawn=function(self)
+		self.storage.team = self.storage.team or "wolf"..math.random(1,5)
+		self.team = self.storage.team
+	end,
+	on_load=function(self)
+		self.team = self.storage.team or self.team
+	end,
+})
+
+examobs.register_mob({
 	description = "A arctic wolf that competing with other wolfies\nGive it meat to bring it to bring yourself a friend",
 	name = "arctic_wolf",
 	textures = {"examobs_arctic_wolf.png"},
@@ -2571,5 +2624,35 @@ examobs.register_mob({
 		if minetest.get_item_group(minetest.get_node(self:pos()).name,"water") > 0 then
 			self:hurt(100)
 		end
+	end
+})
+
+examobs.register_mob({
+	description = "Just an alien",
+	name = "alien",
+	textures = {"player_style_alien1.png"},
+	type = "monster",
+	dmg = 2,
+	coin = 5,
+	hp = 100,
+	aggressivity = 2,
+	run_speed = 12,
+	breathing = 0,
+	inv={["default:iron"]=2},
+	animation = "default",
+	spawn_on={"default:space_stone","default:space_dust"},
+	spawn_in="default:vacuum",
+	max_spawn_y = 4000,
+	min_spawn_y = 2000,
+	is_food=function(self,item)
+		return item == "default:iron_ingot" or item == "default:iron_lump"
+	end,
+	on_spawn=function(self)
+		self.storage.texture ="player_style_alien"..math.random(1,8)..".png"
+		self:on_load()
+	end,
+	on_load=function(self)
+		self.object:set_properties({textures={self.storage.texture}})
+		self.team = self.storage.texture
 	end
 })
