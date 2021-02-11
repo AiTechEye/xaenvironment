@@ -109,7 +109,6 @@ exaachievements.register({
 	item="default:stone",
 	description="Dig 100 stones",
 	skills=2,
-	image="plants:apple_tree",
 	hide_until=4,
 })
 exaachievements.register({
@@ -123,6 +122,18 @@ exaachievements.register({
 })
 
 --================ Average ==================
+
+exaachievements.register({
+	type="customize",
+	name="Mob_book_completely",
+	count=1,
+	description="Completely a mob book",
+	skills=1000,
+	hide_until=10,
+	completed=function(player)
+		Coin(player,10000)
+	end
+})
 
 exaachievements.register({
 	type="eat",
