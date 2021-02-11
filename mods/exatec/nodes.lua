@@ -578,14 +578,14 @@ minetest.register_node("exatec:wire", {
 		connect_top = {-0.05, -0.5, -0.05, 0.05, 0.5, 0.05},
 		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
 	},
-	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,-0.4}},
+	selection_box={type="fixed",fixed={-0.5,0.4,-0.5,0.5,0.5,0.5}},
 	connects_to={"group:exatec_wire","group:exatec_wire_connected"},
 	groups = {dig_immediate = 3,exatec_wire=1,store=100},
 	after_place_node = function(pos, placer)
-		minetest.set_node(pos,{name="exatec:wire",param2=98})
+		minetest.set_node(pos,{name="exatec:wire",param2=112})
 	end,
 	on_timer = function (pos, elapsed)
-		minetest.swap_node(pos,{name="exatec:wire",param2=98})
+		minetest.swap_node(pos,{name="exatec:wire",param2=112})
 	end,
 })
 
@@ -610,14 +610,14 @@ minetest.register_node("exatec:datawire", {
 		connect_top = {-0.05, -0.5, -0.05, 0.05, 0.5, 0.05},
 		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
 	},
-	selection_box={type="fixed",fixed={-0.5,0.5,-0.5,0.5,0.4,0.5}},
+	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	connects_to={"group:exatec_data_wire","group:exatec_data_wire_connected"},
 	groups = {dig_immediate = 3,exatec_data_wire=1,store=100},
 	after_place_node = function(pos, placer)
-		minetest.set_node(pos,{name="exatec:datawire",param2=120})
+		minetest.set_node(pos,{name="exatec:datawire",param2=134})
 	end,
 	on_timer = function(pos, elapsed)
-		minetest.swap_node(pos,{name="exatec:datawire",param2=120})
+		minetest.swap_node(pos,{name="exatec:datawire",param2=134})
 	end,
 })
 

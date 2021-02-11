@@ -132,7 +132,7 @@ exatec.send=function(pos, force_ignored_pos,forcepos,ignore_pos)
 		if forcepos then
 			if minetest.get_item_group(n,"exatec_wire") > 0 then
 				exatec.wire_signals[na]={pos=pos}
-				minetest.swap_node(pos,{name=n,param2=91})
+				minetest.swap_node(pos,{name=n,param2=105})
 				minetest.get_node_timer(pos):start(0.1)
 			end
 			if minetest.get_item_group(n,"exatec_wire_connected") > 0 then
@@ -173,7 +173,7 @@ exatec.wire_leading=function()
 				if not exatec.wire_signals[s] then
 					if minetest.get_item_group(na,"exatec_wire") > 0 then
 						exatec.wire_signals[s]={pos=n}
-						minetest.swap_node(n,{name=na,param2=91})
+						minetest.swap_node(n,{name=na,param2=105})
 						minetest.get_node_timer(n):start(0.1)
 						c=c+1
 					end
@@ -236,7 +236,7 @@ exatec.wire_data_leading=function()
 						if minetest.get_item_group(na,"exatec_data_wire")>0 then
 							a.jobs[s]=n
 							c=c+1
-							minetest.swap_node(n,{name=na,param2=91})
+							minetest.swap_node(n,{name=na,param2=105})
 							minetest.get_node_timer(n):start(0.1)
 						elseif minetest.get_item_group(na,"exatec_data_wire_connected")>0 then
 							local e = exatec.def(n)
