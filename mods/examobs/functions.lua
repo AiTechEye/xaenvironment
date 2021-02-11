@@ -269,7 +269,7 @@ examobs.environment=function(self)
 	elseif self.is_floating then
 		self.is_floating = nil
 		local v = self.object:get_velocity()
-		self.object:set_acceleration({x =0, y=-10, z =0})
+		self.object:set_acceleration({x=0,y=-10*self.gravity,z =0})
 	elseif not self.is_floating then
 		if v.y < 0 and not self.falling then
 			self.falling = pos.y
@@ -342,11 +342,11 @@ examobs.environment=function(self)
 		self.object:set_velocity({x=v.x, y=0, z=v.z})
 		if not default.flowing(self.object) and walkable(apos(posf,0,-1)) then
 			examobs.jump(self)
-			self.object:set_acceleration({x=0, y=-10, z=0})
+			self.object:set_acceleration({x=0,y=-10*self.gravity,z =0})
 		end
 	elseif self.in_liquid then
 		self.in_liquid = nil
-		self.object:set_acceleration({x =0, y = -10, z =0})
+		self.object:set_acceleration({x=0,y=-10*self.gravity,z =0})
 	end
 end
 
@@ -771,7 +771,7 @@ examobs.dying=function(self,set)
 	if self.lay_on_death ~= 1 then return end
 	if set==1 then
 		examobs.anim(self,"lay")
-		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.object:set_acceleration({x=0,y=-10*self.gravity,z =0})
 		self.object:set_velocity({x=0,y=-3,z =0})
 		if self.hp<=self.hp_max*-1 then
 			examobs.dying(self,2)

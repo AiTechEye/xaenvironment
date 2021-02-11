@@ -253,9 +253,17 @@ examobs.register_mob=function(def)
 
 		self.inv = self.storage.inv or table.copy(def.inv)
 		self.otype = self.type
+		self.gravity = 1
+		local y = self.object:get_pos().y
+		for i,v in pairs(multidimensions.registered_dimensions) do
+			if y >= v.dim_y and y <= v.dim_y+v.dim_height then
+				self.gravity = v.gravity
+				break
+			end
+		end
 
 		self.object:set_velocity({x=0,y=-1,z=0})
-		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.object:set_acceleration({x=0,y=-10*self.gravity,z =0})
 
 		if self.dead or self.dying then
 			examobs.anim(self,"lay")
