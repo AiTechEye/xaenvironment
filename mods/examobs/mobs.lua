@@ -17,6 +17,7 @@ examobs.register_mob({
 	inv={["default:steel_ingot"]=4,["default:iron_ingot"]=2,["nitroglycerin:c4"]=1},
 	collisionbox={-0.5,-0.5,-0.5,0.5,0.5,0.5},
 	spawn_on={"group:stone"},
+	max_spawn_y = -50,
 	resist_nodes = {["examobs:barbed_wire"]=1},
 	step=function(self,time)
 		if self.fight then
@@ -44,6 +45,7 @@ examobs.register_mob({
 		if not self.ex then
 			self.ex = 1
 			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_flame",})
+			self.object:remove()
 		end
 	end,
 	use_bow=function(pos1,pos2,arrow)

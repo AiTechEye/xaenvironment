@@ -142,53 +142,15 @@ examobs.register_mob({
 			if self.snowbtime <= 0 then
 				self.snowbtime = 5
 				if examobs.viewfield(self,self.fight) and examobs.visiable(self.object,self.fight:get_pos()) then
-					self:use_bow(self.fight)
+					local pos2 = self.fight:get_pos()
+					if pos2 and pos2.x then
+						examobs.shoot_arrow(self,pos2,"examobs:arrow_snowball")
+					end
 				end
 			else
 				self.snowbtime=self.snowbtime -1
 			end
 		end
-	end,
-	use_bow=function(self,target)
-		local pos1 = apos(self.object:get_pos(),0,-1)
-		pos1 = examobs.pointat(self,2)
-		local pos2 = target:get_pos()
-		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
-		local user = {
-			get_look_dir=function()
-				return dir
-			end,
-			punch=function()
-			end,
-			get_pos=function()
-				return pos1
-			end,
-			set_pos=function(pos)
-				return self.object:set_pos(pos)
-			end,
-			get_player_control=function()
-				return {}
-			end,
-			get_look_horizontal=function()
-				return self.object:get_yaw() or 0
-			end,
-			get_player_name=function()
-				return self.examob ..""
-			end,
-			is_player=function()
-				return true
-			end,
-			examob=self.examob,
-			object=self.object,
-		}
-		local item = ItemStack({
-			name="default:bow_wood_loaded",
-			metadata=minetest.serialize({arrow="examobs:arrow_snowball",shots=1})
-		})
-		bows.shoot(item, user,nil,function(item)
-			item:remove()
-		end)
 	end,
 	death=function(self,puncher,pos)
 		if self.hat and self.hat:get_attach() then
@@ -262,53 +224,15 @@ examobs.register_mob({
 			if self.snowbtime <= 0 then
 				self.snowbtime = 5
 				if examobs.viewfield(self,self.fight) and examobs.visiable(self.object,self.fight:get_pos()) then
-					self:use_bow(self.fight)
+					local pos2 = self.fight:get_pos()
+					if pos2 and pos2.x then
+						examobs.shoot_arrow(self,pos2,"examobs:arrow_snowball")
+					end
 				end
 			else
 				self.snowbtime=self.snowbtime -1
 			end
 		end
-	end,
-	use_bow=function(self,target)
-		local pos1 = apos(self.object:get_pos(),0,-1)
-		pos1 = examobs.pointat(self,2)
-		local pos2 = target:get_pos()
-		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
-		local user = {
-			get_look_dir=function()
-				return dir
-			end,
-			punch=function()
-			end,
-			get_pos=function()
-				return pos1
-			end,
-			set_pos=function(pos)
-				return self.object:set_pos(pos)
-			end,
-			get_player_control=function()
-				return {}
-			end,
-			get_look_horizontal=function()
-				return self.object:get_yaw() or 0
-			end,
-			get_player_name=function()
-				return self.examob ..""
-			end,
-			is_player=function()
-				return true
-			end,
-			examob=self.examob,
-			object=self.object,
-		}
-		local item = ItemStack({
-			name="default:bow_wood_loaded",
-			metadata=minetest.serialize({arrow="examobs:arrow_snowball",shots=1})
-		})
-		bows.shoot(item, user,nil,function(item)
-			item:remove()
-		end)
 	end,
 	death=function(self,puncher,pos)
 		if self.hat and self.hat:get_attach() then

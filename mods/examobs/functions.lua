@@ -1052,10 +1052,10 @@ examobs.shoot_arrow=function(self,pos2,arrow)
 		examob=self.examob,
 		object=self.object,
 	}
-	local item = ItemStack({
-		name="default:bow_wood_loaded",
-		metadata=minetest.serialize({arrow=arrow,shots=1})
-	})
+	local item = ItemStack("default:bow_wood_loaded")
+	local meta = item:get_meta()
+	meta:set_string("arrow",arrow)
+	meta:set_string("shots",1)
 	bows.shoot(item, user,nil,function(item)
 		item:remove()
 	end)
