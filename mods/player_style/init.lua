@@ -628,7 +628,6 @@ minetest.register_globalstep(function(dtime)
 									exaachievements.customize(player,"Parkour!")
 								elseif ppr.flip.type == "left_side" then
 									exaachievements.customize(player,"Tricker")
-
 								end
 
 								if default.defpos(p,"walkable") then
