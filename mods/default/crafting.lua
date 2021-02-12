@@ -329,7 +329,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 		end
 end
 
-default.workbench.result=function(pos,form)
+default.workbench.result=function(pos,form,player)
 	local inv = minetest.get_meta(pos):get_inventory()
 	local craft = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")})
 	if form=="output" and craft.item:get_name() ~= "" then
@@ -347,6 +347,13 @@ default.workbench.result=function(pos,form)
 				end
 			end
 		end
+
+		if craft.item:get_name():find("_ingot") or craft.item:get_name():find("_lump") then
+			minetest.sound_play("default_anvil", {pos=pos, gain = 4,max_hear_distance = 10})
+		elseif minetest.get_item_group(craft.item:get_name(),"wood") then
+			minetest.sound_play("default_saw", {pos=pos, gain = 4,max_hear_distance = 10})
+		end
+		exaachievements.customize(player,"Worker")
 	end
 	craft = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")})
 	inv:set_stack("output",1,craft.item)
@@ -390,12 +397,12 @@ minetest.register_node("default:workbench", {
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		if to_list=="craft" or from_list=="craft" or from_list=="output" then
-			default.workbench.result(pos,from_list)
+			default.workbench.result(pos,from_list, player)
 		end
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname=="craft" or listname=="output" then
-			default.workbench.result(pos,listname)
+			default.workbench.result(pos,listname, player)
 		end
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -437,7 +444,6 @@ minetest.register_node("default:workbench", {
 minetest.register_node("default:craftguide", {
 	description = "Craftguide",
 	tiles={"default_craftgreed.png^default_unknown.png"},
-	use_texture_alpha = true,
 	wield_image="default_craftgreed.png^default_unknown.png",
 	inventory_image="default_craftgreed.png^default_unknown.png",
 	groups = {dig_immediate=3,flammable=2,used_by_npc=2},
