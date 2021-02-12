@@ -1,4 +1,97 @@
 examobs.register_mob({
+	description = "The terminator spider machine shoots barbed wires catch you\nThis mob is also explosive.",
+	name = "terminator_spider",
+	team = "terminator",
+	type = "monster",
+	hp = 40,
+	coin = 4,
+	breathing = 0,
+	swiming = 0,
+	textures = {"default_steelblock.png"},
+	mesh = "examobs_spider.b3d",
+	aggressivity = 1,
+	animation = {
+		stand={x=1,y=2,speed=0,loop=false},
+		walk={x=1,y=20,speed=30},
+	},
+	inv={["default:steel_ingot"]=4,["default:iron_ingot"]=2,["nitroglycerin:c4"]=1},
+	collisionbox={-0.5,-0.5,-0.5,0.5,0.5,0.5},
+	spawn_on={"group:stone"},
+	resist_nodes = {["examobs:barbed_wire"]=1},
+	step=function(self,time)
+		if self.fight then
+			self.am = (self.am or 0) -0.1
+			if self.am <= 0 then
+				local pos2 = self.fight:get_pos()
+				if pos2 and pos2.x then
+					examobs.shoot_arrow(self,pos2,"examobs:arrow_barbed_wire")
+				end
+				self.am = math.random(1,5) * 0.1
+			end
+		end
+	end,
+	on_spawn=function(self)
+		local skins = {"default_steelblock","default_ironblock","default_steelblock","default_copperblock","default_diamondblock","default_electricblock","default_obsidian","default_silverblock","default_uraniumactiveblock","default_uraniumblock","default_bronzeblock","default_goldblock"}
+		self.storage.skin = skins[math.random(1,12)]..".png"
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			self.object:set_properties({textures={self.storage.skin}})
+		end
+	end,
+	death=function(self)
+		if not self.ex then
+			self.ex = 1
+			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_flame",})
+		end
+	end,
+	use_bow=function(pos1,pos2,arrow)
+		--local pos1 = apos(self.object:get_pos(),0,-1)
+		--local pos2 = target:get_pos()
+		if not (pos2 and pos2.x and pos1 and pos1.x) then
+			return
+		end
+		local d=math.floor(vector.distance(pos1,pos2)+0.5)
+		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
+		local user = {
+			get_look_dir=function()
+				return dir
+			end,
+			punch=function()
+			end,
+			get_pos=function()
+				return pos1
+			end,
+			set_pos=function(pos)
+				return self.object:set_pos(pos)
+			end,
+			get_player_control=function()
+				return {}
+			end,
+			get_look_horizontal=function()
+				return self.object:get_yaw() or 0
+			end,
+			get_player_name=function()
+				return self.examob ..""
+			end,
+			is_player=function()
+				return true
+			end,
+			examob=self.examob,
+			object=self.object,
+		}
+		local item = ItemStack({
+			name="default:bow_wood_loaded",
+			metadata=minetest.serialize({arrow=arrow,shots=1})
+		})
+		bows.shoot(item, user,nil,function(item)
+			item:remove()
+		end)
+	end
+})
+
+examobs.register_mob({
 	description = "A little animal that usually hides in sand",
 	name = "crab",
 	team = "crab",
@@ -1203,46 +1296,6 @@ examobs.register_mob({
 		end
 		self.object:set_properties({textures={"examobs_skeleton.png",t}})
 	end,
-	use_bow=function(self,target)
-		local pos1 = apos(self.object:get_pos(),0,-1)
-		local pos2 = target:get_pos()
-		local d=math.floor(vector.distance(pos1,pos2)+0.5)
-		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
-		local user = {
-			get_look_dir=function()
-				return dir
-			end,
-			punch=function()
-			end,
-			get_pos=function()
-				return pos1
-			end,
-			set_pos=function(pos)
-				return self.object:set_pos(pos)
-			end,
-			get_player_control=function()
-				return {}
-			end,
-			get_look_horizontal=function()
-				return self.object:get_yaw() or 0
-			end,
-			get_player_name=function()
-				return self.examob ..""
-			end,
-			is_player=function()
-				return true
-			end,
-			examob=self.examob,
-			object=self.object,
-		}
-		local item = ItemStack({
-			name="default:bow_wood_loaded",
-			metadata=minetest.serialize({arrow="default:arrow_arrow",shots=1})
-		})
-		bows.shoot(item, user,nil,function(item)
-			item:remove()
-		end)
-	end,
 	step=function(self)
 		if self.fight and self.fight_bow and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
 			examobs.stand(self)
@@ -1259,7 +1312,10 @@ examobs.register_mob({
 			elseif self.aim >= 0.5 then
 				self.aim = 0
 				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
-				self:use_bow(self.fight)
+				local pos2 = self.fight:get_pos()
+				if pos2 and pos2.x then
+					examobs.shoot_arrow(self,pos2,"default:arrow_arrow")
+				end
 			end
 			return self
 		elseif self.aim > 0 then

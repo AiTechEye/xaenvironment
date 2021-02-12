@@ -1020,3 +1020,43 @@ minetest.register_lbm({
 		examobs.generate_npc_house(pos)
 	end
 })
+
+examobs.shoot_arrow=function(self,pos2,arrow)
+	local pos1 = self.object:get_pos()
+	local d=math.floor(vector.distance(pos1,pos2)+0.5)
+	local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
+	local user = {
+		get_look_dir=function()
+			return dir
+		end,
+		punch=function()
+		end,
+		get_pos=function()
+			return pos1
+		end,
+		set_pos=function(pos)
+			return self.object:set_pos(pos)
+		end,
+		get_player_control=function()
+			return {}
+		end,
+		get_look_horizontal=function()
+			return self.object:get_yaw() or 0
+		end,
+		get_player_name=function()
+			return self.examob ..""
+		end,
+		is_player=function()
+			return true
+		end,
+		examob=self.examob,
+		object=self.object,
+	}
+	local item = ItemStack({
+		name="default:bow_wood_loaded",
+		metadata=minetest.serialize({arrow=arrow,shots=1})
+	})
+	bows.shoot(item, user,nil,function(item)
+		item:remove()
+	end)
+end

@@ -974,3 +974,77 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		examobs.view_book(player,item)
 	end
 end)
+
+minetest.register_node("examobs:barbed_wire", {
+	description = "Barbed wire",
+	tiles = {"examobs_barbed_wire.png"},
+	paramtype = "light",
+	drawtype = "firelike",
+	sunlight_propagates=true,
+	walkable = false,
+	is_ground_content = false,
+	liquidtype = "source",
+	liquid_range = 0,
+	liquid_alternative_flowing = "examobs:web",
+	liquid_alternative_source = "examobs:web",
+	liquid_viscosity = 15,
+	groups = {cracky=1,level=1},
+	sounds=default.node_sound_metal_defaults(),
+	damage_per_second = 2,
+})
+
+minetest.register_node("examobs:barbed_wire", {
+	description = "Barbed wire",
+	tiles = {"examobs_barbed_wire.png"},
+	paramtype = "light",
+	drawtype = "firelike",
+	sunlight_propagates=true,
+	walkable = false,
+	is_ground_content = false,
+	liquidtype = "source",
+	liquid_range = 0,
+	liquid_alternative_flowing = "examobs:barbed_wire",
+	liquid_alternative_source = "examobs:barbed_wire",
+	liquid_viscosity = 15,
+	groups = {cracky=1,level=1,flammable=1},
+	sounds=default.node_sound_metal_defaults(),
+	damage_per_second = 2,
+	on_burn=function(pos)
+		minetest.set_node(pos,{name="fire:basic_flame"})
+		for x=-1,1 do
+		for y=-1,1 do
+		for z=-1,1 do
+			local p = apos(pos,x,y,z)
+			local n = minetest.get_node(p).name
+			if n == "examobs:barbed_wire" and not minetest.is_protected(p,"") then
+				default.def(n).on_burn(p)
+			end
+		end
+		end
+		end
+	end
+})
+
+bows.register_arrow("barbed_wire",{
+	description="Barbed wire arrow",
+	inventory_image="examobs_barbed_wire.png",
+	damage=1,
+	craft_count=1,
+	groups={treasure=1},
+	on_hit_node=function(self,pos,user,lastpos)
+		if not minetest.is_protected(pos,"") and default.defpos(pos,"buildable_to") then
+			minetest.add_node(pos,{name="examobs:barbed_wire"})
+		end
+		bows.arrow_remove(self)
+		return self
+	end,
+	on_hit_object=function(self,target,hp,user,lastpos)
+		if not minetest.is_protected(lastpos,"") and default.defpos(lastpos,"buildable_to") then
+			minetest.add_node(lastpos,{name="examobs:barbed_wire"})
+		end
+		bows.arrow_remove(self)
+	end,
+	craft={
+		{"group:arrow","examobs:barbed_wire"},
+	}
+})
