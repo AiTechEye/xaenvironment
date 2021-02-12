@@ -27,4 +27,10 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 |Double wall climb|hold left & right|
 |Backflip|jump, (hold) place/RMB & press back/down|
 |Frontflip|jump, (hold) place/RMB & press forward/up|
+|Right sideflip|jump, (hold) place/RMB & press right
+|Left sideflip|jump, (hold) place/RMB & press left
+|Roll|sneak when falling from a height, causing less fall damage|
+|Dive roll|place/RMB and press up, useful to dive faster forward|
 
+You can use all flips to reach more height and come over obstacles on 2 blocks while running,
+but sideflips wont hurt on obstacles and there is no risk you breaks your neck.
