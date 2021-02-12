@@ -429,11 +429,10 @@ end
 
 player_style.register_manual_page({
 	name = "Controls",
-	label = "Controls",
 	text = "",
 	tags = {"default:dirt","default:dirt_with_grass","snowy"},
 	action=function(player)
-		local y = 1
+		local y = 0
 		local t = ""
 		local l = {
 			["Crawl"]="sneak",
@@ -445,13 +444,18 @@ player_style.register_manual_page({
 			["Tic tac/walljump"]="run + jump side of a wall",
 			["Double wall climb"]="hold left & right",
 			["Backflip	"]="jump, (hold) place/RMB & press back",
-			["Frontflip"]="jump, (hold) place/RMB & press forward"
+			["Frontflip"]="jump, (hold) place/RMB & press forward",
+			["Right sideflip"]="jump, (hold) place/RMB & press right",
+			["Left sideflip"]="jump, (hold) place/RMB & press left",
+			["Roll"]="sneak when falling form a height",
+			["Dive roll"]="place/RMB and press up",
 		}
 		table.sort(l)
 		for i,v in pairs(l) do
 			t = t .. "label[-0.2,"..y..";"..i.."]label[2.5,"..y..";"..v.."]"
 			y = y + 0.5
 		end
+		t = t .. "label[-0.2,"..y..";You can use all flips to reach more height and come over\nobstacles on 2 blocks while running, but sideflips wont hurt\non obstacles and there is no risk you breaks your neck.]"
 		return t
 	end
 })

@@ -55,13 +55,24 @@ end)
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and modifer.type == "fall" and player_style.survive_fall_damage == true then
-		hp_change = hp_change*4
-		if hp_change < 0 then
-			player_style.hunger(player,-1)
+		local key = player:get_player_control()
+		if key.sneak then
+			local name = player:get_player_name()
+			local d = player:get_look_dir()
+			local ppr = player_style.players[name]
+			ppr.flip = ppr.flip or {time=0.4,flips=0,y=player:get_pos().y,type=""}
+			player_style.set_animation(name,"roll")
+			player:add_velocity({x=d.x*20,y=0,z=d.z*20})
+			hp_change = hp_change >= -5 and 0 or hp_change*2
+		else
+			hp_change = hp_change*4
+			if hp_change < 0 then
+				player_style.hunger(player,-1)
+			end
 		end
 	end
 	if player and hp_change < 0 then
-			minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
+		minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
 	end
 	return hp_change
 end,true)
@@ -400,7 +411,10 @@ player_style.register_profile=function(def)
 					fly={x=125,y=135,speed=0},
 					dive={x=136,y=155,speed=30},
 					backflip={x=157,y=170,speed=30,loop=false},
-					frontflip={x=170,y=181,speed=30,loop=false},
+					frontflip={x=170,y=180,speed=30,loop=false},
+					right_sideflip={x=181,y=192,speed=30,loop=false},
+					left_sideflip={x=192,y=204,speed=30,loop=false},
+					roll={x=204,y=215,speed=30,loop=false},
 				},
 		eye_height =	def.eye_height or 1.6,
 		stepheight =	def.stepheight or 0.7,
@@ -411,7 +425,7 @@ end
 
 player_style.register_profile()
 
-player_style.set_animation=function(name,typ,n)
+player_style.set_animation=function(name,typ,n,loop)
 	local user=player_style.players[name]
 
 	if not user and type(name) =="userdata" then
@@ -422,13 +436,12 @@ player_style.set_animation=function(name,typ,n)
 	if user and user.current ~= typ and player_style.registered_profiles[user.profile].visual=="mesh" then
 		user.current = typ
 		local a=player_style.registered_profiles[user.profile].animation[typ]
-		user.player:set_animation({x=a.x,y=a.y},n or a.speed,a.blend or 0,a.loop)
+		user.player:set_animation({x=a.x,y=a.y},n or a.speed,a.blend or 0,(loop ~= nil and loop) or a.loop)
 	end
 end
 
 player_style.get_airlike=function(pos)
 	local name = minetest.get_node(pos).name
-	--local d  = default.def(minetest.get_node(pos).name)
 	return name == "air" or name == "default:vacuum" or name == "default:gas" or minetest.get_item_group(name,"climbalespace") > 0 -- and d.liquid_renewable and d.drawtype == "airlike"
 end
 
@@ -593,30 +606,51 @@ minetest.register_globalstep(function(dtime)
 			end
 
 --flips
-			if ppr.flip or key.jump and key.RMB and (key.down or key.up) and not default.defpos(apos(p,0,-0.5),"walkable") then
+			if ppr.flip or key.jump and key.RMB and (key.down or key.up or key.left or key.right) and not default.defpos(apos(p,0,-0.5),"walkable") then
 				if ppr.flip then
 					ppr.flip.time = ppr.flip.time -dtime
 					if ppr.flip.time <= 0 then
-						if key.jump and key.RMB and not ppr.flip.lay and minetest.get_item_group(minetest.get_node(p).name,"liquid") == 0 then
+						if key.jump and key.RMB and not ppr.flip.lay and minetest.get_item_group(minetest.get_node(p).name,"liquid") == 0 and ppr.flip.type ~= "" then
 							ppr.flip.time = 0.4
 							ppr.flip.flips = ppr.flip.flips + 1
 							ppr.current = ""
-							player_style.set_animation(name,ppr.flip.type.."flip")
+							player_style.set_animation(name,ppr.flip.type.."flip",nil,true)
 						else
-							local f = ppr.flip.type:sub(1,1):upper()..ppr.flip.type:sub(2,-1)
+							local f = ppr.flip.type:sub(1,1):upper()..ppr.flip.type:sub(2,-1):gsub("_"," ")
 							local lab = {f.."flip","Double "..f.."flip","Triple "..f.."flip","Quadruple "..f.."flip"}
-							if not ppr.flip.lay then
+							if not ppr.flip.lay and ppr.flip.type ~= "" then
 								minetest.chat_send_player(name,lab[ppr.flip.flips] or (ppr.flip.flips.."x "..f.."flips"))
 								if ppr.flip.type == "front" then
 									exaachievements.customize(player,"Circus artist")
 								elseif ppr.flip.type == "back" then
 									exaachievements.customize(player,"Freerunner")
+								elseif ppr.flip.type == "right_side" then
+									--exaachievements.customize(player,"Parkour!")
+								elseif ppr.flip.type == "left_side" then
+									--exaachievements.customize(player,"Tricker")
 								end
+								if default.defpos(p,"walkable") then
+									player:move_to(apos(p,0,1))
+									player_style.player_diveing(name,player,true)
+								else
+									player_style.set_animation(name,"stand")
+									local profile=player_style.registered_profiles[player_style.players[name].profile]
+									player:set_properties({collisionbox = profile.collisionbox})
+								end
+								for i,v in ipairs({{x=0.5},{x=-0.5},{z=0.5},{z=-0.5}}) do
+									if default.defpos(apos(p,v.x,0,v.z),"walkable") then
+										player:move_to(vector.round(p))
+										break
+									end
+								end
+							end
+							if default.defpos(p,"walkable") then
+								player:move_to(apos(p,0,1))
 							end
 							ppr.flip = nil
 						end
-					elseif not ppr.flip.lay and default.defpos(apos(p,0,-0.5),"walkable") then
-						local r = math.random(1,10)
+					elseif not ppr.flip.lay and (not ppr.flip.side or ppr.flip.side and p.y <= ppr.flip.y) and default.defpos(p,"walkable") then
+						local r = ((ppr.flip.type == "right_side" or ppr.flip.type == "left_side") and 1) or math.random(1,10)
 						player:set_hp(player:get_hp()-(r < 10 and 1 or r*3))
 						player_style.set_animation(name,"lay")
 						ppr.flip.time = 0.5
@@ -625,8 +659,9 @@ minetest.register_globalstep(function(dtime)
 						player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
 					end
 				else
-					ppr.flip = {time=0.4,flips=1,type=key.down and "back" or key.up and "front"}
+					ppr.flip = {time=0.4,flips=1,y=p.y,type=key.down and "back" or key.up and "front" or key.right and "right_side" or key.left and "left_side",side = key.right or key.left}
 					player_style.set_animation(name,ppr.flip.type.."flip")
+					player:set_properties({collisionbox = {-0.35,0.6,-0.35,0.35,1,0.35}})
 				end
 				goto setp
 			elseif key.up or key.down or key.left or key.right then
@@ -635,7 +670,7 @@ minetest.register_globalstep(function(dtime)
 				local p = player:get_pos()
 				local pr = player_style.player_dive[name]
 				local v = player:get_velocity()
-
+				ppr.rolltimer = ppr.rolltimer and ppr.rolltimer > 0 and ppr.rolltimer - dtime or nil
 				if pr and pr.kong then
 					if default.defpos({x=p.x,y=p.y-0.1,z=p.z},"walkable") then
 						pr.kong = nil
@@ -643,10 +678,21 @@ minetest.register_globalstep(function(dtime)
 					else
 						a="dive"
 					end
+				elseif not ppr.rolltimer and key.up and key.RMB and not ppr.flip and minetest.get_item_group(minetest.get_node(p).name,"liquid") == 0 and v.x^2 + v.y^2 + v.z^2 < 100 and witem == "" then
+					local name = player:get_player_name()
+					local d = player:get_look_dir()
+					ppr.flip = ppr.flip or {time=0.4,flips=0,y=player:get_pos().y,type=""}
+					ppr.rolltimer = 1
+					player_style.set_animation(name,"roll")
+					local n = default.defpos(apos(p,0,-0.5),"walkable") and 20 or 10
+					player:add_velocity({x=d.x*n,y=0,z=d.z*n})
+					player_style.player_diveing(name,player,true)
+					hunger = -0.1
+					goto setp
 				elseif key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
 					hunger = -0.0005
 					a="dive"
-					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
+					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0)
 				elseif key.aux1 then
 					a="run"
 					player_style.player_run(name,player,true)
@@ -797,7 +843,7 @@ minetest.register_globalstep(function(dtime)
 				player_style.player_run(name,player)
 
 			end
-	
+
 			player_style.set_animation(name,a)
 			::setp::
 			player_style.hunger(player,hunger)
