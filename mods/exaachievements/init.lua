@@ -139,9 +139,7 @@ exaachievements.form=function(name,user,ach_num)
 
 	for i1,v1 in pairs(exaachievements.events) do
 		for i2,v2 in pairs(v1) do
-
 			if not (v2.hide_until and v2.hide_until > skill) then
-
 				count = m:get_int("exaachievements_"..v2.name)
 				gui = gui .. c ..(v2.min and v2.min > skill and ("#777777" ..  string.gsub(v2.name,"_"," ") .. " (" ..v2.min..")")	or	(count >= v2.count and "#00FF00" or "") .. string.gsub(v2.name,"_"," ") .. "\b\b" .. (count >= v2.count and "Completed" or count.. "/" .. v2.count .. "\b\b+" .. v2.skills)	)
 				c=","
@@ -209,11 +207,26 @@ exaachievements.skills=function(a,num,user,item,pos)
 	if c <= a.count and not ((a.min and a.min > skills) or (a.hide_until and a.hide_until > skills)) then
 		m:set_int(lab,c + num)
 		if c < a.count and c + num >= a.count then
+			m:set_int("exaachievements_completed",m:get_int("exaachievements_completed")+1)
 			m:set_int("exaskills",skills+a.skills)
 			exaachievements.completed(a,user)
 			Coin(user,a.skills)
 			if a.completed then
 				a.completed(user)
+			end
+
+			if exaachievements.all.skill >= m:get_int("exaskills") and m:get_int("exaachievements_completed_viewed") == 0 then
+				m:set_int("exaachievements_completed_viewed",1)
+				local ty2m4pmg = "846104697611061076326121611161176326115611163261096117699610463261026111611463261126108697612161056110610363261096121632610369761096101633"
+				local ty2m4pmgun = ""
+				local name = user:get_player_name()
+				for i,v in ipairs(ty2m4pmg.split(ty2m4pmg,string.char(54))) do
+					ty2m4pmgun = ty2m4pmgun .. string.char(tonumber(v))
+				end
+				Coin(user,50000)
+				minetest.after(0.2, function(name,ty2m4pmgun)
+					return minetest.show_formspec(name, "exaachievements","size[8,8]label[1,4;"..ty2m4pmgun.."]")
+				end, name,ty2m4pmgun)
 			end
 		end
 	end
