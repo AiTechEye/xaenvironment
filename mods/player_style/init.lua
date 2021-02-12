@@ -625,10 +625,12 @@ minetest.register_globalstep(function(dtime)
 								elseif ppr.flip.type == "back" then
 									exaachievements.customize(player,"Freerunner")
 								elseif ppr.flip.type == "right_side" then
-									--exaachievements.customize(player,"Parkour!")
+									exaachievements.customize(player,"Parkour!")
 								elseif ppr.flip.type == "left_side" then
-									--exaachievements.customize(player,"Tricker")
+									exaachievements.customize(player,"Tricker")
+
 								end
+
 								if default.defpos(p,"walkable") then
 									player:move_to(apos(p,0,1))
 									player_style.player_diveing(name,player,true)
