@@ -9,6 +9,14 @@ Tic tac/walljump	run + jump side of a wall
 Double wall climb	hold left & right
 Backflip		hold jump & press back/down
 Frontflip		jump, (hold) place/RMB & press forward/up
+Right sideflip	jump, (hold) place/RMB & press right
+Left sideflip	jump, (hold) place/RMB & press left
+Roll		sneak when falling from a height, causing less fall damage
+Dive roll		place/RMB and press up, useful to dive faster forward
+
+You can use all flips to reach more height and come over obstacles on 2 blocks while running,
+but sideflips wont hurt on obstacles and there is no risk you breaks your neck.
+
 Commands ##########################################################
 /protect 1		select position 1, reselect by punch the node
 /protect 2		select position 2, reselect by punch the node
