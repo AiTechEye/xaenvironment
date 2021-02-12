@@ -956,6 +956,8 @@ minetest.register_node("default:water_flowing", {
 
 
 player_style.register_environment_sound({node="default:water_flowing",sound="default_water_stream",gain=2})
+player_style.register_environment_sound({node="default:salt_water_flowing",sound="default_water_stream",gain=2})
+player_style.register_environment_sound({node="default:salt_water_source",sound="default_ocean",gain=2,timeloop=24,min_y=-2,max_y=5,count=10})
 
 minetest.register_node("default:salt_water_source", {
 	description = "Salt water source",
@@ -1045,8 +1047,6 @@ minetest.register_node("default:salt_water_flowing", {
 	post_effect_color = {a = 100, r = 0, g = 90, b = 133},
 	sounds = default.node_sound_water_defaults(),
 })
-
-player_style.register_environment_sound({node="default:salt_water_flowing",sound="default_water_stream",gain=2})
 
 --||||||||||||||||
 -- ======================= Lava
