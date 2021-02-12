@@ -56,6 +56,7 @@ exaachievements.register({
 	name="Worker",
 	count=20,
 	description="Craft 20 items with a workbench",
+	image="default:workbench",
 	skills=5,
 	hide_until=5,
 })
