@@ -692,7 +692,7 @@ minetest.register_globalstep(function(dtime)
 				elseif key.sneak or minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0 then
 					hunger = -0.0005
 					a="dive"
-					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid") > 0)
+					player_style.player_diveing(name,player,true,minetest.get_item_group(minetest.get_node(p).name,"liquid"))
 				elseif key.aux1 then
 					a="run"
 					player_style.player_run(name,player,true)
