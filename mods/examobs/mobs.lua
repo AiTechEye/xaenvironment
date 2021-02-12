@@ -9,7 +9,7 @@ examobs.register_mob({
 	swiming = 0,
 	textures = {"default_steelblock.png"},
 	mesh = "examobs_spider.b3d",
-	aggressivity = 1,
+	aggressivity = 2,
 	animation = {
 		stand={x=1,y=2,speed=0,loop=false},
 		walk={x=1,y=20,speed=30},
@@ -19,6 +19,7 @@ examobs.register_mob({
 	spawn_on={"group:stone"},
 	max_spawn_y = -50,
 	resist_nodes = {["examobs:barbed_wire"]=1},
+	floating = {["examobs:barbed_wire"]=1},
 	step=function(self,time)
 		if self.fight then
 			self.am = (self.am or 0) -0.1
@@ -633,7 +634,7 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
-	description = "Simply dangerous animal,, made to a monster just to clear out other animals and it self.\nWas done primarily to clear away wolves and create more action in the forest.",
+	description = "Simply dangerous animal, made to a monster just to clear out other animals and it self.\nWas done primarily to clear away wolves and create more action in the forest.",
 	name = "brown_bear",
 	team = "bear",
 	hp = 50,
@@ -1616,6 +1617,7 @@ examobs.register_mob({
 	breathing = 0,
 	inv={["default:ironstick"]=4,["default:iron_ingot"]=2,["default:steel_ingot"]=1},
 	punch_chance=3,
+	spawn_chance = 400,
 	animation = {
 		stand = {x=0,y=9},
 		walk = {x=11,y=31},
@@ -2700,6 +2702,7 @@ examobs.register_mob({
 	animation = "default",
 	spawn_on={"default:space_stone","default:space_dust"},
 	spawn_in="default:vacuum",
+	spawn_chance = 400,
 	max_spawn_y = 4000,
 	min_spawn_y = 2000,
 	is_food=function(self,item)
