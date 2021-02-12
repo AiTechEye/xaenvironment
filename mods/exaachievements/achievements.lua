@@ -51,6 +51,15 @@ exaachievements.register({
 })
 
 --================ Dirty ==================
+exaachievements.register({
+	type="customize",
+	name="Worker",
+	count=20,
+	description="Craft 20 items with a workbench",
+	skills=5,
+	hide_until=5,
+})
+
 
 exaachievements.register({
 	type="dig",
