@@ -749,6 +749,8 @@ depends = examobs
 # examobs.dropall(self)
 # examobs.dying(self,set)
 # walkable(pos)
+# examobs.shoot_arrow(self,pos2,"examobs:arrow")
+
 
 ##########################################################
 Yet undocumentation #############################################
