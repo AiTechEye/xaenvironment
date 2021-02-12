@@ -447,7 +447,7 @@ player_style.register_manual_page({
 			["Frontflip"]="jump, (hold) place/RMB & press forward",
 			["Right sideflip"]="jump, (hold) place/RMB & press right",
 			["Left sideflip"]="jump, (hold) place/RMB & press left",
-			["Roll"]="sneak when falling form a height",
+			["Roll"]="sneak when falling from a height",
 			["Dive roll"]="place/RMB and press up",
 		}
 		table.sort(l)
