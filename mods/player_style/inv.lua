@@ -412,7 +412,7 @@ player_style.manual=function(player,page)
 				end
 			end
 		end
-		text = text .. "textlist[0,0;2,7;manuallist;".. items .."]"
+		text = text .. "textlist[0,0;4,8;manuallist;".. items .."]"
 		return minetest.show_formspec(name, "player_style.manual",text)
 	else
 
