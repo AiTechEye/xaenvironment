@@ -37,12 +37,10 @@ bows.register_arrow=function(name,def)
 end
 
 bows.automode=function(itemstack, user, pointed_thing)
-	local item=itemstack:to_table()
-	local meta = minetest.deserialize(item.metadata) or {}
-	meta.automode = meta.automode == false
-	minetest.chat_send_player(user:get_player_name(), "Auto find arrow "..(meta.automode == false and "disabled" or "enabled"))
-	item.metadata = minetest.serialize(meta)
-	itemstack:replace(item)
+	local meta = itemstack:get_meta()
+	local m = meta:get_int("automode") == 0 and 1 or 0
+	meta:set_int("automode", m)
+	minetest.chat_send_player(user:get_player_name(), "Auto find arrow "..(m == 0 and "disabled" or "enabled"))
 	return itemstack
 end
 
@@ -85,13 +83,12 @@ end
 
 bows.load=function(itemstack, user, pointed_thing)
 	local inv=user:get_inventory()
-	local item=itemstack:to_table()
-	local meta = minetest.deserialize(item.metadata) or {}
-	local shots = bows.registed_bows[item.name .. "_loaded"].shots
+	local meta = itemstack:get_meta()
+	local shots = bows.registed_bows[itemstack:get_name() .. "_loaded"].shots
 	local index
 	local arrow
 
-	if meta.automode == true then
+	if meta:get_int("automode") == 1 then
 		for i,v in pairs(inv:get_list("main")) do
 			if minetest.get_item_group(v:get_name(), "arrow") > 0 then
 				index = i
@@ -120,39 +117,37 @@ bows.load=function(itemstack, user, pointed_thing)
 		inv:set_stack("main",index,ItemStack(arrow:get_name() .. " " .. c))
 	end
 
-	meta.arrow = arrow:get_name()
-	meta.shots = shots
-
-	item.metadata = minetest.serialize(meta)
-	item.name=item.name .. "_loaded"
-	itemstack:replace(item)
+	meta:set_string("arrow",arrow:get_name())
+	meta:set_int("shots",shots)
+	itemstack:set_name(itemstack:get_name() .. "_loaded")
 	return itemstack
 end
 
 bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
-	local item=itemstack:to_table()
-	local meta=minetest.deserialize(item.metadata)
+	local meta = itemstack:get_meta()
+	local arrow = meta:get_string("arrow")
+	local shots = meta:get_int("shots")
+	local name=itemstack:get_name()
+	local replace = bows.registed_bows[name].name
 
-	if (not (meta and meta.arrow)) or (not bows.registed_arrows[meta.arrow]) then
+	meta:set_string("arrow","")
+	meta:set_int("shots",0)
+	itemstack:set_name(replace)
+
+	if not bows.registed_arrows[arrow] then
 		return itemstack
 	end
-	local name=itemstack:get_name()
-	local replace=bows.registed_bows[name].name
+
 	local ar=bows.registed_bows[name].uses
 	local wear=bows.registed_bows[name].uses
 	local level=19 + bows.registed_bows[name].level
-	local shots=meta.shots or 1
-	local dmg = bows.registed_arrows[meta.arrow].damage
+	local dmg = bows.registed_arrows[arrow].damage
 
-	item.arrow=""
-	item.metadata=minetest.serialize(meta)
-	item.name=replace
-	itemstack:replace(item)
 	if bows.creative==false then
 		itemstack:add_wear(65535/wear)
 	end
 	for i=0,shots-1,1 do
-		minetest.after(0.05*i, function(level,user,meta,dmg)
+		minetest.after(0.05*i, function(level,user,arrow,dmg)
 			local pos = user:get_pos()
 			local dir = user:get_look_dir()
 
@@ -169,17 +164,15 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 			e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
 			e:set_acceleration({x=num(dir.x*-3), y=-10, z=num(dir.z*-3)})
 			e:set_yaw(user:get_look_horizontal()-math.pi/2)
-			e:set_properties({textures={meta.arrow}})
+			e:set_properties({textures={arrow}})
 			self.on_dropitem=on_dropitem or function() end
 			self.dir ={x=num(dir.x/2),y=num(dir.y/2),z=num(dir.z/2)}
-			self.arrow = meta.arrow
+			self.arrow = arrow
 			self.user = user
 			self.dmg = dmg
-			self.name=meta.arrow
 			minetest.sound_play("default_bow_shoot", {pos=pos})
-		end,level,user,meta,dmg)
+		end,level,user,arrow,dmg)
 	end
-
 	return itemstack
 end
 
@@ -235,7 +228,7 @@ minetest.register_entity("default:arrow",{
 	drop=function(self)
 		if not self.removed then
 			local pos=self.object:get_pos()
-			local e = minetest.add_item({x=pos.x, y=math.floor(pos.y+0.5), z=pos.z},self.name)
+			local e = minetest.add_item({x=pos.x, y=math.floor(pos.y+0.5), z=pos.z},self.arrow)
 			e:set_velocity({x = math.random(-0.5, 0.5),y=0.5,z = math.random(-0.5, 0.5)})
 			self.on_dropitem(e)
 			self.removed = true
@@ -245,7 +238,7 @@ minetest.register_entity("default:arrow",{
 	on_step=function(self, dtime, moveresult)
 		self.timer=self.timer-dtime
 		local pos=self.object:get_pos()
-		bows.registed_arrows[self.name].on_step(self,dtime,self.user,pos,self.oldpos or pos)
+		bows.registed_arrows[self.arrow].on_step(self,dtime,self.user,pos,self.oldpos or pos)
 		if not self.user or self.timer < 16 then
 			self:drop()
 			return
@@ -253,16 +246,16 @@ minetest.register_entity("default:arrow",{
 			for i,v in pairs(moveresult.collisions) do
 				if v.type == "node" then
 					minetest.check_for_falling(pos)
-					bows.registed_arrows[self.name].on_hit_node(self,pos,self.user,self.oldpos or pos)
-					minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+					bows.registed_arrows[self.arrow].on_hit_node(self,pos,self.user,self.oldpos or pos)
+					minetest.sound_play(bows.registed_arrows[self.arrow].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 					self:drop()
 					return
 				elseif v.type == "object" and not default.is_decoration(v.object,true) then
 					local en = v.object:get_luaentity()
 					if not (en and en.user and en.user == self.user) then
 						bows.on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
-						bows.registed_arrows[self.name].on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
-						minetest.sound_play(bows.registed_arrows[self.name].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
+						bows.registed_arrows[self.arrow].on_hit_object(self,v.object,self.dmg,self.user,self.oldpos or pos)
+						minetest.sound_play(bows.registed_arrows[self.arrow].on_hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 7})
 						self:drop()
 						return
 					end
