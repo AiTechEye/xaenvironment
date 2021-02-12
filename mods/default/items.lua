@@ -45,6 +45,13 @@ player_style.register_manual_page({
 	tags = {"default:uraniumactive_ingot","default:uranium_lump"},
 })
 
+player_style.register_manual_page({
+	name = "Farming",
+	itemstyle = "default:iron_hoe",
+	text = "You can farm crops by using a hoe.\nCraft a hoe through workbench, then simply right click/place on dirt or grass to clear it out of impurities.\nMake sure there is water inside of a radius of 7 blocks to keep the soil wet, or it just dryes out and the crops will die instead of grow.]item_image[1,0.5;1,1;default:wet_soil]item_image[2,0.5;1,1;default:dirt]item_image[3,0.5;1,1;default:dirt_with_grass]item_image[4,0.5;1,1;default:dirt_with_dry_grass]item_image[5,0.5;1,1;default:dirt_with_jungle_grass]item_image[6,0.5;1,1;default:dirt_with_coniferous_grass]",
+	tags = {"default:recycling_mill"},
+})
+
 minetest.register_tool("default:wrench", {
 	description = "Wrench (rotate blocks)",
 	groups = {treasure=1},
