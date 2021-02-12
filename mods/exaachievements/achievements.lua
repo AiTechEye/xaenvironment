@@ -143,6 +143,23 @@ exaachievements.register({
 
 exaachievements.register({
 	type="customize",
+	name="Parkour!",
+	count=20,
+	description="Do 20 right sideflips",
+	skills=10,
+	hide_until=10,
+})
+exaachievements.register({
+	type="customize",
+	name="Tricker",
+	count=20,
+	description="Do 20 left sideflips",
+	skills=10,
+	hide_until=10,
+})
+
+exaachievements.register({
+	type="customize",
 	name="artist",
 	count=#player_style.skins.skins,
 	description="buy all skins",
