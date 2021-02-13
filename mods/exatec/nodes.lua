@@ -1567,7 +1567,8 @@ minetest.register_node("exatec:bow", {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
-		minetest.get_meta(pos):set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
+		meta:get_inventory():set_size("main", 32)
+		meta:set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
 		minetest.get_node_timer(pos):start(1)
 	end,
 	on_destruct = function(pos)
@@ -1583,12 +1584,23 @@ minetest.register_node("exatec:bow", {
 			local m = minetest.get_meta(pos)
 			local channel = pressed.channel or m:get_string("channel")
 			m:set_string("channel",channel)
-			m:set_string("formspec","size[3.5,0.3]"
+			m:set_string("formspec","size[8,5]listcolors[#77777777;#777777aa;#000000ff]"
 			.."field[0,0;3,1;channel;;"..channel.."]"
 			.."button_exit[2.5,-0.3;1,1;go;Save]"
 			.."tooltip[channel;Channel]"
+			.."item_image[3.5,0;1,1;default:arrow_iron]"
+			.."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;3.5,0;1,1;]"
+			.."list[current_player;main;0,1.2;8,4;]"
+			.."listring[current_player;main]"
+			.."listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 			)
 		end
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		return minetest.is_protected(pos, player:get_player_name()) and 0 or stack:get_count()
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		return not minetest.is_protected(pos, player:get_player_name()) and minetest.get_item_group(stack:get_name(), "arrow") > 0 and stack:get_count() or 0
 	end,
 	exatec={
 		on_data_wire=function(pos,data)
@@ -1607,8 +1619,19 @@ minetest.register_node("exatec:bow", {
 				end
 				for _, ob in pairs(data.objects) do
 					local en = ob:get_luaentity()
-					if not (en and en.exatec_item) then
+					if bow and not (en and en.exatec_item) and examobs.visiable(ob,pos) then
 						bow:lookat(ob:get_pos())
+						local meta = minetest.get_meta(pos)
+						local inv = meta:get_inventory()
+						local s = inv:get_stack("main",1)
+
+print(s:get_count())
+
+						if s:get_count() > 0 then
+							bow:shoot(s)
+							s:take_item()
+							inv:set_stack("main",1,s)
+						end
 						return
 					end
 				end
@@ -1627,25 +1650,23 @@ minetest.register_node("exatec:bow", {
 				bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
 				bow = bow:get_luaentity()
 			end
-		end,
-		on_input=function(pos,stack,opos)
-			if minetest.get_item_group(stack:get_name(),"arrow") > 0 then
-				local bow
-				for _, ob in pairs(minetest.get_objects_inside_radius(pos,1)) do
-					local en = ob:get_luaentity()
-					if en and en.exatec_bow then
-						bow = en
-						break
-					end
-				end
-				if not bow then
-					bow = minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
-					bow = bow:get_luaentity()
-				end
-				bow:shoot(stack)
+
+			local meta = minetest.get_meta(pos)
+			local inv = meta:get_inventory()
+			local s = inv:get_stack("main",1)
+			if bow and s:get_count() > 0 then
+				bow:shoot(s)
+				s:take_item()
+				inv:set_stack("main",1,s)
 			end
+
 		end,
+		input_list="main",
+		output_list="main",
 		test_input=function(pos,stack,opos)
+
+print(stack:get_name(),minetest.get_item_group(stack:get_name(),"arrow"))
+print(bows.registed_arrows[stack:get_name()])
 			return minetest.get_item_group(stack:get_name(),"arrow") > 0
 		end,
 	},
