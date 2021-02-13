@@ -1,6 +1,10 @@
-if true then return end
-keystrokes = {}
-keys = {{"Up","up"},{"Down","down"},{"Left","left"},{"Right","right"},{"Sneak","sneak"},{"Special","aux1"},{"Jump","jump"}}
+keystrokes = {enabled=minetest.settings:get_bool("xaenvironment_keystrokes")}
+
+if not keystrokes.enabled then
+	return
+end
+
+keys = {{"Up","up"},{"Down","down"},{"Left","left"},{"Right","right"},{"Sneak","sneak"},{"Special","aux1"},{"Jump","jump"},{"RMB","RMB"},{"LMB","LMB"}}
 minetest.register_on_joinplayer(function(player)
 	if not minetest.is_singleplayer() then
 		return
@@ -36,6 +40,16 @@ minetest.register_on_joinplayer(function(player)
 		scale = {x=8,y=3},
 		position={x=x+0.237,y=y+0.88}
 	}
+	b.LMB={
+		scale = {x=3,y=3},
+		position={x=x+0.05,y=y+0.7}
+	}
+	b.RMB={
+		scale = {x=3,y=3},
+		position={x=x+0.15,y=y+0.7}
+	}
+
+
 	for i, v in pairs(b) do
 		b[i].text = "default_cloud.png^[colorize:#333a"
 		b[i].offset = {x=0,y=0}
