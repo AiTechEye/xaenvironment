@@ -1624,9 +1624,6 @@ minetest.register_node("exatec:bow", {
 						local meta = minetest.get_meta(pos)
 						local inv = meta:get_inventory()
 						local s = inv:get_stack("main",1)
-
-print(s:get_count())
-
 						if s:get_count() > 0 then
 							bow:shoot(s)
 							s:take_item()
@@ -1664,9 +1661,6 @@ print(s:get_count())
 		input_list="main",
 		output_list="main",
 		test_input=function(pos,stack,opos)
-
-print(stack:get_name(),minetest.get_item_group(stack:get_name(),"arrow"))
-print(bows.registed_arrows[stack:get_name()])
 			return minetest.get_item_group(stack:get_name(),"arrow") > 0
 		end,
 	},
