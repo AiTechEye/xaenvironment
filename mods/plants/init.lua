@@ -1085,16 +1085,7 @@ default.register_eatable("craftitem","plants:pumpkinslice",1,4,{
 	description = "Pumpkin slice",
 	inventory_image="plants_pumpkinslice.png",	
 	name="plants_pumpkinslice",
-	--tiles={"plants_tomato.png"},
-	--drawtype = "mesh",
-	--mesh = "plants_tomato.obj",
-	--groups = {dig_immediate = 3,flammable=1,store=10,tomato=1},
-	--sunlight_propagates = true,
-	--walkable = false,
-	--paramtype = "light",
-	--sounds = default.node_sound_leaves_defaults(),
 	wet=1,
-	--selection_box  = {type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}},
 })
 
 
