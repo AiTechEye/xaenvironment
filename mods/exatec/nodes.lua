@@ -1567,7 +1567,7 @@ minetest.register_node("exatec:bow", {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		minetest.add_entity({x=pos.x,y=pos.y+0.3,z=pos.z},"exatec:bow")
-		meta:get_inventory():set_size("main", 32)
+		meta:get_inventory():set_size("main", 1)
 		meta:set_string("formspec","size[1,1]button_exit[0,0;1,1;go;Setup]")
 		minetest.get_node_timer(pos):start(1)
 	end,
@@ -1596,7 +1596,7 @@ minetest.register_node("exatec:bow", {
 			)
 		end
 	end,
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 		return minetest.is_protected(pos, player:get_player_name()) and 0 or stack:get_count()
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -1656,14 +1656,16 @@ minetest.register_node("exatec:bow", {
 				s:take_item()
 				inv:set_stack("main",1,s)
 			end
-
 		end,
 		input_list="main",
 		output_list="main",
 		test_input=function(pos,stack,opos)
-			return minetest.get_item_group(stack:get_name(),"arrow") > 0
+			return minetest.get_item_group(stack:get_name(),"arrow") > 0 and minetest.get_meta(pos):get_inventory():room_for_item("main",stack)
 		end,
 	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
 })
 
 minetest.register_node("exatec:pcb", {
