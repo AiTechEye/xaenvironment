@@ -329,15 +329,6 @@ minetest.register_node("player_style:top_hat_upside_down", {
 			"listring[current_player;main]" ..
 			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 		)
-		--local name = player:get_player_name()
-		--minetest.show_formspec(name, "default.tophat",
-		--	"size[8,8]" ..
-		--	"listcolors[#77777777;#777777aa;#000000ff]" ..
-		--	"list[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main;0,0;8,4;]" ..
-		--	"list[current_player;main;0,4.2;8,4;]" ..
-		--	"listring[current_player;main]" ..
-		--	"listring[nodemeta:" .. npos.x .. "," .. npos.y .. "," .. npos.z  .. ";main]"
-		--)
 	end,
 	on_item_touch=function(pos,object)
 		local meta = minetest.get_meta(pos)
@@ -436,4 +427,122 @@ minetest.register_node("player_style:top_hat_upside_down", {
 			return count
 		end
 	end,
+})
+
+minetest.register_craft({
+	output="player_style:cap_hat",
+	recipe={
+		{"examobs:pelt","examobs:pelt",""},
+		{"examobs:pelt","materials:string","materials:piece_of_cloth"},
+	},
+})
+
+minetest.register_node("player_style:cap_hat", {
+	description = "Cap (hat)",
+	stack_max = 1,
+	tiles = {"default_amberblock.png^[colorize:#6b3209aa"},
+	groups = {dig_immediate = 3,flammable=3,hat=1,store=400},
+	hat_properties={pos={x=-1.5, y=-5, z=0}, rotation={x=180,y=-90,z=0},size={x=0.5,y=0.5,z=0.5}},
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.3125, -0.5, -0.125, 0.3125, -0.0625, 0.5},
+			{-0.3125, -0.5, -0.5, 0.3125, -0.4375, -0.125},
+		}
+	},
+	paramtype2="facedir",
+})
+
+minetest.register_craft({
+	output="player_style:earphone_hat",
+	recipe={
+		{"materials:plastic_sheet","default:electric_lump","materials:plastic_sheet"},
+		{"group:metalstick","materials:diode","group:metalstick"},
+	},
+})
+
+minetest.register_node("player_style:earphone_hat", {
+	description = "Earphone hat",
+	stack_max = 1,
+	tiles = {"default_electricblock.png"},
+	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
+	hat_properties={pos={x=0, y=-2, z=0}, rotation={x=180,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{0.4375, -0.5, -0.1875, 0.5, -0.125, 0.1875},
+			{-0.5, -0.5, -0.1875, -0.4375, -0.125, 0.1875},
+			{-0.5, -0.125, -0.0625, -0.4375, 0.5, 0.0625},
+			{-0.5, 0.4375, -0.0625, 0.5, 0.5, 0.0625},
+			{0.5, -0.125, -0.0625, 0.5, 0.5, 0.0625},
+		}
+	},
+	paramtype2="facedir",
+})
+
+minetest.register_craft({
+	output="player_style:hat",
+	recipe={
+		{"materials:piece_of_cloth","plants:cotton","materials:piece_of_cloth"},
+		{"plants:cotton","materials:string","plants:cotton"},
+	},
+})
+
+minetest.register_node("player_style:hat", {
+	description = "Hat",
+	stack_max = 1,
+	tiles = {"default_wool.png^[colorize:#a00e"},
+	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
+	hat_properties={pos={x=0, y=-1.5, z=0}, rotation={x=0,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5}
+		}
+	},
+	paramtype2="facedir",
+})
+
+minetest.register_craft({
+	output="player_style:felt_hat",
+	recipe={
+		{"","materials:piece_of_cloth",""},
+		{"examobs:pelt","materials:string","examobs:pelt"},
+	},
+})
+
+minetest.register_node("player_style:felt_hat", {
+	description = "Felt hat",
+	stack_max = 1,
+	tiles = {"default_wool.png^[colorize:#002e"},
+	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
+	hat_properties={pos={x=0, y=-6, z=0}, rotation={x=180,y=-90,z=0},size={x=0.6,y=0.6,z=0.6}},
+	drawtype="nodebox",
+	node_box ={
+		type = "fixed",
+		fixed = {
+			{-0.25, -0.4375, -0.25, 0.25, -0.1875, 0.25},
+			{-0.5, -0.5, -0.5, 0.5, -0.4375, 0.5},
+		}
+	},
+	paramtype2="facedir",
+})
+
+minetest.register_craft({
+	output="player_style:grass_with_dirt_hat",
+	recipe={
+		{"","materials:string",""},
+		{"materials:string","default:dirt_with_grass","materials:string"},
+	},
+})
+
+minetest.register_node("player_style:grass_with_dirt_hat", {
+	description = "Grass with dirt hat",
+	stack_max = 1,
+	tiles={"default_grass.png","default_dirt.png","default_dirt.png^default_grass_side.png"},
+	groups = {dig_immediate = 3,flammable=3,hat=1,store=100},
+	hat_properties={pos={x=0, y=-4, z=0}, rotation={x=180,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
 })
