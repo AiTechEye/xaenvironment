@@ -444,7 +444,7 @@ minetest.register_node("examobs:woodbox", {
 		m:get_inventory():set_size("main", 32)
 		m:set_string("infotext","Wooden box")
 		m:set_string("formspec",
-			"size[8,8]" ..
+			"size[8,8]listcolors[#77777777;#777777aa;#000000ff]" ..
 			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
 			"list[current_player;main;0,4.2;8,4;]" ..
 			"listring[current_player;main]" ..
