@@ -18,3 +18,6 @@ xaenvironment_active_spawn_same_mob_limit (Max spawning mobs while active of sam
 
 xaenvironment_survivorstart (Start with helpful items) bool false
 
+xaenvironment_keystrokes (Shows keystrokes) bool false
+
+
