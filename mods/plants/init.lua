@@ -1047,6 +1047,56 @@ minetest.register_craft({
 		{"plants:cabbage"},
 	},
 })
+-- ==================== Pumpkin
+
+default.register_plant({
+	name="pumpkin",
+	tiles={"plants_pumpkintop.png","plants_pumpkinside.png","plants_pumpkinside.png"},
+	drawtype = "normal",
+	walkable=true,
+	selection_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.5,0.5}},
+	collision_box = {type = "fixed",fixed = {-0.5,-0.5,-0.5,0.5,0.5,0.5}},
+	waving =  0,
+	groups = {dig_immediate = 1,flammable=1,spreading_plant=20,store=200},
+	sounds = {
+		footstep = {name = "default_place", gain = 1},
+		dig = {name = "default_place", gain = 1},
+		dug = {name = "default_wood_dug", gain = 1},
+		place = {name = "default_place_hard", gain = 1}
+	},
+	decoration={
+		biomes={"tropic","jungle"},
+		noise_params={
+			offset=-0.0015,
+			scale=0.005,
+			seed=1474265,
+		}
+	}
+})
+
+minetest.register_craft({
+	output="plants:pumpkinslice 9",
+	recipe={
+		{"plants:pumpkin"},
+	},
+})
+
+default.register_eatable("craftitem","plants:pumpkinslice",1,4,{
+	description = "Pumpkin slice",
+	inventory_image="plants_pumpkinslice.png",	
+	name="plants_pumpkinslice",
+	--tiles={"plants_tomato.png"},
+	--drawtype = "mesh",
+	--mesh = "plants_tomato.obj",
+	--groups = {dig_immediate = 3,flammable=1,store=10,tomato=1},
+	--sunlight_propagates = true,
+	--walkable = false,
+	--paramtype = "light",
+	--sounds = default.node_sound_leaves_defaults(),
+	wet=1,
+	--selection_box  = {type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}},
+})
+
 
 -- ==================== Tomato
 
