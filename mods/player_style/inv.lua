@@ -148,7 +148,7 @@ player_style.inventory=function(player)
 
 		invp.hat = minetest.create_detached_inventory("hat", {
 			allow_put = function(inv, listname, index, stack, player)
-				return minetest.get_item_group(stack:get_name(),"hat") > 0 and stack:get_count() or 0
+				return default.def(stack:get_name()).hat_properties and 1 or 0
 			end,
 			on_put = function(inv, listname, index, stack, player)
 				player:get_meta():set_string("hat",minetest.serialize(stack:to_table()))
