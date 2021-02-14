@@ -18,7 +18,6 @@ for i=1,4,1 do
 minetest.register_node("vexcazer:lazer" ..i, {
 	description = "Lazer",
 	drawtype="glasslike",
-	alpha=50,
 	tiles = {"vexcazer_background.png^[colorize:#" ..  colors[i]},
 	drop="",
 	light_source = 14,
