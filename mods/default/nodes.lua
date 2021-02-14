@@ -883,7 +883,6 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	use_texture_alpha = "blend",
-	alpha = 165,
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1,on_load=1},
 	drawtype = "liquid",
 	paramtype = "light",
