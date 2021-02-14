@@ -442,7 +442,7 @@ minetest.register_node("player_style:cap_hat", {
 	stack_max = 1,
 	tiles = {"default_amberblock.png^[colorize:#6b3209aa"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=400},
-	hat_properties={pos={x=-1.5, y=-5, z=0}, rotation={x=180,y=-90,z=0},size={x=0.5,y=0.5,z=0.5}},
+	hat_properties={pos={x=-1.5, y=5, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
 	drawtype="nodebox",
 	node_box ={
 		type = "fixed",
@@ -467,7 +467,7 @@ minetest.register_node("player_style:earphone_hat", {
 	stack_max = 1,
 	tiles = {"default_electricblock.png"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
-	hat_properties={pos={x=0, y=-2, z=0}, rotation={x=180,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
+	hat_properties={pos={x=0, y=2, z=0}, rotation={x=0,y=90,z=0},size={x=0.3,y=0.3,z=0.3}},
 	drawtype="nodebox",
 	node_box ={
 		type = "fixed",
@@ -495,7 +495,7 @@ minetest.register_node("player_style:hat", {
 	stack_max = 1,
 	tiles = {"default_wool.png^[colorize:#a00e"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
-	hat_properties={pos={x=0, y=-1.5, z=0}, rotation={x=0,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
+	hat_properties={pos={x=0, y=4, z=0}, rotation={x=0,y=90,z=0},size={x=0.3,y=0.3,z=0.3}},
 	drawtype="nodebox",
 	node_box ={
 		type = "fixed",
@@ -519,7 +519,7 @@ minetest.register_node("player_style:felt_hat", {
 	stack_max = 1,
 	tiles = {"default_wool.png^[colorize:#002e"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
-	hat_properties={pos={x=0, y=-6, z=0}, rotation={x=180,y=-90,z=0},size={x=0.6,y=0.6,z=0.6}},
+	hat_properties={pos={x=0, y=6, z=0}, rotation={x=0,y=90,z=0},size={x=0.6,y=0.6,z=0.6}},
 	drawtype="nodebox",
 	node_box ={
 		type = "fixed",
@@ -544,5 +544,5 @@ minetest.register_node("player_style:grass_with_dirt_hat", {
 	stack_max = 1,
 	tiles={"default_grass.png","default_dirt.png","default_dirt.png^default_grass_side.png"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=100},
-	hat_properties={pos={x=0, y=-4, z=0}, rotation={x=180,y=-90,z=0},size={x=0.3,y=0.3,z=0.3}},
+	hat_properties={pos={x=0, y=4, z=0}, rotation={x=0,y=90,z=0},size={x=0.3,y=0.3,z=0.3}},
 })
