@@ -674,7 +674,6 @@ minetest.register_node("default:end_of_world_water", {
 			}
 		}
 	},
-	alpha =165,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -715,7 +714,6 @@ minetest.register_node("default:end_of_world_water2", {
 			}
 		}
 	},
-	alpha =165,
 	paramtype = "light",
 	pointable = false,
 	drop = "",

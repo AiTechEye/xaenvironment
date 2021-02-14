@@ -486,7 +486,6 @@ minetest.register_node("default:glass_frosted", {
 	sunlight_propagates = true,
 	use_texture_alpha = "blend",
 	paramtype = "light",
-	alpha = 50,
 	palette="default_palette.png",
 	paramtype2 = "color",
 	on_punch=default.dye_coloring
@@ -883,7 +882,6 @@ minetest.register_node("default:water_source", {
 			}
 		}
 	},
-	alpha =165,
 	use_texture_alpha = "blend",
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1,on_load=1},
 	drawtype = "liquid",
@@ -935,7 +933,6 @@ minetest.register_node("default:water_flowing", {
 			}
 		}
 	},
-	alpha =165,
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
@@ -984,7 +981,6 @@ minetest.register_node("default:salt_water_source", {
 			}
 		}
 	},
-	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
 	drawtype = "liquid",
 	paramtype = "light",
@@ -1029,7 +1025,6 @@ minetest.register_node("default:salt_water_flowing", {
 			}
 		}
 	},
-	alpha =165,
 	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
 	paramtype = "light",
