@@ -40,7 +40,6 @@ minetest.register_node("vexcazer_flashlight:flhtw", {
 	description = "Water light",
 	drawtype = "liquid",
 	tiles = {"vexcazer_background.png^[colorize:#2a80e7aa"},
-	alpha = 160,
 	light_source = 12,
 	paramtype = "light",
 	walkable = false,
