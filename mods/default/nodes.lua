@@ -883,6 +883,7 @@ minetest.register_node("default:water_source", {
 		}
 	},
 	use_texture_alpha = "blend",
+	alpha = 165,
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_craftguide=1,treasure=1,on_load=1},
 	drawtype = "liquid",
 	paramtype = "light",
@@ -934,6 +935,7 @@ minetest.register_node("default:water_flowing", {
 		}
 	},
 	groups = {drinkable=1,water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
+	use_texture_alpha = "blend",
 	drawtype = "flowingliquid",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
@@ -954,7 +956,7 @@ minetest.register_node("default:water_flowing", {
 
 player_style.register_environment_sound({node="default:water_flowing",sound="default_water_stream",gain=2})
 player_style.register_environment_sound({node="default:salt_water_flowing",sound="default_water_stream",gain=2})
-player_style.register_environment_sound({node="default:salt_water_source",sound="default_ocean",gain=2,timeloop=24,min_y=-5,max_y=5,count=10})
+player_style.register_environment_sound({node="default:salt_water_source",sound="default_ocean",gain=2,timeloop=24,min_y=-5,max_y=10,count=10})
 
 minetest.register_node("default:salt_water_source", {
 	description = "Salt water source",
@@ -982,6 +984,7 @@ minetest.register_node("default:salt_water_source", {
 		}
 	},
 	groups = {water=1, liquid=1, cools_lava=1,not_in_craftguide=1},
+	use_texture_alpha = "blend",
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
@@ -1004,7 +1007,6 @@ minetest.register_node("default:salt_water_flowing", {
 	special_tiles={
 		tile="default_salt_water.png",
 		{
-
 			name = "default_salt_water_animated.png",
 			backface_culling = false,
 			animation = {
@@ -1027,6 +1029,7 @@ minetest.register_node("default:salt_water_flowing", {
 	},
 	groups = {water=1, liquid=1, cools_lava=1,not_in_creative_inventory=1},
 	drawtype = "flowingliquid",
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
