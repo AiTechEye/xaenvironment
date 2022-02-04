@@ -393,6 +393,7 @@ minetest.register_node("exatec:cookable_dir_filter", {
 	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
 	exatec={
 		test_input=function(pos,stack,opos)
+			local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
 			return result.item:get_name() ~= ""
 		end,
 		on_input=function(pos,stack,opos)
