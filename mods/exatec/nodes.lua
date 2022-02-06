@@ -807,9 +807,9 @@ minetest.register_node("exatec:extraction", {
 				for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
 					if v:get_name() ~= "" then
 						local stack = ItemStack(v:get_name() .." " .. 1)
-						if exatec.test_input(f,stack,pos) and exatec.test_output(b,stack,pos) then
-							exatec.input(f,stack,pos)
-							exatec.output(b,stack,pos)
+						if exatec.test_input(f,stack,pos,pos) and exatec.test_output(b,stack,pos,pos) then
+							exatec.input(f,stack,pos,pos)
+							exatec.output(b,stack,pos,pos)
 							minetest.sound_play("default_pump_out", {pos=pos, gain = 2, max_hear_distance = 10})
 							return true
 						end
@@ -821,7 +821,7 @@ minetest.register_node("exatec:extraction", {
 		test_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-			return exatec.test_input(f,stack,pos)
+			return exatec.test_input(f,stack,pos,pos)
 		end,
 		on_input=function(pos,stack,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
