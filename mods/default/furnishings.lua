@@ -9,6 +9,15 @@ default.register_fence=function(def)
 	def.groups.flammable = def.groups.flammable or	1
 	def.sounds = def.sounds or			default.node_sound_wood_defaults()
 	def.connects_to = def.connects_to or		{"group:choppy"}
+	def.damage_per_second = def.damage_per_second or 0
+	def.node_box = def.node_box or 		{
+		type = "connected",
+		connect_front={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, -0.5, 0.0625, 0.375, -0.0625},{-0.0625, -0.25, -0.5, 0.0625, -0.125, -0.0625}},
+		connect_back={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, 0.0625, 0.0625, 0.375, 0.5},{-0.0625, -0.25, 0.0625, 0.0625, -0.125, 0.5}},
+		connect_right={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{0.0625, 0.25, -0.0625, 0.5, 0.375, 0.0625},{0.0625, -0.25, -0.0625, 0.5, -0.125, 0.0625}},
+		connect_left={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.5, 0.25, -0.0625, -0.0625, 0.375, 0.0625},{-0.5, -0.25, -0.0625, -0.0625, -0.125, 0.0625}},
+		fixed = {-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},
+	}
 
 	minetest.register_node(name .."_fence", {
 		description = def.description or string.gsub(uname,"_"," ") .. " fence",
@@ -18,18 +27,12 @@ default.register_fence=function(def)
 		sounds = def.sounds,
 		drawtype = "nodebox",
 		paramtype = "light",
-		connects_to=def.connects_to,
-		node_box = {
-			type = "connected",
-			connect_front={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, -0.5, 0.0625, 0.375, -0.0625},{-0.0625, -0.25, -0.5, 0.0625, -0.125, -0.0625}},
-			connect_back={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.0625, 0.25, 0.0625, 0.0625, 0.375, 0.5},{-0.0625, -0.25, 0.0625, 0.0625, -0.125, 0.5}},
-			connect_right={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{0.0625, 0.25, -0.0625, 0.5, 0.375, 0.0625},{0.0625, -0.25, -0.0625, 0.5, -0.125, 0.0625}},
-			connect_left={{-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},{-0.5, 0.25, -0.0625, -0.0625, 0.375, 0.0625},{-0.5, -0.25, -0.0625, -0.0625, -0.125, 0.0625}},
-			fixed = {-0.0625, -0.5, -0.0625, 0.0625, 0.5, 0.0625},
-		},
+		connects_to = def.connects_to,
+		node_box = def.node_box,
 		palette="default_palette.png",
 		paramtype2="color",
-		on_punch=default.dye_coloring
+		on_punch=default.dye_coloring,
+		damage_per_second = def.damage_per_second,
 	})
 
 	if def.craft then
