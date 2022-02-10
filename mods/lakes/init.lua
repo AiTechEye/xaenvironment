@@ -13,6 +13,10 @@ lakes.set_lake=function(def)
 	local c_air = minetest.get_content_id("air")
 	local nodes={}
 	local pos=def.pos
+	
+	if def.on_generate then
+		def.on_generate(pos)
+	end
 
 	nodes[c_source]=true
 
@@ -64,6 +68,10 @@ lakes.set_lake=function(def)
 	vox:write_to_map()
 	vox:update_map()
 	vox:update_liquids()
+
+	if def.after_generate then
+		def.after_generate(pos)
+	end
 end
 
 minetest.register_on_generated(function(min, max, seed)
