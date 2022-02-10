@@ -244,9 +244,6 @@ end
 default.register_plant=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local name = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
-	local ddef = table.copy(def.decoration or {})
-
-	def.decoration = nil
 
 	def = def or {}
 	def.description = def.description or			string.gsub(name,"_"," ")
@@ -270,6 +267,13 @@ default.register_plant=function(def)
 	def.dye_colors = def.dye_colors or			{palette=90}
 
 	minetest.register_node(mod .. def.name, def)
+
+	if def.decoration == false then
+		return
+	end
+
+	local ddef = table.copy(def.decoration or {})
+	def.decoration = nil
 
 	ddef.decoration = def.name
 	ddef.deco_type = ddef.deco_type or			"simple"
@@ -301,13 +305,13 @@ default.register_tree=function(def)
 
 	if type(def.name) ~= "string" then
 		error("name (string) required!")
-	elseif type(def.sapling_place_schematic) ~= "function" then
+	elseif def.sapling_place_schematic and type(def.sapling_place_schematic) ~= "function" then
 		error("sapling_place_schematic (function) required!")
 	elseif def.schematic and type(def.schematic) ~= "string" then
 		error("schematic (string) required!")
 	elseif def.schematics and type(def.schematics) ~= "table" then
 		error("schematics (stable) required!")
-	elseif not (def.schematic or def.schematics or def.schematic_spawner) then
+	elseif def.schematic ~= false and not (def.schematic or def.schematics or def.schematic_spawner) then
 		error("schematic (string) or schematics (table) or schematic_spawner (bool) required!")
 	end
 
@@ -352,6 +356,8 @@ default.register_tree=function(def)
 	})
 
 -- stair
+	def.stair = def.stair or {}
+	def.stair.groups =  def.stair.groups or {wood=1,stair=1,choppy=3,flammable=2}
 
 	minetest.register_node(mod .. def.name .. "_stair",{
 		description = def.wood.description  .. " stair",
@@ -359,7 +365,7 @@ default.register_tree=function(def)
 		drawtype = "nodebox",
 		paramtype = "light",
 		paramtype2 = "facedir",
-		groups = def.wood.groups,
+		groups = def.stair.groups,
 		sounds = def.wood.sounds,
 		node_box = {
 			type = "fixed",
@@ -505,19 +511,20 @@ default.register_tree=function(def)
 		end
 	end
 
-	def.mapgen = def.mapgen or						{}
-	def.mapgen.noise_params = def.mapgen.noise_params or			{}
-	def.mapgen.noise_params.offset = def.mapgen.noise_params.offset or	0.006
-	def.mapgen.noise_params.scale = def.mapgen.noise_params.scale or		0.002
-	def.mapgen.noise_params.spread = def.mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
-	def.mapgen.noise_params.seed = def.mapgen.noise_params.seed or		2
-	def.mapgen.noise_params.octaves = def.mapgen.noise_params.octaves or	3
-	def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
+	if def.mapgen == nil or def.mapgen ~= false then
+		def.mapgen = def.mapgen or						{}
+		def.mapgen.noise_params = def.mapgen.noise_params or			{}
+		def.mapgen.noise_params.offset = def.mapgen.noise_params.offset or	0.006
+		def.mapgen.noise_params.scale = def.mapgen.noise_params.scale or		0.002
+		def.mapgen.noise_params.spread = def.mapgen.noise_params.spread or	{x = 250, y = 250, z = 250}
+		def.mapgen.noise_params.seed = def.mapgen.noise_params.seed or		2
+		def.mapgen.noise_params.octaves = def.mapgen.noise_params.octaves or	3
+		def.mapgen.noise_params.persist = def.mapgen.noise_params.persist or	0.66
 
-	if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
-		def.mapgen.biomes = default.registered_bios_list
+		if def.mapgen.biomes and def.mapgen.biomes[1] == "all" then
+			def.mapgen.biomes = default.registered_bios_list
+		end
 	end
-
 	if def.schematic_spawner then
 		minetest.register_node(mod .. def.name .. "_decoration_spawner", {
 			tiles={"default_wood.png"},
@@ -570,6 +577,7 @@ default.register_tree=function(def)
 			description = name .. " wood door",
 			texture=def.wood.tiles[1],
 			burnable = true,
+			groups = type(def.door) == "table" and def.door.groups or nil,
 			craft={
 				{mod .. def.name .. "_wood",mod .. def.name .. "_wood",""},
 				{mod .. def.name .. "_wood",mod .. def.name .. "_wood",""},
@@ -582,6 +590,7 @@ default.register_tree=function(def)
 			name = def.name .. "_wood",
 			description = def.name .. " wood chair",
 			burnable = true,
+			groups = type(def.chair) == "table" and def.chair.groups or nil,
 			texture =def.wood.tiles[1],
 			craft={{"group:stick","",""},{mod .. def.name .. "_wood","",""},{"group:stick","",""}}
 		})
@@ -589,7 +598,8 @@ default.register_tree=function(def)
 	if def.fence then
 		default.register_fence({
 			name = def.name .. "_wood",
-			texture =def.wood.tiles[1],
+			texture = def.wood.tiles[1],
+			groups = type(def.fence) == "table" and def.fence.groups or nil,
 			craft={
 				{"group:stick","group:stick","group:stick"},
 				{"group:stick",mod .. def.name .. "_wood","group:stick"}
