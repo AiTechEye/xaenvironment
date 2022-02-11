@@ -236,25 +236,27 @@ toxic.spread=function(pos,node,nogen)
 	local p = minetest.find_nodes_in_area(vector.add(pos, 1),vector.subtract(pos, 1),toxic.groups)
 	for i,n in pairs(p) do
 		local nn = minetest.get_node(n).name
-		for i2,g in ipairs(toxic.group) do
-			if nn == "air" then
-				minetest.set_node(n, {name = "default:gas"})
-				minetest.get_meta(n):set_int("t_rad",r+1)
-			elseif nn == "default:dirt_with_snow" or nn == "default:snow" then
-				minetest.set_node(n, {name = "toxic:snowblock_thin"})
-				minetest.get_meta(n):set_int("t_rad",r+1)
-			elseif minetest.get_item_group(nn,g) > 0 and minetest.get_item_group(nn,"toxic_spreading") == 0 then
-				minetest.swap_node(n, {name = toxic.nodes[g]})
-				minetest.get_meta(n):set_int("t_rad",r+1)
-				if g == "dirt" and math.random(0,50) == 0 and default.def(minetest.get_node(apos(n,0,1)).name).buildable_to then
-					local start = nogen and 3 or 1
-					local rnd = math.random(start,#toxic.random_items)
-					local item = toxic.random_items[rnd]
-					local param2 = 0
-					if rnd == 1 or rnd == 2 then
-						param2 = math.random(0,19)
+		if not minetest.is_protected(n, "") then
+			for i2,g in ipairs(toxic.group) do
+				if nn == "air" then
+					minetest.set_node(n, {name = "default:gas"})
+					minetest.get_meta(n):set_int("t_rad",r+1)
+				elseif nn == "default:dirt_with_snow" or nn == "default:snow" then
+					minetest.set_node(n, {name = "toxic:snowblock_thin"})
+					minetest.get_meta(n):set_int("t_rad",r+1)
+				elseif minetest.get_item_group(nn,g) > 0 and minetest.get_item_group(nn,"toxic_spreading") == 0 then
+					minetest.swap_node(n, {name = toxic.nodes[g]})
+					minetest.get_meta(n):set_int("t_rad",r+1)
+					if g == "dirt" and math.random(0,50) == 0 and default.def(minetest.get_node(apos(n,0,1)).name).buildable_to then
+						local start = nogen and 3 or 1
+						local rnd = math.random(start,#toxic.random_items)
+						local item = toxic.random_items[rnd]
+						local param2 = 0
+						if rnd == 1 or rnd == 2 then
+							param2 = math.random(0,19)
+						end
+						minetest.set_node(apos(n,0,1), {name = item,param2=param2})
 					end
-					minetest.set_node(apos(n,0,1), {name = item,param2=param2})
 				end
 			end
 		end
@@ -263,8 +265,8 @@ end
 
 minetest.register_abm({
 	nodenames = {"group:toxic_spreading"},
-	interval = 10,
-	chance = 10,
+	interval = 30,
+	chance = 20,
 	action=function(pos,node)
 		toxic.spread(pos,node,true)
 	end
