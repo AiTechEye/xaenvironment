@@ -155,10 +155,10 @@ minetest.register_node("toxic:snowblock_thin", {
 minetest.register_node("toxic:water_source", {
 	description = "Toxic water Source",
 	drawtype = "liquid",
-	tiles = {name = "default_water_source.png^[colorize:#7c7750cc",},
+	tiles = {name = "default_water.png^[colorize:#7c7750cc",},
 	tiles = {
 		{
-		name = "default_water_animated.png^[colorize:#7c7750cc",
+		name = "default_water.png^[colorize:#7c7750cc",
 		animation = {
 			type = "vertical_frames",
 			aspect_w = 16,
@@ -196,7 +196,7 @@ minetest.register_node("toxic:water_flowing", {
 		backface_culling = false,
 		animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
 		},{
-		name = "default_water_flowing_animated.png^[colorize:#7c775055",
+		name = "default_water_animated.png^[colorize:#7c7750cc",
 		backface_culling = true,animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
 		},},
 	alpha = 190,
