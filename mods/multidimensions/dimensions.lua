@@ -1,17 +1,17 @@
 multidimensions.register_dimension("candyland",{
-	ground_ores = {["examobs:marzipan_rose"] = 100,["examobs:candy1"] = 100,["examobs:candy2"] = 100,["examobs:candy3"] = 100,["examobs:candy4"] = 1000,["examobs:candy5"] = 100,["examobs:candy6"] = 100},
-	water_ores={["examobs:gel"]={chance=500,max_heat=20},},
-	stone = "examobs:sponge_cake",
-	dirt = "examobs:sugar",
-	grass = "examobs:sugar_with_glaze",
-	water = "examobs:gel2",
-	sand = "examobs:sugar",
+	ground_ores = {["materials:marzipan_rose"] = 100,["materials:candy1"] = 100,["materials:candy2"] = 100,["materials:candy3"] = 100,["materials:candy4"] = 1000,["materials:candy5"] = 100,["materials:candy6"] = 100},
+	water_ores={["materials:gel"]={chance=500,max_heat=20},},
+	stone = "materials:sponge_cake",
+	dirt = "materials:sugar",
+	grass = "materials:sugar_with_glaze",
+	water = "materials:gel2",
+	sand = "materials:sugar",
 	sky = {base_color={r=255, g=140, b=255},type="plain"},
 	sun = {scale=0.1,visible=true},
 	moon = {scale=3,visible=true},
 	node={
 		description="Candyland",
-		tiles = {"examobs_glaze.png^examobs_lollipop.png"},
+		tiles = {"materials_glaze.png^examobs_lollipop.png"},
 	},
 	craft = {
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
@@ -52,7 +52,7 @@ multidimensions.register_dimension("moon",{
 	},
 	craft = {
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
-		{"examobs:sponge_cake","examobs:icecreamball","examobs:sponge_cake",},
+		{"materials:sponge_cake","materials:icecreamball",":materials:sponge_cake",},
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
 	}
 })
