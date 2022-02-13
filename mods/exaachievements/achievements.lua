@@ -134,6 +134,49 @@ exaachievements.register({
 --================ Average ==================
 
 exaachievements.register({
+	type="dig",
+	count=500,
+	name="Supercake",
+	item="materials:sugar_with_glaze",
+	description="Dig 500 sugar with glaze",
+	skills=50,
+	hide_until=150,
+})
+
+exaachievements.register({
+	type="dig",
+	count=500,
+	name="Cakemine",
+	item="materials:sponge_cake",
+	description="Dig 500 sponge cake",
+	skills=50,
+	hide_until=160,
+})
+
+exaachievements.register({
+	type="dig",
+	count=10,
+	name="Marzipan rose",
+	item="materials:marzipan_rose",
+	description="Dig 10 Marzipan roses",
+	skills=10,
+	hide_until=160,
+})
+
+local candycolor={"ff75ec","ff0000","00ff00","0000ff","00ffff","ffff00"}
+for i=1,6,1 do
+exaachievements.register({
+	type="dig",
+	count=10,
+	name="Candy "..i,
+	item="materials:candy" .. i,
+	description="Dig 5 candy",
+	skills=5,
+	hide_until=160,
+})
+end
+
+exaachievements.register({
 	type="customize",
 	name="Circus artist",
 	count=20,
