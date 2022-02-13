@@ -1,4 +1,5 @@
 default={
+	XaEnvironment = true,
 	workbench={
 		registered_crafts={}
 	},
