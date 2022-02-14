@@ -22,7 +22,6 @@ deprecated = {
 
 for i1,v2 in pairs(deprecated) do
 	for i,v in pairs(v2.items) do
-		print(v:gsub(v2.replace[1],v2.replace[2]),v)
 		minetest.register_alias(v,v:gsub(v2.replace[1],v2.replace[2]))
 	end
 end
