@@ -74,9 +74,7 @@ for i,v in pairs(rnd.ores) do
 	def = v
 	def.description = v.description or "Unknown"
 	def.tiles = v.tiles or {"default_stone.png"}
-	def.groups = v.groups or {cracky=2,
-	--not_in_creative_inventory=1
-}
+	def.groups = v.groups or {cracky=2,not_in_creative_inventory=1}
 	def.sounds = v.sounds or default.node_sound_stone_defaults()
 
 	ore = def.ore and table.copy(def.ore) or nil
