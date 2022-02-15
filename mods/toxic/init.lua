@@ -343,7 +343,7 @@ lakes.registry_lake("toxic lake",{
 
 lakes.registry_lake("toxic ice lake",{
 	spawn_in = "default:dirt_with_snow",
-	chance = 10,
+	chance = 50,
 	min_y = -50,
 	max_y = 50,
 	radius = math.random(5,20),
