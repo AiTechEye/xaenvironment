@@ -899,7 +899,7 @@ minetest.register_node("default:water_source", {
 	post_effect_color = {a = 110, r = 42, g = 128, b = 231},
 	sounds = default.node_sound_water_defaults(),
 	on_load=function(pos)
-		if pos.y >= 0 and math.random(1,20) == 1 and minetest.get_node(apos(pos,0,1)).name == "air" then
+		if pos.y >= 0 and  pos.y <= 2000 and math.random(1,20) == 1 and minetest.get_node(apos(pos,0,1)).name == "air" then
 			local a = minetest.find_nodes_in_area_under_air(vector.subtract(pos,5),vector.add(pos,5),{"plants:lily_pad"})
 			if #a <= 11 then
 				minetest.set_node(apos(pos,0,1),{name="plants:lily_pad",param2=math.random(0,3)})
