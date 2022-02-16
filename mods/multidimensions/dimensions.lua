@@ -56,3 +56,25 @@ multidimensions.register_dimension("moon",{
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
 	}
 })
+
+multidimensions.register_dimension("macro",{
+	ground_ores = {["plants:macro_grass"] = 100,["plants:macro_flower"] = 1000},
+	water_ores={["plants:macro_lilypad"]={chance=500},},
+	stone = "default:bedrock",
+	dirt = "default:dirt",
+	grass = "default:dirt",
+	water = "default:water_source",
+	sand = "default:sand",
+	sky = {base_color={r=55, g=200, b=55},type="plain"},
+	sun = {scale=10,visible=true},
+	moon = {scale=10,visible=true},
+	node={
+		description="Macro land",
+		tiles = {"plants_oak_tree.png^[colorize:#00ff0055"},
+	},
+	craft = {
+		{"default:emerald", "default:goldblock", "default:emerald"},
+		{"default:titaniumblock","default:uraniumactiveblock","default:titaniumblock",},
+		{"default:emerald", "default:goldblock", "exatec:pcb"},
+	}
+})
