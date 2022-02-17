@@ -25,7 +25,7 @@ for i,v in pairs(plants.piece_of_plant) do
 minetest.register_node("plants:macro_piece_of_plant"..i, {
 	description = "Piece of plant",
 	tiles={"plants_oak_tree.png^[colorize:#"..v.."99"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=0},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
 	sunlight_propagates = true,
 	paramtype = "light",
 	sounds = default.node_sound_wood_defaults(),
@@ -35,7 +35,7 @@ end
 minetest.register_node("plants:macro_piece_of_plant0", {
 	description = "Piece of plant",
 	tiles={"plants_oak_tree.png"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=0},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
 	sunlight_propagates = true,
 	paramtype = "light",
 	palette = "default_palette.png",
@@ -46,9 +46,19 @@ minetest.register_node("plants:macro_piece_of_plant0", {
 minetest.register_node("plants:macro_piece_of_plant01", {
 	description = "Piece of plant",
 	tiles={"plants_hazel_tree.png"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=0},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
 	sunlight_propagates = true,
 	paramtype = "light",
+	palette = "default_palette.png",
+	paramtype2 = "color",
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_node("plants:macro_tree", {
+	description = "Macro tree",
+	tiles={"plants_hazel_tree.png"},
+	groups = {choppy = 1,tree=1,flammable=1,not_in_creative_inventory=1},
+	sunlight_propagates = true,
 	palette = "default_palette.png",
 	paramtype2 = "color",
 	sounds = default.node_sound_wood_defaults(),
@@ -223,7 +233,7 @@ minetest.register_node("plants:macro_mushroom", {
 				l2 = 0
 				p.y = p.y-s+5
 		end
-		print(r)
+
 		for y=0,s do
 			if r == 1 then
 				l1 = l1 -0.1
@@ -253,6 +263,91 @@ minetest.register_node("plants:macro_mushroom", {
 			end
 		end
 		end
+		end
+	end
+})
+
+plants.macro_branch=function(p,size)
+	local dir = vector.new(math.random(-1,1),0,math.random(-1,1))
+	local stem = size or math.random(3,6)
+	local colort = 3
+	local colorg = 3
+	local branch = math.random(10,30)
+	local leafc = 1
+	local leaf
+
+	for w=0,branch do
+		p = apos(p,dir.x*stem,0,dir.z*stem)
+		p = apos(p,math.random(-1,1),-1,math.random(-1,1))
+	for y=-stem,stem do
+	for x=-stem,stem do
+	for z=-stem,stem do
+			if math.abs(y) == stem or math.abs(x) == stem or math.abs(z) == stem then
+				colort = plants.rnd_color(colort,4,8)
+				minetest.set_node(apos(p,x,y,z),{name="plants:macro_tree",param2 = colort+160})
+			else
+				colorg = plants.rnd_color(colorg,0,5)
+				minetest.set_node(apos(p,x,y,z),{name="plants:macro_tree",param2 = colorg+112})
+			end
+	end
+	end
+	end
+		if math.random(1,2) == 1 then
+			local ls = math.random(1,4)
+			local lp = vector.new(math.random(-1,1)*stem,math.random(-1,1)*stem,math.random(-1,1)*stem)
+			if math.random(1,4) == 1 and size == nil then
+				plants.macro_branch(apos(p,lp.x,lp.y,lp.z),3)
+			else
+				for yy=-ls,ls do
+				for xx=-ls,ls do
+				for zz=-ls,ls do
+					leafc,leaf = plants.rnd_piece_of_plant(leafc)
+					minetest.set_node(apos(p,xx+lp.x,yy+lp.y,zz+lp.z),{name=leaf})
+				end
+				end
+				end
+			end
+		end
+	end
+end
+
+minetest.register_node("plants:macro_trees", {
+	description = "Mushroom",
+	tiles={"default_tree.png"},
+	groups = {flammable=1,on_load=1,not_in_creative_inventory=1,unbreakable=1},
+	sunlight_propagates = true,
+	paramtype = "light",
+	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		minetest.registered_nodes["plants:macro_trees"].on_load(pos)
+	end,
+	on_load=function(pos)
+		minetest.remove_node(pos)
+		local color,colorg,colort = 112,3,5
+		local s = math.random(10,20)
+		local stem = math.random(6,16)
+		local p = apos(pos,0,-1)
+		local l = math.random(20,120)
+		for y=0,l do
+			p = apos(p,0,1)
+			for x=-stem,stem do
+			for z=-stem,stem do
+				local d = vector.length(vector.new({x=x,y=stem/2.5,z=z}))/s
+				if d >= 1 or math.abs(x) == stem or math.abs(z) == stem then
+					colort = plants.rnd_color(colort,4,8)
+					minetest.set_node(apos(p,x,0,z),{name="plants:macro_tree",param2 = colort+160})
+				elseif d < 1 then
+					colorg = plants.rnd_color(colorg,0,5)
+					minetest.set_node(apos(p,x,0,z),{name="plants:macro_tree",param2 = colorg+112})
+				end
+			end
+			end
+			if math.random(0,30) == 0 then
+				p = apos(p,math.random(-1,1),-1,math.random(-1,1))
+			end
+			if math.random(0,30) == 0 and l > 40 then
+					plants.macro_branch(apos(p,math.random(-stem/2,stem/2),math.random(-stem/2,stem/2),math.random(-stem/2,stem/2)))
+			end
 		end
 	end
 })
