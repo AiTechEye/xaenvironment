@@ -111,7 +111,7 @@ minetest.register_node("player_style:edgehook", {
 				local key=ob:get_player_control()
 				if key.jump and key.down then
 					local d = ob:get_look_dir()
-					ob:add_player_velocity({x=d.x*7,y=2,z=d.z*7})
+					ob:add_velocity({x=d.x*7,y=2,z=d.z*7})
 					break
 				else
 					return true
