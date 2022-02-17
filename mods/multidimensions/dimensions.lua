@@ -58,7 +58,7 @@ multidimensions.register_dimension("moon",{
 })
 
 multidimensions.register_dimension("macro",{
-	ground_ores = {["plants:macro_grass"] = 100,["plants:macro_flower"] = 1000,["plants:macro_mushroom"] = 10000},
+	ground_ores = {["plants:macro_grass"] = 100,["plants:macro_flower"] = 1000,["plants:macro_mushroom"] = 10000,["plants:macro_trees"] = 100000},
 	water_ores={["plants:macro_lilypad"]={chance=500},},
 	stone = "default:bedrock",
 	dirt = "default:dirt",
