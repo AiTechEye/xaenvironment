@@ -2718,39 +2718,6 @@ examobs.register_mob({
 	end
 })
 
-
-examobs.register_mob({
-	description = "Just an alien",
-	name = "alien",
-	textures = {"examobs_coalcrow.png"},
-	type = "monster",
-	dmg = 2,
-	coin = 5,
-	hp = 100,
-	aggressivity = 2,
-	run_speed = 12,
-	breathing = 0,
-	inv={["default:iron"]=2},
-	animation = "default",
-	spawn_on={"default:space_stone","default:space_dust"},
-	spawn_in="default:vacuum",
-	spawn_chance = 400,
-	max_spawn_y = 4000,
-	min_spawn_y = 2000,
-	is_food=function(self,item)
-		return item == "default:iron_ingot" or item == "default:iron_lump"
-	end,
-	on_spawn=function(self)
-		self.storage.texture ="player_style_alien"..math.random(1,8)..".png"
-		self:on_load()
-	end,
-	on_load=function(self)
-		self.object:set_properties({textures={self.storage.texture}})
-		self.team = self.storage.texture
-	end
-})
-
-
 examobs.register_mob({
 	description = "You do not need a magnifying glass to see this bug",
 	name = "macro_beetle",
@@ -2772,6 +2739,7 @@ examobs.register_mob({
 	reach = 5,
 	max_spawn_y = 4000,
 	min_spawn_y = 5000,
+	spawn_chance = 300,
 	animation = {
 		stand={x=1,y=5,speed=0,loop=false},
 		walk={x=10,y=20,speed=15},
