@@ -2775,8 +2775,6 @@ examobs.register_mob({
 	reach = 2,
 	min_spawn_y = 4000,
 	max_spawn_y = 5000,
---	spawn_chance = 300,
---	bottom=2,
 	animation = {
 		stand={x=1,y=5,speed=0,loop=false},
 		walk={x=10,y=20,speed=15},
@@ -2805,4 +2803,74 @@ examobs.register_mob({
 			self.object:set_properties({textures=self.storage.tex})
 		end
 	end
+})
+
+
+examobs.register_bird({
+	description = "The only fly you should flee from, seriously",
+	pickupable = true,
+	name = "macro_fly",
+	mesh="examobs_fly.b3d",
+	coin = 2,
+	aggressivity = 1,
+	is_food=function(self,item)
+		return true
+	end,
+	inv={["bones:bone"]=1,["default:coal_lump"]=1},
+	hp = 40,
+	dmg = 1,
+	team = "fly",
+	type = "monster",
+	walk_speed = 4,
+	run_speed = 30,
+	inv = {["default:coal_lump"]=1},
+	spawn_on = {"default:dirt","group:macroplant"},
+	light_min = 9,
+	light_max = 15,
+	textures={"examobs_coalcrow.png"},
+	collisionbox = {-0.5,-0.5,-0.5,0.5,0.25,0.5},
+	visual_size = {x=5,y=5,z=5},
+	reach = 2,
+	min_spawn_y = 4000,
+	max_spawn_y = 5000,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=30,y=35,speed=20},
+		eat={x=30,y=35,speed=20},
+		fly={x=31,y=35,speed=50},
+		float={x=31,y=35,speed=50},
+	},
+	on_spawn=function(self)
+		local t = {"examobs_coalcrow.png","examobs_crow.png","examobs_hawk.png","examobs_gull.png^[colorize:#777777aa"}
+		self.storage.tex = t[math.random(1,4)]
+		self.storage.size = math.random(4,6)
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.size then
+			self.object:set_properties({
+				visual_size={x=self.storage.size,y=self.storage.size ,self.storage.size},
+				textures = {self.storage.tex}
+			})
+		end
+	end,
+	is_food=function(self,item)
+		return true
+	end,
+	flysound_timeout= 0,
+	step=function(self,dtime)
+		if self.storage.fly then
+			self.flysound_timeout = self.flysound_timeout - dtime*100
+			if self.flysound_timeout <= 0 then
+				self.flysound_timeout = 2
+				self.flysound = minetest.sound_play("examobs_bee", {object=self.object, gain = 2, max_hear_distance = 20})
+			end
+		elseif self.flysound then
+			minetest.sound_stop(self.flysound)
+			self.flysound = nil
+		end
+	end,
 })

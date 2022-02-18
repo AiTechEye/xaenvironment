@@ -14,7 +14,7 @@ examobs.register_bird=function(def)
 	def2.walk_speed = def.run_speed or 2
 	def2.run_speed = def.run_speed or 4
 	def2.swiming = def2.swiming or 0
-	def2.animation = {
+	def2.animation = def.animation or {
 		stand = {x=20,y=25,speed=0},
 		walk = {x=40,y=50,speed=20},
 		run = {x=5,y=15,speed=40},
@@ -106,8 +106,8 @@ examobs.register_bird=function(def)
 			return 1
 		end
 	end
-	def2.step=function(self)
-		if def.step(self) then
+	def2.step=function(self,dtime)
+		if def.step(self,dtime) then
 			return self
 		elseif self.fight and self.storage.fly then
 			local v = self.object:get_velocity()

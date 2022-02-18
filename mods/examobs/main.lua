@@ -50,7 +50,7 @@ examobs.main=function(self, dtime,moveresult)
 			return
 		end
 	end
-	if self.step(self) or self.targetthen then
+	if self.step(self,dtime) or self.targetthen then
 		return
 	end
 	if examobs.following(self) then return end
