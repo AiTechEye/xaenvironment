@@ -25,7 +25,7 @@ for i,v in pairs(plants.piece_of_plant) do
 minetest.register_node("plants:macro_piece_of_plant"..i, {
 	description = "Piece of plant",
 	tiles={"plants_oak_tree.png^[colorize:#"..v.."99"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1,macroplant=1},
 	sunlight_propagates = true,
 	paramtype = "light",
 	sounds = default.node_sound_wood_defaults(),
@@ -35,7 +35,7 @@ end
 minetest.register_node("plants:macro_piece_of_plant0", {
 	description = "Piece of plant",
 	tiles={"plants_oak_tree.png"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1,macroplant=2},
 	sunlight_propagates = true,
 	paramtype = "light",
 	palette = "default_palette.png",
@@ -46,7 +46,7 @@ minetest.register_node("plants:macro_piece_of_plant0", {
 minetest.register_node("plants:macro_piece_of_plant01", {
 	description = "Piece of plant",
 	tiles={"plants_hazel_tree.png"},
-	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1},
+	groups = {choppy = 3, flammable=1,not_in_creative_inventory=1,macroplant=3},
 	sunlight_propagates = true,
 	paramtype = "light",
 	palette = "default_palette.png",
@@ -57,7 +57,7 @@ minetest.register_node("plants:macro_piece_of_plant01", {
 minetest.register_node("plants:macro_tree", {
 	description = "Macro tree",
 	tiles={"plants_hazel_tree.png"},
-	groups = {choppy = 1,tree=1,flammable=1,not_in_creative_inventory=1},
+	groups = {choppy = 1,tree=1,flammable=1,not_in_creative_inventory=1,macrotree=1},
 	sunlight_propagates = true,
 	palette = "default_palette.png",
 	paramtype2 = "color",
