@@ -2731,6 +2731,7 @@ examobs.register_mob({
 	inv={["bones:bone"]=1,["default:coal_lump"]=1},
 	collisionbox = {-2,-1,-2,2,0.5,2},
 	aggressivity = 2,
+	hp = 50,
 	walk_speed = 4,
 	run_speed = 8,
 	light_min = 1,
@@ -2750,5 +2751,58 @@ examobs.register_mob({
 	},
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end
+})
+examobs.register_mob({
+	description = "The big bug that survives through others blood",
+	name = "macro_tick",
+	type = "monster",
+	team = "tick",
+	dmg = 2,
+	coin = 15,
+	hp = 150,
+	textures={"default_coalblock.png"},
+	mesh="examobs_tick.b3d",
+	spawn_on={"default:dirt","group:stone","default:bedrock"},
+	inv={["bones:bone"]=1,["default:coal_lump"]=1},
+	collisionbox = {-0.5,-0.5,-0.5,0.5,0.25,0.5},
+	aggressivity = 2,
+	walk_speed = 4,
+	run_speed = 8,
+	light_min = 1,
+	light_max = 15,
+	visual_size = {x=5,y=5,z=5},
+	reach = 2,
+	min_spawn_y = 4000,
+	max_spawn_y = 5000,
+--	spawn_chance = 300,
+--	bottom=2,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=1,y=5,speed=20},
+	},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_spawn=function(self)
+		local t = {
+			 {"default_stone.png"},
+			 {"examobs_flesh.png"},
+			 {"examobs_meat.png"},
+			 {"default_desertstone.png"},
+			 {"default_cobble.png"},
+			 {"default_cobble.png^default_stonemoss.png"},
+			 {"default_coalblock.png"},
+		}
+		self.storage.tex =  t[math.random(1,7)]
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.tex ~= nil then
+			self.object:set_properties({textures=self.storage.tex})
+		end
 	end
 })
