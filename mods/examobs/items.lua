@@ -234,7 +234,7 @@ minetest.register_node("examobs:egg", {
 })
 minetest.register_craftitem("examobs:feather",{
 	description = "Feather",
-	groups = {flammable=3,treasure=1},
+	groups = {flammable=3,treasure=1,store=10},
 	inventory_image = "examobs_feather.png",
 	wield_scale={x=0.5,y=0.5,z=0.2},
 	on_use=function(itemstack, user, pointed_thing)
