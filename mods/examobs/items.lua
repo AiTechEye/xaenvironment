@@ -15,6 +15,17 @@ default.register_eatable("craftitem","examobs:meat",3,4,{
 	inventory_image = "examobs_meat.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
+default.register_eatable("craftitem","examobs:bugflesh",-5,4,{
+	description = "Bug flesh",
+	groups={meat=1},
+	inventory_image = "default_coalblock.png^[colorize:#00550044^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
+})
+default.register_eatable("craftitem","examobs:bugmeat",4,5,{
+	description = "Cooked bug meat",
+	groups={meat=1,store=50},
+	inventory_image = "default_coalblock.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
+})
+
 default.register_eatable("craftitem","examobs:flesh_piece",1,2,{
 	description = "Flesh piece",
 	groups={meat=1},
@@ -83,6 +94,11 @@ minetest.register_craft({
 	type = "cooking",
 	output = "examobs:meat",
 	recipe = "examobs:flesh",
+})
+minetest.register_craft({
+	type = "cooking",
+	output = "examobs:bugmeat",
+	recipe = "examobs:bugflesh",
 })
 
 minetest.register_craft({
