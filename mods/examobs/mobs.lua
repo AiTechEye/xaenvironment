@@ -2859,6 +2859,13 @@ examobs.register_bird({
 	end,
 	flysound_timeout= 0,
 	step=function(self,dtime)
+
+		local at = self.object:get_attach()
+		if at and at:is_player() then
+			self.storage.fly = 1
+				at:add_velocity({x=math.random(-20,20) ,y=math.random(0,5) ,z=math.random(-20,20) })
+		end
+
 		if self.storage.fly then
 			self.flysound_timeout = self.flysound_timeout - dtime*100
 			if self.flysound_timeout <= 0 then
@@ -2924,6 +2931,13 @@ examobs.register_bird({
 	end,
 	flysound_timeout= 0,
 	step=function(self,dtime)
+
+		local at = self.object:get_attach()
+		if at and at:is_player() then
+			self.storage.fly = 1
+				at:add_velocity({x=math.random(-50,50) ,y=math.random(0,7) ,z=math.random(-50,50) })
+		end
+
 		if self.storage.fly then
 			self.flysound_timeout = self.flysound_timeout - dtime*100
 			if self.flysound_timeout <= 0 then
