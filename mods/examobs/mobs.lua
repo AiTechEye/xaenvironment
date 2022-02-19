@@ -2731,7 +2731,7 @@ examobs.register_mob({
 	inv={["bones:bone"]=1,["default:amethyst"]=1},
 	collisionbox = {-2,-1,-2,2,0.5,2},
 	aggressivity = 2,
-	hp = 50,
+	hp = 100,
 	walk_speed = 4,
 	run_speed = 8,
 	light_min = 1,
@@ -2740,7 +2740,6 @@ examobs.register_mob({
 	reach = 5,
 	min_spawn_y = 4000,
 	max_spawn_y = 5000,
---	spawn_chance = 300,
 	bottom=2,
 	animation = {
 		stand={x=1,y=5,speed=0,loop=false},
@@ -2805,13 +2804,12 @@ examobs.register_mob({
 	end
 })
 
-
 examobs.register_bird({
 	description = "The only fly you should flee from, seriously",
 	pickupable = true,
 	name = "macro_fly",
 	mesh="examobs_fly.b3d",
-	coin = 2,
+	coin = 5,
 	aggressivity = 1,
 	is_food=function(self,item)
 		return true
@@ -2823,7 +2821,6 @@ examobs.register_bird({
 	type = "monster",
 	walk_speed = 4,
 	run_speed = 30,
-	inv = {["default:coal_lump"]=1},
 	spawn_on = {"default:dirt","group:macroplant"},
 	light_min = 9,
 	light_max = 15,
@@ -2854,6 +2851,71 @@ examobs.register_bird({
 			self.object:set_properties({
 				visual_size={x=self.storage.size,y=self.storage.size ,self.storage.size},
 				textures = {self.storage.tex}
+			})
+		end
+	end,
+	is_food=function(self,item)
+		return true
+	end,
+	flysound_timeout= 0,
+	step=function(self,dtime)
+		if self.storage.fly then
+			self.flysound_timeout = self.flysound_timeout - dtime*100
+			if self.flysound_timeout <= 0 then
+				self.flysound_timeout = 2
+				self.flysound = minetest.sound_play("examobs_bee", {object=self.object, gain = 2, max_hear_distance = 20})
+			end
+		elseif self.flysound then
+			minetest.sound_stop(self.flysound)
+			self.flysound = nil
+		end
+	end,
+})
+
+examobs.register_bird({
+	description = "Just run away from it",
+	pickupable = true,
+	name = "macro_wasp",
+	mesh="examobs_wasp.b3d",
+	coin = 200,
+	aggressivity = 1,
+	is_food=function(self,item)
+		return true
+	end,
+	inv={["bones:bone"]=1,["default:peridotblock"]=1},
+	hp = 100,
+	dmg = 200,
+	team = "wasp",
+	type = "monster",
+	walk_speed = 4,
+	run_speed = 20,
+	spawn_on = {"default:dirt","group:macroplant"},
+	light_min = 9,
+	light_max = 15,
+	textures={"examobs_wasp.png"},
+	collisionbox = {-0.5,-0.5,-0.5,0.5,0.25,0.5},
+	visual_size = {x=5,y=5,z=5},
+	reach = 2,
+	min_spawn_y = 4000,
+	max_spawn_y = 5000,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=30,y=35,speed=20},
+		eat={x=30,y=35,speed=20},
+		fly={x=31,y=35,speed=50},
+		float={x=31,y=35,speed=50},
+	},
+	on_spawn=function(self)
+		self.storage.size = math.random(4,6)
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.size then
+			self.object:set_properties({
+				visual_size={x=self.storage.size,y=self.storage.size ,self.storage.size},
 			})
 		end
 	end,
