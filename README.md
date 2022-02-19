@@ -1,6 +1,6 @@
 ![Alt text](screenshot.png)
 
-# XaEnvironment V10.15
+# XaEnvironment V10.2
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
