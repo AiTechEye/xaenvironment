@@ -1,5 +1,25 @@
 plants.piece_of_plant = {"004400","005500","006600","007700","008800","009900"}
 
+plants.mineral_colors = {
+	"default:rubyblock",
+	"default:taaffeiteblock",
+	"default:taaffeiteblock",
+	"default:amethystblock",
+	"default:amethystblock",
+	"default:electricblock",
+	"default:diamondblock",
+	"default:opalblock",
+	"default:opalblock",
+	"default:jadeiteblock",
+	"default:jadeiteblock" ,
+	"default:jadeiteblock",
+	"default:peridotblock",
+	"default:peridotblock",
+	"default:amberblock",
+	"default:zirconiablock",
+}
+plants.mineral_colors[0] = "default:rubyblock"
+
 plants.rnd_piece_of_plant=function(color,r)
 	r = r or 6
 	color = color or math.random(1,r)
@@ -19,7 +39,6 @@ plants.rnd_color=function(color,r1,r2)
 	end
 	return color
 end
-
 
 for i,v in pairs(plants.piece_of_plant) do
 minetest.register_node("plants:macro_piece_of_plant"..i, {
@@ -145,7 +164,9 @@ minetest.register_node("plants:macro_flower", {
 				p = apos(p,math.random(-1,1),-1,math.random(-1,1))
 			end
 		end
-		local color = math.random(0,16)*8
+		local color = math.random(0,16)
+		local mineral = plants.mineral_colors[color]
+		color = color*8
 		local colorg = math.random(0,4)
 		local a,b,c = 1,1,1
 
@@ -163,11 +184,15 @@ minetest.register_node("plants:macro_flower", {
 		for y=-s,s do
 		for z=-s,s do
 			if vector.length(vector.new({x=x*a,y=y*b,z=z*c}))/s<=1 then
-				local rc = math.random(-1,1)
-				if rc == -1 and colorg > 1 or rc == 1 and colorg < 4 then
-					colorg = colorg + rc
+				if math.random(1,30) == 1 then 
+					minetest.set_node(apos(p,x*a,y*b,z*c),{name=mineral})
+				else
+					local rc = math.random(-1,1)
+					if rc == -1 and colorg > 1 or rc == 1 and colorg < 4 then
+						colorg = colorg + rc
+					end
+					minetest.set_node(apos(p,x*a,y*b,z*c),{name="plants:macro_piece_of_plant0",param2=color+colorg})
 				end
-				minetest.set_node(apos(p,x*a,y*b,z*c),{name="plants:macro_piece_of_plant0",param2=color+colorg})
 			end
 		end
 		end
