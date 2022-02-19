@@ -83,6 +83,11 @@ minetest.register_node("plants:macro_tree", {
 	sounds = default.node_sound_wood_defaults(),
 })
 
+minetest.register_craft({
+	output="materials:mixed_wood",
+	recipe={{"plants:macro_tree"}},
+})
+
 minetest.register_node("plants:macro_grass", {
 	description = "Grass",
 	tiles={"plants_oak_tree.png^[colorize:#00ff0099"},
