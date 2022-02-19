@@ -2728,7 +2728,7 @@ examobs.register_mob({
 	textures={"examobs_coalcrow.png"},
 	mesh="examobs_beetle.b3d",
 	spawn_on={"default:dirt","group:stone","default:bedrock"},
-	inv={["bones:bone"]=1,["default:coal_lump"]=1},
+	inv={["bones:bone"]=1,["default:amethyst"]=1},
 	collisionbox = {-2,-1,-2,2,0.5,2},
 	aggressivity = 2,
 	hp = 50,
@@ -2764,7 +2764,7 @@ examobs.register_mob({
 	textures={"default_coalblock.png"},
 	mesh="examobs_tick.b3d",
 	spawn_on={"default:dirt","group:stone","default:bedrock"},
-	inv={["bones:bone"]=1,["default:coal_lump"]=1},
+	inv={["bones:bone"]=1,["default:taaffeite"]=2},
 	collisionbox = {-0.5,-0.5,-0.5,0.5,0.25,0.5},
 	aggressivity = 2,
 	walk_speed = 4,
@@ -2816,7 +2816,7 @@ examobs.register_bird({
 	is_food=function(self,item)
 		return true
 	end,
-	inv={["bones:bone"]=1,["default:coal_lump"]=1},
+	inv={["bones:bone"]=1,["default:opal"]=1},
 	hp = 40,
 	dmg = 1,
 	team = "fly",
