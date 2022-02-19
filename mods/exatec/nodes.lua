@@ -2240,6 +2240,7 @@ minetest.register_node("exatec:trader", {
 				Coin(p,t)
 				m:get_inventory():set_stack("main",1,nil)
 				minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+				m:set_string("infotext",p:get_meta():get_int("coins"))
 				return
 			end
 		end
