@@ -867,6 +867,363 @@ default.registry_mineral({
 })
 
 default.registry_mineral({
+	name="amethyst",
+	texture="default_amethystblock.png",
+	drop={inventory_image="quartz",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_amethystblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="peridot",
+	texture="default_peridotblock.png",
+	drop={inventory_image="longcrystal",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_peridotblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="jadeite",
+	texture="default_jadeiteblock.png",
+	drop={inventory_image="round",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_jadeiteblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="taaffeite",
+	texture="default_taaffeiteblock.png",
+	drop={inventory_image="tinemeald",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_taaffeiteblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="opal",
+	texture="default_opalblock.png",
+	drop={inventory_image="oval",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_opalblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="ruby",
+	texture="default_rubyblock.png",
+	drop={inventory_image="crystal",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_rubyblock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
+	name="zirconia",
+	texture="default_zirconiablock.png",
+	drop={inventory_image="emeald",groups={treasure=4,store=1100}},
+	block={groups={cracky=1}},
+	not_lump = true,
+	not_ingot = true,
+	ore_settings = false,
+	ore={tiles={"default_cooledlava.png^(default_zirconiablock.png^default_alpha_ore.png^default_ore_mineral.png^[makealpha:0,255,0)"}},
+	block={sounds=default.node_sound_stone_defaults()},
+	pick={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 2,
+		groupcaps = {
+			cracky={times={[1]=2.1,[2]=1.1,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=4}
+	}},
+	shovel={	groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=3.1,[2]=0.8,[3]=0.6},uses=30,maxlevel=3}
+		},
+		damage_groups={fleshy=3}
+	}},
+	axe={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 2,
+		groupcaps = {
+			choppy={times={[1]=2.1,[2]=1.1,[3]=0.7},uses=30,maxlevel=2}
+		},
+		damage_groups={fleshy=5}
+	}},
+	vineyardknife={groups={treasure=4},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			snappy={times={[1]=1.1,[2]=0.6,[3]=0.2},uses=500,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	hoe={uses=1000,groups={treasure=4}},
+	arrow={damage=10,groups={treasure=4}},
+	bow={uses=1000,level=14,groups={treasure=4}},
+})
+
+default.registry_mineral({
 	name="diamond",
 	texture="default_diamondblock.png",
 	drop={inventory_image="diamond",groups={treasure=3,store=900}},
