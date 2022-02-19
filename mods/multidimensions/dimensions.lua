@@ -59,7 +59,16 @@ multidimensions.register_dimension("moon",{
 
 multidimensions.register_dimension("macro",{
 	ground_ores = {["plants:macro_grass"] = 100,["plants:macro_flower"] = 1000,["plants:macro_mushroom"] = 10000,["plants:macro_trees"] = 100000},
-	water_ores={["plants:macro_lilypad"]={chance=500},},
+	water_ores={["plants:macro_lilypad"]={chance=500}},
+	stone_ores = {
+		["default:zirconia_ore"]={chance=4000},
+		["default:ruby_ore"]={chance=4200},
+		["default:opal_ore"]={chance=4300},
+		["default:taaffeite_ore"]={chance=4400},
+		["default:jadeite_ore"]={chance=4500},
+		["default:peridot_ore"]={chance=4600},
+		["default:amethyst_ore"]={chance=4700},
+	},
 	stone = "default:bedrock",
 	dirt = "default:dirt",
 	grass = "default:dirt",
