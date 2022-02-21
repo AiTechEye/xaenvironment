@@ -629,7 +629,7 @@ default.registry_mineral=function(def)
 		minetest.register_node(mod .. def.name .. "_ore", def.ore)
 	end
 --ore settings
-	if not def.not_ore or (def.ore_settings and def.ore_settings.ore) then
+	if not def.not_ore and def.ore_settings ~= false or (def.ore_settings and def.ore_settings.ore) then
 		def.ore_settings = def.ore_settings or {}
 		minetest.register_ore({
 			ore_type		=	"scatter",
