@@ -1446,7 +1446,7 @@ minetest.register_node("exatec:destroyer", {
 	description = "Destroyer",
 	tiles = {"default_lava.png^default_glass.png^default_chest_top.png"},
 	sounds = default.node_sound_glass_defaults(),
-	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,igniter=1,store=400},
+	groups = {chappy=3,dig_immediate = 2,exatec_tube_connected=1,store=400},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
