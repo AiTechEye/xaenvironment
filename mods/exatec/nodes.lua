@@ -489,7 +489,7 @@ minetest.register_node("exatec:tube_filter", {
 			local d = m:get_string(listname)
 			local s = d.split(d,",")
 			local name = stack:get_name()
-			if #s >=10 then
+			if #s >=11 then
 				return 0
 			end
 			for i,v in pairs(s) do
@@ -544,10 +544,6 @@ minetest.register_node("exatec:tube_filter", {
 				if i == out then
 					local I = math.abs(6-i)
 					local v = exatec.tube_rules[I]
-
-
-
-
 					ob:set_velocity(v)
 					ob:get_luaentity().storage.dir = v
 					ob:set_pos(pos)
