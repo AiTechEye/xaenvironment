@@ -52,7 +52,7 @@ multidimensions.register_dimension("moon",{
 	},
 	craft = {
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
-		{"materials:sponge_cake","materials:icecreamball",":materials:sponge_cake",},
+		{"materials:sponge_cake","examobs:icecreamball","materials:sponge_cake",},
 		{"default:obsidian", "default:steel_ingot", "default:obsidian"},
 	}
 })
