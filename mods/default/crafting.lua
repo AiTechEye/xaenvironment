@@ -206,6 +206,8 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 					inv:set_stack(add_to,i,v .. " "..(c+1))
 					inv:remove_item(take_from,v .. " 1")
 				end
+				local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
+				inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
 			end
 		end
 
