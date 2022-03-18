@@ -760,6 +760,7 @@ minetest.register_entity("examobs:torpedo_ray",{
 					local pos=self.user:get_pos()
 					local e = minetest.add_entity(pos,"examobs:"..torpedo)
 					e:get_luaentity().target = v.object
+					minetest.sound_play("nitroglycerin_activated", {object=self.user, gain = 1, max_hear_distance = 7})
 					break
 				end
 			end
@@ -813,16 +814,20 @@ minetest.register_craftitem("examobs:missile",{
 minetest.register_entity("examobs:missile",{
 	hp_max = 1,
 	visual = "wielditem",
-	visual_size={x=0.4,y=1,z=2},
+	visual_size={x=1,y=1,z=2},
 	pointable = false,
 	textures={"examobs:missile"},
 	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
 	physical=true,
+	sound_timeout=0,
 	on_activate=function(self, staticdata)
 		self.torpedo = math.random(1,9999)
 		self.object:set_acceleration({x=0,y=-10,z=0})
 	end,
 	blow=function(self)
+		if self.sound then
+			minetest.sound_stop(self.sound)
+		end
 		if not self.blowed then
 			self.target = nil
 			self.blowed = true
@@ -831,6 +836,9 @@ minetest.register_entity("examobs:missile",{
 		end
 	end,
 	on_blow=function(self)
+		if self.sound then
+			minetest.sound_stop(self.sound)
+		end
 		if not self.blowed then
 			self.target = nil
 			self.blowed = true
@@ -854,13 +862,36 @@ minetest.register_entity("examobs:missile",{
 			local y = math.atan(v.z/v.x)
 			local z = math.atan(v.y/math.sqrt(v.x^2+v.z^2))
 			if pos1.x >= pos2.x then y = y+math.pi end
-			self.object:set_rotation({x=0,y=y,z=z+(math.pi/3)})
+			self.object:set_rotation({x=0,y=y,z=z+(math.pi/4)})
 
 			local def = default.def(minetest.get_node(pos1).name)
 
-			if def.liquidtype == "none" then
+			if not self.blowed and def.liquidtype == "none" then
 				self.object:set_acceleration({x=0,y=0,z=0})
-				self.object:set_velocity({x=math.cos(y)*10,y=-math.tan(z)*10,z=math.sin(y)*10})
+				self.object:set_velocity({x=math.cos(y)*30,y=-math.tan(z)*30,z=math.sin(y)*30})
+				minetest.add_particlespawner({
+					amount = math.random(3,7),
+					time =0.2,
+					minpos = pos1,
+					maxpos = pos1,
+					minvel = {x=-0.1, y=0, z=-0.1},
+					maxvel = {x=0.1, y=0.5, z=0.1},
+					minacc = {x=0, y=0.5, z=0},
+					maxacc = {x=0, y=0, z=0},
+					minexptime = 2,
+					maxexptime = 7,
+					minsize = 1,
+					maxsize = 3,
+					texture = "default_item_smoke.png",
+					collisiondetection = true,
+				})
+
+				self.sound_timeout = self.sound_timeout - dtime
+				if self.sound_timeout <= 0 then
+					self.sound_timeout = 6
+					self.sound = minetest.sound_play("default_rocket", {object=self.object, gain = 2, max_hear_distance = 20})
+				end
+
 			elseif not self.splash then
 					self.splash = true
 					default.watersplash(pos1)
