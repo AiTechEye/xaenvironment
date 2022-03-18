@@ -746,10 +746,11 @@ minetest.register_entity("examobs:torpedo_ray",{
 		elseif moveresult and moveresult.collides and self.hit then
 			for i,v in pairs(moveresult.collisions) do
 				if v.type == "object" and self.user and v.object ~= self.user and not default.is_decoration(v.object,true) then
+					local torpedo = self.missile and "missile" or "torpedo"
 					if self.user:is_player() then
 						local inv = self.user:get_inventory()
 						if inv then
-							local item = inv:remove_item("main",ItemStack("examobs:torpedo"))
+							local item = inv:remove_item("main",ItemStack("examobs:"..torpedo))
 							if item:get_count() == 0 then
 								break
 							end
@@ -757,7 +758,7 @@ minetest.register_entity("examobs:torpedo_ray",{
 					end
 					self.hit.hit = true
 					local pos=self.user:get_pos()
-					local e = minetest.add_entity(pos,"examobs:torpedo")
+					local e = minetest.add_entity(pos,"examobs:"..torpedo)
 					e:get_luaentity().target = v.object
 					break
 				end
@@ -775,6 +776,112 @@ minetest.register_entity("examobs:torpedo_ray",{
 			self.rot = true
 		end
 	end
+})
+
+-- ================ missile ================
+minetest.register_craft({
+	output = "examobs:missile 3",
+	recipe = {
+		{"","default:uranium_lump",""},
+		{"materials:fanblade_metal","materials:diode","default:carbon_ingot"},
+		{"","materials:gear_metal",""}
+	}
+})
+
+minetest.register_craftitem("examobs:missile",{
+	description = "Missile (aim to a mob & use)",
+	groups = {treasure=1,store=300},
+	inventory_image = "examobs_torpedo.png^[brighten^[brighten ",
+	wield_scale={x=1,y=1,z=0.5},
+	on_use=function(itemstack, user, pointed_thing)
+		local p1 = user:get_pos()
+		local d = user:get_look_dir()
+		local dir = {x=d.x*2,y=(d.y*2)+1.5,z=d.z*2}
+		local p = {x=p1.x+(d.x*2),y=p1.y+(d.y*2)+1.5,z=p1.z+(d.z*2)}
+		local pd = {x=d.x*50,y=d.y*50,z=d.z*50}
+		local hit = {}
+		for i=1,20 do
+			local e = minetest.add_entity({x=p1.x+(d.x*(i*1.1)),y=p1.y+(d.y*(i*1.1))+1.5,z=p1.z+(d.z*(i*1.1))},"examobs:torpedo_ray")
+			e:get_luaentity().user = user
+			e:get_luaentity().hit = hit
+			e:get_luaentity().missile = true
+			e:set_velocity(pd)
+		end
+	end
+})
+
+minetest.register_entity("examobs:missile",{
+	hp_max = 1,
+	visual = "wielditem",
+	visual_size={x=0.4,y=1,z=2},
+	pointable = false,
+	textures={"examobs:missile"},
+	collisionbox = {-0.1,-0.1,-0.1,0.1,0.1,0.1},
+	physical=true,
+	on_activate=function(self, staticdata)
+		self.torpedo = math.random(1,9999)
+		self.object:set_acceleration({x=0,y=-10,z=0})
+	end,
+	blow=function(self)
+		if not self.blowed then
+			self.target = nil
+			self.blowed = true
+			nitroglycerin.explode(self.object:get_pos(),{radius=5,set="air"})
+			self.object:remove()
+		end
+	end,
+	on_blow=function(self)
+		if not self.blowed then
+			self.target = nil
+			self.blowed = true
+			local p = self.object:get_pos()
+			minetest.after(0,function(p)
+				nitroglycerin.explode(p,{radius=3,set="air"})
+				self.object:remove()
+			end,p)
+		end
+	end,
+	on_step=function(self,dtime, moveresult)
+		if self.target and moveresult then
+			self.timer = (self.timer or 0) + dtime
+			local pos1 = self.object:get_pos()
+			local pos2 = self.target:get_pos()
+			if not (pos2 and pos2.y) then
+				self:blow()
+				return
+			end
+			local v = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+			local y = math.atan(v.z/v.x)
+			local z = math.atan(v.y/math.sqrt(v.x^2+v.z^2))
+			if pos1.x >= pos2.x then y = y+math.pi end
+			self.object:set_rotation({x=0,y=y,z=z+(math.pi/3)})
+
+			local def = default.def(minetest.get_node(pos1).name)
+
+			if def.liquidtype == "none" then
+				self.object:set_acceleration({x=0,y=0,z=0})
+				self.object:set_velocity({x=math.cos(y)*10,y=-math.tan(z)*10,z=math.sin(y)*10})
+			elseif not self.splash then
+					self.splash = true
+					default.watersplash(pos1)
+					self:blow()
+					return self
+			end
+
+			if self.timer < 0.5 then
+				return self
+			elseif def.walkable then
+				self:blow()
+				return self
+			end
+
+			if moveresult.collides then
+				self:blow()
+			end
+		elseif not self.blowed then
+			self:blow()
+		end
+	end,
 })
 
 minetest.register_craft({
