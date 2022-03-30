@@ -22,6 +22,17 @@ minetest.register_tool("default:biocheck", {
 
 minetest.register_ore({
 	ore_type = "blob",
+	ore= "default:desert_qicksand",
+	wherein= "default:desert_sand",
+	clust_scarcity = 30 * 30 * 30,
+	clust_size = 5,
+	y_min= -31000,
+	y_max= 31000,
+	noise_params = default.ore_noise_params()
+})
+
+minetest.register_ore({
+	ore_type = "blob",
 	ore= "default:bedrock",
 	wherein= "default:stone",
 	clust_scarcity = 10 * 10 * 10,
