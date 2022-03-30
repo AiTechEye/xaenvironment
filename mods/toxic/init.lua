@@ -57,8 +57,17 @@ minetest.register_node("toxic:barbed_wire", {
 	damage_per_second = 5,
 })
 
+bows.register_arrow("arrow",{
+	description="Botox (extremely toxic)",
+	texture="toxic_bottle.png",
+	damage=1100,
+	craft_count=4,
+	groups =  {store=400},
+	craft={{"group:tip","group:stick","toxic:bottle"},}
+})
+
 minetest.register_node("toxic:bottle", {
-	description = "Kalium bottle (yet does nothing)",
+	description = "Botox bottle",
 	drawtype = "mesh",
 	mesh = "toxic_bottle.obj",
 	visual_scale = 1.0,
