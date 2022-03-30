@@ -157,6 +157,10 @@ minetest.register_node("toxic:snowblock_thin", {
 	walkable=false,
 	drowning = 1,
 	drawtype = "glasslike",
+	buildable_to=true,
+	pointable = false,
+	diggable = false,
+	liquid_viscosity = 20,
 	post_effect_color = {a = 255, r = 150, g = 150, b = 90},
 	damage_per_second = 1,
 })
