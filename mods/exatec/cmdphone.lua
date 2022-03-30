@@ -68,7 +68,7 @@ exatec.show_cmdphone=function(player,pressed)
 	m:set_string("text",minetest.serialize(text))
 	player:set_wielded_item(item)
 
-	local list = "textlist[10,-0.3;2.1,11.5;list;"
+	local list = "textlist[10,-0.3;4.1,11.5;list;"
 	local c = ""
 	local listn = 0
 	local listin = pressed.posinput or ""
@@ -116,7 +116,7 @@ exatec.show_cmdphone=function(player,pressed)
 		end
 	end
 
-	local showfosp = "size[12,11]"
+	local showfosp = "size[14,11]"
 	.."button[-0.2,-0.2;1,1;save;Save]"
 	.."label[3.7,-0.2;"..(self and minetest.colorize("#00FF00",self.examob.." is connected") or minetest.colorize("#FFFF00","No mob connected")).."]"
 	.."button[2.5,-0.2;1,1;setmob;Set]tooltip[setmob;Select mob from the list]"
