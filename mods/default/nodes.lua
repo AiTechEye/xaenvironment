@@ -825,12 +825,14 @@ minetest.register_node("default:sand", {
 minetest.register_node("default:snowblock_thin", {
 	description = "Thin snowblock",
 	tiles={"default_snow.png"},
-	groups = {snowy=1,crumbly=3,cools_lava=1},
+	groups = {snowy=1,crumbly=3,cools_lava=1,disable_jump=1},
 	sounds = default.node_sound_snow_defaults(),
 	walkable=false,
 	buildable_to=true,
 	drowning = 1,
-	drawtype = "glasslike",
+	pointable = false,
+	diggable = false,
+	liquid_viscosity = 20,
 	post_effect_color = {a = 255, r = 255, g = 255, b =255},
 })
 
