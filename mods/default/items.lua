@@ -894,7 +894,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	axe={	groups={treasure=4},
+	axe={groups={treasure=4},
 		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
@@ -903,7 +903,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=5}
 	}},
-	vineyardknife={	groups={treasure=4},
+	vineyardknife={groups={treasure=4},
 		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 3,
@@ -914,7 +914,7 @@ default.registry_mineral({
 	}},
 	hoe={uses=1000,groups={treasure=4}},
 	arrow={damage=10,groups={treasure=4}},
-	bow={uses=1000,level=14,groups={treasure=4}},
+	bow={autoaim=true,shots=10,uses=1000,level=14,groups={treasure=4}},
 })
 
 default.registry_mineral({
@@ -1016,7 +1016,7 @@ default.registry_mineral({
 	}},
 	hoe={uses=1000,groups={treasure=4}},
 	arrow={damage=10,groups={treasure=4}},
-	bow={uses=1000,level=14,groups={treasure=4}},
+	bow={autoaim=true,shots=5,uses=1000,level=14,groups={treasure=4}},
 })
 
 default.registry_mineral({
@@ -1067,7 +1067,7 @@ default.registry_mineral({
 	}},
 	hoe={uses=1000,groups={treasure=4}},
 	arrow={damage=10,groups={treasure=4}},
-	bow={uses=1000,level=14,groups={treasure=4}},
+	bow={autoaim=true,shots=2,uses=1000,level=14,groups={treasure=4}},
 })
 
 default.registry_mineral({
@@ -1118,7 +1118,7 @@ default.registry_mineral({
 	}},
 	hoe={uses=1000,groups={treasure=4}},
 	arrow={damage=10,groups={treasure=4}},
-	bow={uses=1000,level=14,groups={treasure=4}},
+	bow={autoaim=true,shots=3,uses=1000,level=14,groups={treasure=4}},
 })
 
 default.registry_mineral({
@@ -1169,7 +1169,7 @@ default.registry_mineral({
 	}},
 	hoe={uses=1000,groups={treasure=4}},
 	arrow={damage=10,groups={treasure=4}},
-	bow={uses=1000,level=14,groups={treasure=4}},
+	bow={autoaim=true,uses=1000,level=14,groups={treasure=4}},
 })
 
 default.registry_mineral({

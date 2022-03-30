@@ -797,6 +797,7 @@ default.registry_mineral=function(def)
 			uses=def.bow.uses or 50,
 			level=def.bow.level or 1,
 			shots=def.bow.shots or 1,
+			autoaim=def.bow.autoaim,
 			craft = def.bow.craft or {{"",item,"materials:string"},{item,"","materials:string"},{"",item,"materials:string"}},
 		})
 	end

@@ -52,6 +52,8 @@ bows.register_bow=function(name,def)
 	def.uses = def.uses-1 or 49
 	def.shots = def.shots or 1
 	def.level = def.level or 1
+	def.autoaim = def.autoaim == true
+
 	def.texture = def.texture or "default_wood.png"
 	def.groups = def.groups or {}
 	def.groups.bow = 1
@@ -60,7 +62,7 @@ bows.register_bow=function(name,def)
 	bows.registed_bows[def.replace]=def
 
 	minetest.register_tool(def.name, {
-		description = def.description or name,
+		description = (def.description or name) .." (level ".. def.level .. (def.shots > 1 and ", shots ".. def.shots or "") .. (def.autoaim and ", autoaim" or "") ..")",
 		inventory_image = def.texture .. "^default_bow.png^[makealpha:0,255,0",
 		on_use =bows.load,
 		on_place = bows.automode,
@@ -68,7 +70,7 @@ bows.register_bow=function(name,def)
 		wield_scale={x=2,y=2,z=1}
 	})
 	minetest.register_tool(def.replace, {
-		description = def.description or name,
+		description = (def.description or name) .." (level ".. def.level .. (def.shots > 1 and ", shots ".. def.shots or "") .. (def.autoaim and ", autoaim" or "") ..")",
 		inventory_image = def.texture .. (def.shots == 1 and "^default_bow_loaded.png" or "^default_bow_loaded_multi.png") .. "^[makealpha:0,255,0",
 		on_use =bows.shoot,
 		on_place = bows.automode,
@@ -161,7 +163,34 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 				z=pos.z+z
 			}, "default:arrow")
 			local self = e:get_luaentity()
-			e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+
+			if bows.registed_bows[itemstack:get_name() .. "_loaded"].autoaim then
+				local obpos2,autodis = nil,100
+				pos = e:get_pos()
+				for _, ob in pairs(minetest.get_objects_inside_radius(pos, 200)) do
+					local en = ob:get_luaentity()
+					if ob ~= user and (en and en.examob and en.dead == nil or ob:is_player()) then
+						local obpos = ob:get_pos()
+						local ob2 = vector.normalize(vector.subtract(obpos, pos))
+						local deg = math.acos((ob2.x*dir.x)+(ob2.y*dir.y)+(ob2.z*dir.z)) * (180 / math.pi)
+						local d = vector.distance(pos,obpos)
+						if d < autodis and not (deg < 0 or deg > 50) and minetest.line_of_sight(pos,obpos) then
+							autodis = d
+							obpos2 = ob:get_pos()
+						end
+					end
+				end
+				if obpos2 then
+					level = level/2
+					dir = vector.new((obpos2.x-pos.x)*1,(obpos2.y-pos.y)*1,(obpos2.z-pos.z)*1)
+					e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+				else
+					e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+				end
+			else
+				e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+			end
+
 			e:set_acceleration({x=num(dir.x*-3), y=-10, z=num(dir.z*-3)})
 			e:set_yaw(user:get_look_horizontal()-math.pi/2)
 			e:set_properties({textures={arrow}})
