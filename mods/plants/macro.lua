@@ -1,5 +1,5 @@
 plants.piece_of_plant = {"004400","005500","006600","007700","008800","009900"}
-
+plants.queue = nil
 plants.mineral_colors = {
 	"default:rubyblock",
 	"default:taaffeiteblock",
@@ -18,6 +18,9 @@ plants.mineral_colors = {
 	"default:amberblock",
 	"default:zirconiablock",
 }
+
+
+
 plants.mineral_colors[0] = "default:rubyblock"
 
 plants.rnd_piece_of_plant=function(color,r)
@@ -99,6 +102,13 @@ minetest.register_node("plants:macro_grass", {
 		minetest.registered_nodes["plants:macro_grass"].on_load(pos)
 	end,
 	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer =  function (pos, elapsed)
+		if plants.queue then
+			return true
+		end
+		plants.queue = true
 		local l = math.random(5,50)
 		local color,node
 		for y=0,l do
@@ -109,6 +119,7 @@ minetest.register_node("plants:macro_grass", {
 				minetest.set_node(apos(pos,0,y),{name=node})
 			end
 		end
+		plants.queue = false
 	end
 })
 
@@ -123,17 +134,25 @@ minetest.register_node("plants:macro_lilypad", {
 		minetest.registered_nodes["plants:macro_lilypad"].on_load(pos)
 	end,
 	on_load=function(pos)
-			minetest.remove_node(pos)
-			local color,node
-			local s = math.random(4,9)
-			for x=-s,s,1 do
-			for z=-s,s,1 do
-				if vector.length(vector.new({x=x,y=0,z=z}))/s<=1 then
-					color,node = plants.rnd_piece_of_plant(color)
-					minetest.set_node(apos(pos,x,1,z),{name=node})
-				end
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer =  function (pos, elapsed)
+		if plants.queue then
+			return true
+		end
+		plants.queue = true
+		minetest.remove_node(pos)
+		local color,node
+		local s = math.random(4,9)
+		for x=-s,s,1 do
+		for z=-s,s,1 do
+			if vector.length(vector.new({x=x,y=0,z=z}))/s<=1 then
+				color,node = plants.rnd_piece_of_plant(color)
+				minetest.set_node(apos(pos,x,1,z),{name=node})
 			end
-			end
+		end
+		end
+		plants.queue = false
 	end
 })
 
@@ -148,6 +167,13 @@ minetest.register_node("plants:macro_flower", {
 		minetest.registered_nodes["plants:macro_flower"].on_load(pos)
 	end,
 	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer =  function (pos, elapsed)
+		if plants.queue then
+			return true
+		end
+		plants.queue = true
 		local p = apos(pos,0,-1)
 		local l = math.random(30,100)
 		local s = math.random(4,9)
@@ -202,6 +228,7 @@ minetest.register_node("plants:macro_flower", {
 		end
 		end
 		end
+		plants.queue = false
 	end
 })
 
@@ -216,6 +243,13 @@ minetest.register_node("plants:macro_mushroom", {
 		minetest.registered_nodes["plants:macro_mushroom"].on_load(pos)
 	end,
 	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer =  function (pos, elapsed)
+		if plants.queue then
+			return true
+		end
+		plants.queue = true
 		minetest.remove_node(pos)
 		local color,colorg = 131,3
 		local r = math.random(1,4)
@@ -227,6 +261,7 @@ minetest.register_node("plants:macro_mushroom", {
 		if r == 4 then
 			l = l *1.5
 		end
+
 		for y=0,l do
 			p = apos(p,0,1)
 			for x=-stem,stem do
@@ -248,6 +283,8 @@ minetest.register_node("plants:macro_mushroom", {
 		color = color[rr]*8
 		local colorg = math.random(0,4)
 		local l1,l2
+
+		minetest.emerge_area(vector.subtract(pos,stem+s),vector.add(pos,stem+s))
 
 		if rr == 16 then
 			color = 132
@@ -294,6 +331,7 @@ minetest.register_node("plants:macro_mushroom", {
 		end
 		end
 		end
+		plants.queue = false
 	end
 })
 
@@ -305,6 +343,8 @@ plants.macro_branch=function(p,size)
 	local branch = math.random(10,30)
 	local leafc = 1
 	local leaf
+
+	minetest.emerge_area(vector.subtract(p,branch+stem),vector.add(p,branch+stem))
 
 	for w=0,branch do
 		p = apos(p,dir.x*stem,0,dir.z*stem)
@@ -342,7 +382,7 @@ plants.macro_branch=function(p,size)
 end
 
 minetest.register_node("plants:macro_trees", {
-	description = "Mushroom",
+	description = "Tree",
 	tiles={"default_tree.png"},
 	groups = {flammable=1,on_load=1,not_in_creative_inventory=1,unbreakable=1},
 	sunlight_propagates = true,
@@ -352,12 +392,22 @@ minetest.register_node("plants:macro_trees", {
 		minetest.registered_nodes["plants:macro_trees"].on_load(pos)
 	end,
 	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer =  function (pos, elapsed)
+		if plants.queue then
+			return true
+		end
+		plants.queue = true
 		minetest.remove_node(pos)
 		local color,colorg,colort = 112,3,5
 		local s = math.random(10,20)
 		local stem = math.random(6,16)
 		local p = apos(pos,0,-1)
 		local l = math.random(20,120)
+
+		minetest.emerge_area(vector.subtract(pos,stem),vector.add(pos,stem))
+
 		for y=0,l do
 			p = apos(p,0,1)
 			for x=-stem,stem do
@@ -366,6 +416,7 @@ minetest.register_node("plants:macro_trees", {
 				if d >= 1 or math.abs(x) == stem or math.abs(z) == stem then
 					colort = plants.rnd_color(colort,4,8)
 					minetest.set_node(apos(p,x,0,z),{name="plants:macro_tree",param2 = colort+160})
+
 				elseif d < 1 then
 					colorg = plants.rnd_color(colorg,0,5)
 					minetest.set_node(apos(p,x,0,z),{name="plants:macro_tree",param2 = colorg+112})
@@ -379,5 +430,6 @@ minetest.register_node("plants:macro_trees", {
 					plants.macro_branch(apos(p,math.random(-stem/2,stem/2),math.random(-stem/2,stem/2),math.random(-stem/2,stem/2)))
 			end
 		end
+		plants.queue = false
 	end
 })
