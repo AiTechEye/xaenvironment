@@ -480,6 +480,7 @@ default.register_plant({
 			flags = "all_floors",
 		},
 	})
+
 	minetest.register_node("plants:crystal_block"..i, {
 		description = "Crystal block "..i,
 		tiles={"default_noise.png^"..default.dye_texturing(v,{opacity=200})},
@@ -490,6 +491,8 @@ default.register_plant({
 		light_source = 7,
 		dye_colors = {palette=v},
 		use_texture_alpha = "blend",
+		drowning = 1,
+		liquid_viscosity = 20,
 		sounds = default.node_sound_glass_defaults(),
 	})
 	minetest.register_decoration({
