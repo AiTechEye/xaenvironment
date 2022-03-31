@@ -144,12 +144,14 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 	local wear=bows.registed_bows[name].uses
 	local level=19 + bows.registed_bows[name].level
 	local dmg = bows.registed_arrows[arrow].damage
+	local autoaim = bows.registed_bows[itemstack:get_name() .. "_loaded"].autoaim
+	local delay = autoaim and shots > 1 and 0.1 or 0.05
 
 	if bows.creative==false then
 		itemstack:add_wear(65535/wear)
 	end
 	for i=0,shots-1,1 do
-		minetest.after(0.05*i, function(level,user,arrow,dmg)
+		minetest.after(delay*i, function(level,user,arrow,dmg,autoaim)
 			local pos = user:get_pos()
 			local dir = user:get_look_dir()
 
@@ -164,7 +166,7 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 			}, "default:arrow")
 			local self = e:get_luaentity()
 
-			if bows.registed_bows[itemstack:get_name() .. "_loaded"].autoaim then
+			if autoaim then
 				local obpos2,autodis = nil,100
 				pos = e:get_pos()
 				for _, ob in pairs(minetest.get_objects_inside_radius(pos, 200)) do
@@ -200,7 +202,7 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 			self.user = user
 			self.dmg = dmg
 			minetest.sound_play("default_bow_shoot", {pos=pos})
-		end,level,user,arrow,dmg)
+		end,level,user,arrow,dmg,autoaim)
 	end
 	return itemstack
 end
@@ -566,4 +568,33 @@ minetest.register_entity("default:arrow_lightning",{
 		end
 	end,
 	t=1
+})
+
+bows.register_arrow("crystal",{
+	description="Crystat arrow",
+	texture="default_noise.png",
+	on_hit_object=function(self,target,hp,user,lastpos)
+		local p = target:get_pos()
+		local c = target:get_properties().collisionbox
+		local cp1 = vector.add(p,vector.new(c[1],c[2],c[3]))
+		local cp2 = vector.add(p,vector.new(c[4],c[5],c[6]))
+		local d = math.floor(vector.distance(cp1,cp2))
+		for x = -d,d do
+		for y = -d-1,d+1 do
+		for z = -d,d do
+			local p2 = apos(lastpos,x,y,z)
+			if not minetest.is_protected(p2,"") and default.defpos(p2,"buildable_to") then
+				minetest.set_node(p2,{name="plants:crystal_block"..math.random(1,#plants.dye_colors)})
+			end
+		end
+		end
+		end
+		bows.arrow_remove(self)
+	end,
+	craft_count=3,
+	groups={treasure=2,store=1000},
+	damage=0,
+	craft={
+		{"group:arrow","group:crystal","default:peridot"},
+	}
 })
