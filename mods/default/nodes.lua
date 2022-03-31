@@ -756,8 +756,8 @@ minetest.register_node("default:desert_sand", {
 	drowning = 1
 })
 
-minetest.register_node("default:desert_qicksand", {
-	description = "Desert qicksand",
+minetest.register_node("default:desert_quicksand", {
+	description = "Desert quicksand",
 	tiles={"default_desert_sand.png^[colorize:#00000008"},
 	groups = {crumbly=3,disable_jump=1,sand=1,treasure=1},
 	sounds = default.node_sound_sand_defaults(),
