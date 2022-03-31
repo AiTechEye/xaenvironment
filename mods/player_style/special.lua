@@ -166,7 +166,7 @@ special={
 				if (minetest.get_node_light(p) or 14) < 11 or n == "vexcazer_flashlight:flht" or n == "vexcazer_flashlight:flhtw" then
 					local v
 					local s
-					if minetest.get_node_group(n, "water") > 0 then
+					if minetest.get_item_group(n, "water") > 0 then
 						minetest.set_node(p, {name="vexcazer_flashlight:flhtw"})
 						v = special.blocks["default:qblock_FFFFFF"].use(player)
 					elseif (n == "air" or n == "vexcazer_flashlight:flht") then
