@@ -187,7 +187,15 @@ bows.shoot=function(itemstack, user, pointed_thing,on_dropitem)
 					dir = vector.new((obpos2.x-pos.x)*1,(obpos2.y-pos.y)*1,(obpos2.z-pos.z)*1)
 					e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
 				else
-					e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+					local inv = user:get_inventory()
+					local s = ItemStack(arrow)
+					if inv:room_for_item("main",s) then
+						e:remove()
+						inv:add_item("main",s)
+						return
+					else
+						e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
+					end
 				end
 			else
 				e:set_velocity({x=num(dir.x*level), y=num(dir.y*level), z=num(dir.z*level)})
