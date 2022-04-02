@@ -58,7 +58,7 @@ minetest.register_node("toxic:barbed_wire", {
 })
 
 bows.register_arrow("arrow",{
-	description="Botox (extremely toxic)",
+	description="Botulinumtoxin (extremely toxic)",
 	texture="toxic_bottle.png",
 	damage=1100,
 	craft_count=4,
@@ -67,7 +67,7 @@ bows.register_arrow("arrow",{
 })
 
 minetest.register_node("toxic:bottle", {
-	description = "Botox bottle",
+	description = "Botulinumtoxin bottle",
 	drawtype = "mesh",
 	mesh = "toxic_bottle.obj",
 	visual_scale = 1.0,
