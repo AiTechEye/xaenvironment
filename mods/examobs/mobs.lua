@@ -558,6 +558,91 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
+	description = "Just another murder machine the cooperating with the terminators, also called terminators skeletons",
+	name = "skeleton",
+	type = "monster",
+	team="metal",
+	dmg = 1,
+	hp= 50,
+	coin = 5,
+	textures = {"examobs_skeleton.png","default_air.png"},
+	mesh = "examobs_skeleton.b3d",
+	inv={["default:iron_ingot"]=1},
+	punch_chance=4,
+	collisionbox = {-0.35,-1.1,-0.35,0.35,0.8,0.35},
+	bottom=-1,
+	animation = {
+		stand = {x=1,y=10,speed=0},
+		walk = {x=12,y=31},
+		run = {x=12,y=32,speed=60},
+		lay = {x=60,y=65},
+		attack = {x=34,y=42},
+		sit = {x=55,y=56,speed=0},
+		aim = {x=47,y=50,speed=0},
+	},
+	aggressivity = 2,
+	walk_speed = 2,
+	run_speed = 4,
+	spawn_chance = 400,
+	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type","default:gravel","default:bedrock"},
+	light_min = 1,
+	light_max = 15,
+	is_food=function(self,item)
+		return false
+	end,
+	on_spawn=function(self)
+		local types = {"fight_ingot","fight_hand","fight_bow"}
+		self.storage.type = types[math.random(1,3)]
+		self:on_load()
+	end,
+	on_load=function(self)
+		self[self.storage.type] = true
+		local t
+		if self.fight_ingot then
+			t = "default_ironblock.png^default_alpha_ingot.png^[makealpha:0,255,0"
+			self.dmg = 3
+		elseif self.fight_bow then
+			t = "default_wood.png^default_bow.png^[makealpha:0,255,0"
+			self.bow_t1 = t
+			self.bow_t2 = "default_wood.png^default_bow_loaded.png^[makealpha:0,255,0"
+			self.inv["default:bow_wood"] = math.random(0,1)
+			self.inv["default:arrow_arrow"] = math.random(0,10)
+		else
+			t = "default_air.png"
+		end
+		self.object:set_properties({textures={"examobs_skeleton.png",t}})
+	end,
+	step=function(self)
+		if self.fight and self.fight_bow and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
+			examobs.stand(self)
+			examobs.anim(self,"aim")
+			examobs.lookat(self,self.fight)
+			if self.aim == 0 then
+				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t2}})
+			end
+			self.aim = self.aim +math.random(0.1,0.5)
+			if examobs.gethp(self.fight) == 0 or not examobs.visiable(self.object,self.fight) or examobs.distance(self.object,self.fight) > self.range then
+				self.aim = 0
+				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+				self.fight = nil
+			elseif self.aim >= 0.5 then
+				self.aim = 0
+				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+				local pos2 = self.fight:get_pos()
+				if pos2 and pos2.x then
+					examobs.shoot_arrow(self,pos2,"default:arrow_arrow")
+				end
+			end
+			return self
+		elseif self.aim > 0 then
+			self.aim = 0
+			self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+		end
+	end,
+	aim=0,
+})
+
+examobs.register_mob({
 	description = "A classic murder machine that with its strength punch targets over great distances.",
 	name = "terminator",
 	type = "monster",
