@@ -574,7 +574,7 @@ examobs.register_mob({
 	walk_speed = 4,
 	run_speed = 6,
 	bottom=1,
-	spawn_chance = 500,
+	spawn_chance = 400,
 	animation = {
 		stand={x=1,y=39,speed=30,loop=false},
 		walk={x=41,y=61,speed=30,loop=false},
@@ -1244,86 +1244,73 @@ examobs.register_mob({
 	end
 })
 
+
 examobs.register_mob({
-	description = "Just another murder machine the cooperating with the terminators, also called terminators skeletons",
-	name = "skeleton",
+	description = "A murder machine that shooting lightning bolts",
+	name = "eletric_terminator",
 	type = "monster",
-	team="metal",
-	dmg = 1,
-	hp= 50,
-	coin = 5,
-	textures = {"examobs_skeleton.png","default_air.png"},
-	mesh = "examobs_skeleton.b3d",
-	inv={["default:iron_ingot"]=1},
-	punch_chance=4,
-	collisionbox = {-0.35,-1.1,-0.35,0.35,0.8,0.35},
-	bottom=-1,
-	animation = {
-		stand = {x=1,y=10,speed=0},
-		walk = {x=12,y=31},
-		run = {x=12,y=32,speed=60},
-		lay = {x=60,y=65},
-		attack = {x=34,y=42},
-		sit = {x=55,y=56,speed=0},
-		aim = {x=47,y=50,speed=0},
-	},
+	team = "metal",
+	dmg = 5,
+	coin = 200,
+	hp = 150,
+	textures={"player_style_eletric_terminator.png^[colorize:#fa7fff44"},
+	mesh="character.b3d",
+	spawn_on={"default:dirt","group:stone","default:gravel","default:bedrock"},
+	inv={["default:steel_ingot"]=2},
+	collisionbox = {-0.35,-0.01,-0.35,0.35,1.8,0.35},
 	aggressivity = 2,
-	walk_speed = 2,
-	run_speed = 4,
+	floating = {["air"]=1,["default:water_source"]=1},
+	walk_speed = 4,
+	run_speed = 6,
+	bottom=1,
 	spawn_chance = 400,
-	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type","default:gravel","default:bedrock"},
-	light_min = 1,
-	light_max = 15,
+	animation = {
+		stand={x=1,y=39,speed=30},
+		walk={x=41,y=60,speed=30},
+		run={x=80,y=99,speed=60},
+		lay={x=113,y=123,speed=0,loop=false},
+		attack={x=65,y=75,speed=30},
+	},
 	is_food=function(self,item)
 		return false
 	end,
 	on_spawn=function(self)
-		local types = {"fight_ingot","fight_hand","fight_bow"}
-		self.storage.type = types[math.random(1,3)]
-		self:on_load()
+		self.on_load(self)
 	end,
 	on_load=function(self)
-		self[self.storage.type] = true
-		local t
-		if self.fight_ingot then
-			t = "default_ironblock.png^default_alpha_ingot.png^[makealpha:0,255,0"
-			self.dmg = 3
-		elseif self.fight_bow then
-			t = "default_wood.png^default_bow.png^[makealpha:0,255,0"
-			self.bow_t1 = t
-			self.bow_t2 = "default_wood.png^default_bow_loaded.png^[makealpha:0,255,0"
-			self.inv["default:bow_wood"] = math.random(0,1)
-			self.inv["default:arrow_arrow"] = math.random(0,10)
-		else
-			t = "default_air.png"
-		end
-		self.object:set_properties({textures={"examobs_skeleton.png",t}})
+		self.storage.skin = "player_style_eletric_terminator.png^[colorize:#fa7fff44"
+		self.bow_t1 = "default_iron.png^default_bow.png^[makealpha:0,255,0"
+		self.bow_t2 = "default_iron.png^default_bow_loaded.png^[makealpha:0,255,0"
+		self.inv["default:bow_iron"] = math.random(0,1)
+		self.inv["default:arrow_lightning"] = math.random(0,3)
+		self.object:set_properties({textures={self.storage.skin,t}})
 	end,
 	step=function(self)
-		if self.fight and self.fight_bow and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
+		if self.fight and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
 			examobs.stand(self)
 			examobs.anim(self,"aim")
 			examobs.lookat(self,self.fight)
 			if self.aim == 0 then
-				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t2}})
+				self.object:set_properties({textures={self.storage.skin,self.bow_t2}})
 			end
 			self.aim = self.aim +math.random(0.1,0.5)
 			if examobs.gethp(self.fight) == 0 or not examobs.visiable(self.object,self.fight) or examobs.distance(self.object,self.fight) > self.range then
 				self.aim = 0
-				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+				self.object:set_properties({textures={self.storage.skin,self.bow_t1}})
 				self.fight = nil
 			elseif self.aim >= 0.5 then
 				self.aim = 0
-				self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+				self.object:set_properties({textures={self.storage.skin,self.bow_t1}})
 				local pos2 = self.fight:get_pos()
 				if pos2 and pos2.x then
-					examobs.shoot_arrow(self,pos2,"default:arrow_arrow")
+					 pos2.y =  pos2.y -1.5
+					examobs.shoot_arrow(self,pos2,"default:arrow_lightning")
 				end
 			end
 			return self
 		elseif self.aim > 0 then
 			self.aim = 0
-			self.object:set_properties({textures={"examobs_skeleton.png",self.bow_t1}})
+			self.object:set_properties({textures={self.storage.skin,self.bow_t1}})
 		end
 	end,
 	aim=0,
@@ -1339,7 +1326,7 @@ examobs.register_mob({
 	walk_speed = 4,
 	run_speed = 8,
 	animation = "default",
-	spawn_chance = 1000,
+	spawn_chance = 400,
 	inv={["examobs:flesh"]=1},
 	on_click=function(self,clicker)
 		if clicker:is_player() then
@@ -1371,7 +1358,7 @@ examobs.register_mob({
 	walk_speed = 4,
 	run_speed = 8,
 	animation = "default",
-	spawn_chance = 1000,
+	spawn_chance = 400,
 	inv={["examobs:flesh"]=1},
 	spawn_on={"group:wood"},
 	on_click=function(self,clicker)
@@ -2578,7 +2565,7 @@ examobs.register_mob({
 	dmg = 0,
 	run_speed = 4,
 	animation = "default",
-	spawn_chance = 800,
+	spawn_chance = 600,
 	extimer = 20,
 	inv = {["nitroglycerin:c4"]=1},
 	step=function(self)
@@ -2938,6 +2925,228 @@ examobs.register_bird({
 				at:add_velocity({x=math.random(-50,50) ,y=math.random(0,7) ,z=math.random(-50,50) })
 		end
 
+		if self.storage.fly then
+			self.flysound_timeout = self.flysound_timeout - dtime*100
+			if self.flysound_timeout <= 0 then
+				self.flysound_timeout = 2
+				self.flysound = minetest.sound_play("examobs_bee", {object=self.object, gain = 2, max_hear_distance = 20})
+			end
+		elseif self.flysound then
+			minetest.sound_stop(self.flysound)
+			self.flysound = nil
+		end
+	end,
+})
+
+examobs.register_mob({
+	description = "A big bug",
+	name = "beetle",
+	type = "animal",
+	team = "bug",
+	dmg = 1,
+	coin = 1,
+	pickupable = true,
+	textures={"examobs_coalcrow.png"},
+	mesh="examobs_beetle.b3d",
+	spawn_on={"default:dirt","group:stone","group:spreading_dirt_type"},
+	inv={["examobs:bugflesh"]=1},
+	collisionbox = {-0.2,-0.1,-0.2,0.2,0.05,0.2},
+	aggressivity = 0,
+	hp = 2,
+	walk_speed = 1,
+	run_speed = 2,
+	light_min = 1,
+	light_max = 15,
+	visual_size = {x=1,y=1,z=1},
+	reach = 5,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=1,y=5,speed=20},
+	},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end
+})
+
+examobs.register_mob({
+	description = "The bug that survives through others blood",
+	name = "tick",
+	type = "monster",
+	team = "tick",
+	dmg = 1,
+	coin = 1,
+	hp = 5,
+	textures={"default_coalblock.png"},
+	mesh="examobs_tick.b3d",
+	spawn_on={"default:dirt","group:stone","group:leaves","group:spreading_dirt_type"},
+	inv={["examobs:bugflesh"]=1},
+	collisionbox = {-0.05,-0.05,-0.05,0.05,0.025,0.05},
+	aggressivity = 2,
+	walk_speed = 1,
+	run_speed = 2,
+	light_min = 1,
+	light_max = 15,
+	visual_size = {x=0.5,y=0.5,z=0.5},
+	reach = 2,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=1,y=5,speed=20},
+	},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_spawn=function(self)
+		local t = {
+			 {"default_stone.png"},
+			 {"examobs_flesh.png"},
+			 {"examobs_meat.png"},
+			 {"default_desertstone.png"},
+			 {"default_cobble.png"},
+			 {"default_cobble.png^default_stonemoss.png"},
+			 {"default_coalblock.png"},
+		}
+		self.storage.tex =  t[math.random(1,7)]
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.tex ~= nil then
+			self.object:set_properties({textures=self.storage.tex})
+		end
+	end
+})
+
+examobs.register_bird({
+	description = "A fly, seriously?",
+	pickupable = true,
+	name = "fly",
+	mesh="examobs_fly.b3d",
+	coin = 1,
+	aggressivity = 1,
+	is_food=function(self,item)
+		return true
+	end,
+	inv={["examobs:bugflesh"]=1},
+	hp = 1,
+	dmg = 1,
+	team = "fly",
+	type = "animal",
+	walk_speed = 2,
+	run_speed = 4,
+	spawn_on = {"default:dirt","group:spreading_dirt_type","group:wood"},
+	light_min = 9,
+	light_max = 15,
+	textures={"examobs_coalcrow.png"},
+	collisionbox = {-0.05,-0.05,-0.05,0.05,0.025,0.05},
+	visual_size = {x=0.5,y=0.5,z=0.5},
+	reach = 2,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=30,y=35,speed=20},
+		eat={x=30,y=35,speed=20},
+		fly={x=31,y=35,speed=50},
+		float={x=31,y=35,speed=50},
+	},
+	on_spawn=function(self)
+		local t = {"examobs_coalcrow.png","examobs_crow.png","examobs_hawk.png","examobs_gull.png^[colorize:#777777aa"}
+		self.storage.tex = t[math.random(1,4)]
+		self.storage.size = math.random(4,6)*0.1
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.size then
+			self.object:set_properties({
+				visual_size={x=self.storage.size,y=self.storage.size ,self.storage.size},
+				textures = {self.storage.tex}
+			})
+		end
+	end,
+	is_food=function(self,item)
+		return true
+	end,
+	flysound_timeout= 0,
+	step=function(self,dtime)
+		local at = self.object:get_attach()
+		if at and at:is_player() then
+			self.storage.fly = 1
+				at:add_velocity({x=math.random(-2,2) ,y=math.random(0,1) ,z=math.random(-2,2) })
+		end
+		if self.storage.fly then
+			self.flysound_timeout = self.flysound_timeout - dtime*100
+			if self.flysound_timeout <= 0 then
+				self.flysound_timeout = 2
+				self.flysound = minetest.sound_play("examobs_bee", {object=self.object, gain = 2, max_hear_distance = 20})
+			end
+		elseif self.flysound then
+			minetest.sound_stop(self.flysound)
+			self.flysound = nil
+		end
+	end,
+})
+
+examobs.register_bird({
+	description = "Run away from that stinging alien",
+	pickupable = true,
+	name = "wasp",
+	mesh="examobs_wasp.b3d",
+	coin = 1,
+	aggressivity = 1,
+	is_food=function(self,item)
+		return true
+	end,
+	inv={["examobs:bugflesh"]=1,["default:peridotblock"]=1},
+	hp = 3,
+	dmg = 1,
+	team = "wasp",
+	type = "monster",
+	walk_speed = 2,
+	run_speed = 4,
+	spawn_on = {"default:dirt","group:spreading_dirt_type","group:wood"},
+	light_min = 9,
+	light_max = 15,
+	textures={"examobs_wasp.png"},
+	collisionbox = {-0.05,-0.05,-0.05,0.05,0.025,0.05},
+	visual_size = {x=0.5,y=0.5,z=0.5},
+	reach = 2,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20,speed=15},
+		run={x=10,y=20,speed=30},
+		lay={x=25,y=30,speed=0,loop=false},
+		attack={x=30,y=35,speed=20},
+		eat={x=30,y=35,speed=20},
+		fly={x=31,y=35,speed=50},
+		float={x=31,y=35,speed=50},
+	},
+	on_spawn=function(self)
+		self.storage.size = math.random(4,6)*0.1
+		self:on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.size then
+			self.object:set_properties({
+				visual_size={x=self.storage.size,y=self.storage.size ,self.storage.size},
+			})
+		end
+	end,
+	is_food=function(self,item)
+		return true
+	end,
+	flysound_timeout= 0,
+	step=function(self,dtime)
+		local at = self.object:get_attach()
+		if at and at:is_player() then
+			self.storage.fly = 1
+				at:add_velocity({x=math.random(-5,5) ,y=math.random(0,1) ,z=math.random(-5,5) })
+		end
 		if self.storage.fly then
 			self.flysound_timeout = self.flysound_timeout - dtime*100
 			if self.flysound_timeout <= 0 then
