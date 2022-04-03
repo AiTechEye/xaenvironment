@@ -3187,7 +3187,7 @@ examobs.register_bird({
 	is_food=function(self,item)
 		return true
 	end,
-	inv={["examobs:bugflesh"]=1,["default:peridotblock"]=1},
+	inv={["examobs:bugflesh"]=1},
 	hp = 3,
 	dmg = 1,
 	team = "wasp",
