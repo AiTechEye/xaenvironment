@@ -699,6 +699,8 @@ minetest.register_node("default:cobble_porous", {
 	damage_per_second = 10,
 })
 
+default.register_stair("default:cobble_porous")
+
 minetest.register_node("default:bedrock", {
 	description = "Bedrock",
 	tiles={"default_cooledlava.png"},
