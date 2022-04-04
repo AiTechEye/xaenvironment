@@ -308,6 +308,9 @@ default.register_chest=function(def)
 		sounds = def.sounds or default.node_sound_wood_defaults(),
 		on_construct=function(pos)
 			minetest.get_meta(pos):get_inventory():set_size("main", 32)
+			if def.on_construct then
+				def.on_construct(pos)
+			end
 		end,
 		after_place_node = function(pos, placer, itemstack)
 			local meta = minetest.get_meta(pos)
@@ -319,6 +322,7 @@ default.register_chest=function(def)
 				meta:set_string("infotext","Chest")
 			end
 		end,
+		on_timer = def.on_timer,
 		on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 			local meta = minetest.get_meta(pos)
 			local owner = meta:get_string("owner")
@@ -334,6 +338,10 @@ default.register_chest=function(def)
 						"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 					)
 				end,pname,pos)
+
+				if def.on_rightclick then
+					def.on_rightclick(pos, node, player, itemstack, pointed_thing)
+				end
 			end
 
 		end,

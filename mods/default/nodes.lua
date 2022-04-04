@@ -115,7 +115,7 @@ minetest.register_node("default:cloud", {
 	description="Cloud",
 	drawtype="glasslike",
 	tiles={"default_cloud.png"},
-	groups = {cracky=1,level=2,fall_damage_add_percent=-90,treasure=2,store=1000},
+	groups = {cracky=1,level=2,fall_damage_add_percent=-90,treasure=2,store=1000,cloud=1},
 	paramtype = "light",
 	sunlight_propagates = true,
 	use_texture_alpha = "blend",
@@ -123,6 +123,17 @@ minetest.register_node("default:cloud", {
 	post_effect_color = {a = 220, r = 255, g = 255, b = 255},
 	drowning = 1,
 })
+
+minetest.register_node("default:cloud_thick", {
+	description = "Thick cloud",
+	tiles={"default_cloud.png"},
+	groups = {cracky=1,level=2,treasure=2,cloud=1},
+	light_source = 13,
+	post_effect_color = {a = 220, r = 255, g = 255, b = 255},
+	drowning = 1,
+})
+
+default.register_stair("default:cloud_thick")
 
 minetest.register_node("default:dye", {
 	tiles={"default_wool.png"},
