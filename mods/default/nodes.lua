@@ -660,6 +660,8 @@ minetest.register_node("default:stone", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+default.register_stair("default:stone")
+
 minetest.register_node("default:space_stone", {
 	description = "Space stone",
 	tiles={"default_space_stone.png"},
@@ -674,6 +676,8 @@ minetest.register_node("default:cobble", {
 	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+default.register_stair("default:cobble")
 
 minetest.register_node("default:stone_hot", {
 	description = "Hot stone",
@@ -702,12 +706,16 @@ minetest.register_node("default:bedrock", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+default.register_stair("default:bedrock")
+
 minetest.register_node("default:mossycobble", {
 	description = "Mossy cobble",
 	tiles={"default_cobble.png^default_stonemoss.png"},
 	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+default.register_stair("default:mossycobble")
 
 minetest.register_node("default:desert_stone", {
 	description = "Desert stone",
@@ -717,12 +725,16 @@ minetest.register_node("default:desert_stone", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+default.register_stair("default:desert_stone")
+
 minetest.register_node("default:desert_cobble", {
 	description = "Desert cobble",
 	tiles={"default_desertcobble.png"},
 	groups = {stone=1,cracky=3,treasure=1},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+default.register_stair("default:desert_cobble")
 
 minetest.register_node("default:gravel", {
 	description = "Gravel",

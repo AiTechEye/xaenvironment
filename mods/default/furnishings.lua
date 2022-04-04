@@ -1,3 +1,36 @@
+default.register_stair=function(name)
+	local mod = minetest.get_current_modname() ..":"
+	--local def = default.def(name)
+	--local groups = table.copy(def.groups)
+	--groups["stairs"] = 1
+
+	local def = table.copy(default.def(name))
+
+	def.groups["stairs"] = 1
+	def.description = def.description .." stair"
+	def.drawtype = "nodebox"
+	def.paramtype = "light"
+	def.on_place = minetest.rotate_node
+	def.paramtype2 = "facedir"
+	def.node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0},
+			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
+		}
+	}
+
+	minetest.register_node(def.name.."_stair",def)
+	minetest.register_craft({
+		output=def.name.."_stair 5",
+		recipe={
+			{"",name,name},
+			{name,name,name}
+		},
+	})
+end
+
+
 default.register_fence=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
