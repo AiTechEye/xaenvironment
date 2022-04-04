@@ -1,7 +1,5 @@
 default.register_stair=function(name)
-	local mod = minetest.get_current_modname() ..":"
 	local def = table.copy(default.def(name))
-
 	def.groups["stairs"] = 1
 	def.description = def.description .." stair"
 	def.drawtype = "nodebox"
@@ -16,12 +14,13 @@ default.register_stair=function(name)
 		}
 	}
 
-	minetest.register_node(def.name.."_stair",def)
+	minetest.register_node(name.."_stair",def)
 	minetest.register_craft({
-		output=def.name.."_stair 5",
+		output=name.."_stair 3",
 		recipe={
-			{"",name,name},
-			{name,name,name}
+			{"","",""},
+			{"","",name},
+			{"",name,name}
 		},
 	})
 end

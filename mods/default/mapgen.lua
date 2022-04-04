@@ -22,7 +22,7 @@ minetest.register_tool("default:biocheck", {
 
 minetest.register_ore({
 	ore_type = "blob",
-	ore= "default:desert_qicksand",
+	ore= "default:desert_quicksand",
 	wherein= "default:desert_sand",
 	clust_scarcity = 30 * 30 * 30,
 	clust_size = 5,
