@@ -1202,3 +1202,48 @@ bows.register_arrow("barbed_wire",{
 		{"group:arrow","examobs:barbed_wire"},
 	}
 })
+
+default.register_chest({
+	name = "cloud_chest",
+	description = "Cloud chest",
+	texture="default_cloud.png",
+	craft={
+		{"group:cloud","group:cloud","group:cloud"},
+		{"group:cloud","","group:cloud"},
+		{"group:cloud","group:cloud","group:cloud"}
+	},
+	on_construct = function(pos, node, player, itemstack, pointed_thing)
+		minetest.get_node_timer(pos):start(5)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		for i = 0,math.random(1,10) do
+			local p = vector.new(pos.x+math.random(-1,1),pos.y+math.random(-1,1),pos.z+math.random(-1,1))
+			local e = minetest.add_entity(p,"examobs:cloud")
+			local self = e:get_luaentity()
+			e:set_yaw(math.random(0,6.28))
+			self.fight = player
+			self.aggressivity = 2
+			self.dmg = 1
+			self.hp = 5
+			self.type = "monster"
+			examobs.lookat(self,player:get_pos())
+			self.static_save = false
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		if math.random(0,5) == 1 then
+			local m = math.random(0,10) == 0 and "examobs:airmonster" or "examobs:cloud"
+			local p = vector.new(pos.x+math.random(-1,1),pos.y+math.random(-1,1),pos.z+math.random(-1,1))
+			local e = minetest.add_entity(pos,m)
+			local self = e:get_luaentity()
+			e:set_yaw(math.random(0,6.28))
+			self.static_save = false
+			if m == "examobs:cloud" then
+				self.aggressivity = 2
+				self.dmg = 1
+				self.step = nil
+			end
+		end
+		return true
+	end,
+})
