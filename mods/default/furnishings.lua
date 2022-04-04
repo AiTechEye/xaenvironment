@@ -1,9 +1,5 @@
 default.register_stair=function(name)
 	local mod = minetest.get_current_modname() ..":"
-	--local def = default.def(name)
-	--local groups = table.copy(def.groups)
-	--groups["stairs"] = 1
-
 	local def = table.copy(default.def(name))
 
 	def.groups["stairs"] = 1
