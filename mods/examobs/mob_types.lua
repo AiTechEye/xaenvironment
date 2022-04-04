@@ -183,7 +183,7 @@ examobs.register_fish=function(def)
 		elseif def2.hurt_outside == 1 and minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
 			self:hurt(1)
 			examobs.stand(self)
-		elseif self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then
+		elseif self.hurt_outside == 1 and self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then
 			self.fight = nil
 		elseif not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
