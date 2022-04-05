@@ -124,6 +124,8 @@ minetest.register_node("default:cloud", {
 	drowning = 1,
 })
 
+default.register_stair("default:cloud")
+
 minetest.register_node("default:cloud_thick", {
 	description = "Thick cloud",
 	tiles={"default_cloud.png"},
@@ -488,6 +490,8 @@ minetest.register_node("default:glass", {
 	on_punch=default.dye_coloring
 })
 
+default.register_stair("default:glass")
+
 minetest.register_node("default:glass_frosted", {
 	description = "Frosted glass",
 	tiles={"default_glass_with_frame.png","default_cloud.png"},
@@ -501,6 +505,8 @@ minetest.register_node("default:glass_frosted", {
 	paramtype2 = "color",
 	on_punch=default.dye_coloring
 })
+
+default.register_stair("default:glass_frosted")
 
 minetest.register_node("default:obsidian_glass", {
 	description = "Obsidian glass",
