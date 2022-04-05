@@ -102,9 +102,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local area
 	local data
 	for i,v in pairs(places.buildings) do
-local r = math.random(0,v.chance)
-print(i," ",r)
-		if math.random(0,v.chance) == 0 and minp.y-100 <= v.miny and maxp.y+100 >= v.maxy then
+		if math.random(math.random(0,v.chance),v.chance) == 0 and minp.y-100 <= v.miny and maxp.y+100 >= v.maxy then
 			local spawn_at = {}
 			for i1,v1 in pairs(v.spawn_at) do
 				spawn_at[minetest.get_content_id(v1)] = true
@@ -117,8 +115,6 @@ print(i," ",r)
 			for t=0,10 do
 				local tx = vector.new(math.random(minp.x,maxp.x),maxp.y,math.random(minp.z,maxp.z))
 				for y=maxp.y,minp.y,-1 do
-
-print(y," ", v.miny ," ", v.maxy," ",spawn_at[data[area:index(tx.x,y,tx.z)]])
 					if y >= v.miny and y <= v.maxy and spawn_at[data[area:index(tx.x,y,tx.z)]] then
 						local sp = vector.new(tx.x,y,tx.z)
 						minetest.emerge_area(vector.subtract(sp,v.sx,v.sy,v.sx),vector.add(sp,v.sx,v.sy,v.sx))
