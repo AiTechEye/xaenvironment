@@ -1,5 +1,5 @@
 plants = {
-	dye_colors={132,25,32,21,118,14,49,7,105,131,124,111,63,77,98,2}
+	dye_colors={132,25,32,21,118,14,49,7,105,131,124,111,63,77,98,2,136,137}
 }
 dofile(minetest.get_modpath("plants") .. "/water.lua")
 dofile(minetest.get_modpath("plants") .. "/macro.lua")
