@@ -1,7 +1,7 @@
 places = {
 	buildings = {
 		["cloud castle"]={
-			chance=10,sx=112,sy=16,miny=200,maxy=300,spawn_at={"air"},
+			chance=100,sx=112,sy=16,miny=200,maxy=300,spawn_at={"air"},
 			on_spawn=function(pos)
 				minetest.place_schematic(pos,minetest.get_modpath("places").."/schematics/places_cloudcastle.mts","random",nil,true,"place_center_x,place_center_z")
 				local nodes = minetest.find_nodes_in_area(vector.subtract(pos,50),vector.add(pos,50),"examobs:cloud_chest")
