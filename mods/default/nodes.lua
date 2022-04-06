@@ -699,7 +699,7 @@ default.register_stair("default:cobble")
 minetest.register_node("default:lava_cobble", {
 	description = "Lava cobble",
 	tiles={"default_lavacobble.png"},
-	groups = {stone=1,cracky=3,treasure=3,igniter=3,},
+	groups = {stone=1,cracky=3,treasure=3,igniter=3,store=1000},
 	sounds = default.node_sound_stone_defaults(),
 	light_source=14,
 	damage_per_second = 10,
