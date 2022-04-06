@@ -696,6 +696,18 @@ minetest.register_node("default:cobble", {
 
 default.register_stair("default:cobble")
 
+minetest.register_node("default:lava_cobble", {
+	description = "Lava cobble",
+	tiles={"default_lavacobble.png"},
+	groups = {stone=1,cracky=3,treasure=3,igniter=3,},
+	sounds = default.node_sound_stone_defaults(),
+	light_source=14,
+	damage_per_second = 10,
+	after_destruct=function(pos)
+		minetest.set_node(pos,{name="fire:basic_flame"})
+	end
+})
+
 minetest.register_node("default:stone_hot", {
 	description = "Hot stone",
 	drop = "default:cobble",
