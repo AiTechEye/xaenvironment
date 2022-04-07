@@ -854,7 +854,7 @@ examobs.register_mob({
 	},
 	collisionbox={-1,-0.65,-1,1,0.8,1},
 	spawn_on={"default:stone","default:cobble","default:lava_source","default:cooledlava"},
-	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:basic_flame"]=1,["fire:permanent_flame"]=1},
+	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:permanent_flame"]=1},
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
 	end,
@@ -1900,6 +1900,91 @@ examobs.register_mob({
 	end,
 	on_punching = function(self)
 		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
+	end
+})
+
+examobs.register_mob({
+	description = "A fire creature living in hotness",
+	name = "firewolf",
+	textures = {"fire_basic_flame.png"},
+	mesh = "examobs_wolf.b3d",
+	type = "monster",
+	team = "fire",
+	dmg = 5,
+	coin = 15,
+	hp = 100,
+	aggressivity = 2,
+	swiming = 0,
+	run_speed = 15,
+	inv={["default:iron_ingot"]=20,["examobs:tooth"]=1},
+	animation = {
+		stand = {x=0,y=9},
+		walk = {x=11,y=31},
+		run = {x=32,y=52,speed=60},
+		lay = {x=66,y=75},
+		attack = {x=53,y=65},
+	},
+	visual_size= {x=1.5,y=1.5,z=1.5},
+	collisionbox={-0.9,-1.2,-0.9,0.9,0.45,0.9,},
+	spawn_on={"group:fire"},
+	resist_nodes = {["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:permanent_flame"]=1},
+	lay_on_death=0,
+	bottom=-1,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.fight = clicker
+				examobs.known(self,clicker,"fight")
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0
+	end,
+	fireanim = 0,
+	step=function(self)
+		self.object:set_properties({textures={"[combine:16x16:0,"..(self.fireanim*-16).."=fire_basic_flame_animated.png"}})
+		self.fireanim = self.fireanim + 1
+		if self.fireanim > 7 then
+			self.fireanim = 0
+		end
+		local p = self:pos()
+		if minetest.get_item_group(minetest.get_node(p).name,"cools_lava") > 0 or minetest.get_item_group(minetest.get_node(apos(p,0,-1)).name,"cools_lava") > 0 then
+			self:hurt(10)
+		elseif not minetest.is_protected(p, "") and default.defpos(p,"buildable_to") then
+			minetest.add_node(p,{name="fire:basic_flame"})
+		end
+		if self.fight and not self.detection then
+			self.detection = true
+			minetest.sound_play("examobs_wolf_detect", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.detection and not self.fight then
+			self.detection = nil
+		elseif math.random(1,100) == 1 then
+			minetest.sound_play("examobs_wolf", {object=self.object, gain = 1, max_hear_distance = 20})
+		elseif self.fight and math.random(1,20) == 1 then
+			minetest.sound_play("examobs_wolf_attack3", {object=self.object, gain = 1, max_hear_distance = 20})
+		end
+	end,
+	on_punching = function(self)
+		minetest.sound_play("examobs_wolf_attack"..math.random(1,2), {object=self.object, gain = 1, max_hear_distance = 20})
+	end,
+	death=function(self)
+		local pos=self:pos()
+		local s = 5
+		for x=-s,s,1 do
+		for z=-s,s,1 do
+		for y=-s,s,1 do
+			local p = vector.new(x,y,z)
+			local pos2 = vector.add(pos,p)
+			if vector.length(p)/s<=1 and not minetest.is_protected(pos2, "") and default.defpos(pos2,"buildable_to") then
+				minetest.add_node(pos2,{name="fire:basic_flame"})
+			end
+		end
+		end
+		end
 	end
 })
 
