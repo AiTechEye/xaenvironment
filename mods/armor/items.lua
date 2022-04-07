@@ -287,3 +287,12 @@ armor.register_item("uranium",{
 	item="default:uraniumactive_ingot",
 	groups={treasure=3},
 })
+
+armor.register_group("zirconia","default_zirconiablock.png","default:zirconia",14)
+armor.register_group("ruby","default_rubyblock.png","default:ruby",14)
+armor.register_group("opal","default_opalblock.png","default:opal",14)
+armor.register_group("peridot","default_peridotblock.png","default:peridot",14)
+armor.register_group("jadeite","default_jadeiteblock.png","default:jadeite",14)
+armor.register_group("taaffeite","default_taaffeiteblock.png","default:taaffeite",14)
+armor.register_group("amethyst","default_amethystblock.png","default:amethyst",14)
+armor.register_group("cloud","default_cloud.png","default:cloud",12)
