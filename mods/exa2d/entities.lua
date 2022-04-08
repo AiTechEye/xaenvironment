@@ -313,7 +313,7 @@ minetest.register_entity("exa2d:cam",{
 		end
 		return self
 	end,
-	jump_v = 10,
+	jump_v = 12,
 	jump_timer = 0.5,
 	block_hit = true,
 	timer = 2,
