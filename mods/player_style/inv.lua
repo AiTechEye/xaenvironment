@@ -123,7 +123,13 @@ player_style.inventory=function(player)
 		end
 		invp.backpack = minetest.create_detached_inventory("backpack", {
 			allow_put = function(inv, listname, index, stack, player)
-				return inv:is_empty("main") and minetest.get_item_group(stack:get_name(),"backpack") > 0 and 0 or stack:get_count()
+				local invps = player_style.players[name].inv
+				if invps.backpacki == 0 or inv:is_empty("main") and minetest.get_item_group(stack:get_name(),"backpack") > 0 then
+					return 0
+				elseif invps["backpackslot"..invps.backpacki]:is_empty("main") then
+					return 0
+				end
+				return stack:get_count()
 			end,
 			on_move = function(inv, from_list, from_index, to_list, to_index, count,player)
 				local name = player:get_player_name()
