@@ -1491,3 +1491,24 @@ qblock({color="e29f00",store=3000,description="Fire resistance"})
 qblock({color="800080",store=5000,description="Immortal"})
 qblock({color="0000FF",store=2000,description="No water drowning"})
 qblock({color="FFFFFF",store=1000,description="Light in darkness"})
+
+
+for i=1,8 do
+minetest.register_node("default:oddstone"..i, {
+	description = "Odd Stone",
+	tiles={"default_oddstone"..i..".png"},
+	groups = {stone=1,cracky=3,treasure=1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_ore({
+	ore_type = "blob",
+	ore="default:oddstone"..i,
+	wherein= "default:stone",
+	clust_scarcity = 5 * 5 * 5,
+	clust_size = 5,
+	y_min= -31000,
+	y_max= -50,
+	noise_params = default.ore_noise_params()
+})
+end
