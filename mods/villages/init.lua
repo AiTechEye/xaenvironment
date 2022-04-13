@@ -282,7 +282,10 @@ villages.set_building=function(pos,node)
 		local n = minetest.get_node(v)
 		if n.name == "examobs:villager_npc_spawner" then
 			minetest.remove_node(v)
-			minetest.add_entity(v,"examobs:villager_npc"):set_yaw(math.random(0,6.28))
+			local self = minetest.add_entity(v,"examobs:villager_npc"):get_luaentity()
+			self.storage.npc_generated = true
+			self.storage.property_area = prop.area
+			self.storage.property_area_pos = pos
 		elseif n.name == "examobs:chicken_spawner" then
 			minetest.remove_node(v)
 			minetest.add_entity(v,"examobs:chicken"):set_yaw(math.random(0,6.28))
