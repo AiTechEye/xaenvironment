@@ -992,7 +992,10 @@ examobs.generate_npc_house=function(pos)
 	end
 	end
 	end
-	minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity().storage.npc_generated = true
+	local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
+	self.storage.npc_generated = true
+	self.storage.property_area = s
+	self.storage.property_area_pos = pos
 end
 
 minetest.register_ore({

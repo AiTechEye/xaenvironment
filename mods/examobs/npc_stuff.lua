@@ -59,6 +59,7 @@ examobs.npc = {
 		{keywords={"who want to mine with me?"},response={"yes","ok","where are you?","no","why?"}},
 	},
 	expressions = {
+		breakarea = {"So what does that mean?","what!?","Stop it!","Stop breaking my home!","Stop it, get away from my house!","STOP THAT RUBBER!!!!","STOP THAT STEALER!!!!"},
 		folow = {"ok","what?","ok, but then?","so?"},
 		flee = {"AHHH NOOB","im sorry!!!!","run","RUN!!","AHH!!","nooo","help!","HELP MEEE","ohh no","you again","hey be cool!","need something?","i dont have enough","STOP HIM!!!","plz stop him!"},
 		punched = {"ow","ah","ahhh","ohha","it hurts","A","stop it!","aaaa"},
@@ -289,4 +290,16 @@ minetest.register_on_chat_message(function(name, message)
 			examobs.on_chat(p:get_pos(),name,message,nil,p)
 		end
 	end,p,name,message)
+end)
+
+
+minetest.register_on_dignode(function(pos, oldnode, digger)
+	for i,v in pairs(examobs.active.ref) do
+		local self = v:get_luaentity()
+		if self.type == "npc" and self.storage.property_area and vector.distance(pos,self.storage.property_area_pos) <= self.storage.property_area and examobs.visiable(self.object,digger) then
+			examobs.lookat(self,digger)
+			self.fight = digger
+			examobs.on_expression(self,"breakarea")
+		end
+	end
 end)
