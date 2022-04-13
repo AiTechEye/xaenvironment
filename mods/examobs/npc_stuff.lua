@@ -292,14 +292,23 @@ minetest.register_on_chat_message(function(name, message)
 	end,p,name,message)
 end)
 
-
 minetest.register_on_dignode(function(pos, oldnode, digger)
+	examobs.break_in_area(pos,digger)
+end)
+
+examobs.break_in_area=function(pos,ob)
 	for i,v in pairs(examobs.active.ref) do
 		local self = v:get_luaentity()
-		if self.type == "npc" and self.storage.property_area and vector.distance(pos,self.storage.property_area_pos) <= self.storage.property_area and examobs.visiable(self.object,digger) then
-			examobs.lookat(self,digger)
-			self.fight = digger
+		if self.type == "npc" and self.storage.property_area and vector.distance(pos,self.storage.property_area_pos) <= self.storage.property_area and examobs.visiable(self.object,ob) then
+			examobs.lookat(self,ob)
+			self.fight = ob
 			examobs.on_expression(self,"breakarea")
 		end
+	end
+end
+
+minetest.register_on_player_receive_fields(function(player, form, pressed)
+	if form == "default.chest" then
+		examobs.break_in_area(player:get_pos(),player)
 	end
 end)
