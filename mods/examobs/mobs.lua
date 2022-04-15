@@ -2621,6 +2621,159 @@ examobs.register_fish({
 		self.object:set_properties({visual_size= {x=s,y=s,z=s}})
 	end
 })
+
+examobs.register_fish({
+	description = "The monster fish",
+	name = "shark",
+	team = "shark",
+	coin = 10,
+	type = "monster",
+	hp = 50,
+	dmg = 5,
+	mesh = "examobs_shark.b3d",
+	lay_on_death = 1,
+	textures = {"examobs_shark1.png"},
+	inv={["examobs:flesh"]=5,["examobs:tooth"]=8},
+	walk_speed=2,
+	run_speed=5,
+	reach=4,
+	animation = {
+		stand = {x=0,y=10,speed=0},
+		walk = {x=20,y=38,speed=20},
+		run = {x=40,y=48,speed=20},
+		lay = {x=65,y=66,speed=0},
+		attack = {x=55,y=60,speed=30},
+	},
+	aggressivity = 2,
+	spawn_chance = 500,
+	on_spawn=function(self)
+		self.storage.size = math.random(1,7)
+		self.storage.c = math.random(1,3)
+		self:on_load()
+	end,
+	on_load=function(self)
+		examobs.anim(self,"walk")
+		local s = self.storage.size or 1
+		local c = self.storage.c or 1
+		self.object:set_properties({
+			visual_size = {x=s,y=s,z=s},
+			textures = {"examobs_shark"..c..".png"},
+			collisionbox = {-0.5*(s/2),-0.2*(s/2),-0.5*(s/2),0.5*(s/2),0.5*(s/2),0.5*(s/2)},
+		})
+		self.reach = 1 + s
+		self.dmg = 5 + s
+	end,
+	before_punching=function(self)
+		local en = self.fight:get_luaentity()
+		if en and examobs.gethp(self.fight)-self.dmg <= 0 and en.inv then
+			for i,v in pairs(en.inv) do
+				if minetest.get_item_group(i,"meat") > 0 then
+					self:eat_item(i.." "..v)
+				else
+					self.inv[i] = (self.inv[i] or 0) + v
+				end
+				en.inv[i]=nil
+			end
+			local c = self.object:get_properties().collisionbox
+			local es = math.max(math.abs(c[1])+math.abs(c[4]),math.abs(c[2])+math.abs(c[5]),math.abs(c[3])+math.abs(c[6]))
+			if es < self.storage.size+0.5 then
+				self.fight:remove()
+			end
+			
+		end
+	end,
+	on_fly=function(self,x,y,z)
+		if self.fight then
+			examobs.anim(self,"run")
+		end
+	end,
+})
+
+examobs.register_fish({
+	description = "The lava shark",
+	name = "lavashark",
+	team = "shark",
+	coin = 10,
+	type = "monster",
+	hp = 150,
+	dmg = 10,
+	mesh = "examobs_shark.b3d",
+	lay_on_death = 1,
+	textures = {"examobs_sharklava.png"},
+	hurt_outside = 0,
+	inv={["default:obsidian"]=1,["default:cooledlava"]=2,["examobs:tooth"]=1,["default:diamond"]=3},
+	walk_speed=2,
+	run_speed=5,
+	reach=4,
+	floating_in_group = "lava",
+	spawn_on = {"default:lava_source"},
+	spawn_in = "default:lava_source",
+	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:permanent_flame"]=1},
+	animation = {
+		stand = {x=0,y=10,speed=0},
+		walk = {x=20,y=38,speed=20},
+		run = {x=40,y=48,speed=20},
+		lay = {x=65,y=66,speed=0},
+		attack = {x=55,y=60,speed=30},
+	},
+	aggressivity = 2,
+	spawn_chance = 500,
+	on_spawn=function(self)
+		self.storage.size = math.random(3,7)
+		self:on_load()
+	end,
+	on_load=function(self)
+		examobs.anim(self,"walk")
+		local s = self.storage.size or 1
+		self.object:set_properties({
+			visual_size = {x=s,y=s,z=s},
+			collisionbox = {-0.5*(s/2),-0.2*(s/2),-0.5*(s/2),0.5*(s/2),0.5*(s/2),0.5*(s/2)},
+		})
+		self.reach = 1 + s
+		self.dmg = 10 + s
+	end,
+	before_punching=function(self)
+		local en = self.fight:get_luaentity()
+		if en and examobs.gethp(self.fight)-self.dmg <= 0 and en.inv then
+			for i,v in pairs(en.inv) do
+				if minetest.get_item_group(i,"meat") > 0 then
+					self:eat_item(i.." "..v)
+				else
+					self.inv[i] = (self.inv[i] or 0) + v
+				end
+				en.inv[i]=nil
+			end
+			local c = self.object:get_properties().collisionbox
+			local es = math.max(math.abs(c[1])+math.abs(c[4]),math.abs(c[2])+math.abs(c[5]),math.abs(c[3])+math.abs(c[6]))
+			if es < self.storage.size+0.5 then
+				self.fight:remove()
+			end
+		end
+	end,
+	on_fly=function(self,x,y,z)
+		if self.fight then
+			examobs.anim(self,"run")
+		end
+	end,
+	step=function(self,dtime)
+		local p = self:pos()
+		if minetest.get_item_group(minetest.get_node(p).name,"cools_lava") > 0 then
+			if minetest.is_protected(p, "") then
+				self:hurt(50)
+			else
+				minetest.add_node(p,{name="default:obsidian"})
+				examobs.dropall(self)
+				self.object:remove()
+				return self
+			end
+		elseif not minetest.is_protected(p, "") then
+			minetest.add_node(p,{name="fire:basic_flame"})
+		end
+	end,
+
+
+})
+
 examobs.register_fish({
 	description = "A monster some is calling fish",
 	name = "pike",

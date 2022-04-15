@@ -135,57 +135,55 @@ end
 
 examobs.register_fish=function(def)
 	def = def or {}
-	local def2 = {}
-	def2.name = def.name or "fish"
+	def.name = def.name or "fish"
 
-	local mobname = minetest.get_current_modname() ..":" .. def2.name
+	local mobname = minetest.get_current_modname() ..":" .. def.name
+	local step = def.step or function() end
+	local is_food = def.is_food or function() end
+	local on_click = def.on_click or function() end
 
-	def2.makes_footstep_sound = false
-	def2.textures = def.textures or {"examobs_fish.png"}
-	def2.mesh = def.mesh or "examobs_fish.obj"
-	def2.type = def.type or "animal"
-	def2.team = def.team or "fish"
-	def2.dmg = def.dmg or 1
-	def2.hp = def.hp or 2
-	def2.aggressivity = def.aggressivity or -2
-	def2.inv = def.inv
-	def2.walk_speed = def.run_speed or 2
-	def2.run_speed = def.run_speed or 3
-	def2.animation = def.animation
-	def2.collisionbox = def.collisionbox or {-0.4,-0.4,-0.4,0.4,0.4,0.4}
-	def2.spawn_on = def.spawn_on or {"group:water"}
-	def2.spawn_in = def.spawn_in or "group:water"
-	def2.floating = def.floating
-	def2.floating_in_group = def.floating_in_group or "water"
-	def2.light_min = def.light_min or 5
-	def2.breathing = 0
-	def2.hurt_outside = def.hurt_outside or 1
-
-	def2.lay_on_death = def.lay_on_death or 0
-	def2.inv = def.inv or {[mobname]=1}
+	def.makes_footstep_sound = false
+	def.textures = def.textures or {"examobs_fish.png"}
+	def.mesh = def.mesh or "examobs_fish.obj"
+	def.type = def.type or "animal"
+	def.team = def.team or "fish"
+	def.dmg = def.dmg or 1
+	def.hp = def.hp or 2
+	def.aggressivity = def.aggressivity or -2
+	def.walk_speed = def.run_speed or 2
+	def.run_speed = def.run_speed or 3
+	def.collisionbox = def.collisionbox or {-0.4,-0.4,-0.4,0.4,0.4,0.4}
+	def.spawn_on = def.spawn_on or {"group:water"}
+	def.spawn_in = def.spawn_in or "group:water"
+	def.floating_in_group = def.floating_in_group or "water"
+	def.light_min = def.light_min or 5
+	def.breathing = 0
+	def.hurt_outside = def.hurt_outside or 1
+	def.lay_on_death = def.lay_on_death or 0
+	def.inv = def.inv or {[mobname]=1}
 	def.is_food = def.is_food or function() end
 	def.on_click = def.on_click or function() end
-	def.step = def.step or function() end
 
-	def2.is_food=function(self,item)
-		return def.is_food(self)
+	def.is_food=function(self,item)
+		return is_food(self)
 	end
-	def2.on_click=function(self,clicker)
-		if def.on_click(self) then return end
-		if clicker:is_player() then
+	def.on_click=function(self,clicker)
+		if on_click(self) then
+			return
+		elseif clicker:is_player() then
 			self.flee = clicker
 			examobs.known(self,clicker,"flee")
 		end
 	end
-	def2.step=function(self)
-		if def.step(self) then
+	def.step=function(self)
+		if step(self) then
 			return self
-		elseif def2.hurt_outside == 1 and minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
+		elseif def.hurt_outside == 1 and minetest.get_item_group(minetest.get_node(self:pos()).name,"water") == 0 and walkable(apos(self:pos(),0,-1)) then
 			self:hurt(1)
 			examobs.stand(self)
 		elseif self.hurt_outside == 1 and self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then
 			self.fight = nil
-		elseif not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
+		elseif lay_on_death == 0 and not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
@@ -227,28 +225,25 @@ examobs.register_fish=function(def)
 		end
 	end
 
-	for i,v in pairs(def) do
-		if not def2[i] then
-			def2[i]=v
-		end
-	end
-	examobs.register_mob(def2)
+	examobs.register_mob(def)
 
-	minetest.register_node(mobname, {
-		description = "Dead " .. def2.name,
-		wield_scale = {x=0.3,y=0.3,z=0.3},
-		visual_scale=0.1,
-		selection_box = {
-			type = "fixed",
-			fixed = {-0.2,-0.2,-0.2,0.2,0.2,0.2}
-		},
-		drawtype = "mesh",
-		mesh = "examobs_fish.obj",
-		tiles=def2.textures,
-		paramtype ="light",
-		paramtype2 ="facedir",
-		groups = {dig_immediate = 3,eatable=1,meat=1,fish=1},
-		sounds = default.node_sound_defaults(),
-		walkable = false,
-	})
+	if lay_on_death == 0 then
+		minetest.register_node(mobname, {
+			description = "Dead " .. def.name,
+			wield_scale = {x=0.3,y=0.3,z=0.3},
+			visual_scale=0.1,
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.2,-0.2,-0.2,0.2,0.2,0.2}
+			},
+			drawtype = "mesh",
+			mesh = def.mesh,
+			tiles=def.textures,
+			paramtype ="light",
+			paramtype2 ="facedir",
+			groups = {dig_immediate = 3,eatable=1,meat=1,fish=1},
+			sounds = default.node_sound_defaults(),
+			walkable = false,
+		})
+	end
 end
