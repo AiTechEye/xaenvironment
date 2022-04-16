@@ -183,7 +183,7 @@ examobs.register_fish=function(def)
 			examobs.stand(self)
 		elseif self.hurt_outside == 1 and self.fight and self.fight:get_pos() and minetest.get_node(self.fight:get_pos()).name == "air" then
 			self.fight = nil
-		elseif lay_on_death == 0 and not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
+		elseif def.lay_on_death == 0 and not (self.target or self.fight or self.flee) and math.random(1,5) == 1 then
 			for _, ob in pairs(minetest.get_objects_inside_radius(self:pos(), self.range)) do
 				local en = ob:get_luaentity()
 				local p = ob:get_pos()
