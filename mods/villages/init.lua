@@ -412,3 +412,169 @@ minetest.register_ore({
 	y_max= 50,
 	noise_params = default.ore_noise_params()
 })
+
+minetest.register_node("villages:trader", {
+	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
+	pointable=false,
+	paramtype = "light",
+	drawtype="airlike",
+	drop="",
+	walkable=false,
+	floodable = true,
+	sunlight_propagates = true,
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(3)
+	end,
+	on_timer = function (pos, elapsed)
+		local npc
+		local item
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos,10)) do
+			local en = ob:get_luaentity()
+			if en and en.examob and en.type == "npc" then
+				npc = true
+			elseif en and en.traderitem and vector.distance(ob:get_pos(),pos) <= 0.3 then
+				item = ob
+			end
+			if npc and item then
+				break
+			end
+		end
+
+		if minetest.get_meta(pos):get_string("item1") == "" then
+			minetest.registered_nodes["villages:trader"].newitem(pos)
+		end
+
+		if not npc then
+			if item then
+				item:remove()
+			end
+		elseif not item then
+			minetest.registered_nodes["villages:trader"].spawnitem(pos)
+		end
+		return true
+	end,
+	on_load=function(pos)
+		if math.random(1,5) == 1 or minetest.get_meta(pos):get_string("item1") == "" then
+			minetest.get_node_timer(pos):start(3)
+			minetest.registered_nodes["villages:trader"].newitem(pos)
+			minetest.registered_nodes["villages:trader"].spawnitem(pos)
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,0.3)) do
+				local en = ob:get_luaentity()
+				if en and en.traderitem then
+					ob:remove()
+				end
+			end
+		end
+	end,
+	spawnitem=function(pos)
+		local e = minetest.add_entity(pos,"villages:traderitem"):get_luaentity()
+		e.index = minetest.get_meta(pos):get_int("index")
+		e:on_rightclick()
+	end,
+	newitem=function(pos)
+		local items = {}
+		local m = minetest.get_meta(pos)
+		for i,v in pairs(minetest.registered_items) do
+			if minetest.get_item_group(i,"store") > 1 then
+				table.insert(items,i)
+			end
+		end
+		for i=1,10 do
+			local item = items[math.random(1,#items)]
+			local cost = minetest.get_item_group(item,"store")
+			m:set_string("item"..i,item)
+			m:set_int("index",1)
+			m:set_int("count"..i,math.random(1,10))
+			m:set_int("cost"..i,cost+math.floor(math.random(cost*0.1,cost*2)))
+		end
+	end,
+})
+
+minetest.register_entity("villages:traderitem",{
+	hp_max = 1000,
+	physical = false,
+	collisionbox = {-0.3,-0.3,-0.3,0.3,0.3,0.3},
+	visual = "wielditem",
+	visual_size = {x=0.3,y=0.3},
+	textures = {"default:stick"},
+	decoration=true,
+	traderitem=true,
+	static_save = false,
+	automatic_rotate = math.pi/4,
+	timer = 0,
+	on_step=function(self, dtime)
+		self.timer = self.timer -dtime
+		if self.timer < 0 then
+			self.timer = 1
+			if minetest.get_node(self.object:get_pos()).name ~= "villages:trader" then
+				self.object:remove()
+			end
+		end
+	end,
+	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
+		self.object:set_hp(1000)
+		if puncher:is_player() then
+			local m = puncher:get_meta()
+			local inv = puncher:get_inventory()
+			local c = m:get_int("coins")
+			local pos = self.object:get_pos()
+			local m2 = minetest.get_meta(pos)
+			if c >= self.cost and inv:room_for_item("main",self.item) then
+				inv:add_item("main",self.item)
+				m:set_int("coins",c-self.cost)
+				local ic = m2:get_int("count"..self.index)-1
+				m2:set_int("count"..self.index,ic)
+				self.update = true
+				self.on_rightclick(self)
+			end
+		end
+	end,
+	on_rightclick=function(self)
+		local pos = self.object:get_pos()
+		local items = {}
+		local m = minetest.get_meta(pos)
+		local set
+
+		if self.update == nil or m:get_int("count"..self.index) <= 0 then
+			for i = self.index+1,10 do
+				if m:get_int("count"..i) > 0 then
+					self.index = i
+					set = true
+					break
+				end
+			end
+			if not set then
+				for i = 1,self.index do
+					if m:get_int("count"..i) > 0 then
+						self.index = i
+						set = true
+						break
+					end
+				end
+				if not set then
+					minetest.registered_nodes["villages:trader"].newitem(pos)
+					minetest.registered_nodes["villages:trader"].spawnitem(pos)
+					self.object:remove()
+					return
+				end
+			end
+			m:set_int("index",self.index)
+		end
+		self.update = nil
+		self.item = m:get_string("item"..self.index)
+		self.cost = m:get_int("cost"..self.index)
+		local def = minetest.registered_items[self.item]
+
+		if not def then
+			minetest.registered_nodes["villages:trader"].newitem(pos)
+			minetest.registered_nodes["villages:trader"].spawnitem(pos)
+			self.object:remove()
+			return
+		end
+
+		self.object:set_properties(
+			{textures={self.item},
+			infotext=(def.description or def.name) .. "\nCost: "..self.cost.."\n"..m:get_int("count"..self.index).." left\n"..self.index.."/10\n\nRight click to change"
+		})
+	end,
+})
