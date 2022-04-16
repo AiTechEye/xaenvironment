@@ -62,7 +62,7 @@ bows.register_arrow("arrow",{
 	texture="toxic_bottle.png",
 	damage=1100,
 	craft_count=4,
-	groups =  {store=400,tressure=3},
+	groups =  {store=400,treasure=3},
 	craft={{"group:tip","group:stick","toxic:bottle"}},
 	on_hit_object=function(self,target,hp,user,lastpos)
 		bows.arrow_remove(self)
