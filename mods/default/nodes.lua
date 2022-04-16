@@ -129,7 +129,7 @@ default.register_stair("default:cloud")
 minetest.register_node("default:cloud_thick", {
 	description = "Thick cloud",
 	tiles={"default_cloud.png"},
-	groups = {cracky=1,level=2,treasure=2,cloud=1},
+	groups = {cracky=1,level=2,treasure=2,cloud=1,store=1000},
 	light_source = 13,
 	post_effect_color = {a = 220, r = 255, g = 255, b = 255},
 	drowning = 1,
@@ -1497,7 +1497,7 @@ for i=1,8 do
 minetest.register_node("default:oddstone"..i, {
 	description = "Odd Stone",
 	tiles={"default_oddstone"..i..".png"},
-	groups = {stone=1,cracky=3,treasure=1},
+	groups = {stone=1,cracky=3,treasure=1,store=100},
 	sounds = default.node_sound_stone_defaults(),
 })
 
