@@ -2201,19 +2201,37 @@ minetest.register_node("exatec:trader", {
 	on_construct = function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 1)
+		m:get_inventory():set_size("output", 1)
+		m:set_int("tocoins",1)
+		minetest.registered_nodes["exatec:trader"].setform(pos)
+	end,
+	setform = function(pos)
+		local m = minetest.get_meta(pos)
+		local coins = m:get_int("tocoins") == 0 and 1 or 0
+		m:set_int("tocoins",coins)
+
 		m:set_string("formspec",
-			"size[8,5]" ..
-			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;3.5,0;8,4;]" ..
-			"list[current_player;main;0,1.2;8,4;]" ..
-			"listring[current_player;main]" ..
-			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+			"size[8,5]"
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			 .."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;3,0;8,4;]"
+
+			..(coins == 1 and "item_image[4,0;1,1;player_style:coin]"
+			.."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";output;4,0;8,4;]" or "")
+
+			 .."list[current_player;main;0,1.2;8,4;]"
+			 .."listring[current_player;main]"
+			 .."listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
 			.."listring[current_player;main]"
 			.."tooltip[showstore;Open store]"
 			.."image_button[0,0;1,1;player_style_coin.png;showstore;]"
+			.."button[1,0;2,1;coin;"..(coins == 1 and "Get coins" or "Earn").."]"
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		return minetest.registered_nodes["exatec:trader"].can_trade(pos,stack) and stack:get_count() or 0
+		return listname == "main" and minetest.registered_nodes["exatec:trader"].can_trade(pos,stack) and stack:get_count() or 0
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		return 0
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
@@ -2226,6 +2244,14 @@ minetest.register_node("exatec:trader", {
 				t = stack:get_count()
 			end
 
+			if m:get_int("tocoins") == 1 then
+				local ss = m:get_inventory():add_item("output",ItemStack("player_style:coin "..t))
+				m:get_inventory():set_stack("main",1,nil)
+				if ss:get_count() == 0 then
+					minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+					return
+				end
+			end
 			if p then
 				local c = m:get_int("coins")
 				if c > 0 then
@@ -2247,9 +2273,12 @@ minetest.register_node("exatec:trader", {
 		minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
 	end,
 	on_destruct=function(pos)
-		local at = minetest.get_meta(pos):get_int("coins")
-		if at > 0 then
-			minetest.add_item(pos,ItemStack("player_style:coin "..at))
+		local m = minetest.get_meta(pos)
+		if m:get_int("coins") > 0 then
+			minetest.add_item(pos,ItemStack("player_style:coin "..m:get_int("coins")))
+		end
+		if m:get_inventory():is_empty("output") == false then
+			minetest.add_item(pos,m:get_inventory():get_stack("output",1))
 		end
 	end,
 	can_trade=function(pos,item)
@@ -2261,6 +2290,9 @@ minetest.register_node("exatec:trader", {
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.showstore then
 			player_style.store(sender)
+		elseif pressed.coin then
+			minetest.registered_nodes["exatec:trader"].setform(pos)
+
 		end
 	end,
 	exatec={
