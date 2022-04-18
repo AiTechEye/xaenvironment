@@ -47,6 +47,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "exatec:group_dir_filter",
+	recipe={
+		{"","materials:diode",""},
+		{"","exatec:tube",""},
+		{"","default:ruby",""},
+	}
+})
+
+minetest.register_craft({
 	output="exatec:tube_teleport",
 	recipe={
 		{"","materials:diode",""},

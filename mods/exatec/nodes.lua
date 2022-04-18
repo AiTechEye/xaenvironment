@@ -423,6 +423,125 @@ minetest.register_node("exatec:cookable_dir_filter", {
 	}
 })
 
+minetest.register_node("exatec:group_dir_filter", {
+	description = "Group filter direction tube",
+	tiles = {
+		"exatec_glass.png^[colorize:#ff0000cc^default_crafting_arrowup.png",
+		"exatec_glass.png^[colorize:#ff0000cc",
+		"exatec_glass.png^[colorize:#ff0000cc",
+		"exatec_glass.png^[colorize:#ff0000cc",
+		"exatec_glass.png^[colorize:#ff0000cc",
+		"exatec_glass.png^[colorize:#ff0000cc",
+	},
+	use_texture_alpha = "clip",
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,store=600},
+	paramtype2 = "facedir",
+	node_box = {
+		type = "connected",
+		connect_left={-0.5, -0.25, -0.25, 0.25, 0.25, 0.25},
+		connect_right={-0.25, -0.25, -0.25, 0.5, 0.25, 0.25},
+		connect_front={-0.25, -0.25, -0.5, 0.25, 0.25, 0.25},
+		connect_back={-0.25, -0.25, -0.25, 0.25, 0.25, 0.5},
+		connect_bottom={-0.25, -0.5, -0.25, 0.25, 0.25, 0.25},
+		connect_top={-0.25, -0.25, -0.25, 0.25, 0.5, 0.25},
+		fixed = {-0.25, -0.25, -0.25, 0.25, 0.25, 0.25},
+	},
+	connects_to={"group:exatec_tube","group:exatec_tube_connected"},
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("item", 1)
+		minetest.registered_items["exatec:group_dir_filter"].setform(pos)
+	end,
+	setform = function(pos)
+		local m = minetest.get_meta(pos)
+		local stack = m:get_inventory():get_stack("item",1)
+		local def = minetest.registered_items[stack:get_name()]
+		local c = ""
+		local g = ""
+		if stack:get_name() ~= "" then
+			for i,v in pairs(def.groups) do
+				g = g .. c..i
+				c = ","
+			end
+		end
+		m:set_string("formspec",
+			"size[8,5]"
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."dropdown[1,0;7,1;group;"..g..";"..m:get_int("index").."]"
+			.."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";item;0,0;1,1;]"
+			.."list[current_player;main;0,1;8,4;]" 
+		)
+	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_stack("item",1,nil)
+		m:set_int("index",0)
+		m:set_string("group","")
+		minetest.registered_items["exatec:group_dir_filter"].setform(pos)
+		return 0
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local def = minetest.registered_items[stack:get_name()]
+			if def and def.groups then
+				stack:set_count(1)
+				minetest.get_meta(pos):get_inventory():set_stack("item",1,stack)
+				minetest.registered_items["exatec:group_dir_filter"].setform(pos)
+			end
+		end
+		return 0
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.group then
+			local m = minetest.get_meta(pos)
+			local def = minetest.registered_items[m:get_inventory():get_stack("item",1):get_name()]
+			local x = 0
+			m:set_string("group",pressed.group)
+			for i,v in pairs(def.groups) do
+				x = x + 1
+				if i == pressed.group then
+					m:set_int("index",x)
+					minetest.registered_items["exatec:group_dir_filter"].setform(pos)
+					return
+				end
+			end
+		end
+	end,
+	exatec={
+		test_input=function(pos,stack,opos)
+			local m = minetest.get_meta(pos)
+			return m:get_string("group") ~= "" and minetest.get_item_group(stack:get_name(),m:get_string("group")) > 0
+		end,
+		on_input=function(pos,stack,opos)
+			local m = minetest.get_meta(pos)
+			if m:get_string("group") ~= "" and minetest.get_item_group(stack:get_name(),m:get_string("group")) > 0 then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				local ob = minetest.add_entity(pos,"exatec:tubeitem")
+				local en = ob:get_luaentity()
+				en:new_item(stack,opos)
+				en.storage.dir = d
+				ob:set_velocity(d)
+			else
+				minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+			end
+		end,
+		on_tube = function(pos,stack,opos,ob)
+			local m = minetest.get_meta(pos)
+			if m:get_string("group") ~= "" and minetest.get_item_group(stack:get_name(),m:get_string("group")) > 0 then
+				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				if exatec.test_input(apos(pos,d.x,d.y,d.z),stack,pos) then
+					ob:get_luaentity().storage.dir = d
+					ob:set_velocity(d)
+					ob:set_pos(pos)
+				end
+			end
+		end
+	}
+})
+
 minetest.register_node("exatec:tube_filter", {
 	description = "Filter tube",
 	tiles = {
@@ -792,6 +911,21 @@ minetest.register_node("exatec:extraction", {
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
 	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1,store=200},
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_string("formspec",
+			"size[2,1]"
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."button[0,0;2,1;stack;"..(m:get_int("stack") == 0 and "Single" or "Full").."]"
+		)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if pressed.stack then
+			local m = minetest.get_meta(pos)
+			m:set_int("stack",m:get_int("stack") == 0 and 1 or 0)
+			minetest.registered_nodes["exatec:extraction"].on_construct(pos)
+		end
+	end,
 	exatec={
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -800,9 +934,10 @@ minetest.register_node("exatec:extraction", {
 			if b1.output_list then
 				local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 				local f1 = exatec.def(f)
+				local st = minetest.get_meta(pos):get_int("stack")
 				for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
 					if v:get_name() ~= "" then
-						local stack = ItemStack(v:get_name() .." " .. 1)
+						local stack = ItemStack(v:get_name() .." " .. (st == 0 and 1 or v:get_count()))
 						if exatec.test_input(f,stack,pos,pos) and exatec.test_output(b,stack,pos,pos) then
 							exatec.input(f,stack,pos,pos)
 							exatec.output(b,stack,pos,pos)
@@ -2292,14 +2427,14 @@ minetest.register_node("exatec:trader", {
 			player_style.store(sender)
 		elseif pressed.coin then
 			minetest.registered_nodes["exatec:trader"].setform(pos)
-
 		end
 	end,
 	exatec={
 		input_list="main",
+		output_list="output",
 		test_input=function(pos,stack,opos)
 			return minetest.registered_nodes["exatec:trader"].can_trade(pos,stack)
-		end
+		end,
 	}
 })
 
