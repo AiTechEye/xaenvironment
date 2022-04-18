@@ -803,7 +803,7 @@ minetest.register_node("default:recycling_mill", {
 		output_list="output",
 		test_input=function(pos,stack)
 			local inv = minetest.get_meta(pos):get_inventory()
-			return inv:is_empty("input") and inv:is_empty("output") and minetest.registered_nodes["default:recycling_mill"].allow_metadata_inventory_put(pos, "input", 1, stack,stack) == 1
+			return stack:get_count() == 1 and inv:is_empty("input") and inv:is_empty("output") and minetest.registered_nodes["default:recycling_mill"].allow_metadata_inventory_put(pos, "input", 1, stack,stack) == 1
 		end,
 	},
 })
