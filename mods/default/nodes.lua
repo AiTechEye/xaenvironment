@@ -1485,12 +1485,12 @@ local qblock = function(def)
 	})
 end
 
-qblock({color="FF0000",store=2000,description="No hunger"})
-qblock({color="1c7800",store=5000,description="Fly as a bird"})
-qblock({color="e29f00",store=3000,description="Fire resistance"})
-qblock({color="800080",store=5000,description="Immortal"})
-qblock({color="0000FF",store=2000,description="No water drowning"})
-qblock({color="FFFFFF",store=1000,description="Light in darkness"})
+qblock({color="FF0000",store=20000,description="No hunger"})
+qblock({color="1c7800",store=50000,description="Fly as a bird"})
+qblock({color="e29f00",store=30000,description="Fire resistance"})
+qblock({color="800080",store=50000,description="Immortal"})
+qblock({color="0000FF",store=20000,description="No water drowning"})
+qblock({color="FFFFFF",store=10000,description="Light in darkness"})
 
 
 for i=1,8 do
