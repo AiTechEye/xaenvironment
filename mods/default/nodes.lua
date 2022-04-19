@@ -182,7 +182,7 @@ minetest.register_node("default:carpet", {
 minetest.register_node("default:quantumblock", {
 	description = "Quantum block",
 	tiles={"default_quantumblock.png"},
-	groups = {cracky=1,level=2,treasure=3,store=3000},
+	groups = {cracky=1,level=2,treasure=3,store=30000},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 13
