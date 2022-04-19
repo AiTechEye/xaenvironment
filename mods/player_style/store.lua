@@ -58,7 +58,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						local s = i:sub(9,-1)
 						if inv:contains_item("main",s) then
 							inv:remove_item("main",ItemStack(s.." 1"))
-							m:set_int("coins",m:get_int("coins")+math.floor(player_style.store_items_cost[t]*0.01))
+							m:set_int("coins",m:get_int("coins")+math.floor(player_style.store_items_cost[t]*0.1))
 							player_style.store(player)
 							minetest.sound_play("default_coins", {to_player=name, gain = 2})
 							break
@@ -119,7 +119,7 @@ player_style.store=function(player)
 		if it then
 			local s
 			if store.sell then
-				local ss = player_style.store_items_cost[it]*0.01
+				local ss = player_style.store_items_cost[it]*0.1
 				if ss >= 1 then
 					s = math.floor(ss)
 				end
