@@ -49,16 +49,32 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				player_style.store(player)
 				return
 			end
-			if store.sell then
+			if pressed.cancel then
+				player_style.store(player)
+			elseif store.sell then
 				for i,v in pairs(pressed) do
-					if i:sub(1,8) == "itembut_" then
+					local b = i:sub(1,8)
+					if b == "itembut_" or b == "confirm_" then
 						local t = i:sub(9,-1)
 						local m = player:get_meta()
 						local inv = player:get_inventory()
 						local s = i:sub(9,-1)
+						local c = math.floor(player_style.store_items_cost[t]*0.1)
 						if inv:contains_item("main",s) then
+
+							if b ~= "confirm_" and c >= 1000 then
+								minetest.after(0.2, function(name,t)
+									return minetest.show_formspec(name, "store",
+									"size[3,2]" 
+									.."listcolors[#77777777;#777777aa;#000000ff]"
+									.."label[0,0;Sell item?\n(Worth: "..c..")]"
+									.."button[0,1;1.5,1;confirm_"..t..";Sell]button[1.5,1;1.5,1;cancel;Cancel]"
+									)end,name,t)
+								return
+							end
+
 							inv:remove_item("main",ItemStack(s.." 1"))
-							m:set_int("coins",m:get_int("coins")+math.floor(player_style.store_items_cost[t]*0.1))
+							m:set_int("coins",m:get_int("coins")+c)
 							player_style.store(player)
 							minetest.sound_play("default_coins", {to_player=name, gain = 2})
 							break
@@ -67,13 +83,27 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				end
 			else
 				for i,v in pairs(pressed) do
-					if i:sub(1,8) == "itembut_" then
+					local b = i:sub(1,8)
+					if b == "itembut_" or b == "confirm_" then
 						local t = i:sub(9,-1)
 						local m = player:get_meta()
 						local inv = player:get_inventory()
-						if m:get_int("coins") >= player_style.store_items_cost[t] and inv:room_for_item("main",t) then
+						local c = player_style.store_items_cost[t]
+						if m:get_int("coins") >= c and inv:room_for_item("main",t) then
+
+							if b ~= "confirm_" and player_style.store_items_cost[t] >= 1000 then
+								minetest.after(0.2, function(name,t)
+									return minetest.show_formspec(name, "store",
+									"size[3,2]" 
+									.."listcolors[#77777777;#777777aa;#000000ff]"
+									.."label[0,0;Confirm purchase?\n(Cost: "..c..")]"
+									.."button[0,1;1.5,1;confirm_"..t..";Buy]button[1.5,1;1.5,1;cancel;Cancel]"
+									)end,name,t)
+								return
+							end
+
 							inv:add_item("main",t.." 1")
-							m:set_int("coins",m:get_int("coins")-player_style.store_items_cost[t])
+							m:set_int("coins",m:get_int("coins")-c)
 							player_style.store(player)
 							break
 						end
@@ -128,7 +158,8 @@ player_style.store=function(player)
 			end
 
 			if s then
-				itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";\n"..s.."]"
+				local def = minetest.registered_items[it]
+				itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";]tooltip[itembut_"..it..";"..(def and def.description or it).."\n"..(store.sell and "Worth " or "Cost ")..s.."]"
 				x = x + 0.8
 				if x >= 6 then
 					y = y + 0.8
