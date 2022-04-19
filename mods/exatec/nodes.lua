@@ -2370,7 +2370,7 @@ minetest.register_node("exatec:trader", {
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
-		local t = math.floor(player_style.store_items_cost[stack:get_name()]*0.01) * stack:get_count()
+		local t = math.floor(player_style.store_items_cost[stack:get_name()]*0.1) * stack:get_count()
 		local o = m:get_string("owner")
 		if o ~= "" then
 			local p = minetest.get_player_by_name(o)
@@ -2420,7 +2420,7 @@ minetest.register_node("exatec:trader", {
 		player_style.open_store()
 		local it = item:get_name()
 		local i = player_style.store_items_cost[it]
-		return (i ~= nil and i*0.01 >= 1 or it == "player_style:coin")
+		return (i ~= nil and i*0.1 >= 1 or it == "player_style:coin")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if pressed.showstore then
