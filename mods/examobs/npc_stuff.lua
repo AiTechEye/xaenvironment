@@ -299,7 +299,7 @@ end)
 examobs.break_in_area=function(pos,ob)
 	for i,v in pairs(examobs.active.ref) do
 		local self = v:get_luaentity()
-		if self.type == "npc" and self.storage.property_area and vector.distance(pos,self.storage.property_area_pos) <= self.storage.property_area and examobs.visiable(self.object,ob) then
+		if self and self.type == "npc" and self.storage.property_area and vector.distance(pos,self.storage.property_area_pos) <= self.storage.property_area and examobs.visiable(self.object,ob) then
 			examobs.lookat(self,ob)
 			self.fight = ob
 			examobs.on_expression(self,"breakarea")
