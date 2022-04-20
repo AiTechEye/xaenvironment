@@ -911,33 +911,42 @@ minetest.register_node("exatec:extraction", {
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
 	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_tube=1,exatec_wire_connected=1,store=200},
-	on_construct = function(pos)
-		local m = minetest.get_meta(pos)
-		m:set_string("formspec",
-			"size[2,1]"
-			.."listcolors[#77777777;#777777aa;#000000ff]"
-			.."button[0,0;2,1;stack;"..(m:get_int("stack") == 0 and "Single" or "Full").."]"
-		)
-	end,
-	on_receive_fields=function(pos, formname, pressed, sender)
-		if pressed.stack then
-			local m = minetest.get_meta(pos)
-			m:set_int("stack",m:get_int("stack") == 0 and 1 or 0)
-			minetest.registered_nodes["exatec:extraction"].on_construct(pos)
-		end
-	end,
+
+	--logical problems
+	--on_construct = function(pos)
+	--	local m = minetest.get_meta(pos)
+	--	m:set_string("formspec",
+	--		"size[2,1]"
+	--		.."listcolors[#77777777;#777777aa;#000000ff]"
+	--		.."button[0,0;2,1;stack;"..(m:get_int("stack") == 0 and "Single" or "Full").."]"
+	--	)
+	--end,
+	--on_receive_fields=function(pos, formname, pressed, sender)
+	--	if pressed.stack then
+	--		local m = minetest.get_meta(pos)
+	--		m:set_int("stack",m:get_int("stack") == 0 and 1 or 0)
+	--		minetest.registered_nodes["exatec:extraction"].on_construct(pos)
+	--	end
+	--end,
 	exatec={
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
 			local b1 = exatec.def(b)
 			if b1.output_list then
+
+			--	local st = minetest.get_meta(pos):get_int("stack")
+			--	if st == 1 then
+			--		st = 0
+			--		minetest.registered_nodes["exatec:extraction"].on_construct(pos)
+			--	end
+
 				local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 				local f1 = exatec.def(f)
-				local st = minetest.get_meta(pos):get_int("stack")
+				
 				for i,v in pairs(minetest.get_meta(b):get_inventory():get_list(b1.output_list)) do
 					if v:get_name() ~= "" then
-						local stack = ItemStack(v:get_name() .." " .. (st == 0 and 1 or v:get_count()))
+						local stack = ItemStack(v:get_name() .." 1") --.. (st == 0 and 1 or v:get_count()))
 						if exatec.test_input(f,stack,pos,pos) and exatec.test_output(b,stack,pos,pos) then
 							exatec.input(f,stack,pos,pos)
 							exatec.output(b,stack,pos,pos)
