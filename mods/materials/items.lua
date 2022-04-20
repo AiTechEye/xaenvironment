@@ -548,3 +548,16 @@ minetest.register_node("materials:granite_orb",{
 	sounds = default.node_sound_stone_defaults(),
 	mesh = "materials_orb.obj",
 })
+
+minetest.register_node("materials:pelletsblock",{
+	description = "Pellets block",
+	tiles = {"default_salt_water.png^[invert:rgb^plants_wheat_seed.png"},
+	groups = {wood=1,flammable = 3,choppy=3,dig_immediate = 3,treasure=1,store=100},
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_craftitem("materials:pellets", {
+	description = "Pellets",
+	inventory_image = "plants_wheat_seed.png",
+	groups = {flammable = 1},
+})
