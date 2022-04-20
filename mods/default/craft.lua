@@ -69,6 +69,14 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="default:pellets_mill",
+	recipe={
+		{"default:steel_ingot","materials:tube_metal","default:steel_ingot"},
+		{"default:iron_ingot","default:copper_ingot","materials:fanblade_metal"},
+		{"default:iron_ingot","materials:sawblade","default:iron_ingot"},
+	},
+})
 
 minetest.register_craft({
 	output="default:recycling_mill",

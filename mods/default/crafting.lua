@@ -692,7 +692,7 @@ local recycling_mill_items = {}
 minetest.register_node("default:recycling_mill", {
 	description = "Recycling mill",
 	tiles={"default_ironblock.png^synth_repeat.png"},
-	groups = {cracky=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,store=1000},
+	groups = {cracky=3,used_by_npc=1,exatec_tube_connected=1,store=10000},
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
@@ -806,4 +806,96 @@ minetest.register_node("default:recycling_mill", {
 			return stack:get_count() == 1 and inv:is_empty("input") and inv:is_empty("output") and minetest.registered_nodes["default:recycling_mill"].allow_metadata_inventory_put(pos, "input", 1, stack,stack) == 1
 		end,
 	},
+})
+
+minetest.register_node("default:pellets_mill", {
+	description = "Pellets mill",
+	tiles={"default_steelblock.png^fire_basic_flame.png^synth_repeat.png"},
+	groups = {cracky=3,used_by_npc=1,exatec_tube_connected=1,store=6000},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos, placer, itemstack)
+		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
+	end,
+	on_construct=function(pos)
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
+		inv:set_size("input", 1)
+		inv:set_size("output1", 1)
+		inv:set_size("output2", 1)
+		meta:set_string("formspec",
+			"size[8,5]" ..
+			"listcolors[#77777777;#777777aa;#000000ff]"..
+			"image[2,0;1,1;fire_basic_flame.png]" ..
+			"list[context;input;2,0;1,1;]" ..
+			"list[context;output1;3.5,0;3,3;]" ..
+			"list[context;output2;5,0;3,3;]" ..
+			"list[current_player;main;0,1.5;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[current_name;input]" ..
+			"listring[current_name;output2]" ..
+			"listring[current_player;main]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		if listname == "input" and minetest.get_item_group(stack:get_name(),"flammable") > 0 and stack:get_name() ~= "materials:pelletsblock" then
+			return stack:get_count()
+		end
+		return 0
+	end,
+	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+		return 0
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		minetest.get_node_timer(pos):start(0.01)
+	end,
+	on_metadata_inventory_put = function(pos, listname, index, stack, player,test)
+		minetest.get_node_timer(pos):start(0.01)
+	end,
+	on_timer = function(pos, elapsed)
+		local timer = false
+		local inv = minetest.get_meta(pos):get_inventory()
+		local stack1= inv:get_stack("input",1)
+
+		local c = minetest.get_item_group(stack1:get_name(),"wood") > 0 and 4 or minetest.get_item_group(stack1:get_name(),"tree") > 0 and 12 or 1
+		local pellets = ItemStack("materials:pellets "..c)
+		local pelletsblock = ItemStack("materials:pelletsblock")
+
+		if inv:is_empty("input") and inv:is_empty("output1") then	
+			return false
+		elseif stack1:get_count() >= 10 and inv:room_for_item("output1",ItemStack("materials:pellets "..(c*10))) then
+			inv:add_item("output1",ItemStack("materials:pellets "..(c*10)))
+			inv:set_stack("input",1,ItemStack(stack1:get_name() .. " "..stack1:get_count()-10))
+			timer = true
+		elseif stack1:get_count() >= 1 and inv:room_for_item("output1",pellets) then
+			inv:add_item("output1",pellets)
+			inv:set_stack("input",1,ItemStack(stack1:get_name() .. " "..stack1:get_count()-1))
+			timer = true
+		end
+
+		for i = 0,10 do
+			local stack2= inv:get_stack("output1",1)
+			if stack2:get_count() >= 9 and inv:room_for_item("output2",pelletsblock) then
+				inv:add_item("output2",pelletsblock)
+				inv:set_stack("output1",1,ItemStack(stack2:get_name() .. " "..stack2:get_count()-9))
+				timer = true
+			else
+				break
+			end
+		end
+		return timer 
+	end,
+	can_dig = function(pos, player)
+		local inv = minetest.get_meta(pos):get_inventory()
+		return inv:is_empty("input") and inv:is_empty("output1") and inv:is_empty("output2")
+	end,
+	exatec={
+		--input_max=10,
+		input_list="input",
+		output_list="output2",
+		test_input=function(pos,stack)
+			return minetest.get_item_group(stack:get_name(),"flammable") > 0 and stack:get_name() ~= "materials:pelletsblock" and minetest.get_meta(pos):get_inventory():room_for_item("input",stack) and stack:get_count() or false
+		end,
+	}
 })
