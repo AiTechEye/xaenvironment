@@ -1059,7 +1059,9 @@ minetest.register_node("exatec:counter", {
 			local c = meta:get_int("count")+1
 			local times = meta:get_int("times")
 			if c >= times then
-				exatec.send(pos,true)
+				minetest.after(0, function(pos)
+					exatec.send(pos,true)
+				end,pos)
 				c = 0
 			end
 			meta:set_int("count",c)
