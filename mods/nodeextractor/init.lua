@@ -1,5 +1,49 @@
 nodeextractor = {user={}}
 
+minetest.register_tool("nodeextractor:a", {
+	inventory_image = "default_stick.png^[colorize:#00b",
+	range=20,
+	groups={not_in_craftguide=1},
+	on_use=function(itemstack, user, pointed_thing)
+		local map = {}
+		if pointed_thing.above then
+			for z=-10,10 do
+			local fil = false
+			for x=-10,10 do
+				local p = apos(pointed_thing.above,x,0,z)
+				local node = "default:dirt"
+				local z1 = map[x..","..(z-1)]
+				local z2 = map[x..","..(z-2)]
+				local x0 = map[(x-1)..","..z]
+				local x1 = map[(x-1)..","..(z-1)]
+				local x2 = map[(x+1)..","..(z-1)]
+
+				if fil then
+					if z1 then
+						map[x..","..z] = true
+						node = "default:stone"
+					else
+						fil = false
+					end
+				elseif z == -10 then
+					if not x0 or math.random(1,2) == 1 then
+						map[x..","..z] = true
+						node = "default:stone"
+					end
+				elseif not (z1 and (z2 or math.random(1,2) == 1)) and (z1 or not (x1 or x2)) and (not x0 or math.random(1,2) == 1) then
+					map[x..","..z] = true
+					node = "default:stone"
+					if z1 then
+						fil = true
+					end
+				end
+				minetest.set_node(p,{name=node})
+			end
+			end
+		end
+	end,
+})
+
 minetest.register_on_leaveplayer(function(player)
 	nodeextractor.user[player:get_player_name()] = nil
 end)
@@ -35,9 +79,22 @@ nodeextractor.create=function(pos1,pos2,filename)
 		end
 		if fields == nil then
 			m1.fields = nil
+		else
+			for i,f in pairs(m1.fields) do
+				if type(f) == "string" then
+					m1.fields[i] = f:gsub("\n","´½`")
+				end
+			end
 		end
 		
 		m1.node = minetest.get_node(pos)
+
+		if m1.node.name == "air" or m1.node.param1 == 0 then
+			m1.node.param1 = nil
+		end
+		if m1.node.name == "air" or m1.node.param2 == 0 then
+			m1.node.param2 = nil
+		end
 
 		local t = minetest.get_node_timer(pos)
 		if t:is_started() then
@@ -64,7 +121,8 @@ nodeextractor.set=function(pos,filepath)
 	file:close()
 	pos = vector.round(pos)
 	local dat = minetest.deserialize(f)
-	minetest.emerge_area(pos,vector.add(pos,dat.size))
+
+	minetest.emerge_area(vector.add(pos,dat.size),vector.subtract(pos,dat.size))
 
 	for i,v in pairs(dat.nodes) do
 		local p = i.split(i,",")
@@ -73,6 +131,7 @@ nodeextractor.set=function(pos,filepath)
 
 		local meta = minetest.get_meta(pos2)
 		local m = minetest.deserialize(v)
+
 		if v.inventory then
 			for l,v1 in pairs(v.inventory) do
 				local stacks = {}
@@ -85,7 +144,7 @@ nodeextractor.set=function(pos,filepath)
 		if v.fields then
 			for i,v in pairs(v.fields) do
 				if type(v) == "string" then
-					meta:set_string(i,v)
+					meta:set_string(i,v:gsub("´½`","\n"))
 				elseif type(v) == "int" then
 					meta:set_int(i,v)
 				elseif type(v) == "float" then
