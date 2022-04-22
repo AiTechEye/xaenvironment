@@ -1,49 +1,5 @@
 nodeextractor = {user={}}
 
-minetest.register_tool("nodeextractor:a", {
-	inventory_image = "default_stick.png^[colorize:#00b",
-	range=20,
-	groups={not_in_craftguide=1},
-	on_use=function(itemstack, user, pointed_thing)
-		local map = {}
-		if pointed_thing.above then
-			for z=-10,10 do
-			local fil = false
-			for x=-10,10 do
-				local p = apos(pointed_thing.above,x,0,z)
-				local node = "default:dirt"
-				local z1 = map[x..","..(z-1)]
-				local z2 = map[x..","..(z-2)]
-				local x0 = map[(x-1)..","..z]
-				local x1 = map[(x-1)..","..(z-1)]
-				local x2 = map[(x+1)..","..(z-1)]
-
-				if fil then
-					if z1 then
-						map[x..","..z] = true
-						node = "default:stone"
-					else
-						fil = false
-					end
-				elseif z == -10 then
-					if not x0 or math.random(1,2) == 1 then
-						map[x..","..z] = true
-						node = "default:stone"
-					end
-				elseif not (z1 and (z2 or math.random(1,2) == 1)) and (z1 or not (x1 or x2)) and (not x0 or math.random(1,2) == 1) then
-					map[x..","..z] = true
-					node = "default:stone"
-					if z1 then
-						fil = true
-					end
-				end
-				minetest.set_node(p,{name=node})
-			end
-			end
-		end
-	end,
-})
-
 minetest.register_on_leaveplayer(function(player)
 	nodeextractor.user[player:get_player_name()] = nil
 end)
