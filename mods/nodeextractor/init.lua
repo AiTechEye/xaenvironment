@@ -80,15 +80,37 @@ nodeextractor.set=function(pos,filepath)
 
 	minetest.emerge_area(vector.add(pos,dat.size),vector.subtract(pos,dat.size))
 
+
+
+
+
+	local vox = minetest.get_voxel_manip()
+	local min, max = vox:read_from_map(vector.add(pos,dat.size), vector.subtract(pos,dat.size))
+	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+	local data = vox:get_data()
+	local contens = {}
+
 	for i,v in pairs(dat.nodes) do
 		local p = i.split(i,",")
 		local pos2 = vector.add(pos,vector.new(tonumber(p[1]),tonumber(p[2]),tonumber(p[3])))
-		minetest.set_node(pos2,v.node)
+		local id = area:index(pos2.x,pos2.y,pos2.z)
+		contens[v.node.name] = contens[v.node.name] or minetest.get_content_id(v.node.name)
+		data[id] = contens[v.node.name]
+	end
+	vox:set_data(data)
+	vox:write_to_map()
+	vox:update_map()
+	vox:update_liquids()
 
-		local meta = minetest.get_meta(pos2)
-		local m = minetest.deserialize(v)
-
+	for i,v in pairs(dat.nodes) do
+		local p = i.split(i,",")
+		local pos2 = vector.add(pos,vector.new(tonumber(p[1]),tonumber(p[2]),tonumber(p[3])))
+		local meta
+		if v.node.param1 or v.node.param2 then
+			minetest.set_node(pos2,v.node)
+		end
 		if v.inventory then
+			meta = minetest.get_meta(pos2)
 			for l,v1 in pairs(v.inventory) do
 				local stacks = {}
 				for i,v2 in pairs(v1) do
@@ -98,6 +120,7 @@ nodeextractor.set=function(pos,filepath)
 			end
 		end
 		if v.fields then
+			meta = meta or minetest.get_meta(pos2)
 			for i,v in pairs(v.fields) do
 				if type(v) == "string" then
 					meta:set_string(i,v:gsub("´½`","\n"))
