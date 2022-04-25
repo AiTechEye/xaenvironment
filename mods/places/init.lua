@@ -153,10 +153,10 @@ places = {
 				end
 			end
 		},
-		["city"]={
-			chance=50,sx=10,sy=250,miny=0-20,maxy=50,spawn_at={"default:dirt"},
-			on_spawn=function(pos)
-			end,
+	--	["city"]={
+	--		chance=50,sx=10,sy=250,miny=0-20,maxy=50,spawn_at={"default:dirt"},
+	--		on_spawn=function(pos)
+	--		end,
 		}
 	}
 }
