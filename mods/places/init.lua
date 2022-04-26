@@ -199,7 +199,7 @@ minetest.register_tool("places:spawn", {
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		--places.buildings["lava castle"].on_spawn(vector.round(pos))
-		--places.city(pos)
+		places.city(pos)
 	end
 })
 
@@ -209,7 +209,7 @@ end
 
 places.city=function(pos)
 --gen map
-	local citysize = 10
+	local citysize = 5
 	local scale = 16
 	local houses = 0
 	local map = {}
@@ -311,8 +311,11 @@ places.city=function(pos)
 if 1 then return end
 --]]
 
+
+	local citysize2 = (citysize*scale)+scale+10
+
 	local vox = minetest.get_voxel_manip()
-	local min, max = vox:read_from_map(vector.add(pos,citysize*scale ), vector.subtract(pos,citysize*scale ))
+	local min, max = vox:read_from_map(vector.add(pos,citysize2), vector.subtract(pos,citysize2))
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 
@@ -323,12 +326,12 @@ if 1 then return end
 	local dirt = minetest.get_content_id("default:dirt")
 
 --roads
-	for x = -citysize*scale,citysize*scale do
-	for z = -citysize*scale,citysize*scale do
+
+	for x = -citysize2+scale,citysize2 do
+	for z = -citysize2+scale,citysize2 do
 		local id = area:index(pos.x+x,pos.y,pos.z+z)
-		if z >scale-2 and z < scale+3 and math.abs(x) > scale/2 then
-			local s = scale/2
-			if (z == scale or z == scale+1) and (math.abs(x-1) > s or math.abs(x+1) > s) then
+		if z >scale-2 and z < scale+3 and math.abs(x) >= scale/2 then
+			if (z == scale or z == scale+1) and math.abs(x) ~= scale/2 then
 
 				data[id] = dirt
 				data[id+area.ystride] = grass
@@ -342,6 +345,7 @@ if 1 then return end
 		end
 	end
 	end
+
 --build city
 	for i,v in pairs(map) do
 
@@ -376,7 +380,7 @@ if 1 then return end
 
 	for i,v in pairs(map) do
 		if v.house then
---			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/house1.exexn")
+			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/house1.exexn")
 		end
 	end
 
