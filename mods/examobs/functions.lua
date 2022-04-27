@@ -192,10 +192,12 @@ examobs.environment=function(self)
 		if def.walkable and v.x+v.z == 0 then
 			if walkable(apos(pos,0,1)) and walkable(apos(pos,0,2)) and (minetest.get_node_light(pos,0,1) or 0) == 0 then
 				self:hurt(1)
-			else
+			elseif default.surfaceheight(pos) > pos.y+0.5 then
 				examobs.jump(self)
 			end
-		elseif v.x+v.z ~= 0 and deff.walkable or (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y >= pos.y) then
+		elseif v.x+v.z ~= 0 and deff.walkable and default.surfaceheight(posf) > pos.y+0.5 then
+			examobs.jump(self)
+		elseif (target and examobs.gethp(target) > 0 and not walkable(apos(posf,0,-1)) and target:get_pos().y >= pos.y) then
 			examobs.jump(self)
 		elseif (deff.damage_per_second or 0) > 0 then
 			examobs.stand(self)
