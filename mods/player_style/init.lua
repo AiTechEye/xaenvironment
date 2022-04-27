@@ -721,7 +721,8 @@ minetest.register_globalstep(function(dtime)
 						elseif key.up and not (key.down or key.left or key.right)
 						and default.defpos({x=p.x,y=p.y-1,z=p.z},"walkable") 
 						and default.defpos({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)},"walkable")
-						and not default.defpos({x=p.x+(d.x*2),y=p.y+1,z=p.z+(d.z*2)},"walkable") then
+						and not default.defpos({x=p.x+(d.x*2),y=p.y+1,z=p.z+(d.z*2)},"walkable")
+						and default.surfaceheight({x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)}) > p.y+0.5 then
 							player:set_pos(apos(p,0,1,0))
 							a="dive"
 							player_style.player_diveing(name,player,true,nil,{x=p.x+(d.x*2),y=p.y,z=p.z+(d.z*2)})
