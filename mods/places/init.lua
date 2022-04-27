@@ -196,6 +196,7 @@ end)
 minetest.register_tool("places:spawn", {
 	description = "Spawn place",
 	inventory_image = "default_stick.png",
+	groups={not_in_creative_inventory=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		--places.buildings["lava castle"].on_spawn(vector.round(pos))
@@ -319,11 +320,12 @@ if 1 then return end
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 
-	local road = minetest.get_content_id("default:bedrock")
+	local road = minetest.get_content_id("materials:asphalt_slab")-- minetest.get_content_id("default:bedrock")
 	local house = minetest.get_content_id("default:dirt")
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
 	local dirt = minetest.get_content_id("default:dirt")
+
 
 --roads
 
@@ -332,7 +334,6 @@ if 1 then return end
 		local id = area:index(pos.x+x,pos.y,pos.z+z)
 		if z >scale-2 and z < scale+3 and math.abs(x) >= scale/2 then
 			if (z == scale or z == scale+1) and math.abs(x) ~= scale/2 then
-
 				data[id] = dirt
 				data[id+area.ystride] = grass
 			else
@@ -347,21 +348,33 @@ if 1 then return end
 	end
 
 --build city
+
+	local lamppos = {}
 	for i,v in pairs(map) do
 
 		local X = v.pos.x
 		local Z = v.pos.z
 
-		local xm = map[(X-1)..","..(Z)]
-		local xp = map[(X+1)..","..(Z)]
-		local zm = map[(X)..","..(Z-1)]
-		local zp = map[(X)..","..(Z+1)]
+		local xm = map[(X-1)..","..Z]
+		local xp = map[(X+1)..","..Z]
+		local zm = map[X..","..(Z-1)]
+		local zp = map[X..","..(Z+1)]
 
 		if v.house then
 			for x=-2,scale+3 do
 			for z=-2,scale+3 do
 				local id = area:index(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z)
 				data[id]=sidewalk
+--lamps
+				if x == scale/2 and z == -2 and not (zm and zm.house) then
+					table.insert(lamppos,{pos=vector.new(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z),dir=vector.new(0,0,-1)})
+				elseif x == scale/2 and z == scale+3 and not (zp and zp.house) then
+					table.insert(lamppos,{pos=vector.new(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z),dir=vector.new(0,0,1)})
+				elseif x == -2  and z == scale/2 and not (xm and xm.house) then
+					table.insert(lamppos,{pos=vector.new(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z),dir=vector.new(-1,0,0)})
+				elseif x == scale+3  and z == scale/2 and not (xp and xp.house) then
+					table.insert(lamppos,{pos=vector.new(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z),dir=vector.new(1,0,0)})
+				end
 			end
 			end
 		elseif v.courtyard or v.park then
@@ -383,5 +396,16 @@ if 1 then return end
 			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/house1.exexn")
 		end
 	end
-
+	for i,v in pairs(lamppos) do
+		for h=1,7 do
+			minetest.set_node(apos(v.pos,0,h),{name="exatec:wire",param2=112})
+		end
+		minetest.set_node(apos(v.pos,0,8),{name="exatec:light_detector"})
+		minetest.set_node(apos(v.pos,v.dir.x,v.dir.y+7,v.dir.z),{name="exatec:wire",param2=112})
+		minetest.set_node(apos(v.pos,v.dir.x,v.dir.y+8,v.dir.z),{name="default:lamp"})
+		local m = minetest.get_meta(apos(v.pos,0,8))
+		m:set_int("level",7)
+		m:set_int("type",2)
+		m:set_string("infotext","")
+	end
 end
