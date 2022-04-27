@@ -995,3 +995,17 @@ default.treasure=function(def)
 		end
 	end
 end
+
+default.surfaceheight=function(pos)
+	pos = vector.round(pos)
+	local h = 0
+	local def = default.def(minetest.get_node(pos).name)
+	if def.node_box and def.node_box.fixed then
+		for i,v in pairs(def.node_box.fixed) do
+			h = math.max(h,v[2],v[5])
+		end
+	else 
+		h = 0.5
+	end
+	return pos.y+h
+end
