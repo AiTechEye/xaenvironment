@@ -13,7 +13,7 @@ default.register_stair=function(name)
 			{-0.5, -0.5, 0, 0.5, 0.5, 0.5}
 		}
 	}
-
+	local def2 = table.copy(def)
 	minetest.register_node(name.."_stair",def)
 	minetest.register_craft({
 		output=name.."_stair 3",
@@ -21,6 +21,26 @@ default.register_stair=function(name)
 			{"","",""},
 			{"","",name},
 			{"",name,name}
+		},
+	})
+	
+	def2.groups["stairs"] = nil
+	def2.groups["slabs"] = 1
+	def2.description = def2.description .." slab"
+	def2.node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5}
+		}
+	}
+
+	minetest.register_node(name.."_slab",def2)
+	minetest.register_craft({
+		output=name.."_slab 3",
+		recipe={
+			{"","",""},
+			{"","","",},
+			{name,name,name}
 		},
 	})
 end
