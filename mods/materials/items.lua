@@ -561,3 +561,11 @@ minetest.register_craftitem("materials:pellets", {
 	inventory_image = "plants_wheat_seed.png",
 	groups = {flammable = 1},
 })
+
+minetest.register_node("materials:asphalt",{
+	description = "Asphalt",
+	tiles = {"default_oil.png^[colorize:#9995"},
+	groups = {cracky=2,asphalt=1,treasure=1,store=100},
+	sounds = default.node_sound_stone_defaults(),
+})
+default.register_stair("materials:asphalt")
