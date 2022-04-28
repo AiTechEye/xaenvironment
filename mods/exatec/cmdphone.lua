@@ -170,3 +170,133 @@ minetest.register_tool("exatec:cmdphone", {
 		exatec.show_cmdphone(user,pressed)
 	end,
 })
+
+minetest.register_node("exatec:mindforcer", {
+	description = "Mindforcer (not fully working yet)",
+	tiles={"spacestuff_gen.png^[invert:rgb",
+		"spacestuff_gen.png^[invert:rgb",
+		"spacestuff_gen.png^[invert:rgb^exatec_wirecon.png"
+	},
+	paramtype2 = "facedir",
+	sounds = default.node_sound_stone_defaults(),
+	groups = {choppy=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=200},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 1)
+		m:set_string("formspec",
+			"size[8,5]" ..
+			"listcolors[#77777777;#777777aa;#000000ff]"..
+			"image[3.5,0;1,1;exatec_phone.png]"..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;3.5,0;1,1;]" ..
+			"list[current_player;main;0,1.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		return stack:get_name() == "exatec:cmdphone" and not minetest.is_protected(pos, player:get_player_name()) and stack:get_count() or 0
+	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		return not minetest.is_protected(pos, player:get_player_name()) and stack:get_count() or 0
+	end,
+	--on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+	--	local t = minetest.get_node_timer(pos)
+	----	local m = minetest.get_meta(pos)
+	--	if t:is_started() then
+	--		t:stop()
+	--		m:set_string("infotext","OFF")
+	--	else
+	--		t:start(1)
+	--		m:set_string("infotext","ON")
+	--	end
+	--end,
+	exatec={
+		on_wire = function(pos)
+			local rad = 40
+			local meta = minetest.get_meta(pos)
+			if meta:get_inventory():is_empty("main") then
+				return
+			end
+			local o = minetest.add_entity(pos,"plasma:impulse")
+			local en = o:get_luaentity()
+			en.end_scale = rad
+			o:set_properties({textures={"default_cloud.png^[colorize:#0044cc99"}})
+
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, rad/2)) do
+			--	local en = ob:get_luaentity()
+				if ob:is_player() and ob:get_hp() > 0 then
+					local l = {"11","22","33","44","55","66","77","88","99","aa","bb","cc","dd","ee","ff"}
+					local p = player_style.players[ob:get_player_name()]
+
+					if not p.mindforcer then
+						p.mindforcer = {level=0,catched=false,id=0,id2=-1}
+						exatec.re_mindforcer(ob)
+					end
+
+					if p.black_death_id then
+						ob:hud_remove(p.black_death_id)
+					end
+					p.mindforcer.level = p.mindforcer.level + 1
+					p.mindforcer.id = p.mindforcer.id + 1
+print( p.mindforcer.level)
+					if p.mindforcer.level >= 15 then
+						p.mindforcer.catched=true
+						p.mindforcer = nil
+						ob:set_hp(0)
+						--player_style.survive_black_death
+						return
+					end
+
+					p.black_death_id = ob:hud_add({
+						hud_elem_type="image",
+						scale = {x=-100, y=-100},
+						name="black_death",
+						position={x=0,y=0},
+						text="default_gas.png^[colorize:#0044cc"..l[p.mindforcer.level],
+						alignment = {x=1, y=1},
+					})
+				end
+			end
+		end
+	}
+})
+
+exatec.re_mindforcer=function(player,id)
+
+	local p = player_style.players[player:get_player_name()]
+
+	if not (p and p.mindforcer) then
+		return
+	elseif p.mindforcer.id ~= p.mindforcer.id2 then
+		p.mindforcer.id2 = p.mindforcer.id
+		minetest.after(1.1,function(player)
+			exatec.re_mindforcer(player)
+		end,player)
+	else
+		p.mindforcer.level = p.mindforcer.level -1
+print( p.mindforcer.level)
+		if p.mindforcer.level <= 0 or player:get_hp() <= 0 then
+			player_style.players[player:get_player_name()].mindforcer = nil
+			if p.black_death_id then
+				player:hud_remove(p.black_death_id)
+			end
+			return
+		else
+			local l = {"11","22","33","44","55","66","77","88","99","aa","bb","cc","dd","ee","ff"}
+			if p.black_death_id then
+				player:hud_remove(p.black_death_id)
+			end
+			p.black_death_id = player:hud_add({
+				hud_elem_type="image",
+				scale = {x=-100, y=-100},
+				name="black_death",
+				position={x=0,y=0},
+				text="default_gas.png^[colorize:#0044cc"..l[p.mindforcer.level],
+				alignment = {x=1, y=1},
+			})
+			minetest.after(0.1,function(player)
+				exatec.re_mindforcer(player)
+			end,player)
+		end
+	end
+end
