@@ -199,17 +199,9 @@ minetest.register_node("exatec:mindforcer", {
 	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 		return not minetest.is_protected(pos, player:get_player_name()) and stack:get_count() or 0
 	end,
-	--on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-	--	local t = minetest.get_node_timer(pos)
-	----	local m = minetest.get_meta(pos)
-	--	if t:is_started() then
-	--		t:stop()
-	--		m:set_string("infotext","OFF")
-	--	else
-	--		t:start(1)
-	--		m:set_string("infotext","ON")
-	--	end
-	--end,
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
 	exatec={
 		on_wire = function(pos)
 			local rad = 40
@@ -225,25 +217,30 @@ minetest.register_node("exatec:mindforcer", {
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos, rad/2)) do
 			--	local en = ob:get_luaentity()
 				if ob:is_player() and ob:get_hp() > 0 then
-					local l = {"11","22","33","44","55","66","77","88","99","aa","bb","cc","dd","ee","ff"}
 					local p = player_style.players[ob:get_player_name()]
-
 					if not p.mindforcer then
 						p.mindforcer = {level=0,catched=false,id=0,id2=-1}
 						exatec.re_mindforcer(ob)
+					elseif p.mindforcer.catched then
+						return
 					end
 
 					if p.black_death_id then
 						ob:hud_remove(p.black_death_id)
 					end
+					local l = {"11","22","33","44","55","66","77","88","99","aa","bb","cc","dd","ee","ff"}
 					p.mindforcer.level = p.mindforcer.level + 1
 					p.mindforcer.id = p.mindforcer.id + 1
-print( p.mindforcer.level)
 					if p.mindforcer.level >= 15 then
-						p.mindforcer.catched=true
-						p.mindforcer = nil
 						ob:set_hp(0)
-						--player_style.survive_black_death
+						local e = minetest.add_entity(ob:get_pos(),"examobs:npc")
+						local en = e:get_luaentity()
+						e:set_properties({textures=ob:get_properties().textures})
+						en.storage.npcname = ob:get_player_name()
+						ob:set_attach(e, "",{x=0, y=0, z=0}, {x=0,y=0,z=0})
+						ob:set_look_vertical(0)
+						p.mindforcer.object = e
+						p.mindforcer.catched=true
 						return
 					end
 
@@ -261,12 +258,29 @@ print( p.mindforcer.level)
 	}
 })
 
-exatec.re_mindforcer=function(player,id)
-
+minetest.register_on_respawnplayer(function(player)
 	local p = player_style.players[player:get_player_name()]
+	if p.mindforcer then
+		if p.black_death_id then
+			player:hud_remove(p.black_death_id)
+		end
+		if player:get_attach() then
+			player:set_detach()
+		end
+		p.mindforcer = nil
+	end
 
+end)
+
+exatec.re_mindforcer=function(player,id)
+	local p = player_style.players[player:get_player_name()]
 	if not (p and p.mindforcer) then
 		return
+	elseif p.mindforcer.catched and p.mindforcer.object and p.mindforcer.object:get_luaentity() then
+		player:set_look_horizontal(p.mindforcer.object:get_rotation().y)
+		minetest.after(0.5,function(player)
+			exatec.re_mindforcer(player)
+		end,player)
 	elseif p.mindforcer.id ~= p.mindforcer.id2 then
 		p.mindforcer.id2 = p.mindforcer.id
 		minetest.after(1.1,function(player)
@@ -274,7 +288,6 @@ exatec.re_mindforcer=function(player,id)
 		end,player)
 	else
 		p.mindforcer.level = p.mindforcer.level -1
-print( p.mindforcer.level)
 		if p.mindforcer.level <= 0 or player:get_hp() <= 0 then
 			player_style.players[player:get_player_name()].mindforcer = nil
 			if p.black_death_id then
