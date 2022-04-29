@@ -396,7 +396,7 @@ exatec.create_env=function(A,g,self)
 			end,
 			visiable_text = "(pos) if pos is visiable (not blocked)",
 			visiable=function(pos)
-				examobs.visiable(self,pos)
+				return examobs.visiable(self.object,pos)
 			end,
 			team_text = "(id/nil) get object/self team",
 			team=function(n)
