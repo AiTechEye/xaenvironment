@@ -9,6 +9,16 @@ examobs.main=function(self, dtime,moveresult)
 		self.timer1 = 0
 		if self.environment_timer > 0.2 and examobs.environment(self) then return end
 	end
+
+
+	if self.storage.code_execute_interval and moveresult.collides then
+		for i,v in pairs(moveresult.collisions) do
+			if v.type == "object" then
+				self.colliding_with_object = true
+				break
+			end
+		end
+	end
 	if self:on_abs_step() or self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 	local p = self.object:get_pos()
@@ -39,6 +49,7 @@ examobs.main=function(self, dtime,moveresult)
 		self.lifetimer = self.lifetime
 		local err,limit = exatec.run_code(self.storage.code_execute_interval,{type={run=true},mob=true,user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
 		self.exatec_limit = limit
+		self.colliding_with_object = nil
 		if err ~= "" then
 			examobs.showtext(self,"ERROR","ffff00")
 			examobs.stand(self)
