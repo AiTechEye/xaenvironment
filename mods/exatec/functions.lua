@@ -793,6 +793,18 @@ exatec.create_env=function(A,g,self)
 					end
 				end
 			end,
+			colliding_with_object_text = "() if colliding with objects",
+			colliding_with_object=function(pos)
+				return self.colliding_with_object
+			end,
+			touching_ground_text = "() if touching on ground",
+			touching_ground=function(pos)
+				return self.moveresult.touching_ground
+			end,
+			standing_on_object_text = "() if standing on object",
+			standing_on_object=function(pos)
+				return self.moveresult.standing_on_object
+			end,
 		} or nil,
 		exatec=(self and {}) or {
 			send_text = "(x,y,z) send signal",
