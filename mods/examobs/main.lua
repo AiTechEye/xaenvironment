@@ -49,6 +49,7 @@ examobs.main=function(self, dtime,moveresult)
 		elseif self.standby then
 			return
 		end
+		return
 	end
 	if self.step(self,dtime) or self.targetthen then
 		return
