@@ -47,9 +47,13 @@ examobs.main=function(self, dtime,moveresult)
 			self.cmdphone = true
 		end
 		self.lifetimer = self.lifetime
-		local err,limit = exatec.run_code(self.storage.code_execute_interval,{type={run=true},mob=true,user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
+
+		local err,limit = exatec.run_code(self.storage.code_execute_interval,{just_loaded=self.just_loaded,just_spawned=self.just_spawned,type={run=true},mob=true,user=self.storage.code_execute_interval_user,self=self,pos=vector.round(self.object:get_pos())})
 		self.exatec_limit = limit
 		self.colliding_with_object = nil
+		self.just_loaded = false
+		self.just_spawned = false
+
 		if err ~= "" then
 			examobs.showtext(self,"ERROR","ffff00")
 			examobs.stand(self)
@@ -285,6 +289,9 @@ examobs.register_mob=function(def)
 		if self.type == "npc" and def.speaking == 1 then
 			examobs.npc_setup(self)
 		end
+
+		self.just_loaded = staticdata ~= ""
+		self.just_spawned = staticdata == ""
 
 		if staticdata ~= "" then
 			self.on_load(self)
