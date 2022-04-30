@@ -298,7 +298,7 @@ exatec.run_code=function(text,A)
 		return "Connect a ''Node constructor'' to use the node functions"
 	end
 
-	local g={user=A.name,count = 0,pos=vector.new(A.pos),storage=A.mob and A.self and (A.self.storage and A.self.storage.exatec or {}) or minetest.deserialize(m:get_string("storage")) or {}}
+	local g={just_loaded=A.just_loaded,just_spawned=A.just_spawned,user=A.name,count = 0,pos=vector.new(A.pos),storage=A.mob and A.self and (A.self.storage and A.self.storage.exatec or {}) or minetest.deserialize(m:get_string("storage")) or {}}
 
 	local F=function()
 		local f,err = loadstring(text)
@@ -447,6 +447,10 @@ exatec.create_env=function(A,g,self)
 			showtext_text = "(text,nil/hexcolor) temporary change the nametag, do not add # to the color code",
 			showtext=function(text,color)
 				examobs.showtext(self,text,color)
+			end,
+			set_texture_text = '("texture.png") set texture',
+			set_texture=function(t)
+				self.object:set_properties({textures={t}})
 			end,
 			get_object_text = "(type) get object id from fight, flee, folow, target",
 			get_object=function(typ)
