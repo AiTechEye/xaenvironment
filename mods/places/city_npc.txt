@@ -1,0 +1,41 @@
+if event.just_loaded then
+	mob.set_texture("#skin#")
+end
+if event.storage.target then
+	mob.lookat(event.storage.target)
+	mob.walk()
+	if mob.distance(event.pos,event.storage.target) < 2.4 then
+		event.storage.target = nil
+		mob.stand()
+	elseif mob.colliding_with_object() then
+		mob.lookat()
+		mob.walk()
+	end
+else
+	mob.stand()
+	local pos2w = {}
+	local r = event.storage.rad or 20
+	local nodes = #code#
+	--{
+	--	{x=-320,y=777,z=663},
+	--	{x=-301,y=777,z=663},
+	--	{x=-301,y=777,z=644},
+	--	{x=-320,y=777,z=644},
+	--}
+	for i,p in ipairs(nodes) do
+		if mob.distance(event.pos,p) < r and mob.visiable(p) then
+			table.insert(pos2w,p)
+		end
+	end
+	if #pos2w > 0 then
+		event.storage.target = pos2w[math.random(1,#pos2w)]
+		event.storage.rad = 20
+	else
+		event.storage.rad = r + 10
+		if event.storage.rad > 50 then
+			event.storage.target = nodes[math.random(1,#nodes)]
+			mob.lookat()
+			mob.walk()
+		end
+	end
+end

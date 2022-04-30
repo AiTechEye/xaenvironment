@@ -201,6 +201,8 @@ minetest.register_tool("places:spawn", {
 		local pos = user:get_pos()
 		--places.buildings["lava castle"].on_spawn(vector.round(pos))
 		places.city(pos)
+	end,
+	on_place=function(itemstack, user, pointed_thing)
 	end
 })
 
@@ -320,8 +322,8 @@ if 1 then return end
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 
-	local road = minetest.get_content_id("materials:asphalt_slab")-- minetest.get_content_id("default:bedrock")
-	local house = minetest.get_content_id("default:dirt")
+	local road = minetest.get_content_id("materials:asphalt_slab")
+	local dirt = minetest.get_content_id("default:dirt")
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
 	local dirt = minetest.get_content_id("default:dirt")
@@ -348,8 +350,9 @@ if 1 then return end
 	end
 
 --build city
-
+	local sidewalk_paths = {}
 	local lamppos = {}
+	local corners = {}
 	for i,v in pairs(map) do
 
 		local X = v.pos.x
@@ -361,6 +364,15 @@ if 1 then return end
 		local zp = map[X..","..(Z+1)]
 
 		if v.house then
+
+			for x=1,scale, scale-1 do
+				for z=-1,scale+2, scale+3 do
+					table.insert(corners,vector.new(pos.x+(X*scale)+x,pos.y+1,pos.z+(Z*scale)+z))
+					table.insert(corners,vector.new(pos.x+(X*scale)+z,pos.y+1,pos.z+(Z*scale)+x))
+				end
+			end
+
+
 			for x=-2,scale+3 do
 			for z=-2,scale+3 do
 				local id = area:index(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z)
@@ -400,12 +412,78 @@ if 1 then return end
 		for h=1,7 do
 			minetest.set_node(apos(v.pos,0,h),{name="exatec:wire",param2=112})
 		end
-		minetest.set_node(apos(v.pos,0,8),{name="exatec:light_detector"})
+		local l = apos(v.pos,0,8)
+		minetest.set_node(l,{name="exatec:light_detector"})
 		minetest.set_node(apos(v.pos,v.dir.x,v.dir.y+7,v.dir.z),{name="exatec:wire",param2=112})
-		minetest.set_node(apos(v.pos,v.dir.x,v.dir.y+8,v.dir.z),{name="default:lamp"})
-		local m = minetest.get_meta(apos(v.pos,0,8))
+		minetest.set_node(apos(v.pos,v.dir.x,v.dir.y+8,v.dir.z),{name="default:lamp_off"})
+		local m = minetest.get_meta(l)
 		m:set_int("level",7)
 		m:set_int("type",2)
 		m:set_string("infotext","")
+		minetest.get_node_timer(l):start(20)
+	end
+	local pathpoints = "{"
+	for i,p in ipairs(corners) do
+		local n = minetest.get_node(p).name
+		if n == "air" or n == "ignore" then
+			minetest.set_node(p,{name="exatec:light_detector"})	
+			table.insert(sidewalk_paths,p)
+			pathpoints = pathpoints .."{x="..p.x..",y="..p.y..",z="..p.z.."},"
+		end
+	end
+	pathpoints = pathpoints .."}"
+
+	--local de_sidewalk_paths = minetest.serialize(sidewalk_paths)
+
+	for i,p in ipairs(sidewalk_paths) do
+		minetest.set_node(p,{name="places:city_npcspawner"})	
+		minetest.get_meta(p):set_string("paths",pathpoints)
 	end
 end
+
+minetest.register_node("places:city_npcspawner", {
+	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
+	pointable=false,
+	paramtype = "light",
+--	drawtype="airlike",
+	drop="",
+	walkable=false,
+	floodable = true,
+	sunlight_propagates = true,
+	on_construct=function(pos)
+		minetest.registered_nodes["places:city_npcspawner"].on_load(pos)
+	end,
+	on_load=function(pos)
+		minetest.get_node_timer(pos):start(math.random(1,60))
+	end,
+	on_timer = function (pos, elapsed)
+		local n = examobs.active.types["examobs:npc"]
+		if n and n > 50 then
+			return true
+		end
+
+		local paths = minetest.get_meta(pos):get_string("paths")--minetest.deserialize(minetest.get_meta(pos):get_string("paths") or "")
+		if paths == "" then
+			minetest.remove_node(pos)
+			return
+		end
+		local skin = player_style.skins.skins[math.random(1,26)].skin
+		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
+		local text = file:read("*all")
+		file:close()
+
+		if text == "" then
+			return
+		end
+
+		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
+		text = text:gsub("#code#",paths)
+
+		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
+
+		self.storage.code_execute_interval = text
+		self.storage.code_execute_interval_user = "singleplayer"
+		self.object:set_properties({textures={skin}})
+		return true
+	end
+})
