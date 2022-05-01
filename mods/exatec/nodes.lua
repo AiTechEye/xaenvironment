@@ -2589,7 +2589,7 @@ minetest.register_node("exatec:transsignal", {
 	exatec={
 		on_wire = function(pos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+			exatec.send({x=pos.x+d.x*2,y=pos.y+d.y*2,z=pos.z+d.z*2},true,true)
 		end,
 	},
 	paramtype2 = "facedir",
