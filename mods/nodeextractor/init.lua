@@ -24,9 +24,9 @@ nodeextractor.create=function(pos1,pos2,filename)
 			for l,v1 in pairs(m1.inventory) do
 				local stacks = {}
 				for i,v2 in pairs(v1) do
-					if v2:get_count() > 0 then
+					--if v2:get_count() > 0 then
 						stacks[i] = minetest.serialize(v2:to_table())
-					end
+					--end
 				end
 				m1.inventory[l] = stacks
 			end
@@ -80,10 +80,6 @@ nodeextractor.set=function(pos,filepath)
 
 	minetest.emerge_area(vector.add(pos,dat.size),vector.subtract(pos,dat.size))
 
-
-
-
-
 	local vox = minetest.get_voxel_manip()
 	local min, max = vox:read_from_map(vector.add(pos,dat.size), vector.subtract(pos,dat.size))
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
@@ -106,28 +102,49 @@ nodeextractor.set=function(pos,filepath)
 		local p = i.split(i,",")
 		local pos2 = vector.add(pos,vector.new(tonumber(p[1]),tonumber(p[2]),tonumber(p[3])))
 		local meta
+
+		local def = minetest.registered_items[v.node.name]
+		--if def.on_construct then
+		--	def.on_construct(pos2)
+		--end
+
 		if v.node.param1 or v.node.param2 then
 			minetest.set_node(pos2,v.node)
 		end
+
 		if v.inventory then
 			meta = minetest.get_meta(pos2)
+			local inv = meta:get_inventory()
 			for l,v1 in pairs(v.inventory) do
+				inv:set_size(l, #v1)
 				local stacks = {}
 				for i,v2 in pairs(v1) do
 					stacks[i] = ItemStack(minetest.deserialize(v2))
 				end
-				meta:get_inventory():set_list(l,stacks)
+				inv:set_list(l,stacks)
 			end
 		end
 		if v.fields then
 			meta = meta or minetest.get_meta(pos2)
-			for i,v in pairs(v.fields) do
-				if type(v) == "string" then
-					meta:set_string(i,v:gsub("´½`","\n"))
-				elseif type(v) == "int" then
-					meta:set_int(i,v)
-				elseif type(v) == "float" then
-					meta:set_float(i,v)
+			for ii,vv in pairs(v.fields) do
+				if type(vv) == "string" then
+					if ii == "formspec" then
+						local ti = 1
+						while true do
+							local a1,a2 = vv:find("%[nodemeta:",ti)
+							if a1 == nil then
+								break
+							end
+							local a3,a4 = vv:find(";",a1)
+							vv = vv:sub(1,a2)..pos2.x..","..pos2.y..","..pos2.z..vv:sub(a3,-1)
+							ti = a4
+						end
+					end
+					meta:set_string(ii,vv:gsub("´½`","\n"))
+				elseif type(vv) == "int" then
+					meta:set_int(ii,vv)
+				elseif type(vv) == "float" then
+					meta:set_float(ii,vv)
 				end
 			end
 		end
@@ -136,7 +153,7 @@ nodeextractor.set=function(pos,filepath)
 		end
 
 		if minetest.get_item_group(v.node.name,"on_load") > 0 then
-			minetest.registered_items[v.node.name].on_load(pos2)
+			def.on_load(pos2)
 		end
 	end
 	return true
