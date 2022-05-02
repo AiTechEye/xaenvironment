@@ -511,7 +511,7 @@ default.register_stair("default:glass_frosted")
 minetest.register_node("default:obsidian_glass", {
 	description = "Obsidian glass",
 	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
-	groups = {cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1,store=70},
+	groups = {glass=1,cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1,store=70},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
