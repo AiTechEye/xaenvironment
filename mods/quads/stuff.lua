@@ -25,6 +25,24 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="quads:engine",
+	recipe={
+		{"default:steel_ingot","materials:gear_metal","default:steel_ingot"},
+		{"default:steel_ingot","materials:gear_metal","default:steel_ingot"},
+		{"default:steel_ingot","materials:tube_metal","default:steel_ingot"},
+	},
+})
+
+minetest.register_node("quads:engine", {
+	stack_max = 1,
+	description="Engine",
+	tiles={"quads_engine_top.png","quads_engine_under.png","quads_engine_side.png","quads_engine_side.png","quads_engine_front.png"},
+	groups = {cracky = 2,treasure=2,store=1000},
+	paramtype2="facedir",
+	sounds =  default.node_sound_metal_defaults(),
+})
+
 minetest.register_node("quads:petrol_tank", {
 	stack_max = 1,
 	description="Petrol tank",

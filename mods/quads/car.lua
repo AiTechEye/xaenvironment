@@ -1,12 +1,22 @@
+minetest.register_craft({
+	output="quads:car",
+	recipe={
+		{"default:copper_ingot","quads:engine","quads:petrol_tank_empty"},
+		{"group:glass","default:steelblock","group:metalstick"},
+		{"default:steel_ingot","materials:fanblade_metal","default:steel_ingot"},
+	},
+})
+
 minetest.register_node("quads:car", {
 	stack_max=1,
-	description="Car",
+	description="Car (right click with a block to paint it, right click with glass to change glass)",
 	drawtype="mesh",
 	groups = {treasure=3,store=10000},
 	mesh="quads_car.b3d",
-	tiles={"default_wood.png","default_glass_with_frame.png","default_zirconiablock.png","default_rubyblock.png","default_oil.png","default_silverblock.png"},
-	wield_scale={x=0.1,y=0.1,z=0.1},
-	visual_scale = 0.1,
+	tiles={"default_steelblock.png","default_glass_with_frame.png","default_zirconiablock.png","default_rubyblock.png","default_oil.png","default_silverblock.png"},
+	wield_scale={x=0.05,y=0.05,z=0.05},
+	visual_scale = 0.05,
+	paramtype = "light",
 	walkable=false,
 	pointable=false,
 	buildable_to=true,
@@ -30,7 +40,7 @@ minetest.register_entity("quads:car",{
 	visual="mesh",
 	mesh="quads_car.b3d",
 	backface_culling = false,
-	textures={"default_wood.png","default_glass_with_frame.png","default_zirconiablock.png","default_rubyblock.png","default_oil.png","default_silverblock.png"},
+	textures={"default_steelblock.png","default_glass_with_frame.png","default_zirconiablock.png","default_rubyblock.png","default_oil.png","default_silverblock.png"},
 	visual_size = {x=1,y=1},
 	makes_footstep_sound = true,
 	stepheight = 0.51,

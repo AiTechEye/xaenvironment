@@ -2,14 +2,14 @@ minetest.register_craft({
 	output="quads:quad",
 	recipe={
 		{"default:copper_ingot","default:electric_lump","quads:petrol_tank_empty"},
-		{"default:steel_ingot","default:steelblock","default:steel_ingot"},
+		{"default:steel_ingot","quads:engine","default:steel_ingot"},
 		{"default:steel_ingot","default:steel_ingot","default:steel_ingot"},
 	},
 })
 
 minetest.register_node("quads:quad", {
 	stack_max=1,
-	description="Quad",
+	description="Quad (Right click with dye to paint)",
 	drawtype="mesh",
 	groups = {treasure=3,store=4000},
 	mesh="quads_quad.b3d",
@@ -18,6 +18,7 @@ minetest.register_node("quads:quad", {
 	visual_scale = 0.1,
 	walkable=false,
 	pointable=false,
+	paramtype = "light",
 	buildable_to=true,
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type=="node" and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
