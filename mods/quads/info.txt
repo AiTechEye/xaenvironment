@@ -9,3 +9,10 @@ use + up/down in air = flip
 - explodes when it dies
 - must be contain petrol (fuel) before you can drive it
 you dies if you fails in a flip
+
+Cars:
+
+- Give it a block to change its texture
+- Give it glass to change its glass
+You gets back the block when you changing to another texture
+Note that all blocks doesn't work, like animated blocks because those usually have another kind of texture
