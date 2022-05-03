@@ -326,8 +326,6 @@ if 1 then return end
 	local dirt = minetest.get_content_id("default:dirt")
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
-	local dirt = minetest.get_content_id("default:dirt")
-
 
 --roads
 
@@ -350,9 +348,11 @@ if 1 then return end
 	end
 
 --build city
-	local sidewalk_paths = {}
+	local sidewalk_paths1 = {}
+	local sidewalk_paths2 = {}
+	local road_paths = {vector.new(pos.x,pos.y+1,pos.z+scale)}
+
 	local lamppos = {}
-	local corners = {}
 	for i,v in pairs(map) do
 
 		local X = v.pos.x
@@ -363,15 +363,15 @@ if 1 then return end
 		local zm = map[X..","..(Z-1)]
 		local zp = map[X..","..(Z+1)]
 
-		if v.house then
-
+		if v.street then
+			table.insert(road_paths,vector.new(pos.x+(X*scale)+(scale/2),pos.y+1,pos.z+(Z*scale)+(scale/2)))
+		elseif v.house then
 			for x=1,scale, scale-1 do
 				for z=-1,scale+2, scale+3 do
-					table.insert(corners,vector.new(pos.x+(X*scale)+x,pos.y+1,pos.z+(Z*scale)+z))
-					table.insert(corners,vector.new(pos.x+(X*scale)+z,pos.y+1,pos.z+(Z*scale)+x))
+					table.insert(sidewalk_paths1,vector.new(pos.x+(X*scale)+x,pos.y+1,pos.z+(Z*scale)+z))
+					table.insert(sidewalk_paths1,vector.new(pos.x+(X*scale)+z,pos.y+1,pos.z+(Z*scale)+x))
 				end
 			end
-
 
 			for x=-2,scale+3 do
 			for z=-2,scale+3 do
@@ -423,22 +423,44 @@ if 1 then return end
 		minetest.get_node_timer(l):start(20)
 	end
 	local pathpoints = "{"
-	for i,p in ipairs(corners) do
+	for i,p in ipairs(sidewalk_paths1) do
 		local n = minetest.get_node(p).name
 		if n == "air" or n == "ignore" then
 			minetest.set_node(p,{name="exatec:light_detector"})	
-			table.insert(sidewalk_paths,p)
+			table.insert(sidewalk_paths2,p)
 			pathpoints = pathpoints .."{x="..p.x..",y="..p.y..",z="..p.z.."},"
 		end
 	end
 	pathpoints = pathpoints .."}"
 
-	--local de_sidewalk_paths = minetest.serialize(sidewalk_paths)
-
-	for i,p in ipairs(sidewalk_paths) do
+	for i,p in ipairs(sidewalk_paths2) do
 		minetest.set_node(p,{name="places:city_npcspawner"})	
 		minetest.get_meta(p):set_string("paths",pathpoints)
 	end
+
+	local rp = {}
+	for x = -citysize2+scale,citysize2 do
+	for z = -citysize2+scale,citysize2 do
+		local min = -citysize2+scale+4
+		local max = citysize2-4
+		local x1 = x+5
+		local z1 = z+5
+		if (x == min or x == max) and z1/16 == math.floor(z1/16) or (z == min or z == max) and x1/16 == math.floor(x1/16) then
+			local p = vector.new(pos.x+x,pos.y+1,pos.z+z)
+			local i = p.x..","..p.z
+			if not rp[i] then
+				rp[i] = true
+				table.insert(road_paths,p)
+			end
+		end
+	end
+	end
+
+	for i,p in ipairs(road_paths) do
+		minetest.set_node(p,{name="places:city_npccarspawner"})	
+		minetest.get_meta(p):set_string("paths",road_paths)
+	end
+
 end
 
 minetest.register_node("places:city_npcspawner", {
@@ -457,12 +479,11 @@ minetest.register_node("places:city_npcspawner", {
 		minetest.get_node_timer(pos):start(math.random(1,60))
 	end,
 	on_timer = function (pos, elapsed)
-		local n = examobs.active.types["examobs:npc"]
-		if n and n > 50 then
+		if (examobs.active.types["examobs:npc"] or 0) > 20 then
 			return true
 		end
 
-		local paths = minetest.get_meta(pos):get_string("paths")--minetest.deserialize(minetest.get_meta(pos):get_string("paths") or "")
+		local paths = minetest.get_meta(pos):get_string("paths")
 		if paths == "" then
 			minetest.remove_node(pos)
 			return
@@ -480,7 +501,54 @@ minetest.register_node("places:city_npcspawner", {
 		text = text:gsub("#code#",paths)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
+		self.static_save = false
+		self.storage.code_execute_interval = text
+		self.storage.code_execute_interval_user = "singleplayer"
+		self.object:set_properties({textures={skin}})
+		return true
+	end
+})
 
+minetest.register_node("places:city_npccarspawner", {
+	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
+	pointable=false,
+	paramtype = "light",
+--	drawtype="airlike",
+	tiles = {"default_water.png"},
+	drop="",
+	walkable=false,
+	floodable = true,
+	sunlight_propagates = true,
+	on_construct=function(pos)
+		minetest.registered_nodes["places:city_npccarspawner"].on_load(pos)
+	end,
+	on_load=function(pos)
+		--minetest.get_node_timer(pos):start(math.random(1,60))
+	end,
+	on_timer = function (pos, elapsed)
+		if (examobs.active.types["examobs:npc"] or 0) > 20 then
+			return true
+		end
+
+		local paths = minetest.get_meta(pos):get_string("paths")
+		if paths == "" then
+			minetest.remove_node(pos)
+			return
+		end
+		local skin = player_style.skins.skins[math.random(1,26)].skin
+		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
+		local text = file:read("*all")
+		file:close()
+
+		if text == "" then
+			return
+		end
+
+		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
+		text = text:gsub("#code#",paths)
+
+		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
+		self.static_save = false
 		self.storage.code_execute_interval = text
 		self.storage.code_execute_interval_user = "singleplayer"
 		self.object:set_properties({textures={skin}})
