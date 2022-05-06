@@ -11,7 +11,7 @@ examobs.main=function(self, dtime,moveresult)
 	end
 
 
-	if self.storage.code_execute_interval and moveresult.collides then
+	if self.storage.code_execute_interval and self.moveresult.collides then
 		for i,v in pairs(moveresult.collisions) do
 			if v.type == "object" then
 				self.colliding_with_object = true
