@@ -483,6 +483,7 @@ examobs.stand=function(self)
 		x = 0,
 		y = v.y,
 		z = 0})
+	self.walking = false
 	if not self.on_stand(self) then
 		examobs.anim(self,"stand")
 	end
@@ -521,7 +522,7 @@ examobs.walk=function(self,run)
 		y = v.y,
 		z = z
 	})
-
+	self.walking = true
 	if self.on_walk(self,x,v.yy,z) then return end
 
 	if running then
