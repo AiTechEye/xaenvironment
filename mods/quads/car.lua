@@ -177,7 +177,7 @@ minetest.register_entity("quads:car",{
 		return self
 	end,
 	hud_update=function(self)
-		if self.user and self.user:get_pos() then
+		if self.user and self.user:get_pos() and not self.bot then
 			self.user:hud_change(self.hud.hp, "number", self.object:get_hp())
 			self.user:hud_change(self.hud.petrol, "number", self.petrol)
 		end
@@ -237,7 +237,6 @@ minetest.register_entity("quads:car",{
 				collisiondetection = true,
 			})
 		end
-print(hp," ",self.object:get_hp()," ",pd," ",hp-(pd or 0))
 		if hp-(pd or 0) <= 0 then
 			if self.user then
 				self.leave = true
@@ -250,7 +249,7 @@ print(hp," ",self.object:get_hp()," ",pd," ",hp-(pd or 0))
 		end
 	end,
 	pos=function(self)
-		return self.object:get_pos()
+		return self.object:get_pos() or vector.new()
 	end,
 	yaw=function(self)
 		local a = self.object:get_yaw()
@@ -266,6 +265,27 @@ print(hp," ",self.object:get_hp()," ",pd," ",hp-(pd or 0))
 		end
 
 		local key = self.user and self.user:get_player_control() or {}
+
+
+		if self.bot then
+			self.lerp_start = self.object:get_yaw()
+			self.lerp_end = self.user:get_yaw() or self.lerp_start
+			self.lerp_cur = self.lerp_start + (self.lerp_end-self.lerp_start) * 0.2 -- lerp
+			self.object:set_yaw(self.lerp_cur)
+
+			if self.bot.walking then
+				key.up = true
+			end
+			self.petrol = 100
+
+			local target = self.bot.storage.exatec and self.bot.storage.exatec.target
+
+			if target and type(target) == "table" and self.speed > 5 and vector.distance(p,target) < 10 then
+				--self.speed = self.speed - 1
+				self.speed = self.speed + (1-self.speed) * 0.2
+			end
+		end
+
 
 		if key.left and self.speed ~= 0 then
 			local r = self.object:get_rotation()
@@ -399,9 +419,9 @@ print(hp," ",self.object:get_hp()," ",pd," ",hp-(pd or 0))
 			end
 		end
 
-		if moveresult.collides then
+		if moveresult and moveresult.collides then
 			for i,v in pairs(moveresult.collisions) do
-				if v.type == "object" then
+				if v.type == "object" and v.object then
 					v.object:add_velocity({x=x*2,y=v.object:get_velocity().y,z=z*2})
 					local en=v.object:get_luaentity()
 					if not (en and en.dead) then
