@@ -5,9 +5,10 @@ if event.storage.target then
 	mob.lookat(event.storage.target)
 	mob.walk()
 	if mob.distance(event.pos,event.storage.target) < 2.4 then
-		event.storage.oldtarget[1] = event.storage.target
-		event.storage.oldtarget[2] = event.storage.oldtarget[1]
-		event.storage.oldtarget[3] = event.storage.oldtarget[2]
+		table.insert(event.storage.oldtarget,1,event.storage.target)
+		if #event.storage.oldtarget > 5 then
+			table.remove(event.storage.oldtarget)
+		end
 		event.storage.target = nil
 		mob.stand()
 	elseif mob.colliding_with_object() then
@@ -27,14 +28,14 @@ else
 	--}
 
 	if event.storage.oldtarget == nil then
-		event.storage.oldtarget = {event.pos,event.pos,event.pos}
+		event.storage.oldtarget = {event.pos}
 	end
 	local oldpos = event.storage.oldtarget or event.pos
 	for i,p in ipairs(nodes) do
 		if mob.distance(event.pos,p) < r and mob.visiable(p) then
 			local not_same = true
-			for ii=1,3 do
-				if same_pos(p,event.storage.oldtarget[ii]) then
+			for ii,v in ipairs(event.storage.oldtarget) do
+				if same_pos(p,v) then
 					not_same = false
 					break
 				end
