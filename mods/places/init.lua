@@ -334,12 +334,10 @@ if 1 then return end
 		local id = area:index(pos.x+x,pos.y,pos.z+z)
 		if z >scale-2 and z < scale+3 and math.abs(x) >= scale/2 then
 			if (z == scale or z == scale+1) and math.abs(x) ~= scale/2 then
-				data[id] = dirt
-				data[id+area.ystride] = grass
+				data[id] = grass
+				--data[id+area.ystride] = grass
 			else
-
 				data[id] = sidewalk
-				data[id+area.ystride] = sidewalk
 			end
 		else
 			data[id]=road
@@ -506,9 +504,10 @@ minetest.register_node("places:city_npcspawner", {
 
 		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
 		text = text:gsub("#code#",paths)
+		text = text:gsub("#distance#",2.4)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
---		self.static_save = false
+
 		self.storage.code_execute_interval = text
 		self.storage.code_execute_interval_user = "singleplayer"
 		self.object:set_properties({textures={skin},static_save = false})
@@ -561,6 +560,7 @@ minetest.register_node("places:city_npccarspawner", {
 
 		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
 		text = text:gsub("#code#",paths)
+		text = text:gsub("#distance#",4)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
 		

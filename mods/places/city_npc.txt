@@ -4,7 +4,7 @@ end
 if event.storage.target then
 	mob.lookat(event.storage.target)
 	mob.walk()
-	if mob.distance(event.pos,event.storage.target) < 2.4 then
+	if mob.distance(event.pos,event.storage.target) < #distance# then
 		table.insert(event.storage.oldtarget,1,event.storage.target)
 		if #event.storage.oldtarget > 5 then
 			table.remove(event.storage.oldtarget)
@@ -30,7 +30,6 @@ else
 	if event.storage.oldtarget == nil then
 		event.storage.oldtarget = {event.pos}
 	end
-	local oldpos = event.storage.oldtarget or event.pos
 	for i,p in ipairs(nodes) do
 		if mob.distance(event.pos,p) < r and mob.visiable(p) then
 			local not_same = true
