@@ -158,7 +158,7 @@ places = {
 	--		on_spawn=function(pos)
 	--		end,
 	--	}
-	}
+	},
 }
 
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -456,9 +456,15 @@ if 1 then return end
 	end
 	end
 
+	local road_paths2 = "{"
+	for i,p in ipairs(road_paths) do
+		road_paths2 = road_paths2 .."{x="..p.x..",y="..p.y..",z="..p.z.."},"
+	end
+	road_paths2 = road_paths2 .."}"
+
 	for i,p in ipairs(road_paths) do
 		minetest.set_node(p,{name="places:city_npccarspawner"})	
-		minetest.get_meta(p):set_string("paths",road_paths)
+		minetest.get_meta(p):set_string("paths",road_paths2)
 	end
 
 end
@@ -474,6 +480,54 @@ minetest.register_node("places:city_npcspawner", {
 	sunlight_propagates = true,
 	on_construct=function(pos)
 		minetest.registered_nodes["places:city_npcspawner"].on_load(pos)
+	end,
+	on_load=function(pos)
+		minetest.get_node_timer(pos):start(math.random(1,60))
+	end,
+	on_timer = function (pos, elapsed)
+
+		if (examobs.active.types["examobs:npc"] or 0) > 20 then
+			return true
+		end
+
+		local paths = minetest.get_meta(pos):get_string("paths")
+		if paths == "" then
+			minetest.remove_node(pos)
+			return
+		end
+		local skin = player_style.skins.skins[math.random(1,26)].skin
+		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
+		local text = file:read("*all")
+		file:close()
+
+		if text == "" then
+			return
+		end
+
+		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
+		text = text:gsub("#code#",paths)
+
+		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
+--		self.static_save = false
+		self.storage.code_execute_interval = text
+		self.storage.code_execute_interval_user = "singleplayer"
+		self.object:set_properties({textures={skin},static_save = false})
+		return true
+	end
+})
+
+minetest.register_node("places:city_npccarspawner", {
+	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
+	pointable=false,
+	paramtype = "light",
+--	drawtype="airlike",
+	tiles = {"default_water.png"},
+	drop="",
+	walkable=false,
+	floodable = true,
+	sunlight_propagates = true,
+	on_construct=function(pos)
+		minetest.registered_nodes["places:city_npccarspawner"].on_load(pos)
 	end,
 	on_load=function(pos)
 		minetest.get_node_timer(pos):start(math.random(1,60))
@@ -495,63 +549,35 @@ minetest.register_node("places:city_npcspawner", {
 
 		if text == "" then
 			return
+		elseif not places.car_colors then
+			places.car_colors = {}
+			for i,v in pairs(minetest.registered_nodes) do
+				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" then
+					table.insert(places.car_colors,{name=v.name,texture=v.tiles[1]})
+				end
+			end
 		end
+		local ndef = places.car_colors[math.random(1,#places.car_colors)]
 
 		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
 		text = text:gsub("#code#",paths)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-		self.static_save = false
+		
 		self.storage.code_execute_interval = text
 		self.storage.code_execute_interval_user = "singleplayer"
-		self.object:set_properties({textures={skin}})
-		return true
-	end
-})
+		self.object:set_properties({textures={skin},static_save = false})
 
-minetest.register_node("places:city_npccarspawner", {
-	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
-	pointable=false,
-	paramtype = "light",
---	drawtype="airlike",
-	tiles = {"default_water.png"},
-	drop="",
-	walkable=false,
-	floodable = true,
-	sunlight_propagates = true,
-	on_construct=function(pos)
-		minetest.registered_nodes["places:city_npccarspawner"].on_load(pos)
-	end,
-	on_load=function(pos)
-		--minetest.get_node_timer(pos):start(math.random(1,60))
-	end,
-	on_timer = function (pos, elapsed)
-		if (examobs.active.types["examobs:npc"] or 0) > 20 then
-			return true
-		end
+		local car = minetest.add_entity(apos(pos,0,1),"quads:car"):get_luaentity()
+		self.object:set_attach(car.object, "",{x=-5, y=-3, z=2})
+		car.object:set_properties({static_save = false})
+		car.user = self.object
+		car.user_name= self.examob
+		car.bot = self
+		car.texture_node = ndef.name
+		car.texture = ndef.texture
+		car.color(car)
 
-		local paths = minetest.get_meta(pos):get_string("paths")
-		if paths == "" then
-			minetest.remove_node(pos)
-			return
-		end
-		local skin = player_style.skins.skins[math.random(1,26)].skin
-		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
-		local text = file:read("*all")
-		file:close()
-
-		if text == "" then
-			return
-		end
-
-		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
-		text = text:gsub("#code#",paths)
-
-		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-		self.static_save = false
-		self.storage.code_execute_interval = text
-		self.storage.code_execute_interval_user = "singleplayer"
-		self.object:set_properties({textures={skin}})
 		return true
 	end
 })
