@@ -865,6 +865,11 @@ exatec.create_env=function(A,g,self)
 			minetest.chat_send_player(A.user,dump(p))
 			g.count = g.count + 4000
 		end,
+		same_pos_text = "(pos1,pos2) if pos1 and pos2 is same position",
+		same_pos=function(pos1,pos2)
+			return (pos1.x..","..pos1.y..","..pos1.z) == (pos2.x..","..pos2.y..","..pos2.z)
+		end,
+
 		tonumber=tonumber,
 		tostring=tostring,
 		type=type,
