@@ -327,6 +327,8 @@ if 1 then return end
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
 
+	protect.add_game_rule_area(vector.add(pos,citysize2+scale),vector.subtract(pos,citysize2+scale),"City")
+
 --roads
 
 	for x = -citysize2+scale,citysize2 do
