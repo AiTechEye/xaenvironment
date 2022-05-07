@@ -149,32 +149,26 @@ end)
 
 local old_is_protected = minetest.is_protected
 minetest.is_protected=function(pos,name)
-	local pb
-	if name == "" then
-		pb = false
-	else
-		pb = (minetest.player_exists(name) and minetest.get_player_privs(name).protection_bypass == true) or false
-	end
+	local pb = (minetest.player_exists(name) and minetest.get_player_privs(name).protection_bypass == true) or false
 	local inside
 	local interacts
+	local owner
 	for i,v in pairs(protect.areas) do
-		if v.game_rule or (v.owner ~= name and pb == false) then
-			if (pos.x >= v.pos1.x and pos.x <= v.pos2.x)
-			and (pos.y >= v.pos1.y and pos.y <= v.pos2.y)
-			and (pos.z >= v.pos1.z and pos.z <= v.pos2.z) then
-				interacts = true
-				if name == v.owner then
-					inside = true
-				end
+		if (pos.x >= v.pos1.x and pos.x <= v.pos2.x)
+		and (pos.y >= v.pos1.y and pos.y <= v.pos2.y)
+		and (pos.z >= v.pos1.z and pos.z <= v.pos2.z) then
+			if v.owner == name then
+				return false
+			else
+				owner = (v.game_rule or pb == false) and v.owner or nil
 			end
 		end
 	end
-	if inside then
-		return false
-	elseif interacts then
-		return true
+	if owner then
+		return true,owner
+	else
+		return old_is_protected(pos,name)
 	end
-	return old_is_protected(pos,name)
 end
 
 protect.inside_area=function(pos)
@@ -191,7 +185,7 @@ protect.inside_area=function(pos)
 	return list,count
 end
 
-protect.add_area=function(name,title)
+protect.add_area=function(name,title,pos1,pos2)
 	local p = protect.user[name]
 	if not (p and p.pos1 and p.pos2) then
 		minetest.chat_send_player(name,"You have to select 2 positions first")
@@ -242,7 +236,7 @@ protect.add_area=function(name,title)
 	return false
 end
 
-protect.add_game_rule_area=function(pos1,pos2,title)
+protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule)
 	local id = 0
 	local a = {}
 	for i,v in pairs(protect.areas) do
@@ -255,7 +249,7 @@ protect.add_game_rule_area=function(pos1,pos2,title)
 		end
 	end
 	pos1,pos2 = protect.sort(pos1,pos2)
-	table.insert(protect.areas,{id=id,game_rule=true,owner="game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
+	table.insert(protect.areas,{id=id,game_rule=game_rule == nil,owner=name or "game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
 	return id
 end
