@@ -185,7 +185,7 @@ protect.inside_area=function(pos)
 	return list,count
 end
 
-protect.add_area=function(name,title,pos1,pos2)
+protect.add_area=function(name,title)
 	local p = protect.user[name]
 	if not (p and p.pos1 and p.pos2) then
 		minetest.chat_send_player(name,"You have to select 2 positions first")
