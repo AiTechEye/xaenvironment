@@ -130,6 +130,7 @@ minetest.register_entity("quads:car",{
 			clicker:hud_remove(self.hud.petrol)
 			clicker:hud_remove(self.hud.petrol_back)
 		elseif (self.user_name =="" or self.user_name == clicker:get_player_name()) and not player_style.player_attached[clicker:get_player_name()] and minetest.get_item_group(minetest.get_node(clicker:get_pos()).name,"liquid") == 0 then
+			self.object:set_properties({static_save = true})
 			self.user = clicker
 			self.user_name = clicker:get_player_name()
 			self.user:set_attach(self.object, "",{x=-5, y=-3, z=2})
@@ -266,8 +267,17 @@ minetest.register_entity("quads:car",{
 
 		local key = self.user and self.user:get_player_control() or {}
 
-
 		if self.bot then
+			if self.user:get_luaentity() == nil then
+				self.user = nil
+				self.user_name = ""
+				self.bot = nil
+				if math.random(1,10) > 1 then
+					self.object:remove()
+				end
+				return
+			end
+
 			self.lerp_start = self.object:get_yaw()
 			self.lerp_end = self.user:get_yaw() or self.lerp_start
 			self.lerp_cur = self.lerp_start + (self.lerp_end-self.lerp_start) * 0.2 -- lerp
@@ -281,7 +291,6 @@ minetest.register_entity("quads:car",{
 			local target = self.bot.storage.exatec and self.bot.storage.exatec.target
 
 			if target and type(target) == "table" and self.speed > 5 and vector.distance(p,target) < 10 then
-				--self.speed = self.speed - 1
 				self.speed = self.speed + (1-self.speed) * 0.2
 			end
 		end
