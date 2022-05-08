@@ -17,14 +17,15 @@ minetest.register_on_mods_loaded(function()
 end)
 
 minetest.register_on_punchnode(function(pos,node,puncher,pointed_thing)
+	local ppos = puncher:get_wielded_item():get_name() == "" and pos or pointed_thing.above 
 	local name = puncher:get_player_name()
 	local p = protect.user[name]
 	if p and p.current then
 		if p.pos1 and p.current == 1 then
-			p.pos1 = pos
+			p.pos1 = ppos
 			p.pos1id = math.random(0,9999)
 		elseif p.pos2 and p.current == 2 then
-			p.pos2 = pos
+			p.pos2 = ppos
 			p.pos2id = math.random(0,9999)
 		else
 			return
@@ -74,7 +75,7 @@ minetest.register_chatcommand("protect", {
 					self.user = name
 					self.markid = protect.user[name].markid
 				end
-				return true,"Position "..param.." selected"
+				return true,"Position "..param.." selected (punch with empty hand for pos under/above)"
 			elseif n then
 				return false, "Numberitic names are unalowed"
 			elseif param ~= "" then
@@ -352,6 +353,7 @@ minetest.register_entity("protect:mark",{
 	visual = "cube",
 	textures = {"vexcazer_schematic_mark.png","vexcazer_schematic_mark.png","vexcazer_schematic_mark.png","vexcazer_schematic_mark.png","vexcazer_schematic_mark.png","vexcazer_schematic_mark.png","vexcazer_schematic_mark.png"}, 
 	is_visible = true,
+	backface_culling = false,
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.1 then

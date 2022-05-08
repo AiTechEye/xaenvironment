@@ -5,7 +5,7 @@
 /remove_area <number>	remove area
 
 You can also punch a block to move the last selected, punch a marker to abort.
-
+Punch with empty hand for pos under/above.
 
 Privileges:
 
