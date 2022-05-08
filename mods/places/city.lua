@@ -351,7 +351,7 @@ minetest.register_node("places:city_npccarspawner", {
 		elseif not places.car_colors then
 			places.car_colors = {}
 			for i,v in pairs(minetest.registered_nodes) do
-				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" then
+				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" and not (v.groups and (v.groups.not_in_creative_inventory or v.groups.rail)) then
 					table.insert(places.car_colors,{name=v.name,texture=v.tiles[1]})
 				end
 			end
