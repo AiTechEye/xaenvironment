@@ -57,7 +57,7 @@ minetest.register_tool("default:wrench", {
 	groups = {treasure=1},
 	inventory_image = "default_wrench.png",
 	on_place=function(itemstack, user, pointed_thing)
-		if pointed_thing.type == "node" then
+		if pointed_thing.type == "node" and not minetest.is_protected(pointed_thing.under,user:get_player_name()) then
 			local n = minetest.get_node(pointed_thing.under)
 			if n.param2 >= 3 then
 				n.param2 = 0
@@ -70,7 +70,7 @@ minetest.register_tool("default:wrench", {
 		end
 	end,
 	on_use=function(itemstack, user, pointed_thing)
-		if pointed_thing.type == "node" then
+		if pointed_thing.type == "node" and not minetest.is_protected(pointed_thing.under,user:get_player_name()) then
 			local n = minetest.get_node(pointed_thing.under)
 			n.param2 = n.param2 == 4 and 6 or 4
 			minetest.swap_node(pointed_thing.under,n)
