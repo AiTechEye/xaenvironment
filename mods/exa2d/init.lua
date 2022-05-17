@@ -293,7 +293,7 @@ exa2d.join=function(player,pos)
 	exa2d.user[name].ui_coins = player:hud_add({
 		hud_elem_type="text",
 		scale = {x=1,y=1},
-		text=player:get_meta():get_int("coins"),
+		text=Getcoin(player),
 		number=0xFFFF00,
 		offset={x=0,y=10},
 		position={x=0.95,y=0.02},

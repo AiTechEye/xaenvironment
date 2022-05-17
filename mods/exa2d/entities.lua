@@ -122,7 +122,7 @@ minetest.register_entity("exa2d:cam",{
 				if default.defpos(cef,"buildable_to") and not minetest.is_protected(cef, "") and not exa2d.is_item(cef) then
 					minetest.set_node(cef,{name="exa2d:coin_effect",param2=above.param2})
 				end
-				self.user:hud_change(exa2d.user[self.username].ui_coins,"text",self.user:get_meta():get_int("coins"))
+				self.user:hud_change(exa2d.user[self.username].ui_coins,"text",Getcoin(self.user))
 			end
 		elseif not self.block_hit and v.y ~= 0 and above.name == "exa2d:block_empty" then
 			self.block_hit = true
@@ -131,7 +131,7 @@ minetest.register_entity("exa2d:cam",{
 		if cp then
 			minetest.sound_play("exa2d_coin",{pos=pos2,gain=0.1,max_hear_distance=10})
 			Coin(self.user,1)
-			self.user:hud_change(exa2d.user[self.username].ui_coins,"text",self.user:get_meta():get_int("coins"))
+			self.user:hud_change(exa2d.user[self.username].ui_coins,"text",Getcoin(self.user))
 			minetest.remove_node(cp)
 		elseif self.block_hit and self.jump_timer <= 0 then
 			self.block_hit = false
