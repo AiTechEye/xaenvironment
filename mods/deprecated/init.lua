@@ -25,3 +25,12 @@ for i1,v2 in pairs(deprecated) do
 		minetest.register_alias(v,v:gsub(v2.replace[1],v2.replace[2]))
 	end
 end
+
+minetest.register_on_joinplayer(function(player)
+	local m = player:get_meta()
+	local c = m:get_int("coins")
+	if c > 0 then
+		Coin(player,c)
+		m:set_int("coins",0)
+	end
+end)
