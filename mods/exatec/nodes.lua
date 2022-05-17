@@ -2388,8 +2388,6 @@ minetest.register_node("exatec:trader", {
 		local t = math.floor(player_style.store_items_cost[stack:get_name()]*0.1) * stack:get_count()
 		local o = m:get_string("owner")
 		if o ~= "" then
-			local p = minetest.get_player_by_name(o)
-
 			if stack:get_name() == "player_style:coin" then
 				t = stack:get_count()
 			end
@@ -2402,19 +2400,11 @@ minetest.register_node("exatec:trader", {
 					return
 				end
 			end
-			if p then
-				local c = m:get_int("coins")
-				if c > 0 then
-					t = t + c
-					m:set_int("coins",0)
-					m:set_string("infotext","")
-				end
-				Coin(p,t)
-				m:get_inventory():set_stack("main",1,nil)
-				minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
-				m:set_string("infotext",p:get_meta():get_int("coins"))
-				return
-			end
+			Coin(o,t)
+			m:set_string("infotext",Getcoin(o))
+			m:get_inventory():set_stack("main",1,nil)
+			minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+			return
 		end
 		local at = m:get_int("coins")+t
 		m:set_int("coins",at)
