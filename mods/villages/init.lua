@@ -514,14 +514,13 @@ minetest.register_entity("villages:traderitem",{
 	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		self.object:set_hp(1000)
 		if puncher:is_player() then
-			local m = puncher:get_meta()
 			local inv = puncher:get_inventory()
-			local c = m:get_int("coins")
+			local c = Getcoin(puncher)
 			local pos = self.object:get_pos()
 			local m2 = minetest.get_meta(pos)
 			if c >= self.cost and inv:room_for_item("main",self.item) then
 				inv:add_item("main",self.item)
-				m:set_int("coins",c-self.cost)
+				Coin(puncher,c-self.cost,true)
 				local ic = m2:get_int("count"..self.index)-1
 				m2:set_int("count"..self.index,ic)
 				self.update = true
