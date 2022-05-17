@@ -224,9 +224,18 @@ default.flowing=function(object)
 	end
 end
 
-Coin=function(player,count)
-	local m = player:get_meta()
-	m:set_int("coins",m:get_int("coins")+count)
+Coin=function(player,count,set)
+	player = type(player) == "string" and player or player:get_player_name()
+	local c = set and 0 or default.storage:get_int(player.."_coins")
+	default.storage:set_int(player.."_coins",c+count)
+--old system
+	--local m = player:get_meta()
+	--m:set_int("coins",m:get_int("coins")+count)
+end
+
+Getcoin=function(player)
+	player = type(player) == "string" and player or player:get_player_name()
+	return default.storage:get_int(player.."_coins")
 end
 
 default.register_on_item_drop=function(f)

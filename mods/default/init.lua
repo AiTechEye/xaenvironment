@@ -1,5 +1,6 @@
 default={
 	XaEnvironment = true,
+	storage = minetest.get_mod_storage(),
 	workbench={
 		registered_crafts={}
 	},
