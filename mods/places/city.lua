@@ -1,3 +1,8 @@
+places.citybuildings = {
+	house1={chance=5,size=1},
+	uncraft_sell_service={chance=20,size=1},
+}
+
 --places.buildings.city={
 	--		chance=50,sx=10,sy=250,miny=0-20,maxy=50,spawn_at={"default:dirt"},
 	--		on_spawn=function(pos)
@@ -203,7 +208,16 @@ if 1 then return end
 
 	for i,v in pairs(map) do
 		if v.house then
-			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/house1.exexn")
+			local house
+			for c,h in pairs(places.citybuildings) do
+				if math.random(1,h.chance) == 1 then
+					house = c
+					break
+				elseif not house or math.random(1,5) == 1 then
+					house = c
+				end
+			end
+			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/"..house..".exexn")
 		end
 	end
 	for i,v in pairs(lamppos) do
