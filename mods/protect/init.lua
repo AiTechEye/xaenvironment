@@ -250,7 +250,7 @@ protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule)
 		end
 	end
 	pos1,pos2 = protect.sort(pos1,pos2)
-	table.insert(protect.areas,{id=id,game_rule=game_rule == nil,owner=name or "game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
+	table.insert(protect.areas,{id=id,game_rule=game_rule == nil,owner=name or "*game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
 	return id
 end
