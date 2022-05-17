@@ -1,3 +1,20 @@
+minetest.register_craft({
+	output="places:rental",
+	recipe={
+		{"default:locked_chest","materials:plastic_sheet","materials:gear_metal"},
+		{"materials:diode","materials:wood_table","default:iron_ingot"},
+		{"default:sign","group:wood","group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output="places:rentpanel_copycard",
+	recipe={
+		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
+		{"materials:diode","materials:diode","default:copper_ingot"},
+	},
+})
+
 minetest.register_node("places:rental", {
 	description = "Rental panel",
 	tiles={
@@ -36,7 +53,7 @@ minetest.register_node("places:rental", {
 		if not preview and (name ~= "" and (m:get_string("owner") == name or minetest.check_player_privs(name, {protection_bypass=true}))) then
 			form = form
 			.."label[0,-0.3;"..(m:get_string("pos1") == "" and "No area is setup" or "Area is setup").."]"
-			.."button[0,0;2.2,1;setup;Setup area]"
+			.. (m:get_string("renter") == "" and "button[0,0;2.2,1;setup;Setup area]" or "button[0,0;2.2,1;cancelrenting;Cancel]tooltip[cancelrenting;Cancel renting]")
 			.."button[2,0;1,1;set;Set]tooltip[set;Set values]"
 			.."button[-0.2,3.4;3.5,0.6;cp;Customer Preview]"
 			.."textlist[0,0.8;2,2.5;list;Second,Minute,Hour,Day;"..m:get_int("list").."]"
@@ -50,7 +67,8 @@ minetest.register_node("places:rental", {
 				form = form .."label[0,-0.3;Occupied by "..renter.."]"
 			else
 				form = form
-				.."label[-0.2,0;Owner: "..m:get_string("owner").."]"
+				.. (m:get_string("owner") ~= "" and "label[0.5,0;Owner: "..m:get_string("owner").."]" or "")
+				..(user and "label[2,0;"..minetest.colorize("#FFFF00",Getcoin(user)).."]" or "")
 				.."button[0.5,1;2.2,1;"..(renter == name and "cancel;Cancel" or "rent;Rent").."]"
 				.."label[-0.2,2;Price: "..m:get_int("price").."\n"..m:get_int("amount").."'th "..tt[t].."]"
 			end
@@ -101,8 +119,14 @@ minetest.register_node("places:rental", {
 			m:set_int("id",id)
 			m:set_string("renter",name)
 			m:set_int("date",default.date("get"))
+			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):start((l== 1 or l == 2) and 1 or 10)
 			Coin(sender,-p)
+			minetest.registered_nodes["places:rental"].panel(pos, sender)
+		elseif pressed.cancelrenting then
+			m:set_int("cancel",1)
+			minetest.chat_send_player(m:get_string("owner"),"The renting is canceling")
+			minetest.chat_send_player(m:get_string("renter"),"The renting is canceling")
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
 		elseif pressed.cancel then
 			local renter = m:get_string("renter")
@@ -114,6 +138,7 @@ minetest.register_node("places:rental", {
 			end
 			protect.remove_game_rule_area(m:get_int("id"))
 			m:set_string("renter","")
+			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):stop()
 		elseif pressed.cp then
 			minetest.registered_nodes["places:rental"].panel(pos, sender,true)
@@ -123,13 +148,6 @@ minetest.register_node("places:rental", {
 			minetest.registered_nodes["places:rental"].counts(pos)
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
 		elseif pressed.setup then
-			if m:get_string("renter") ~= "" then
-				minetest.registered_nodes["places:rental"].on_receive_fields(pos, formname, {cancel=true}, sender)
-				minetest.chat_send_player(name,"The renter is terminated")
-				minetest.registered_nodes["places:rental"].panel(pos, sender)
-				return
-			end
-
 			local p = protect.user[name]
 			if not (p and p.pos1 and p.pos2) then
 				minetest.chat_send_player(name,'Mark with "/protect 1 /protect 2" to select the area to rent out\nYou do not need to protect, just mark it\nThen Press the setup button again')
@@ -164,23 +182,29 @@ minetest.register_node("places:rental", {
 		local renter = m:get_string("renter")
 		local owner = m:get_string("owner")
 		if time >= a and renter ~= "" then
+			if m:get_int("cancel") == 1 then
+				minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+				return
+			end
+
 			local cost = math.floor(time/a)*m:get_int("price")
-				local c = Getcoin(renter)
-				if c <= cost then
-					Coin(renter,-c)
-					Coin(owner,c)
+			local c = Getcoin(renter)
+			if c <= cost then
+				Coin(renter,-c)
+				Coin(owner,c)
+				minetest.chat_send_player(renter,c.." coin(s) has just been taken from you due your rent ("..minetest.colorize("#FFFF00",Getcoin(renter)).." left)")
+				minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+				return
+			else
+				Coin(renter,-cost)
+				Coin(owner,cost)
+				minetest.chat_send_player(renter,cost.." coin(s) has just been taken from you due your rent ("..minetest.colorize("#FFFF00",Getcoin(renter)).." left)")
+				if c-cost <= cost then
 					minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
 					return
-				else
-					Coin(renter,-cost)
-					Coin(owner,cost)
-					if c-cost <= cost then
-						minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
-						return
-					end
 				end
+			end
 			m:set_int("date",default.date("get"))
-
 		end
 		return true
 	end,
