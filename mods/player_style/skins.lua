@@ -298,7 +298,7 @@ player_style.skins.store=function(player,scroll)
 	return minetest.show_formspec(player:get_player_name(), "player_style_skins",
 		"size[8,8]" 
 		.."listcolors[#77777777;#777777aa;#000000ff]"
-		.."label[6,-0.35;"..minetest.colorize("#FFFF00",m:get_int("coins")).."]"
+		.."label[6,-0.35;"..minetest.colorize("#FFFF00",Getcoin(player)).."]"
 		.."scrollbaroptions[max="..((#player_style.skins.skins-3)*36)..";]"
 		.."scrollbar[7.5,0;0.5,8;vertical;scrollbar;"..(scroll or 0).."]"
 		.."scroll_container[0,0;9.7,10;scrollbar;vertical]"
@@ -318,11 +318,11 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if index == "skinbuy=" then
 				local m = player:get_meta()
 				local v = player_style.skins.skins[tonumber(i:sub(9,-1))]
-				if m:get_int("coins") >= v.cost then
+				if Getcoin(player) >= v.cost then
 					local own = minetest.deserialize(m:get_string("skins")) or {}
 					own[v.name] = true
 					m:set_string("skins", minetest.serialize(own))
-					m:set_int("coins",m:get_int("coins")-v.cost)
+					Coin(player)
 					index = "skinuse="
 					exaachievements.customize(player,"artist")
 				end

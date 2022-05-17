@@ -275,7 +275,7 @@ special.show=function(player)
 		"listcolors[#77777777;#777777aa;#000000ff]"..
 		"list[detached:special;main;1,0.2;"..special.num..",1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
-		"label[0,-0.35;"..minetest.colorize("#FFFF00",player:get_meta():get_int("coins")).."]" ..
+		"label[0,-0.35;"..minetest.colorize("#FFFF00",Getcoin(player)).."]" ..
 		slots)
 	end, player)
 end
@@ -284,11 +284,10 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 	if form == "special" then
 		for i,v in pairs(pressed) do
 			if string.sub(i,1,11) == "specialbut_" then
-				local m = player:get_meta()
 				local b = special.blocks[string.sub(i,12,-1)]
-				local c = m:get_int("coins")
+				local c = Getcoin(player)
 				if c >= 100 and m:get_int(b.meta)+b.amount <= 10000 then
-					m:set_int("coins",c-100)
+					Coin(player,-100)
 					b.trigger(player)
 					special.show(player)
 				end

@@ -74,7 +74,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							end
 
 							inv:remove_item("main",ItemStack(s.." 1"))
-							m:set_int("coins",m:get_int("coins")+c)
+							Coin(player,c)
 							player_style.store(player)
 							minetest.sound_play("default_coins", {to_player=name, gain = 2})
 							break
@@ -86,10 +86,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					local b = i:sub(1,8)
 					if b == "itembut_" or b == "confirm_" then
 						local t = i:sub(9,-1)
-						local m = player:get_meta()
 						local inv = player:get_inventory()
 						local c = player_style.store_items_cost[t]
-						if m:get_int("coins") >= c and inv:room_for_item("main",t) then
+						if Getcoin(player) >= c and inv:room_for_item("main",t) then
 
 							if b ~= "confirm_" and player_style.store_items_cost[t] >= 1000 then
 								minetest.after(0.2, function(name,t)
@@ -101,9 +100,8 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 									)end,name,t)
 								return
 							end
-
 							inv:add_item("main",t.." 1")
-							m:set_int("coins",m:get_int("coins")-c)
+							Coin(player,-c)
 							player_style.store(player)
 							break
 						end
@@ -188,7 +186,7 @@ player_style.store=function(player)
 			.."image_button[2.4,7;1,1;player_style_coin.png;sell;]"
 
 			
-			.."label[0,-0.35;"..minetest.colorize("#FFFF00",player:get_meta():get_int("coins")).."]"
+			.."label[0,-0.35;"..minetest.colorize("#FFFF00",Getcoin(player)).."]"
 
 			.."label[7.6,9.9;"..page.."/"..pages.."]"
 			.."field[4,7.3;3,1;searchbox;;"..(store.search and store.search.text or "").."]"
