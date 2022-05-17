@@ -84,11 +84,11 @@ minetest.register_node("places:rental", {
 		m:set_int("price",p)
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
-		local name = sender:get_player_name()
 		local m = minetest.get_meta(pos)
+		local name = sender and sender:get_player_name() or m:get_string("renter")
 
 		if pressed.rent then
-			local c = sender:get_meta():get_int("coins")
+			local c = Getcoin(sender)
 			local p = m:get_int("price")
 			if c < p then
 				minetest.chat_send_player(name,"You can't afford "..p.." (cons: ".. c ..")")
@@ -106,18 +106,15 @@ minetest.register_node("places:rental", {
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
 		elseif pressed.cancel then
 			local renter = m:get_string("renter")
-			local r = minetest.get_player_by_name(renter)
 			minetest.chat_send_player(name,name == renter and "You as renter is terminated" or "The renter is terminated")
-			if r then
-				local c = r:get_meta():get_int("coins")
-				local p = m:get_int("price")
-				if c < p then
-					minetest.chat_send_player(name,"Could not afford "..p..(name == renter and " (cons: ".. c ..")" or ""))
-				end
+			local c = Getcoin(renter)
+			local p = m:get_int("price")
+			if c < p then
+				minetest.chat_send_player(name,"Could not afford "..p.." cons"..(name == renter and " (have: ".. c ..")" or ""))
 			end
 			protect.remove_game_rule_area(m:get_int("id"))
 			m:set_string("renter","")
-			--minetest.get_node_timer(pos):stop()
+			minetest.get_node_timer(pos):stop()
 		elseif pressed.cp then
 			minetest.registered_nodes["places:rental"].panel(pos, sender,true)
 		elseif pressed.set then
@@ -166,44 +163,24 @@ minetest.register_node("places:rental", {
 		local a = m:get_int("amount")
 		local renter = m:get_string("renter")
 		local owner = m:get_string("owner")
-		local o = minetest.get_player_by_name(owner)
-		local r = minetest.get_player_by_name(renter)
-		local coins = m:get_int("coins")
-		if coins > 0 then
-			if o then
-				Coin(o,coins)
-				m:set_int("coins",0)
-			end
-		elseif renter == "" then
-			return
-		end
 		if time >= a and renter ~= "" then
 			local cost = math.floor(time/a)*m:get_int("price")
-			if r then
-				local c = r:get_meta():get_int("coins")
+				local c = Getcoin(renter)
 				if c <= cost then
-					Coin(r,-c)
-					if o then
-						Coin(o,c)
-					else
-						m:set_int("coins",m:get_int("coins")+c)
-					end
-					minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true},r)
-					return true
+					Coin(renter,-c)
+					Coin(owner,c)
+					minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+					return
 				else
-					Coin(r,-cost)
-					if o then
-						Coin(o,cost)
-					else
-						m:set_int("coins",m:get_int("coins")+cost)
-					end
+					Coin(renter,-cost)
+					Coin(owner,cost)
 					if c-cost <= cost then
-						minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true},r)
-						return true
+						minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+						return
 					end
 				end
 			m:set_int("date",default.date("get"))
-			end
+
 		end
 		return true
 	end,
