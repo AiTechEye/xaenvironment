@@ -160,8 +160,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local vm,min,max
 	local area
 	local data
+	local y = maxp.y-minp.y
 	for i,v in pairs(places.buildings) do
-		if math.random(0,v.chance) == 0 and (v.miny <= minp.y and v.maxy >= maxp.y) then
+		if math.random(0,v.chance) == 0 and (v.miny <= y and y <= v.maxy) then
 			local spawn_at = {}
 			for i1,v1 in pairs(v.spawn_at) do
 				spawn_at[minetest.get_content_id(v1)] = true

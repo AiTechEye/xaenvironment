@@ -1,24 +1,51 @@
 places.citybuildings = {
-	house1={chance=5,size=1},
-	uncraft_sell_service={chance=20,size=1},
+	{name="house1",chance=5,size=1},
+	{name="uncraft_sell_service",chance=20,size=1,freespace={{-1,0}}},
 }
 
---places.buildings.city={
-	--		chance=50,sx=10,sy=250,miny=0-20,maxy=50,spawn_at={"default:dirt"},
-	--		on_spawn=function(pos)
-	--		end,
-	--	}
+places.buildings.city={
+	chance=50,sx=100,sy=100,miny=-50,maxy=150,spawn_at={"default:dirt"},
+	on_spawn=function(pos)
+		places.city(pos)
+	end
+}
 
 places.ishouse=function(a)
 	return a and a.house
 end
 
 places.city=function(pos)
---gen map
-	local citysize = 5
+	local min_size_for_middle_split = 5
+	local citysize = 10
 	local scale = 16
 	local houses = 0
 	local map = {}
+	local ignore = {}
+
+--test map
+
+	for i=1,citysize do
+		local terrain = 0
+		for x=-citysize,citysize do
+		for z=-citysize,citysize do
+			local dpos = vector.new(pos.x+(x*16),pos.y,pos.z+(z*16))
+			local def = minetest.registered_nodes[minetest.get_node(dpos).name]
+			if def and def.groups and (def.groups.dirt or def.groups.stone) then
+				terrain = terrain +1
+			end
+		end
+		end
+print(citysize,terrain)
+		if terrain >= citysize then
+			citysize = citysize - 1
+			if citysize < 1 then
+				return
+			end
+		end
+	end
+
+--gen map
+
 	pos = vector.round(pos)
 	for z=-citysize,citysize do
 	local fil = false
@@ -43,7 +70,7 @@ places.city=function(pos)
 				map[x..","..z] = {house=true,pos=vector.new(x,0,z)}
 				houses = houses +1
 			end
-		elseif not ((z==0 or z==1)    or z1 and math.random(1,2) == 1) and (z1 or not (x1 or x2)) and (not x0 or math.random(1,2) == 1) then
+		elseif not ((citysize >= min_size_for_middle_split and (z==0 or z==1)) or z1 and math.random(1,2) == 1) and (z1 or not (x1 or x2)) and (not x0 or math.random(1,2) == 1) then
 			map[x..","..z] = {house=true,pos=vector.new(x,0,z)}
 			houses = houses +1
 			if z1 then
@@ -56,11 +83,17 @@ places.city=function(pos)
 --changes
 
 	for i,v in pairs(map) do
-		if v.house then
+		local dpos = vector.add(apos(pos,8,0,8),vector.multiply(v.pos,16))
+		local def = minetest.registered_nodes[minetest.get_node(dpos).name]
+		if def and def.groups and (def.groups.dirt or def.groups.stone) then
+			ignore[v.pos.x..","..v.pos.z] = true
+			map[i].house = nil
+			map[i].street = nil
+		elseif v.house then
 			local X = v.pos.x
 			local Z = v.pos.z
 --park
-			if math.random(1,houses) == 1 then
+			if math.random(1,houses) == 1 and citysize > 3 then
 				local block = {[X..","..Z]={X,Z}}
 				local done = true
 				map[X..","..Z].park = true
@@ -127,9 +160,10 @@ if 1 then return end
 
 	local road = minetest.get_content_id("materials:asphalt_slab")
 	local dirt = minetest.get_content_id("default:dirt")
+	local stone = minetest.get_content_id("default:stone")
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
-
+	local air = minetest.get_content_id("air")
 	protect.add_game_rule_area(vector.add(pos,citysize2+scale),vector.subtract(pos,citysize2+scale),"City")
 
 --roads
@@ -137,14 +171,27 @@ if 1 then return end
 	for x = -citysize2+scale,citysize2 do
 	for z = -citysize2+scale,citysize2 do
 		local id = area:index(pos.x+x,pos.y,pos.z+z)
-		if z >scale-2 and z < scale+3 and math.abs(x) >= scale/2 then
+		local ig = ignore[math.floor(x/16)..","..math.floor(z/16)]
+
+		if not ig then
+			for y = -scale*2,scale do
+				local id = area:index(pos.x+x,pos.y+y,pos.z+z)
+				if y < 0 then
+					data[id] = stone
+				elseif y > 0 then
+					data[id] = air
+				end
+			end
+		end
+		
+		if not ig and (citysize >= min_size_for_middle_split and z >scale-2 and z < scale+3 and math.abs(x) >= scale/2) then
 			if (z == scale or z == scale+1) and math.abs(x) ~= scale/2 then
 				data[id] = grass
 				--data[id+area.ystride] = grass
 			else
 				data[id] = sidewalk
 			end
-		else
+		elseif not ig then
 			data[id]=road
 		end
 	end
@@ -154,7 +201,7 @@ if 1 then return end
 	local sidewalk_paths1 = {}
 	local sidewalk_paths2 = {}
 	local road_paths = {vector.new(pos.x,pos.y+1,pos.z+scale)}
-
+	local plantspos = {}
 	local lamppos = {}
 	for i,v in pairs(map) do
 
@@ -166,7 +213,8 @@ if 1 then return end
 		local zm = map[X..","..(Z-1)]
 		local zp = map[X..","..(Z+1)]
 
-		if v.street then
+		if ignore[X..","..Z] then
+		elseif v.street then
 			table.insert(road_paths,vector.new(pos.x+(X*scale)+(scale/2),pos.y+1,pos.z+(Z*scale)+(scale/2)))
 		elseif v.house then
 			for x=1,scale, scale-1 do
@@ -197,6 +245,7 @@ if 1 then return end
 			for z=1,scale do
 				local id = area:index(pos.x+(X*scale)+x,pos.y,pos.z+(Z*scale)+z)
 				data[id]=grass
+				table.insert(plantspos,vector.new(pos.x+(X*scale)+x,pos.y+1,pos.z+(Z*scale)+z))
 			end
 			end
 		end
@@ -206,18 +255,51 @@ if 1 then return end
 	vox:update_map()
 	vox:update_liquids()
 
+	for i,p in ipairs(plantspos) do
+		local r = math.random(1,1000)
+		if r == 1 then
+			minetest.set_node(p,{name=default.registered_trees[math.random(1,#default.registered_trees)]})
+			minetest.get_node_timer(p):start(0.1)
+		elseif r == 2 then
+			minetest.set_node(p,{name=default.registered_bushies[math.random(1,#default.registered_bushies)]})
+		elseif r < 100 then
+			local j = default.registered_plants[math.random(1,#default.registered_plants)]
+			local def = minetest.registered_nodes[j]
+			if def.drawtype ~= "plantlike_rooted" and j ~= "plants:lily_pad" then
+				minetest.set_node(p,{name=j})
+			end
+		else
+			minetest.set_node(p,{name="plants:grass"..math.random(1,5)})
+		end
+	end
+
 	for i,v in pairs(map) do
-		if v.house then
+		if v.house and not ignore[v.pos.x..","..v.pos.z] then
+			local X = v.pos.x
+			local Z = v.pos.z
 			local house
-			for c,h in pairs(places.citybuildings) do
+			local s = #places.citybuildings
+			while(house == nil) do
+				local h = places.citybuildings[math.random(1,s)]
 				if math.random(1,h.chance) == 1 then
-					house = c
-					break
-				elseif not house or math.random(1,5) == 1 then
-					house = c
+					if h.freespace then
+						local block
+						for f,r in ipairs(h.freespace) do	
+							local spc = map[(X+r[1])..","..(Z+r[2])]
+							if not (spc == nil or spc.street) then
+								block = true
+								break
+							end
+						end
+						if not block then
+							house = h
+						end
+					else
+						house = h
+					end
 				end
 			end
-			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/"..house..".exexn")
+			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/"..house.name..".exexn")
 		end
 	end
 	for i,v in pairs(lamppos) do
@@ -257,7 +339,8 @@ if 1 then return end
 		local max = citysize2-4
 		local x1 = x+5
 		local z1 = z+5
-		if (x == min or x == max) and z1/16 == math.floor(z1/16) or (z == min or z == max) and x1/16 == math.floor(x1/16) then
+		if not ignore[math.floor(x1/16)..","..math.floor(z1/16)] then
+		elseif (x == min or x == max) and z1/16 == math.floor(z1/16) or (z == min or z == max) and x1/16 == math.floor(x1/16) then
 			local p = vector.new(pos.x+x,pos.y+1,pos.z+z)
 			local i = p.x..","..p.z
 			if not rp[i] then
