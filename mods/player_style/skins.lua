@@ -322,7 +322,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					local own = minetest.deserialize(m:get_string("skins")) or {}
 					own[v.name] = true
 					m:set_string("skins", minetest.serialize(own))
-					Coin(player)
+					Coin(player,-v.cost)
 					index = "skinuse="
 					exaachievements.customize(player,"artist")
 				end
