@@ -20,7 +20,7 @@ default.register_bush=function(def)
 	def.sounds = def.sounds or 				default.node_sound_leaves_defaults()
 	def.drop = def.drop or 				{max_items = 1,items = {{items = {"default:stick"}, rarity = 10},{items = {nname}}}}
 	minetest.register_node(nname, def)
-
+	table.insert(default.registered_bushies,nname.."_spawner")
 	minetest.register_node(nname.."_spawner",{
 		groups = {on_load=1,not_in_craftguide=1,not_in_creative_inventory=1},
 		drawtype = "airlike",
@@ -265,7 +265,7 @@ default.register_plant=function(def)
 	def.walkable = def.walkable or			false
 	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
 	def.dye_colors = def.dye_colors or			{palette=90}
-
+	table.insert(default.registered_plants,mod .. def.name)
 	minetest.register_node(mod .. def.name, def)
 
 	if def.decoration == false then
@@ -458,7 +458,7 @@ default.register_tree=function(def)
 		end
 	end
 	minetest.register_node(mod .. def.name .. "_sapling", def.sapling)
-
+	table.insert(default.registered_trees,mod .. def.name .. "_sapling")
 	if def.fruit then
 		minetest.register_ore({
 			ore_type = "scatter",
