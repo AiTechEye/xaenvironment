@@ -2387,19 +2387,20 @@ minetest.register_node("exatec:trader", {
 		local m = minetest.get_meta(pos)
 		local t = math.floor(player_style.store_items_cost[stack:get_name()]*0.1) * stack:get_count()
 		local o = m:get_string("owner")
-		if o ~= "" then
-			if stack:get_name() == "player_style:coin" then
-				t = stack:get_count()
-			end
 
-			if m:get_int("tocoins") == 1 then
-				local ss = m:get_inventory():add_item("output",ItemStack("player_style:coin "..t))
-				m:get_inventory():set_stack("main",1,nil)
-				if ss:get_count() == 0 then
-					minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
-					return
-				end
+		if stack:get_name() == "player_style:coin" then
+			t = stack:get_count()
+		end
+
+		if m:get_int("tocoins") == 1 then
+			local ss = m:get_inventory():add_item("output",ItemStack("player_style:coin "..t))
+			m:get_inventory():set_stack("main",1,nil)
+			if ss:get_count() == 0 then
+				minetest.sound_play("default_coins", {pos=pos, gain = 2, max_hear_distance = 10})
+				return
 			end
+		end
+		if o ~= "" then
 			Coin(o,t)
 			m:set_string("infotext",Getcoin(o))
 			m:get_inventory():set_stack("main",1,nil)
