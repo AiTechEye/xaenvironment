@@ -141,7 +141,7 @@ default.register_tree({
 	},
 	schematic = false,
 	sapling={on_timer=function(pos, elapsed)
-		minetest.set_node(pos, {name = "toxic:dry_plant"})
+		minetest.set_node(pos, {name = "toxic:toxic_plant"})
 		end
 	}
 })
