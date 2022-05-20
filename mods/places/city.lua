@@ -1,6 +1,7 @@
 places.citybuildings = {
 	{name="house1",chance=5,size=1},
-	{name="uncraft_sell_service",chance=20,size=1,freespace={{-1,0}}},
+	{name="uncraft_sell_service",chance=30,size=1,freespace={{-1,0}}},
+	{name="places_shop",chance=20,size=1,freespace={{0,-1}}},
 }
 
 places.buildings.city={
@@ -35,7 +36,7 @@ places.city=function(pos)
 			end
 		end
 		end
-print(citysize,terrain)
+
 		if terrain >= citysize then
 			citysize = citysize - 1
 			if citysize < 1 then
@@ -43,6 +44,8 @@ print(citysize,terrain)
 			end
 		end
 	end
+
+	print("Generating a city",citysize)
 
 --gen map
 
@@ -299,7 +302,11 @@ if 1 then return end
 					end
 				end
 			end
+
 			nodeextractor.set(vector.new(pos.x+(v.pos.x*scale)+1,pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1),minetest.get_modpath("places").."/nodeextractor/"..house.name..".exexn")
+			if house.on_spawn then
+				house.on_spawn(vector.new(pos.x+(v.pos.x*scale)+1+math.floor(scale/2),pos.y+v.pos.y,pos.z+(v.pos.z*scale)+1+math.floor(scale/2)))
+			end
 		end
 	end
 	for i,v in pairs(lamppos) do
