@@ -490,6 +490,26 @@ minetest.register_node("villages:trader", {
 	end,
 })
 
+local trader2 = table.copy(default.def("villages:trader"))
+trader2.on_timer = function(pos, elapsed)
+	local item
+	for _, ob in ipairs(minetest.get_objects_inside_radius(pos,10)) do
+		local en = ob:get_luaentity()
+		if en and en.traderitem and vector.distance(ob:get_pos(),pos) <= 0.3 then
+			item = ob
+			break
+		end
+	end
+	if minetest.get_meta(pos):get_string("item1") == "" then
+		minetest.registered_nodes["villages:trader"].newitem(pos)
+	end
+	if not item then
+		minetest.registered_nodes["villages:trader"].spawnitem(pos)
+	end
+	return true
+end
+minetest.register_node("villages:trader2", trader2)
+
 minetest.register_entity("villages:traderitem",{
 	hp_max = 1000,
 	physical = false,
@@ -506,7 +526,8 @@ minetest.register_entity("villages:traderitem",{
 		self.timer = self.timer -dtime
 		if self.timer < 0 then
 			self.timer = 1
-			if minetest.get_node(self.object:get_pos()).name ~= "villages:trader" then
+			local n = minetest.get_node(self.object:get_pos()).name
+			if n ~= "villages:trader" and n ~= "villages:trader2" then
 				self.object:remove()
 			end
 		end
