@@ -388,8 +388,17 @@ minetest.register_node("places:city_npcspawner", {
 		minetest.get_node_timer(pos):start(math.random(1,60))
 	end,
 	on_timer = function (pos, elapsed)
-
-		if (examobs.active.types["examobs:npc"] or 0) > 20 then
+		if (examobs.active.types["examobs:npc"] or 0) > 30 then
+			for i,v in pairs(examobs.active.ref) do
+				local en = v and v:get_luaentity()
+				if examobs.active.types["examobs:npc"] > 30 then
+					if en and en.name == "examobs:npc" and en.storage.city then
+						v:remove()
+					end
+				else
+					return true
+				end
+			end
 			return true
 		end
 
@@ -412,7 +421,7 @@ minetest.register_node("places:city_npcspawner", {
 		text = text:gsub("#distance#",2.4)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-
+		self.storage.city = true
 		self.storage.code_execute_interval = text
 		self.storage.code_execute_interval_user = "singleplayer"
 		self.object:set_properties({textures={skin},static_save = false})
@@ -436,7 +445,7 @@ minetest.register_node("places:city_npccarspawner", {
 		minetest.get_node_timer(pos):start(math.random(1,60))
 	end,
 	on_timer = function (pos, elapsed)
-		if (examobs.active.types["examobs:npc"] or 0) > 20 then
+		if (examobs.active.types["examobs:npc"] or 0) > 30 then
 			return true
 		end
 
@@ -467,7 +476,7 @@ minetest.register_node("places:city_npccarspawner", {
 		text = text:gsub("#distance#",4)
 
 		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-		
+		self.storage.city = true
 		self.storage.code_execute_interval = text
 		self.storage.code_execute_interval_user = "singleplayer"
 		self.object:set_properties({textures={skin},static_save = false})
