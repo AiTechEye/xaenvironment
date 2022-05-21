@@ -7,6 +7,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "exatec:paypass",
+	recipe = {{"default:iron_ingot","exatec:wire","default:iron_ingot"},
+		{"materials:diode","player_style:coin","materials:diode"},
+		{"materials:plastic_sheet","exatec:button","materials:plastic_sheet"},
+	}
+})
+
+minetest.register_craft({
 	output = "exatec:transsignal",
 	recipe = {{"materials:plastic_sheet","default:copper_ingot","materials:plastic_sheet"},
 		{"default:iron_ingot","default:uranium_lump","default:iron_ingot"},

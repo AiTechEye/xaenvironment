@@ -2567,6 +2567,67 @@ minetest.register_node("exatec:codelock", {
 	}
 })
 
+minetest.register_node("exatec:paypass", {
+	description = "Pay pass (pay to activate)",
+	tiles = {"default_steelblock.png","exatec_codelock.png"},
+	groups = {snappy = 3,exatec_wire_connected=1,store=300},
+	sounds = default.node_sound_wood_defaults(),
+	after_place_node = function(pos, placer, itemstack)
+		local m=minetest.get_meta(pos)
+		m:set_string("owner",placer:get_player_name())
+	end,
+	on_construct=function(pos)
+		minetest.registered_nodes["exatec:paypass"].update_panel(pos)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		minetest.registered_nodes["exatec:paypass"].update_panel(pos,player)
+	end,
+	update_panel=function(pos,user,customer)
+		local m = minetest.get_meta(pos)
+		local owner = m:get_string("owner")
+		local name = user and user:get_player_name() or ""
+		local form = "size[3,2]"
+
+		if not customer and name == owner then
+			form = form
+			.."field[0,0;2,1;cost;;" .. m:get_int("cost") .."]"
+			.."button[2,-0.3;1,1;set;Set]"
+			.."button[0,1;3,1;customer;Customer view]"
+		elseif user then
+			form = form
+			.."label[0,0;"..minetest.colorize("#FFFF00",Getcoin(user)).."]"
+			.."button_exit[0,1;3,1;pay;Pay "..m:get_int("cost").."]"
+		end	
+		m:set_string("formspec",form)
+	end,
+	on_receive_fields=function(pos, form, pressed, sender)
+		local m = minetest.get_meta(pos)
+		if pressed.set then
+			m:set_int("cost",pressed.cost)
+			minetest.registered_nodes["exatec:paypass"].update_panel(pos,sender)
+		elseif pressed.pay then
+			local c = m:get_int("cost")
+			Coin(sender,-c)
+			Coin(m:get_string("owner"),c)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+		elseif pressed.customer then
+			minetest.registered_nodes["exatec:paypass"].update_panel(pos,sender,true)
+		end
+	end,
+	drawtype = "nodebox",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	walkable = false,
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.1875, -0.4375, 0.375, 0.1875, 0.0625, 0.5},
+		}
+	}
+})
+
 minetest.register_node("exatec:transsignal", {
 	description = "Transsignal (sends signals 2 blocks away)",
 	tiles = {
