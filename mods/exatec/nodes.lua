@@ -1255,11 +1255,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 				m:set_int("on",on)
 				m:set_string("infotext",on == 1 and "On, toggleable" or "Off, toggleable")
 			elseif m:get_int("on") == 1 then
-
-				minetest.after(0.1,function(f)
-					exatec.send(f,true,true)
-				end,f)
-
+				exatec.send(f,true,true)
 			end
 		end,
 	}
