@@ -120,6 +120,7 @@ multidimensions.register_dimension=function(name,def,self)
 				multidimensions.apply_dimension(player)
 			else
 				local pos2 = {x=pos.x,y=def.dirt_start+def.dirt_depth+2,z=pos.z}
+				meta:set_string("obpos",minetest.pos_to_string(player:get_pos()))
 				multidimensions.move(player,pos2,pos)
 			end
 		end

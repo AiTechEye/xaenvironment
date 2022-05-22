@@ -190,7 +190,7 @@ multidimensions.move=function(object,pos,set_re,firstspos)
 		move = move + 1
 	elseif not w and nname ~= "ignore" then
 		minetest.set_node(pos,{name="multidimensions:teleporterre"})
-		minetest.get_meta(pos):set_string("pos",minetest.pos_to_string({x=set_re.x,y=set_re.y+1,z=set_re.z}))
+		minetest.get_meta(pos):set_string("pos",minetest.get_meta(set_re):get_string("obpos"))
 		pos.y = pos.y + 1
 		minetest.get_meta(set_re):set_string("pos",minetest.pos_to_string(pos))
 		if move < 5 then
