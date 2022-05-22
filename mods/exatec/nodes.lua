@@ -2596,9 +2596,10 @@ minetest.register_node("exatec:paypass", {
 		local name = user and user:get_player_name() or ""
 		local form = "size[3,2]"
 
-		if not customer and name == owner then
+		if not customer and (name == owner or minetest.check_player_privs(name, {protection_bypass=true})) then
 			form = form
-			.."field[0,0;2,1;cost;;" .. m:get_int("cost") .."]"
+			.."field[0,0;1,1;cost;;" .. m:get_int("cost") .."]tooltip[cost;Cost]"
+			.."field[1,0;1,1;delay;;" .. m:get_int("delay") .."]tooltip[delay;Repeats after timeout 0 == no repeat]"
 			.."button[2,-0.3;1,1;set;Set]"
 			.."button[0,1;3,1;customer;Customer view]"
 		elseif user then
@@ -2611,7 +2612,12 @@ minetest.register_node("exatec:paypass", {
 	on_receive_fields=function(pos, form, pressed, sender)
 		local m = minetest.get_meta(pos)
 		if pressed.set then
+			pressed.cost = tonumber(pressed.cost)
+			pressed.cost = pressed.cost < 0 and 0 or pressed.cost > 100000 and 100000 or pressed.cost
 			m:set_int("cost",pressed.cost)
+			pressed.delay = tonumber(pressed.delay)
+			pressed.delay = pressed.delay < 0 and 0 or pressed.delay > 60 and 60 or pressed.delay
+			m:set_int("delay",pressed.delay)
 			minetest.registered_nodes["exatec:paypass"].update_panel(pos,sender)
 		elseif pressed.pay then
 			local c = m:get_int("cost")
@@ -2619,9 +2625,17 @@ minetest.register_node("exatec:paypass", {
 			Coin(m:get_string("owner"),c)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+			if m:get_int("delay") > 0 then
+				minetest.get_node_timer(pos):start(m:get_int("delay"))
+			end
 		elseif pressed.customer then
 			minetest.registered_nodes["exatec:paypass"].update_panel(pos,sender,true)
 		end
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
 	end,
 	drawtype = "nodebox",
 	paramtype = "light",
