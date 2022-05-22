@@ -1230,10 +1230,12 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		local m = minetest.get_meta(pos)
-		local i = m:get_int("toggleable") == 1 and 0 or 1
-		m:set_int("toggleable",i)
-		m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable")
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local i = m:get_int("toggleable") == 1 and 0 or 1
+			m:set_int("toggleable",i)
+			m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable")
+		end
 	end,
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
@@ -1253,9 +1255,12 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 				m:set_int("on",on)
 				m:set_string("infotext",on == 1 and "On, toggleable" or "Off, toggleable")
 			elseif m:get_int("on") == 1 then
-				exatec.send(f,true,true)
-			end
 
+				minetest.after(0.1,function(f)
+					exatec.send(f,true,true)
+				end,f)
+
+			end
 		end,
 	}
 })
@@ -2619,8 +2624,9 @@ minetest.register_node("exatec:paypass", {
 			pressed.delay = pressed.delay < 0 and 0 or pressed.delay > 60 and 60 or pressed.delay
 			m:set_int("delay",pressed.delay)
 			minetest.registered_nodes["exatec:paypass"].update_panel(pos,sender)
-		elseif pressed.pay then
+		elseif pressed.pay and m:get_int("open") == 0 then
 			local c = m:get_int("cost")
+			m:set_int("open",1)
 			Coin(sender,-c)
 			Coin(m:get_string("owner"),c)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
@@ -2636,6 +2642,7 @@ minetest.register_node("exatec:paypass", {
 		local m = minetest.get_meta(pos)
 		local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+		m:set_int("open",0)
 	end,
 	drawtype = "nodebox",
 	paramtype = "light",
