@@ -3,6 +3,7 @@ places.citybuildings = {
 	{name="uncraft_sell_service",chance=30,size=1,freespace={{-1,0}}},
 	{name="places_shop",chance=20,size=1,freespace={{0,-1}}},
 	{name="places_burnserivce",chance=20,size=1,freespace={{-1,0}}},
+	{name="places_portal_service",chance=30,size=1,freespace={{0,-1}}},
 }
 
 places.buildings.city={
