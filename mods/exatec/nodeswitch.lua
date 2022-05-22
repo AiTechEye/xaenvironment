@@ -43,23 +43,14 @@ end)
 
 exatec.consnodeswitch=function(name)
 	local p = exatec.nodeswitch_user[name]
-
-
 	if p.p1 and p.p2 then
 		local meta=minetest.get_meta(p.pos)
---		local npos1=p.p1
---		local npos2=p.p2
 		minetest.get_meta(p.p1):set_string("exatec_nodeswitch",name)
 		minetest.get_meta(p.p2):set_string("exatec_nodeswitch",name)
 		meta:set_string("node1",p.node1)
 		meta:set_string("node2",p.node2)
-
 		meta:set_string("pos1",minetest.pos_to_string(vector.subtract(p.p1,p.pos)))
 		meta:set_string("pos2",minetest.pos_to_string(vector.subtract(p.p2,p.pos)))
-
-
---		meta:set_string("pos1",minetest.pos_to_string(p.p1))
---		meta:set_string("pos2",minetest.pos_to_string(p.p2))
 		meta:set_int("able",1)
 		exatec.nodeswitch_user[name]=nil
 	end
@@ -70,8 +61,6 @@ exatec.consnodeswitch_switch=function(pos,state)
 		if meta:get_int("able")==0 then return end
 		local pos1 = vector.add(pos,minetest.string_to_pos(meta:get_string("pos1")))
 		local pos2 = vector.add(pos,minetest.string_to_pos(meta:get_string("pos2")))
---		local pos1=minetest.string_to_pos(meta:get_string("pos1"))
---		local pos2=minetest.string_to_pos(meta:get_string("pos2"))
 		local node1=meta:get_string("node1")
 		local node2=meta:get_string("node2")
 		local owner=meta:get_string("owner")
