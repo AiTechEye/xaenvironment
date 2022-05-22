@@ -1229,10 +1229,17 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 	sunlight_propagates = true,
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local m = minetest.get_meta(pos)
+		local i = m:get_int("toggleable") == 1 and 0 or 1
+		m:set_int("toggleable",i)
+		m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable")
+	end,
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
+		m:set_int("toggleable",1)
 		m:set_int("on",1)
-		m:set_string("infotext","On")
+		m:set_string("infotext","On, toggleable")
 	end,
 	exatec={
 		on_wire = function(pos,opos)
@@ -1240,10 +1247,11 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
-			if not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
+			local toggleable = m:get_int("toggleable")
+			if toggleable == 1 and not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
 				local on = m:get_int("on") == 1 and 0 or 1
 				m:set_int("on",on)
-				m:set_string("infotext",on == 1 and "On" or "Off")
+				m:set_string("infotext",on == 1 and "On, toggleable" or "Off, toggleable")
 			elseif m:get_int("on") == 1 then
 				exatec.send(f,true,true)
 			end
