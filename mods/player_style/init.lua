@@ -621,9 +621,9 @@ minetest.register_globalstep(function(dtime)
 							if not ppr.flip.lay and ppr.flip.type ~= "" then
 								minetest.chat_send_player(name,lab[ppr.flip.flips] or (ppr.flip.flips.."x "..f.."flips"))
 								if ppr.flip.type == "front" then
-									exaachievements.customize(player,"Circus artist")
-								elseif ppr.flip.type == "back" then
 									exaachievements.customize(player,"Freerunner")
+								elseif ppr.flip.type == "back" then
+									exaachievements.customize(player,"Circus artist")									
 								elseif ppr.flip.type == "right_side" then
 									exaachievements.customize(player,"Parkour!")
 								elseif ppr.flip.type == "left_side" then
