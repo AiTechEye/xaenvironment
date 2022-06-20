@@ -488,6 +488,7 @@ minetest.register_node("places:city_npccarspawner", {
 		car.user = self.object
 		car.user_name= self.examob
 		car.bot = self
+		car.citycar = true
 		car.texture_node = ndef.name
 		car.texture = ndef.texture
 		car.color(car)
