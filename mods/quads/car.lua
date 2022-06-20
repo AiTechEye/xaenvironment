@@ -49,7 +49,7 @@ minetest.register_entity("quads:car",{
 	jump = 0,
 	timer = 0,
 	get_staticdata = function(self)
-		return minetest.serialize({petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
+		return minetest.serialize({citycar=self.citycar,petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
 	end,
 	anim=function(self,s)
 		if self.an ~= s then
@@ -58,10 +58,15 @@ minetest.register_entity("quads:car",{
 		end
 	end,
 	on_activate=function(self, staticdata)
-		self.object:set_acceleration({x=0,y=-10,z =0})
 		local s = minetest.deserialize(staticdata) or {}
+		if s.citycar and (s.petrol or 0) == 0 then
+			self.object:remove()
+			return
+		end
+		self.object:set_acceleration({x=0,y=-10,z =0})
 		self.quad = math.random(1,9999)
 		self.petrol = s.petrol or 0
+		self.citycar = s.citycar
 		self.palette_index = s.palette_index
 		self.user_name = s.user_name or ""
 		self.texture = s.texture
