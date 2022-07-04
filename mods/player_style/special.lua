@@ -286,6 +286,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if string.sub(i,1,11) == "specialbut_" then
 				local b = special.blocks[string.sub(i,12,-1)]
 				local c = Getcoin(player)
+				local m = player:get_meta()
 				if c >= 100 and m:get_int(b.meta)+b.amount <= 10000 then
 					Coin(player,-100)
 					b.trigger(player)
