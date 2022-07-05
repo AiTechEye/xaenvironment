@@ -268,7 +268,7 @@ minetest.register_node("places:selling", {
 			.."label[0,-0.3;"..(a and "Area is setup" or "No area is setup").."]"
 			.. "button[0,0;2.2,1;setup;Setup area]"
 			.."field[0,1;1.5,1;price;;"..m:get_int("price").."]tooltip[price;Price]"
-			.."field[1.5,1;1,1;removearea;;"..m:get_int("removearea").."]tooltip[removearea;Remove area (ID) during purchase]"
+			.."field[1.5,1;1,1;removearea;;"..(m:get_int("removearea") ~= -1 and m:get_int("removearea") or "").."]tooltip[removearea;Remove area (ID) during purchase]"
 			.."button[2,0.7;1,1;set;Set]"
 			.."button[-0.2,3.4;3.5,0.6;cp;Customer Preview]"
 			..(a and "label[0,2;Size: "..((p2.x-p1.x)+1).."x"..((p2.y-p1.y)+1).."x"..((p2.z-p1.z)+1).."]button_exit[0,2.5;3,0.6;pa;Preview area]" or "")
@@ -333,7 +333,7 @@ minetest.register_node("places:selling", {
 			end,name,markid)
 		elseif pressed.set then
 			local n = tonumber(pressed.removearea)
-			if n ~= -1 then
+			if pressed.removearea ~= "" and n ~= -1 then
 				local f = true
 				local pb = minetest.get_player_privs(name).protection_bypass == true
 				for i,v in pairs(protect.areas) do
