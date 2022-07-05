@@ -1,5 +1,6 @@
 places.citybuildings = {
 	{name="house1",chance=5,size=1},
+	{name="places_plot",chance=30,size=1},
 	{name="uncraft_sell_service",chance=30,size=1,freespace={{-1,0}}},
 	{name="places_shop",chance=20,size=1,freespace={{0,-1}}},
 	{name="places_burnserivce",chance=20,size=1,freespace={{-1,0}}},

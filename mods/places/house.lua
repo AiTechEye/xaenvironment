@@ -8,6 +8,17 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="places:selling",
+	recipe={
+		{"default:chest","materials:plastic_sheet","player_style:coin"},
+		{"materials:diode","materials:wood_table","default:iron_ingot"},
+		{"default:sign","group:wood","group:wood"},
+	},
+})
+
+
+
+minetest.register_craft({
 	output="places:rentpanel_copycard",
 	recipe={
 		{"materials:plastic_sheet","materials:plastic_sheet","materials:plastic_sheet"},
@@ -211,6 +222,163 @@ minetest.register_node("places:rental", {
 	can_dig = function(pos, player)
 		return minetest.get_meta(pos):get_string("renter") == ""
 	end
+})
+
+minetest.register_node("places:selling", {
+	description = "Selling panel",
+	tiles={
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_rentalpanel.png^[invert:rgb",
+	},
+	paramtype2 = "facedir",
+	sounds = default.node_sound_wood_defaults(),
+	groups = {choppy=3,oddly_breakable_by_hand=3,store=100},
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4, -0.4, 0.5, 0.4, 0.4, 0.45},
+		}
+	},
+	after_place_node=function(pos, placer, itemstack, pointed_thing)
+		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+	end,
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("price",1000)
+		m:set_int("removearea",-1)
+	end,
+	panel=function(pos,user,preview,confirm)
+		local m = minetest.get_meta(pos)
+		local a = m:get_string("pos1") ~= ""
+		local p1 = a and vector.add(pos,minetest.string_to_pos(m:get_string("pos1"))) or ""
+		local p2 = a and vector.add(pos,minetest.string_to_pos(m:get_string("pos2"))) or ""
+		local name = user and user:is_player() and user:get_player_name() or ""
+		local form = "size[3,3.6]listcolors[#77777777;#777777aa;#000000ff]"
+		if confirm then
+			form = form
+			.."label[0,-0.3;Buy this area?\n\nPrice: "..m:get_int("price").."]"
+			.."button[-0.2,3;3.5,1;confirm;Confirm]"
+		elseif not preview and (name ~= "" and m:get_string("owner") == name) then
+			form = form
+			.."label[0,-0.3;"..(a and "Area is setup" or "No area is setup").."]"
+			.. "button[0,0;2.2,1;setup;Setup area]"
+			.."field[0,1;1.5,1;price;;"..m:get_int("price").."]tooltip[price;Price]"
+			.."field[1.5,1;1,1;removearea;;"..m:get_int("removearea").."]tooltip[removearea;Remove area (ID) during purchase]"
+			.."button[2,0.7;1,1;set;Set]"
+			.."button[-0.2,3.4;3.5,0.6;cp;Customer Preview]"
+			..(a and "label[0,2;Size: "..((p2.x-p1.x)+1).."x"..((p2.y-p1.y)+1).."x"..((p2.z-p1.z)+1).."]button_exit[0,2.5;3,0.6;pa;Preview area]" or "")
+		else
+			local renter = m:get_string("renter")
+			if m:get_string("pos1") == "" then
+				form = form .."label[0,-0.3;The panel is not setup]"
+			else
+				form = form
+				.. (m:get_string("owner") ~= "" and "label[0,0.5;By: "..m:get_string("owner").."]" or "")
+				..(user and "label[0,0;"..minetest.colorize("#FFFF00",Getcoin(user)).."]" or "")
+				.."button[0.5,3;2.2,1;buy;Buy]"
+				.."label[0,1.25;Price: "..m:get_int("price").."]"
+				..(a and "label[0,2;Size: "..((p2.x-p1.x)+1).."x"..((p2.y-p1.y)+1).."x"..((p2.z-p1.z)+1).."]button_exit[0,2.5;3,0.6;pa;Preview area]" or "")
+			end
+		end
+		m:set_string("formspec",form)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		minetest.registered_nodes["places:selling"].panel(pos, player)
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		local m = minetest.get_meta(pos)
+		local name = sender and sender:get_player_name()
+		if pressed.buy then
+			minetest.registered_nodes["places:selling"].panel(pos, sender,true,true)
+		elseif pressed.confirm then
+			local c = Getcoin(sender)
+			local p = m:get_int("price")
+			if c < p then
+				minetest.chat_send_player(name,"You can't afford "..p.." (cons: ".. c ..")")
+				minetest.registered_nodes["places:selling"].panel(pos, sender)
+				return
+			end
+			local p1 = vector.add(pos,minetest.string_to_pos(m:get_string("pos1")))
+			local p2 = vector.add(pos,minetest.string_to_pos(m:get_string("pos2")))
+			local id = protect.add_game_rule_area(p1,p2,"City",name,false)
+			Coin(sender,-p)
+			Coin(m:get_string("owner"),p+minetest.get_item_group("places:selling","store"))
+			local id = m:get_int("removearea")
+			if id ~= -1 then
+				protect.remove_game_rule_area(id)
+			end
+			minetest.remove_node(pos)
+		elseif pressed.cp then
+			minetest.registered_nodes["places:selling"].panel(pos, sender,true)
+		elseif pressed.pa then
+			local p = protect.user[name]
+			p.user = name
+			p.markid = math.random(0,9999)
+			p.pos1 = vector.add(pos,minetest.string_to_pos(m:get_string("pos1")))
+			p.pos2 = vector.add(pos,minetest.string_to_pos(m:get_string("pos2")))
+			local self = minetest.add_entity(pos, "protect:mark"):get_luaentity()
+			self.user = name
+			self.markid = p.markid
+			local markid = self.markid
+			minetest.after(10,function(name,markid)
+				local p = protect.user[name]
+				if p.markid == markid then
+					protect.clear(name)
+				end
+			end,name,markid)
+		elseif pressed.set then
+			local n = tonumber(pressed.removearea)
+			if n ~= -1 then
+				local f = true
+				local pb = minetest.get_player_privs(name).protection_bypass == true
+				for i,v in pairs(protect.areas) do
+					if v.id == n then
+						if v.game_rule then
+							minetest.chat_send_player(name,"You can't remove a game rule area")
+							f = false
+						elseif v.owner == name or pb then
+							m:set_int("removearea",pressed.removearea)
+							minetest.chat_send_player(name,"Area set")
+							f = false
+						else
+							minetest.chat_send_player(name,"That area doesn't belongs to you")
+							f = false
+						end
+						break
+					end
+				end
+				if f then
+					minetest.chat_send_player(name,"Area do not exist")
+				end
+			else
+				m:set_int("removearea",-1)
+			end
+			m:set_int("price",pressed.price or m:get_int("price"))
+			minetest.registered_nodes["places:selling"].panel(pos, sender)
+		elseif pressed.setup then
+			local p = protect.user[name]
+			if not (p and p.pos1 and p.pos2) then
+				minetest.chat_send_player(name,'Mark with "/protect 1 /protect 2" to select the area to sell\nYou do not need to protect, just mark it\nThen Press the setup button again')
+			else
+				local pr,o = protect.test(p.pos1,p.pos2,name)
+				if pr == false then
+					minetest.chat_send_player(name,"The area is protected by "..o)
+				else
+					m:set_string("pos1",minetest.pos_to_string(vector.subtract(p.pos1,pos)))
+					m:set_string("pos2",minetest.pos_to_string(vector.subtract(p.pos2,pos)))
+					protect.clear(name)
+					minetest.chat_send_player(name,"The area is confirmed")
+					minetest.registered_nodes["places:selling"].on_receive_fields(pos, formname, {cancel=true}, sender)
+					minetest.registered_nodes["places:selling"].panel(pos, sender)
+				end
+			end
+		end
+	end,
 })
 
 minetest.register_tool("places:rentpanel_copycard", {
