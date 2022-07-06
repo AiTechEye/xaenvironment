@@ -19,6 +19,7 @@ places.ishouse=function(a)
 end
 
 places.city=function(pos)
+
 	local min_size_for_middle_split = 5
 	local citysize = 10
 	local scale = 16
@@ -27,6 +28,13 @@ places.city=function(pos)
 	local ignore = {}
 
 --test map
+	for y=math.floor(pos.y),0,-1 do
+		local n = minetest.get_node(vector.new(pos.x,y,pos.z)).name
+		if n ~= "ignore" and n ~= "air" or y < 3 then
+			pos.y = y
+			break
+		end
+	end
 
 	for i=1,citysize do
 		local terrain = 0
