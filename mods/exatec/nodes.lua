@@ -2320,7 +2320,7 @@ minetest.register_node("exatec:node_constructor", {
 				.."label[4,0.5;Power ("..m:get_int("power")..")]" 
 				.."field[0.3,0;3,1;channel;;"..channel.."]"
 				.."button_exit[3,-0.3;1,1;save;Save]"
-				.."tooltip[channel;Channel (send ''connect=true'' to connect)]"
+				.."tooltip[channel;Channel (send {connect=true} to connect)]"
 				.."list[context;main;0,1;8,6;]" 
 				.."list[current_player;main;0,7.3;8,4;]" 
 				.."listring[current_player;main]" 
