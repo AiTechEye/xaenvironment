@@ -140,27 +140,29 @@ minetest.register_chatcommand("setnodes", {
 })
 
 minetest.register_chatcommand("setnode", {
-	params = "<node> <pos2>",
-	description = "Set a node (max size: 50) eg: default:stone,x y z",
+	params = "<node> <param2/rotation> <pos2>",
+	description = "Set a node (rotation can be empty) eg: default:stone, 2, x y z",
 	privs = {server=true},
 	func = function(name, param)
-		local s = param:gsub(", ",","):gsub("  "," "):split(",")
+		local s = param:gsub(", ",","):gsub("  "," "):split(",",true)
 
-		if #s < 2 then
-			return false, "To less params, do eg: default:stone, x y z"
+		if #s < 3 then
+			return false, "To less params, do eg: default:stone, 2, x y z"
 		end
 		local node = s[1]:gsub(" ","")
-		local a = minetest.string_to_pos("("..s[2]:gsub(" ",",")..")")
+		local p2 = tonumber(s[2])
+		local a = minetest.string_to_pos("("..s[3]:gsub(" ",",")..")")
 
 		if not a then
 			return false, "position is invalid"
 		elseif not minetest.registered_nodes[node] then
 			return false, node.. " is not a registered node"
+		elseif not p2 then
+			p2 = 0
 		end
-		minetest.set_node(a,{name=node})
+		minetest.set_node(a,{name=node,param2=p2})
 	end
 })
-
 
 --/setnodes default:stone, 10 28520 10,0 28503 0
 --/setnode default:dirt, 3 28532 -1
