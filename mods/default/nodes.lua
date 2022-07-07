@@ -21,21 +21,33 @@ minetest.register_node("default:sign", {
 		.."field[1,0;3,1;color;;]tooltip[color;Text color, eg: fff, 0a5, 09f ...]"
 		.."field[4,0;3,1;size;;100]tooltip[size;Text size,10 - 200]"
 		.."field[7,0;3,1;bg;;]tooltip[bg;Background image/color, eg default_goldblock.png or, eg: fff, 0a5, 09f ...]"
+		.."button_exit[10,-0.2;2,1;locked;Unlocked]"
 		)
+	end,
+	after_place_node = function(pos, placer, itemstack)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("owner",placer:get_player_name())
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
 		if not sender then
 			return
 		end
 		local name = sender:get_player_name()
-		if pressed.save and sender and not minetest.is_protected(pos, name) then
+		if (pressed.save or pressed.locked) and sender and not minetest.is_protected(pos, name) then
 			local m = minetest.get_meta(pos)
+			local locked = m:get_int("locked")
+			local owner = m:get_string("owner")
 			local text = sign.unallowed_characters(pressed.text or "")
 			local s = tonumber(pressed.size) or m:get_int("size")
 			local bg = sign.unallowed_characters(pressed.bg or "")
 			s = s < 10 and 10 or s > 200 and 200 or s
 
-
+			if locked == 1 and owner ~= "" and name ~= owner and not minetest.check_player_privs(name, {protection_bypass=true}) then
+				return
+			elseif pressed.locked then
+				locked = m:get_int("locked") == 0 and 1 or 0
+			end
+			m:set_int("locked",locked)
 			m:set_int("size",s)
 			m:set_string("infotext",name)
 			m:set_string("text",text)
@@ -48,8 +60,8 @@ minetest.register_node("default:sign", {
 			.."field[1,0;3,1;color;;"..(pressed.color or m:get_string("color")).."]tooltip[color;Text color, eg: fff, 0a5, 09f ...]"
 			.."field[4,0;3,1;size;;"..s.."]tooltip[size;Text size,10 - 200]"
 			.."field[7,0;3,1;bg;;"..bg.."]tooltip[bg;Background image/color, eg default_goldblock.png or, eg: fff, 0a5, 09f ...]"
+			.."button_exit[10,-0.2;2,1;locked;"..(locked == 1 and "Locked" or "Unlocked").."]"
 			)
-
 			for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
 				local en = ob:get_luaentity()
 				if en and en.name == "sign:text" then
@@ -63,6 +75,12 @@ minetest.register_node("default:sign", {
 		local m = minetest.get_meta(pos)
 		local ob = minetest.add_entity(pos,"sign:text")
 		ob:get_luaentity():text({s=m:get_string("text"),color=m:get_string("color"),size_x=0.8,size_y=0.6,pos=0.440,size=m:get_int("size"),bg=m:get_string("bg")})
+	end,
+	can_dig = function(pos, player)
+		local m = minetest.get_meta(pos)
+		local owner = m:get_string("owner")
+		local name = player:get_player_name()
+		return m:get_int("locked") == 0 and (owner == "" or name == owner)
 	end,
 	on_destruct = function(pos)
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
