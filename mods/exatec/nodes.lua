@@ -2028,7 +2028,6 @@ minetest.register_node("exatec:cmd", {
 				aa = {data.cmd,""}
 			end
 			local c = minetest.registered_chatcommands[aa[1]]
-
 			if c then
 				if minetest.check_player_privs(user, c.privs) then
 					c.func(user,aa[2])
@@ -2054,7 +2053,10 @@ minetest.register_node("exatec:cmd", {
 				local aa = a.split(a," ")
 				if not (aa and aa[2]) then
 					aa = {a,""}
+				else
+					aa[2] = a:sub(aa[1]:len()+1,-1)
 				end
+
 				local c = minetest.registered_chatcommands[aa[1]]
 				if c then
 					if minetest.check_player_privs(user, c.privs) then
