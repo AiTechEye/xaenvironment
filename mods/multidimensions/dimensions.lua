@@ -1,3 +1,19 @@
+multidimensions.register_dimension("misc",{ -- ground: /teleport 0 28501 0
+	dim_y = 26000,
+	dim_height = 5000,
+	dirt_start = 2500,
+	bedrock_depth = 50,
+	dirt_depth = 0,
+	ground_limit = 0,
+	enable_water = false,
+	flatland = true,
+	stone = "air",
+	dirt = "default:bedrock",
+	grass = "air",
+	sand = "air",
+	teleporter = false,
+})
+
 multidimensions.register_dimension("candyland",{
 	ground_ores = {["materials:marzipan_rose"] = 100,["materials:candy1"] = 100,["materials:candy2"] = 100,["materials:candy3"] = 100,["materials:candy4"] = 1000,["materials:candy5"] = 100,["materials:candy6"] = 100},
 	water_ores={["materials:gel"]={chance=500,max_heat=20},},
