@@ -2728,6 +2728,7 @@ minetest.register_node("exatec:node_set", {
 				local p = protect.user[name]
 				if p and p.pos1 and p.pos2 then
 					pressed.node = minetest.get_node(p.pos1).name
+					node = true
 					pos1 = p.pos1
 					pos2 = p.pos2
 					pressed.pos1 =  p.pos1.x.." "..p.pos1.y.." "..p.pos1.z 
