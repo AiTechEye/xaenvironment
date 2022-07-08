@@ -1176,7 +1176,9 @@ minetest.register_node("exatec:wire_gate", {
 	exatec={
 		on_wire = function(pos,opos)
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
-			exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true,true)
+			if not exatec.samepos(vector.subtract(opos,pos),d) then
+				exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z},true,true)
+			end
 		end,
 	}
 })
@@ -1203,7 +1205,9 @@ minetest.register_node("exatec:wire_dir_gate", {
 			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 			local b  = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
-			if exatec.samepos(opos,f) then
+			if exatec.samepos(vector.subtract(opos,pos),d) then
+				return
+			elseif exatec.samepos(opos,f) then
 				exatec.send(b,true,true)
 			elseif exatec.samepos(opos,b) then
 				exatec.send(f,true,true)
