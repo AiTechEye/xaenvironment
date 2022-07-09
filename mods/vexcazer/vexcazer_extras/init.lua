@@ -168,3 +168,17 @@ minetest.register_node("vexcazer_extras:sourceblocking", {
 	pointable=false,
 	groups = {not_in_creative_inventory=1},
 })
+
+table.insert(vexcazer_extras.nodes,"vexcazer_extras:no_build")
+minetest.register_node("vexcazer_extras:no_build", {
+	description = "No build",
+	range=15,
+	stack_max=1000,
+	drawtype="airlike",
+	drop="",
+	paramtype = "light",
+	walkable=false,
+	sunlight_propagates = true,
+	pointable=false,
+	groups = {not_in_creative_inventory=1},
+})
