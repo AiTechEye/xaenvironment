@@ -57,16 +57,20 @@ nodeextractor.create=function(pos1,pos2,filename)
 			m1.timer = t:get_timeout()
 		end
 
-		m[x..","..y..","..z] = m1
+		if m1.node.name ~= "air" or m1.fields or m1.timer then
+			m[x..","..y..","..z] = m1
+		end
+
 	end
 	end
 	end
 	local s = vector.new((pos2.x-pos1.x)+1,(pos2.y-pos1.y)+1,(pos2.z-pos1.z)+1)
 	minetest.log("size: "..minetest.pos_to_string(s))
+print(dump(m))
 	return minetest.serialize({nodes=m,size=s})
 end
 
-nodeextractor.set=function(pos,filepath)
+nodeextractor.set=function(pos,filepath,clearspace)
 	if not filepath then
 		print("nodeextractor set: filepath is missing")
 		return false
@@ -85,6 +89,18 @@ nodeextractor.set=function(pos,filepath)
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 	local contens = {}
+
+	if clearspace == true then
+		local air = minetest.get_content_id("air")
+		local clearpos2 = vector.add(pos,dat.size)
+		for x=pos.x,clearpos2.x do
+		for y=pos.y,clearpos2.y do
+		for z=pos.z,clearpos2.z do
+			data[area:index(x,y,z)] = air
+		end
+		end
+		end
+	end
 
 	for i,v in pairs(dat.nodes) do
 		local p = i.split(i,",")
