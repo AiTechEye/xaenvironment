@@ -66,7 +66,6 @@ nodeextractor.create=function(pos1,pos2,filename)
 	end
 	local s = vector.new((pos2.x-pos1.x)+1,(pos2.y-pos1.y)+1,(pos2.z-pos1.z)+1)
 	minetest.log("size: "..minetest.pos_to_string(s))
-print(dump(m))
 	return minetest.serialize({nodes=m,size=s})
 end
 
@@ -336,7 +335,6 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 
 		nodeextractor.user[n].sch = pressed.addsch ~= nil and pressed.addsch or nodeextractor.user[n].sch or "true"
 		local adds = nodeextractor.user[n].sch == "true" and "/nodeextractor" or ""
-
 		if pressed.world then
 			nodeextractor.user[n].world = pressed.world
 			u.path = minetest.get_worldpath()..adds.."/"..pressed.text..".exexn"
@@ -352,9 +350,12 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			end
 			local m2 = m and "" or (pressed.mod.." not found")
 			nodeextractor.user[n].mod = pressed.mod
-			nodeextractor.place(player,pressed.text,m2)
-
-		elseif pressed.place and u.path and u.pos then
+			if not m then
+				nodeextractor.place(player,pressed.text,m2)
+				return
+			end
+		end
+		if pressed.place and u.path and u.pos then
 			local o = io.open(u.path, "r")
 			if o then
 				o:close()
