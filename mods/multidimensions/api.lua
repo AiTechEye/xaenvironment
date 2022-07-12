@@ -204,7 +204,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				elseif data[id] ~= grass then
 					data[id] = air
 				end
-			else
+			elseif y < 2000 then
 				data[id] = air
 			end
 
