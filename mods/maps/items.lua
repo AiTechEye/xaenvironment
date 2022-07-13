@@ -169,6 +169,31 @@ minetest.register_node("maps:playermove", {
 	}
 })
 
+minetest.register_node("maps:clearinv", {
+	description = "player clearinv",
+	tiles={"default_stone.png^[invert:bg"},
+	groups = {unbreakable=1,exatec_wire_connected=1,not_in_creative_inventory=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local meta = minetest.get_meta(pos)
+			local r = meta:get_int("r")
+			r = r < 20 and r or 0
+			meta:set_int("r",r+1)
+			meta:set_string("infotext","Radius (" .. (r+1) ..")")
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos,minetest.get_meta(pos):get_int("r"))) do
+				if ob:is_player() then
+					player_style.inventory_handle(ob,{clear=true})
+				end
+			end
+		end
+	}
+})
+
 minetest.register_node("maps:button", {
 	description = "Button",
 	tiles={"default_wood.png",},

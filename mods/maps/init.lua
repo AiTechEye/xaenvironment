@@ -6,7 +6,7 @@ maps = {
 			image="default_craftguide.png",
 			pos={x=0,y=28501,z=0},
 			size={y=51,x=133,z=100},
-			locked=true,
+			--locked=true,
 			hide_items = true,
 			singleplayer=true,
 			on_enter=function(player)
@@ -19,9 +19,11 @@ maps = {
 				end,player)
 			end,
 			on_exit=function(player)
-				player:set_pos(minetest.pos_to_string(m:get_string("Tutorials_pos")))
 			end,
 			on_die=function(player)
+			end,
+			on_respawn=function(player)
+				player:set_pos({x=60,y=28531,z=42})
 			end,
 		},
 	}
@@ -42,7 +44,6 @@ player_style.register_button({
 		else
 			maps.show(user)
 		end
-
 	end
 })
 
@@ -73,6 +74,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local map = maps.maps[b]
 				if not (maps.maps[b].unable or maps.maps[b].locked) then
 					local m = player:get_meta()
+					m:set_string("maps_current",b)
 					maps.set_exit_player(player)
 								
 					if map.hide_items then
@@ -120,6 +122,11 @@ minetest.register_on_mods_loaded(function()
 			maps.maps[map].unable = true
 		end
 
+		if not m.on_respawn then
+			minetest.log("warning","Maps: "..map.." Is missing on_respawn (function)")
+			maps.maps[map].unable = true
+		end
+
 		for i,v in pairs(maps.maps) do
 			local pos1,pos2 = protect.sort(v.pos,vector.add(v.pos,v.size))
 			if map ~= i and not maps.maps[map].unable
@@ -145,12 +152,17 @@ maps.set_exit_player=function(player)
 	local m = player:get_meta()
 	inv.adds["maps_exit"] = "image_button[7,1;1,1;map_map.png^default_cross.png;maps_exit;]tooltip[maps_exit;Exit map]"
 	m:set_int("maps_exit",1)
-
+	m:set_int("respawn_disallowed",1)
 	inv.adds_func["maps_exit"] = function(player)
 		local m = player:get_meta()
 		local name = player:get_player_name()
 		local inv = player_style.players[name].inv
 		local p = minetest.string_to_pos(m:get_string("maps_pos"))
+		local map = maps.maps[m:get_string("maps_current")]
+		if map and map.on_exit then
+			map.on_exit(player)
+		end
+
 		if p then
 				player:set_pos(p)
 		end
@@ -158,7 +170,25 @@ maps.set_exit_player=function(player)
 		inv.adds_func["maps_exit"] =nil
 		m:set_string("maps_pos","")
 		m:set_int("maps_exit",0)
+		m:set_int("respawn_disallowed",0)
+		m:set_string("maps_current","")
 		player_style.inventory_handle(player,{show=true})
 		minetest.close_formspec(name,"")
 	end
 end
+
+minetest.register_on_respawnplayer(function(player)
+	local map = maps.maps[player:get_meta():get_string("maps_current")]
+	if map then
+		minetest.after(0, function(player,map)
+			map.on_respawn(player)
+		end,player,map)
+	end
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local map = maps.maps[player:get_meta():get_string("maps_current")]
+	if map and map.on_die then
+		map.on_die(player)
+	end
+end)
