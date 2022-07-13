@@ -7,22 +7,15 @@ maps = {
 			pos={x=0,y=28501,z=0},
 			size={y=51,x=133,z=100},
 			locked=true,
+			hide_items = true,
 			singleplayer=true,
 			on_enter=function(player)
-				--nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
-					local m = player:get_meta()
 
-					if m:get_string("Tutorials_pos") ~= "" then
-						player_style.inventory_handle(player,{show=true})
-						m:set_string("Tutorials_pos","")
-						return
-					else
-						m:set_string("Tutorials_pos",minetest.pos_to_string(player:get_pos()))
-						player_style.inventory_handle(player,{hide=true})
-					end
-					player_style.inventory(player)
-
-				minetest.after(0.5, function(player)
+				if default.storage:get_int("Tutorials") == 0 then
+					default.storage:set_int("Tutorials",1)
+					nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
+				end
+				minetest.after(0.1, function(player)
 					player:set_pos({x=60,y=28531,z=42})
 				end,player)
 			end,
@@ -41,7 +34,14 @@ player_style.register_button({
 	type="image",
 	info="Abilities",
 	action=function(user)
-		maps.show(user)
+		local name = user:get_player_name()
+		local inv = player_style.players[name].inv
+		if inv.adds["maps_exit"] then
+			minetest.chat_send_player(name,"You have to exit the current map first")
+		else
+			maps.show(user)
+		end
+
 	end
 })
 
@@ -69,8 +69,20 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		for i,v in pairs(pressed) do
 			if i:sub(1,8) == "mapsbut_" then
 				local b = i:gsub("mapsbut_","")
+				local map = maps.maps[b]
 				if not (maps.maps[b].unable or maps.maps[b].locked) then
+					local m = player:get_meta()
+					maps.set_exit_player(player)
+								
+					if map.hide_items then
+						player_style.inventory_handle(player,{hide=true})
+						if m:get_string("maps_pos") == "" then
+							m:set_string("maps_pos",minetest.pos_to_string(player:get_pos()))
+						end
+					end
+					player_style.inventory(player)
 					maps.maps[b].on_enter(player)
+					minetest.close_formspec(player:get_player_name(),"")
 				end
 			end
 		end
@@ -119,3 +131,33 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
+
+minetest.register_on_joinplayer(function(player)
+	if player:get_meta():get_int("maps_exit") == 1 then
+		maps.set_exit_player(player)
+	end
+end)
+
+maps.set_exit_player=function(player)
+	local name = player:get_player_name()
+	local inv = player_style.players[name].inv
+	local m = player:get_meta()
+	inv.adds["maps_exit"] = "image_button[7,1;1,1;map_map.png^default_cross.png;maps_exit;]tooltip[maps_exit;Exit map]"
+	m:set_int("maps_exit",1)
+
+	inv.adds_func["maps_exit"] = function(player)
+		local m = player:get_meta()
+		local name = player:get_player_name()
+		local inv = player_style.players[name].inv
+		local p = minetest.string_to_pos(m:get_string("maps_pos"))
+		if p then
+				player:set_pos(p)
+		end
+		inv.adds["maps_exit"] = nil
+		inv.adds_func["maps_exit"] =nil
+		m:set_string("maps_pos","")
+		m:set_int("maps_exit",0)
+		player_style.inventory_handle(player,{show=true})
+		minetest.close_formspec(name,"")
+	end
+end
