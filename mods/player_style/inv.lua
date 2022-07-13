@@ -460,19 +460,18 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						return
 					end
 				end
-
-				for i,v in pairs(invp.adds) do
-					if pressed[i] and invp.adds_func[i] then
-						invp.adds_func[i](player)
-						break
-					end
-				end
-
 			end
 			for i,v in pairs(pressed) do
 				if i:sub(1,8) == "itembut_" then
 					local t = i:sub(9,-1)
 					player:get_inventory():add_item("main",t.." "..minetest.registered_items[t].stack_max)
+					break
+				end
+			end
+
+			for i,v in pairs(invp.adds) do
+				if pressed[i] and invp.adds_func[i] then
+					invp.adds_func[i](player)
 					break
 				end
 			end

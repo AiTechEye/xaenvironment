@@ -4,7 +4,11 @@ player_style.register_button({
 	type="image",
 	info="Store",
 	action=function(player)
-		player_style.store(player)
+		if player:get_meta():get_int("store_disabled") == 1 then
+			minetest.chat_send_player(player:get_player_name(),"The store is disallowed in this case")
+		else
+			player_style.store(player)
+		end
 	end
 })
 

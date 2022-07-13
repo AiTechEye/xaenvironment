@@ -555,7 +555,7 @@ minetest.register_globalstep(function(dtime)
 			local a="stand"
 			local hunger = -0.0001
 
-			if key.jump and player:get_look_vertical() <= -1.5 and not player:get_attach() and special.use_ability(player,"fly_as_a_bird") then
+			if key.jump and player:get_look_vertical() <= -1.5 and not player:get_attach() and special.have_ability(player,"fly_as_a_bird") and special.use_ability(player,"fly_as_a_bird") then
 				local ob = minetest.add_entity(apos(p,0,1), "examobs:hawk")
 				local en = ob:get_luaentity()
 				en.target = player
@@ -577,7 +577,7 @@ minetest.register_globalstep(function(dtime)
 					local key = target:get_player_control()
 					self.flee = nil
 					self.fight = nil
-					if not key.	jump or not target:get_attach() or target:get_hp() <= 0 or self.dead or self.dying then
+					if not key.jump or not target:get_attach() or target:get_hp() <= 0 or self.dead or self.dying then
 						target:set_detach()
 						target:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 						target:set_properties({textures = en.playerskin})

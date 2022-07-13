@@ -69,8 +69,8 @@ special={
 			use=function(player,c)
 				c = c or -1
 				local m = player:get_meta()
-				local f  = m:get_int("fire_resistance")
-				local hp  = f+c
+				local f = m:get_int("fire_resistance")
+				local hp = f+c
 				if f > 0 then
 					m:set_int("fire_resistance",hp > 0 and hp or 0)
 					special.hud(player,"default:qblock_e29f00")
@@ -227,6 +227,9 @@ special.hud=function(player,n)
 end
 
 special.have_ability=function(player,ab)
+	if player:get_meta():get_int("special_disabled") == 1 then
+		return false
+	end
 	local s = special.shortcuts[ab]
 	local name = player:get_player_name()
 	local i = special.blocks[s].i
@@ -254,7 +257,11 @@ player_style.register_button({
 	type="item_image",
 	info="Abilities",
 	action=function(user)
-		special.show(user)
+		if user:get_meta():get_int("special_disabled") == 1 then
+			minetest.chat_send_player(user:get_player_name(),"Abilities is disallowed in this case")	
+		else
+			special.show(user)
+		end
 	end
 })
 
