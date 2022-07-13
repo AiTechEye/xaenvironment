@@ -108,10 +108,16 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 minetest.register_on_dieplayer(function(player)
+	local m = player:get_meta()
+	if m:get_int("bones_disabled") == 1 then
+		return
+	end
 	bones.drop(player)
 	local name = player:get_player_name()
 	local p = minetest.pos_to_string(vector.round(player:get_pos()))
-	minetest.chat_send_player(name,p)
+	if m:get_int("bones_drop_only") == 0 then
+		minetest.chat_send_player(name,p)
+	end
 	minetest.log("action",name.."died at "..p)
 end)
 bones.drop=function(player)
@@ -131,7 +137,8 @@ bones.drop=function(player)
 		bones.corpses[name] = true
 		local pos = player:get_pos()
 		local bpos
-		if not minetest.is_protected(pos,name) then
+		if not minetest.is_protected(pos,name) and player:get_meta():get_int("bones_drop_only") == 0 then
+
 			if default.defpos(pos,"buildable_to") then
 				bpos = pos
 			elseif minetest.find_node_near(pos,2,"air") then
