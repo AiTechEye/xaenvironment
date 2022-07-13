@@ -10,7 +10,6 @@ maps = {
 			hide_items = true,
 			singleplayer=true,
 			on_enter=function(player)
-
 				if default.storage:get_int("Tutorials") == 0 then
 					default.storage:set_int("Tutorials",1)
 					nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
@@ -27,6 +26,8 @@ maps = {
 		},
 	}
 }
+
+dofile(minetest.get_modpath("maps") .. "/items.lua")
 
 player_style.register_button({
 	name="special",
