@@ -53,13 +53,15 @@ maps.show=function(player)
 		local x,y = 0,0
 		local form = "size[8,8]listcolors[#77777777;#777777aa;#000000ff]"
 		for i,v in pairs(maps.maps) do
-			form = form
-			.. "image_button["..x..","..y..";1,1;"..(v.image or "map_map.png")..(v.locked and "^default_lock_icon.png" or "")..(v.unable and "^default_cross.png" or "")..";mapsbut_"..i..";]"
-			.. (v.info and "tooltip[mapsbut_"..i..";"..v.info.."]" or "")
-			x = x + 1
-			if x >= 8 then
-				x = 0
-				y = y +1
+			if not (v.singleplayer and minetest.is_singleplayer() == false) then
+				form = form
+				.. "image_button["..x..","..y..";1,1;"..(v.image or "map_map.png")..(v.locked and "^default_lock_icon.png" or "")..(v.unable and "^default_cross.png" or "")..";mapsbut_"..i..";]"
+				.. (v.info and "tooltip[mapsbut_"..i..";"..v.info..(v.singleplayer and "\n(Singleplayer only)" or "").."]" or "")
+				x = x + 1
+				if x >= 8 then
+					x = 0
+					y = y +1
+				end
 			end
 		end
 		return minetest.show_formspec(name, "maps",form)
