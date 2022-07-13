@@ -7,11 +7,9 @@ player_style.register_button({
 	type="item_image",
 	info="Go to bed",
 	action=function(player)
-		local pos = player:get_meta():get_string("beds_position")
-		if pos ~= "" then
-			player:set_pos(minetest.string_to_pos(pos))
-			return true
-		else
+		if player:get_meta():get_int("respawn_disallowed") == 1 then
+			minetest.chat_send_player(player:get_player_name(),"Beds is disallowed in this case")
+		elseif not beds.respawn(player) then
 			minetest.chat_send_player(player:get_player_name(),"You have to sleep in a bed first")
 		end
 	end
@@ -23,7 +21,7 @@ end)
 
 beds.respawn=function(player)
 	local pos = player:get_meta():get_string("beds_position")
-	if pos ~= "" then
+	if pos ~= "" and player:get_meta():get_int("respawn_disallowed") == 0 then
 		player:set_pos(minetest.string_to_pos(pos))
 		return true
 	end
@@ -63,8 +61,9 @@ beds.sleeping=function(pos,player)
 			end
 		end
 		for _, p in pairs(minetest.get_connected_players()) do
-			if minetest.get_item_group(minetest.get_node(p:get_pos()).name,"tent") == 0 then
-				p:get_meta():set_string("beds_position",minetest.pos_to_string(p:get_pos()))
+			local m = p:get_meta()
+			if minetest.get_item_group(minetest.get_node(p:get_pos()).name,"tent") == 0 and m:get_int("respawn_disallowed") == 0 then
+				m:set_string("beds_position",minetest.pos_to_string(p:get_pos()))
 			end
 		end
 		minetest.set_timeofday(0.21)
