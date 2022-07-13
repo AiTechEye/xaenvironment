@@ -287,8 +287,8 @@ minetest.register_entity("map:map",{
 		local rad = 5
 		local s = 0.8
 		local ds = rad*2
-
 		local i = 0
+
 		for x=-rad,rad do
 		for z=-rad,rad do
 			table.insert(self.parts,{lpos={x=-x*s,y=-z*s,z=-0.01},pos={x=self.pos.x+(x*ds),y=self.pos.y,z=self.pos.z+(z*ds)}})
@@ -393,12 +393,6 @@ minetest.register_entity("map:map",{
 		end
 	end
 })
-
---minetest.register_chatcommand("t", {	--using while testing
---	func = function(name, param)
---		map.t=tonumber(param)
---	end
---})
 
 map.generate_texture=function(rad,pos,maxram)
 	pos=vector.round(pos)
