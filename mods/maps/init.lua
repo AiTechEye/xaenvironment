@@ -155,7 +155,9 @@ maps.set_exit_player=function(player)
 	inv.adds["maps_exit"] = "image_button[7,1;1,1;map_map.png^default_cross.png;maps_exit;]tooltip[maps_exit;Exit map]"
 	m:set_int("maps_exit",1)
 	m:set_int("respawn_disallowed",1)
+	player:hud_set_flags({basic_debug=false})
 	inv.adds_func["maps_exit"] = function(player)
+		player:hud_set_flags({basic_debug=true})
 		local m = player:get_meta()
 		local name = player:get_player_name()
 		local inv = player_style.players[name].inv
