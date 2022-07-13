@@ -7,7 +7,7 @@ minetest.register_node("maps:node_set", {
 		minetest.get_meta(pos):set_string("formspec","size[2,1]button_exit[0,0;2,1;setup;Setup]")
 	end,
 	on_receive_fields=function(pos, formname, pressed, sender)
-		if pressed.save or pressed.setup then
+		if (pressed.save or pressed.setup) and minetest.check_player_privs(sender:get_player_name(), {server=true}) then
 			local m = minetest.get_meta(pos)
 			local node = minetest.registered_nodes[pressed.node]
 			local n = tonumber(pressed.pos2)
@@ -43,11 +43,11 @@ minetest.register_node("maps:node_set", {
 				m:set_string("node",pressed.node)
 			end
 
-			if pos1 then
+			if pos1 and (pos1.y > 26000 and pos1.y < 31000) then
 				m:set_string("pos1l",minetest.pos_to_string(vector.subtract(pos1,pos)))
 				m:set_string("pos1",pressed.pos1:gsub(","," "))
 			end
-			if pos2 then
+			if pos2 and (pos2.y > 26000 and pos2.y < 31000) then
 				m:set_string("pos2l",minetest.pos_to_string(vector.subtract(pos2,pos)))
 				m:set_string("pos2",pressed.pos2:gsub(","," "))
 			else
