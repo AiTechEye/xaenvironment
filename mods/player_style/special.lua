@@ -154,7 +154,7 @@ special={
 			end,
 			on_load=function(player)
 				local name = player:get_player_name()
-				if not player then
+				if not player or not special.have_ability(player,"light_in_darkness") then
 					return
 				end
 				local p = player:get_pos()
@@ -163,6 +163,9 @@ special={
 				end
 				p = apos(p,0,0.1)
 				local n = minetest.get_node(p).name
+
+
+
 				if (minetest.get_node_light(p) or 14) < 11 or n == "vexcazer_flashlight:flht" or n == "vexcazer_flashlight:flhtw" then
 					local v
 					local s
