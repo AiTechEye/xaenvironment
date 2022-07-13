@@ -210,7 +210,7 @@ end)
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and hp_change < 0 and not (modifer.type == "node_damage" and minetest.get_item_group(modifer.node,"igniter") > 0) then
-		hp_change = special.use_ability(player,"immortal",hp_change)
+		hp_change = special.have_ability(player,"immortal") and special.use_ability(player,"immortal",hp_change) or hp_change 
 		if hp_change < 0 then
 			armor.update(player,hp_change*-1)
 		end
