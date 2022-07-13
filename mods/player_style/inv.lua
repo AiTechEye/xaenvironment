@@ -93,8 +93,8 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 		for i=1,4 do
 			m:set_string("backpack"..i,m:get_string("backpack"..i.."_hide"))
 			m:set_string("backpackslot"..i,m:get_string("backpackslot"..i.."_hide"))
-			m:set_string("backpack"..i,"")
-			m:set_string("backpackslot"..i,"")
+			m:set_string("backpack_hide"..i,"")
+			m:set_string("backpackslot_hide"..i,"")
 			player_style.players[name].inv["backpackslot"..i]:set_stack("main",1, minetest.deserialize(m:get_string("backpackslot"..i.."_hide")))
 		end
 		
