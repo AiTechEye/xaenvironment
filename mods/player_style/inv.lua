@@ -53,6 +53,71 @@ player_style.register_button({
 	end
 })
 
+player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} {clear=true}
+	local m = player:get_meta()
+	local name = player:get_player_name()
+	local inv=player:get_inventory()
+	local items1 = {}
+	local items2 = {}
+
+	if handle.hide or handle.clear then
+		for i=1,4 do
+			if handle.hide then
+				m:set_string("backpack"..i.."_hide",m:get_string("backpack"..i))
+				m:set_string("backpackslot"..i.."_hide",m:get_string("backpackslot"..i))
+			end
+			m:set_string("backpack"..i,"")
+			m:set_string("backpackslot"..i,"")
+			player_style.players[name].inv["backpackslot"..i]:set_stack("main",1, "")
+		end
+
+		for i,v in pairs(inv:get_list("main")) do
+			items1[i] = v:to_table()
+		end
+		for i,v in pairs(inv:get_list("craft")) do
+			items2[i] = v:to_table()
+		end
+
+		if handle.hide then
+			m:set_int("hiding_inventory",1)
+			m:set_string("hat_hide",m:get_string("hat"))
+			m:set_string("main_hide",minetest.serialize(items1))
+			m:set_string("craft_hide",minetest.serialize(items2))
+		end
+		m:set_string("hat","")
+		inv:set_list("main",{})
+		inv:set_list("craft",{})
+
+		player_style.players[name].inv["hat"]:set_stack("main",1, "")
+	elseif handle.show and m:get_int("hiding_inventory") == 1 then
+		for i=1,4 do
+			m:set_string("backpack"..i,m:get_string("backpack"..i.."_hide"))
+			m:set_string("backpackslot"..i,m:get_string("backpackslot"..i.."_hide"))
+			m:set_string("backpack"..i,"")
+			m:set_string("backpackslot"..i,"")
+			player_style.players[name].inv["backpackslot"..i]:set_stack("main",1, minetest.deserialize(m:get_string("backpackslot"..i.."_hide")))
+		end
+		
+		for i,v in pairs(minetest.deserialize(m:get_string("main_hide"))) do
+			items1[i]=ItemStack(v)
+		end
+		for i,v in pairs(minetest.deserialize(m:get_string("craft_hide"))) do
+			items2[i]=ItemStack(v)
+		end
+
+		inv:set_list("main",items1)
+		inv:set_list("craft",items2)
+		m:set_string("hat",m:get_string("hat_hide"))
+		player_style.players[name].inv["hat"]:set_stack("main",1, minetest.deserialize(m:get_string("hat_hide")))
+
+		m:set_string("hat_hide","")
+		m:set_string("craft_hide","")
+		m:set_string("main_hide","")
+		m:set_int("hiding_inventory",0)
+	end
+	player_style.inventory(player)
+end
+
 player_style.inventory=function(player)
 	local name = player:get_player_name()
 	player_style.players[name].inv = player_style.players[name].inv or {}
