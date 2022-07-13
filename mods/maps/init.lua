@@ -7,8 +7,14 @@ maps = {
 			pos={x=0,y=28501,z=0},
 			size={y=51,x=133,z=100},
 			--locked=true,
+			--unable=true,
 			hide_items = true,
 			singleplayer=true,
+			bones_disabled=true,
+			--bones_drop_only = true,
+			special_disabled=true,
+			store_disabled=true,
+
 			on_enter=function(player)
 				if default.storage:get_int("Tutorials") == 0 then
 					default.storage:set_int("Tutorials",1)
@@ -32,10 +38,10 @@ maps = {
 dofile(minetest.get_modpath("maps") .. "/items.lua")
 
 player_style.register_button({
-	name="special",
+	name="maps",
 	image="map_map.png",
 	type="image",
-	info="Abilities",
+	info="Maps",
 	action=function(user)
 		local name = user:get_player_name()
 		local inv = player_style.players[name].inv
@@ -85,6 +91,21 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							m:set_string("maps_pos",minetest.pos_to_string(player:get_pos()))
 						end
 					end
+					if map.bones_disabled then
+						m:set_int("bones_disabled",1)
+					elseif map.bones_drop_only then
+						m:set_int("bones_drop_only",1)
+					end
+					if map.killme_disabled then
+						m:set_int("killme_disabled",1)
+					end
+					if map.special_disabled then
+						m:set_int("special_disabled",1)
+					end
+					if map.store_disabled then
+						m:set_int("store_disabled",1)
+					end
+
 					player_style.inventory(player)
 					maps.maps[b].on_enter(player)
 					minetest.close_formspec(player:get_player_name(),"")
@@ -176,6 +197,11 @@ maps.set_exit_player=function(player)
 		m:set_int("maps_exit",0)
 		m:set_int("respawn_disallowed",0)
 		m:set_string("maps_current","")
+		m:set_int("bones_disabled",0)
+		m:set_int("bones_drop_only",0)
+		m:set_int("killme_disabled",0)
+		m:set_int("special_disabled",0)
+		m:set_int("store_disabled",0)
 		player_style.inventory_handle(player,{show=true})
 		minetest.close_formspec(name,"")
 	end
