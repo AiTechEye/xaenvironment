@@ -303,7 +303,7 @@ player_style.hunger=function(player,add,reset)
 
 	local a = p.hunger.level+add
 
-	if special.use_ability(player,"no_hunger") then
+	if special.have_ability(player,"no_hunger") and special.use_ability(player,"no_hunger") then
 		a = math.ceil(p.hunger.level)+1
 		p.hunger.level = a
 	end
@@ -342,7 +342,7 @@ player_style.thirst=function(player,add,reset)
 
 	local a = p.thirst.level+add
 
-	if special.use_ability(player,"no_hunger") then
+	if special.have_ability(player,"no_hunger") and special.use_ability(player,"no_hunger") then
 		a = math.ceil(p.thirst.level)+1
 		p.thirst.level = a
 	end
@@ -931,7 +931,7 @@ player_style.player_diveing=function(name,player,a,water,kong)
 		local pr =  player_style.player_dive[name]
 		local b = player:get_breath()
 
-		if b < 10 and minetest.get_item_group(minetest.get_node(pos).name,"water") > 0 and special.use_ability(player,"no_water_drowning") then
+		if b < 10 and minetest.get_item_group(minetest.get_node(pos).name,"water") > 0 and special.have_ability(player,"no_water_drowning") and special.use_ability(player,"no_water_drowning") then
 			player:set_breath(b+1)
 		end
 
