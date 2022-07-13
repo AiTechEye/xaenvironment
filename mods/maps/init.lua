@@ -7,14 +7,27 @@ maps = {
 			pos={x=0,y=28501,z=0},
 			size={y=51,x=133,z=100},
 			locked=true,
+			singleplayer=true,
 			on_enter=function(player)
-				nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
-				minetest.after(0.5, function(player)
+				--nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
 					local m = player:get_meta()
+
+					if m:get_string("Tutorials_pos") ~= "" then
+						player_style.inventory_handle(player,{show=true})
+						m:set_string("Tutorials_pos","")
+						return
+					else
+						m:set_string("Tutorials_pos",minetest.pos_to_string(player:get_pos()))
+						player_style.inventory_handle(player,{hide=true})
+					end
+					player_style.inventory(player)
+
+				minetest.after(0.5, function(player)
 					player:set_pos({x=60,y=28531,z=42})
 				end,player)
 			end,
 			on_exit=function(player)
+				player:set_pos(minetest.pos_to_string(m:get_string("Tutorials_pos")))
 			end,
 			on_die=function(player)
 			end,
