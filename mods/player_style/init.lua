@@ -791,7 +791,7 @@ minetest.register_globalstep(function(dtime)
 				player_style.player_diveing(name,player,true)
 			elseif key.LMB or key.RMB then
 				a="mine"
-				if key.RMB and ppr.ability2d and not exa2d.user[name] and player:get_wielded_item():get_name() == "" then
+				if key.RMB and ppr.ability2d and player:get_meta():get_int("special_disabled") == 0 and not exa2d.user[name] and player:get_wielded_item():get_name() == "" then
 					local d = player:get_look_dir()
 					local p1 = {x=p.x+(d.x*2),y=p.y+2+(d.y*2),z=p.z+(d.z*2)}
 					local p2 = {x=p.x,y=p.y+2,z=p.z}
