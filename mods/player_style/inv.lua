@@ -120,7 +120,7 @@ end
 
 player_style.inventory=function(player)
 	local name = player:get_player_name()
-	player_style.players[name].inv = player_style.players[name].inv or {}
+	player_style.players[name].inv = player_style.players[name].inv or {adds={},adds_func={}}
 	local invp = player_style.players[name].inv
 
 --detached inventory (backpack)
@@ -285,6 +285,11 @@ player_style.inventory=function(player)
 
 --inventory
 
+	local adds = ""
+	for i,v in pairs(invp.adds) do
+		adds = adds .. v
+	end
+
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[4,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10)..";]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
@@ -306,6 +311,7 @@ player_style.inventory=function(player)
 			..model
 			..buttons
 			..backpack
+			..adds
 		)
 	else
 --creative inventory items
@@ -379,6 +385,7 @@ player_style.inventory=function(player)
 			..model
 			..backpack
 			..itembutts
+			..adds
 		)
 	end
 end
@@ -453,6 +460,14 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						return
 					end
 				end
+
+				for i,v in pairs(invp.adds) do
+					if pressed[i] and invp.adds_func[i] then
+						invp.adds_func[i](player)
+						break
+					end
+				end
+
 			end
 			for i,v in pairs(pressed) do
 				if i:sub(1,8) == "itembut_" then
