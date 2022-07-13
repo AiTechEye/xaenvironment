@@ -5,7 +5,11 @@ minetest.register_chatcommand("killme", {
 	func = function(name, param)
 		local p = minetest.get_player_by_name(name)
 		if p then
-			p:set_hp(0)
+			if p:get_meta():get_int("killme_disabled") == 1
+				minetest.chat_send_player(name,"Suiciding is disallowed in this case")
+			else
+				p:set_hp(0)
+			end
 		end
 	end
 })
