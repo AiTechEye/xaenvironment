@@ -34,10 +34,14 @@ minetest.register_chatcommand("sethome", {
 	func = function(name, param)
 		local player=minetest.get_player_by_name(name)
 		if player then
-			local meta = player:get_meta()
+			local m = player:get_meta()
 			local pos = player:get_pos()
-			meta:set_string("home",minetest.pos_to_string(pos))
-			minetest.chat_send_player(name, "Home set!")
+			if m:get_int("respawn_disallowed") == 1 then
+				minetest.chat_send_player(name,"Homes is disallowed in this case")
+			else
+				m:set_string("home",minetest.pos_to_string(pos))
+				minetest.chat_send_player(name, "Home set!")
+			end
 		end
 	end
 })
@@ -49,12 +53,16 @@ minetest.register_chatcommand("home", {
 	func = function(name, param)
 		local player=minetest.get_player_by_name(name)
 		if player then
-			local meta = player:get_meta()
-			local s = meta:get_string("home")
+			local m = player:get_meta()
+			local s = m:get_string("home")
 			if s ~="" then
-				local pos = minetest.string_to_pos(s)
-				player:set_pos(pos)
-				minetest.chat_send_player(name, "Teleported to home")
+				if m:get_int("respawn_disallowed") == 1 then
+					minetest.chat_send_player(name,"Homes is disallowed in this case")
+				else
+					local pos = minetest.string_to_pos(s)
+					player:set_pos(pos)
+					minetest.chat_send_player(name, "Teleported to home")
+				end
 			end
 		end
 	end
@@ -68,10 +76,14 @@ player_style.register_button({
 	info="Set home",
 	action=function(player)
 		local name = player:get_player_name()
-		local meta = player:get_meta()
-		local pos = player:get_pos()
-		meta:set_string("home",minetest.pos_to_string(pos))
-		minetest.chat_send_player(name, "Home set!")
+		local m = player:get_meta()
+		if m:get_int("respawn_disallowed") == 1 then
+			minetest.chat_send_player(name,"Homes is disallowed in this case")
+		else
+			local pos = player:get_pos()
+			m:set_string("home",minetest.pos_to_string(pos))
+			minetest.chat_send_player(name, "Home set!")
+		end
 	end
 })
 
@@ -82,13 +94,17 @@ player_style.register_button({
 	name="gohome",
 	info="Go home",
 	action=function(player)
-		local meta = player:get_meta()
+		local m = player:get_meta()
 		local name = player:get_player_name()
-		local s = meta:get_string("home")
-		if s ~="" then
-			local pos = minetest.string_to_pos(s)
-			player:set_pos(pos)
-			minetest.chat_send_player(name, "Teleported to home")
+		if m:get_int("respawn_disallowed") == 1 then
+			minetest.chat_send_player(name,"Homes is disallowed in this case")
+		else
+			local s = m:get_string("home")
+			if s ~="" then
+				local pos = minetest.string_to_pos(s)
+				player:set_pos(pos)
+				minetest.chat_send_player(name, "Teleported to home")
+			end
 		end
 	end
 })
