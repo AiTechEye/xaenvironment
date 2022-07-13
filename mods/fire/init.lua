@@ -53,7 +53,7 @@ minetest.register_node("fire:basic_flame", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
-				if ob:is_player() and special.use_ability(ob,"fire_resistance") == 0 then
+				if ob:is_player() and special.have_ability(ob,"fire_resistance") and special.use_ability(ob,"fire_resistance") == 0 then
 					goto conti
 				end
 				minetest.add_node(p,{name="fire:not_igniter"})
@@ -108,7 +108,7 @@ minetest.register_node("fire:not_igniter", {
 			local p = ob:get_pos()
 			p = {x=p.x,y=p.y+0.1,z=p.z}
 			if default.def(minetest.get_node(p).name).buildable_to then
-				if ob:is_player() and special.use_ability(ob,"fire_resistance") == 0 then
+				if ob:is_player() and special.have_ability(ob,"fire_resistance") and special.use_ability(ob,"fire_resistance") == 0 then
 					goto conti
 				end
 				minetest.add_node(p,{name="fire:not_igniter"})
@@ -213,7 +213,7 @@ minetest.register_abm({
 
 minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player and hp_change < 0 and modifer.type == "node_damage" and minetest.get_item_group(modifer.node,"igniter") > 0 then
-		hp_change = special.use_ability(player,"fire_resistance",hp_change)
+		hp_change = special.have_ability(player,"fire_resistance") and special.use_ability(player,"fire_resistance",hp_change) or hp_change
 	end
 	return hp_change
 end,true)
