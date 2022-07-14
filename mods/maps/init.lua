@@ -4,7 +4,7 @@ maps = {
 		["tutorial"]={
 			info = "Tutorials",
 			image="default_craftguide.png",
-			pos={x=0,y=1,z=0},--{x=0,y=28501,z=0}
+			pos={x=0,y=0,z=0},--{x=0,y=28501,z=0}
 			size={y=51,x=133,z=100},
 			--locked=true,
 			--unable=true,
@@ -14,7 +14,6 @@ maps = {
 			--bones_drop_only = true,
 			special_disabled=true,
 			store_disabled=true,
-
 			on_enter=function(player)
 				if default.storage:get_int("Tutorials") == 0 then
 					default.storage:set_int("Tutorials",1)
@@ -38,6 +37,28 @@ maps = {
 
 dofile(minetest.get_modpath("maps") .. "/items.lua")
 
+minetest.register_chatcommand("ttmd", {
+	params = "<pos>",
+	description = "Teleport to maps dimension",
+	privs = {teleport=true},
+	func = function(name, param)
+		local p = minetest.get_player_by_name(name)
+		local p2 = param:gsub(","," "):split(" ")
+		if p and p2[3] then
+			local x,y,z = tonumber(p2[1]),tonumber(p2[2]),tonumber(p2[3])
+			if math.abs(y) > 2500 then
+				return false, "Not allowed to move outside the dimension"
+			elseif x and y and z then
+				maps.set_pos(p,vector.new(x,y,z))
+				return true
+			else
+				return false, "Not a valid position, eg: 0 1 0 or 0,1,0"
+			end
+		end
+	end
+})
+
+
 maps.get_pos=function(pos)
 	return vector.add(pos,{x=0,y=28500,z=0})
 end
@@ -46,7 +67,7 @@ maps.set_pos=function(object,pos)
 	if math.abs(pos.y) < 2500 then
 		object:set_pos(maps.get_pos(pos))
 	else
-		minetest.log("warning","Maps: Unable to move outside the dimension")
+		minetest.log("warning","Maps: Not allowed to move outside the dimension")
 	end
 end
 
@@ -146,16 +167,6 @@ minetest.register_on_mods_loaded(function()
 
 		if not m.on_enter then
 			minetest.log("warning","Maps: "..map.." Is missing on_enter (function)")
-			maps.maps[map].unable = true
-		end
-
-		if not m.on_exit then
-			minetest.log("warning","Maps: "..map.." Is missing on_exit (function)")
-			maps.maps[map].unable = true
-		end
-
-		if not m.on_die then
-			minetest.log("warning","Maps: "..map.." Is missing on_die (function)")
 			maps.maps[map].unable = true
 		end
 
