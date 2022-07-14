@@ -208,3 +208,29 @@ minetest.register_node("maps:button", {
 		exatec.send(pos)
 	end,
 })
+
+minetest.register_node("maps:settime", {
+	description = "Set time",
+	tiles={"default_stone.png^[invert:r"},
+	groups = {unbreakable=1,exatec_wire_connected=1,not_in_creative_inventory=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_float("t",12.0)
+		m:set_string("infotext","Time (12)")
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name())==false then
+			local m = minetest.get_meta(pos)
+			local t = m:get_float("t")
+			t = t+1 < 25 and t+1 or 0
+			m:set_float("t",t)
+			m:set_string("infotext","Time (" .. t ..")")
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			minetest.set_timeofday(minetest.get_meta(pos):get_float("t")/24)
+		end
+	}
+})

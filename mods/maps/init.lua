@@ -4,7 +4,7 @@ maps = {
 		["tutorial"]={
 			info = "Tutorials",
 			image="default_craftguide.png",
-			pos={x=0,y=28501,z=0},
+			pos={x=0,y=1,z=0},--{x=0,y=28501,z=0}
 			size={y=51,x=133,z=100},
 			--locked=true,
 			--unable=true,
@@ -18,10 +18,10 @@ maps = {
 			on_enter=function(player)
 				if default.storage:get_int("Tutorials") == 0 then
 					default.storage:set_int("Tutorials",1)
-					nodeextractor.set({x=0,y=28501,z=0},minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
+					nodeextractor.set(maps.get_pos({x=0,y=1,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
 				end
 				minetest.after(0.1, function(player)
-					player:set_pos({x=60,y=28531,z=42})
+					maps.set_pos(player,{x=60,y=31,z=42})
 				end,player)
 			end,
 			on_exit=function(player)
@@ -29,13 +29,27 @@ maps = {
 			on_die=function(player)
 			end,
 			on_respawn=function(player)
-				player:set_pos({x=60,y=28531,z=42})
+				maps.set_pos(player,{x=60,y=31,z=42})
+				--player:set_pos({x=60,y=28531,z=42})
 			end,
 		},
 	}
 }
 
 dofile(minetest.get_modpath("maps") .. "/items.lua")
+
+maps.get_pos=function(pos)
+	return vector.add(pos,{x=0,y=28500,z=0})
+end
+
+maps.set_pos=function(object,pos)
+	if math.abs(pos.y) < 2500 then
+		object:set_pos(maps.get_pos(pos))
+	else
+		minetest.log("warning","Maps: Unable to move outside the dimension")
+	end
+end
+
 
 player_style.register_button({
 	name="maps",
