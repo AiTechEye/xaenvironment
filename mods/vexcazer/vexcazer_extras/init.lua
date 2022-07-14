@@ -5,6 +5,7 @@ vexcazer_extras={
 		"maps:clearinv",
 		"maps:button",
 		"maps:settime",
+		"maps:protect",
 	},
 	tmpcns={},
 }
