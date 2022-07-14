@@ -178,16 +178,14 @@ minetest.register_entity("sign:text",{
 		local r = p[n.param2] or {x=0,y=0,z=0}
 		local d = def.pos or 0
 
-
 		self.object:set_rotation({x=r.x,y=r.y,z=0})
 		local w = minetest.wallmounted_to_dir(n.param2)
 		self.object:set_pos({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)})
 
-
 		if def.bg and def.bg ~= "" and def.bg:find("%.") then
 			d = d +0.001
 			local ob = minetest.add_entity({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)},"sign:text")
-			self.object:set_rotation({x=r.x,y=r.y,z=0})
+			ob:set_rotation({x=r.x,y=r.y,z=0})
 			ob:set_properties({
 				textures={def.bg},
 				visual_size = {x=def.size_x or 1,y=def.size_y or 1,z=1},
@@ -204,14 +202,17 @@ minetest.register_entity("sign:text",{
 
 			d = d +0.001
 			local ob = minetest.add_entity({x=pos.x+(w.x*d),y=pos.y+(w.y*d),z=pos.z+(w.z*d)},"sign:text")
-			self.object:set_rotation({x=r.x,y=r.y,z=0})
+			ob:set_rotation({x=r.x,y=r.y,z=0})
 			ob:set_properties({
 				textures={"default_cloud.png^[colorize:#"..def.bg},
 				visual_size = {x=def.size_x or 1,y=def.size_y or 1,z=1},
 				backface_culling = false,
 			})
 		end
+		if not def.s or def.s == "" then
+			self.object:remove()
+		end
 	end,
-	on_activate=function(self, staticdata)
-	end,
+	--on_activate=function(self, staticdata)
+	--end,
 })
