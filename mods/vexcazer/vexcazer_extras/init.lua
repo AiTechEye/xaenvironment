@@ -1,5 +1,11 @@
 vexcazer_extras={
-	nodes={},
+	nodes={
+		"maps:node_set",
+		"maps:playermove",
+		"maps:clearinv",
+		"maps:button",
+		"maps:settime",
+	},
 	tmpcns={},
 }
 
@@ -29,24 +35,6 @@ minetest.register_node("vexcazer_extras:unbreakable_glowing_" ..v, {
 })
 
 end
-
-for i,v in pairs(minetest.registered_nodes) do
-	local def=minetest.registered_nodes[i]
-	if not vexcazer_extras.tmpcns[i] and def and def.mod_origin=="default" and (def.drawtype=="normal" or def.drawtype=="glasslike_framed_optional" or def.drawtype=="glasslike") then
-		local newdef=table.copy(def)
-		local name="vexcazer_extras:unbreakable_" .. v.name:sub(v.name:find(":")+1,v.name:len())
-		newdef.description="Unbreakable " .. def.description
-		newdef.range=15
-		newdef.drop=""
-		newdef.groups = {not_in_creative_inventory=1,unbreakable=1}
-		newdef.stack_max=1000
-		minetest.register_node(name, newdef)
-		table.insert(vexcazer_extras.nodes,name)
-		vexcazer_extras.tmpcns[i]=true
-	end
-end
-
-vexcazer_extras.tmpcns=nil
 
 vexcazer.registry_mode({
 	name="Unbreakable",
@@ -182,3 +170,22 @@ minetest.register_node("vexcazer_extras:no_build", {
 	pointable=false,
 	groups = {not_in_creative_inventory=1},
 })
+
+
+for i,v in pairs(minetest.registered_nodes) do
+	local def=minetest.registered_nodes[i]
+	if not vexcazer_extras.tmpcns[i] and def and (def.mod_origin=="default" or def.mod_origin=="plants") and (def.drawtype=="normal" or def.drawtype=="glasslike_framed_optional" or def.drawtype=="glasslike") then
+		local newdef=table.copy(def)
+		local name="vexcazer_extras:unbreakable_" .. v.name:sub(v.name:find(":")+1,v.name:len())
+		newdef.description="Unbreakable " .. def.description
+		newdef.range=15
+		newdef.drop=""
+		newdef.groups = {not_in_creative_inventory=1,unbreakable=1}
+		newdef.stack_max=1000
+		minetest.register_node(name, newdef)
+		table.insert(vexcazer_extras.nodes,name)
+		vexcazer_extras.tmpcns[i]=true
+	end
+end
+
+vexcazer_extras.tmpcns=nil
