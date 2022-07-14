@@ -25,7 +25,7 @@ maps.maps.MyMap={
 	store_disabled=true,			-- optional, disabled the store
 	on_enter=function(player)		-- required, when player enter
 
-		if default.storage:get_int("mymap") == 0 then	-- in this case, only generating the map 1 time
+		if default.storage:get_int("mymap") < 1 then		-- in this case, only generating the map 1 time, could also use it as a version number, to replace the map with a newer version, smart huh?
 			default.storage:set_int("mymap",1)
 			nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
 		end
