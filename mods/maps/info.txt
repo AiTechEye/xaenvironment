@@ -1,0 +1,44 @@
+/ttmd 0 0 0 can be usefull while testing them maps
+
+The nodeextractor mod is great to create maps, it keeps all nodes and its metadata, and is easy to edit as text if needed.
+You can find the tools in the game, as "Creater" and "Placer" if you want to place the map by your self.
+
+Methods:
+
+maps.get_pos(pos)				-- adds y=28500, easier to use set_pos()
+maps.set_pos(object,pos)			-- set positions, easier then set_pos()
+
+Add map:
+
+maps.maps.MyMap={
+	info = "My map",
+	image="default_stone.png",	-- optional, map icon
+	pos={x=0,y=0,z=0},			-- required, used to calcilate if the map interacts with other maps
+	size={y=51,x=133,z=100},	-- required, same as above
+	locked=true,					-- optional, locks the map
+	unable=true,					-- optional, makes the map unable
+	hide_items = true,			-- optional, hides the players items
+	singleplayer=true,			-- optional, singleplayer only
+	bones_disabled=true,			-- optional, disabled bones / drop items on death
+	bones_drop_only = true,		-- optional, drop items on death, do not placing bone
+	special_disabled=true,			-- optional, disabled special/abilities
+	store_disabled=true,			-- optional, disabled the store
+	on_enter=function(player)		-- required, when player enter
+
+		if default.storage:get_int("mymap") == 0 then	-- in this case, only generating the map 1 time
+			default.storage:set_int("mymap",1)
+			nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
+		end
+		minetest.after(0.1, function(player)
+			maps.set_pos(player,{x=60,y=31,z=42})
+		end,player)
+
+	end,
+	on_respawn=function(player)	-- required, player respawns
+		maps.set_pos(player,{x=0,y=0,z=0})
+	end,
+	on_exit=function(player)		-- optional, player leaving
+	end,
+	on_die=function(player)		-- optional, player die
+	end,
+}
