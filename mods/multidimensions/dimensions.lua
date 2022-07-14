@@ -1,7 +1,7 @@
-multidimensions.register_dimension("misc",{ -- ground: /teleport 0 28501 0
+multidimensions.register_dimension("maps",{
 	dim_y = 26000,
 	dim_height = 5000,
-	dirt_start = 2500,
+	dirt_start = 2499,
 	bedrock_depth = 50,
 	dirt_depth = 0,
 	ground_limit = 0,
@@ -9,7 +9,7 @@ multidimensions.register_dimension("misc",{ -- ground: /teleport 0 28501 0
 	flatland = true,
 	stone = "air",
 	dirt = "default:bedrock",
-	grass = "air",
+	grass = "default:bedrock",
 	sand = "air",
 	teleporter = false,
 })
