@@ -57,9 +57,10 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 	local m = player:get_meta()
 	local name = player:get_player_name()
 	local inv=player:get_inventory()
+	local invp =  player_style.players[name].inv
 	local items1 = {}
 	local items2 = {}
-
+	local items3 = {}
 	if handle.hide or handle.clear then
 		for i=1,4 do
 			if handle.hide then
@@ -77,16 +78,23 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 		for i,v in pairs(inv:get_list("craft")) do
 			items2[i] = v:to_table()
 		end
-
 		if handle.hide then
 			m:set_int("hiding_inventory",1)
 			m:set_string("hat_hide",m:get_string("hat"))
 			m:set_string("main_hide",minetest.serialize(items1))
 			m:set_string("craft_hide",minetest.serialize(items2))
+			m:set_string("armor_hide",m:get_string("armor"))
 		end
 		m:set_string("hat","")
 		inv:set_list("main",{})
 		inv:set_list("craft",{})
+		armor.user[name].inv:set_list("main", {})
+		m:set_string("armor","")
+
+		if invp.backpack_object then
+			invp.backpack_object:remove()
+			invp.backpack_object = nil
+		end
 
 		player_style.players[name].inv["hat"]:set_stack("main",1, "")
 	elseif handle.show and m:get_int("hiding_inventory") == 1 then
@@ -105,17 +113,28 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 			items2[i]=ItemStack(v)
 		end
 
+		for i,v in pairs(minetest.deserialize(m:get_string("armor_hide") or "") or {}) do
+			local g = minetest.get_item_group(v.name,"armor")
+			if g > 0 then
+				items3[g] = ItemStack(v)
+			end
+		end
+
 		inv:set_list("main",items1)
 		inv:set_list("craft",items2)
+		armor.user[name].inv:set_list("main", items3)
 		m:set_string("hat",m:get_string("hat_hide"))
+		m:set_string("armor",m:get_string("armor_hide"))
 		player_style.players[name].inv["hat"]:set_stack("main",1, minetest.deserialize(m:get_string("hat_hide")))
 
 		m:set_string("hat_hide","")
 		m:set_string("craft_hide","")
 		m:set_string("main_hide","")
+		m:set_string("armor_hide","")
 		m:set_int("hiding_inventory",0)
 	end
 	player_style.inventory(player)
+	armor.update(player)
 end
 
 player_style.inventory=function(player)
