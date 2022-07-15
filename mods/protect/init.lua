@@ -387,14 +387,14 @@ minetest.register_node("protect:area_breaker", {
 	},
 	del=function(pos)
 		for i,v in pairs(protect.areas) do
-			if v.game_rule then
+			--if v.game_rule then
 				if (pos.x >= v.pos1.x and pos.x <= v.pos2.x)
 				and (pos.y >= v.pos1.y and pos.y <= v.pos2.y)
 				and (pos.z >= v.pos1.z and pos.z <= v.pos2.z) then
 					protect.remove_game_rule_area(v.id)
 					return true
 				end
-			end
+			--end
 		end
 	end,
 	after_destruct = function(pos)
