@@ -2,7 +2,7 @@ projectilelauncher={
 	registed_bullets={},
 	user = {},
 }
-
+--[[
 minetest.register_craft({
 	output = "default:projectile_launcher",
 	recipe = {
@@ -11,7 +11,7 @@ minetest.register_craft({
 		{"materials:diode","materials:tube_metal","materials:plastic_sheet"}
 	}
 })
-
+--]]
 projectilelauncher.register_bullet=function(name,def)
 	if name==nil or name=="" then return false end
 	local defname = minetest.get_current_modname() ..":"..name.."_bullet"
@@ -30,6 +30,7 @@ projectilelauncher.register_bullet=function(name,def)
 	--def.on_hit_node
 	--def.on_step
 	--def.on_trigger
+	--def.on_bullet_used
 	--def.on_shoot
 
 	projectilelauncher.registed_bullets[defname]=def
@@ -227,10 +228,6 @@ projectilelauncher.shoot=function(itemstack, user)
 	local p = projectilelauncher.user[name]
 	local stack = p.inv:get_stack("main",p.index)
 	local def
-
-
-
-
 	if stack:get_name() == "" then
 		minetest.sound_play("default_projectilelauncher_out", {object=user})
 		return
@@ -243,20 +240,12 @@ projectilelauncher.shoot=function(itemstack, user)
 	end
 	local pos = user:get_pos()
 	local dir = user:get_look_dir()
-	local height = (user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.5 or 1.5
+	local height = (user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.6 or 1.5
+	local bulletpos = vector.add(vector.new(pos.x, pos.y+height, pos.z),vector.multiply(dir,height == 1.5 and 0.1 or 0.5))
 
-	local e = minetest.add_entity({
-		x=pos.x,
-		y=pos.y+height,
-		z=pos.z
-		}, "default:bullet")
-	local self = e:get_luaentity()
-
-	self.bullet_activate(self,def,user)
 	stack:set_count(stack:get_count()-1)
 	p.inv:set_stack("main",p.index,stack)
 	projectilelauncher.update_inventory(itemstack, user)
-
 
 	if p.autoaim > 0 then
 		local obpos2,autodis = nil,100
@@ -267,9 +256,19 @@ projectilelauncher.shoot=function(itemstack, user)
 				local ob2 = vector.normalize(vector.subtract(obpos, pos))
 				local deg = math.acos((ob2.x*dir.x)+(ob2.y*dir.y)+(ob2.z*dir.z)) * (180 / math.pi)
 				local d = vector.distance(pos,obpos)
-				if d < autodis and not (deg < 0 or deg > 50) and minetest.line_of_sight(vector.new(pos.x,pos.y+height,pos.z),obpos) then
-					autodis = d
-					obpos2 = ob:get_pos()
+				if d < autodis and not (deg < 0 or deg > 50) then -- and minetest.line_of_sight(vector.new(pos.x,pos.y+height,pos.z),obpos)
+					local c = minetest.raycast(vector.new(pos.x,pos.y+height,pos.z),obpos)
+					local ob2 = c:next()
+					local ex = true
+					while (ob2 and ex) do
+						if ob2 and ob2.type == "node" and default.defpos(ob2.under,"walkable") then
+							ex = nil
+						elseif ob2 and ob2.type == "object" and ob2.ref ~= user and not default.is_decoration(ob2.ref,true) then
+							autodis = d
+							obpos2 = obpos
+						end
+						ob2 = c:next()
+					end
 				end
 			end
 		end
@@ -277,6 +276,14 @@ projectilelauncher.shoot=function(itemstack, user)
 			dir = vector.new((obpos2.x-pos.x)/autodis,((obpos2.y-pos.y)-height)/autodis,(obpos2.z-pos.z)/autodis)
 		end
 	end
+	if def.before_bullet_released and def.before_bullet_released(itemstack, user, bulletpos, dir) then
+		return
+	end
+
+	local e = minetest.add_entity(bulletpos, "default:bullet")
+	local self = e:get_luaentity()
+
+	self.bullet_activate(self,def,user)
 	self.dir = dir
 	e:set_yaw(user:get_look_horizontal()-math.pi/2)
 	e:set_velocity({x=num(dir.x*20), y=num(dir.y*20), z=num(dir.z*20)})
@@ -357,6 +364,8 @@ projectilelauncher.register_bullet("lazer",{
 	--magazine_alpha = "emeald",
 	--on_trigger(itemstack, user) then
 	--end
+	--before_bullet_released(itemstack, user,pos, dir)
+	--end,
 	--on_shoot(itemstack, user,bullet)
 	--end
 	--on_hit_node=function(self,user,pos)
@@ -409,14 +418,83 @@ projectilelauncher.register_bullet("lightning_",{
 	craft_count=8,
 	bullet_alpha = "quartz",
 	launch_sound = "default_projectilelauncher_shot12",
-	groups={treasure=2,store=4},
+	groups={treasure=2,store=8},
 	on_shoot=function(itemstack, user,bullet)
-		user:add_velocity(vector.multiply(bullet:get_luaentity().dir,-5))
+		local dir = bullet:get_luaentity().dir
+		dir.y = 0
+		user:add_velocity(vector.multiply(dir,-5))
 	end,
 	on_hit_object=function(self,user,target,pos)
 		target:add_velocity(vector.multiply(self.dir,5))
 	end,
 	craft={
 		{"default:amethyst","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("flash_",{
+	description="Flash bullet",
+	texture="default_wood.png^[colorize:#00f",
+	damage=0,
+	craft_count=8,
+	magazine_alpha = "longcrystal",
+	launch_sound = "default_projectilelauncher_shot8",
+	groups={treasure=2,store=15},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2 = vector.add(pos1,vector.multiply(dir,100))
+		local c = minetest.raycast(pos1,pos2)
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos2 = ob.intersection_point
+				minetest.check_for_falling(ob.under)
+				break
+			elseif ob.type == "object" and ob.ref ~= user and not default.is_decoration(ob.ref,true) then
+				default.punch(ob.ref,user,8)
+			end
+			ob = c:next()
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#00f"
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		lightning:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+		return true
+	end,
+	craft={
+		{"default:diamond","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("blob_",{
+	description="Blob bullet",
+	texture="default_wood.png^[colorize:#00ff80",
+	damage=5,
+	craft_count=8,
+	bullet_alpha = "flint",
+	magazine_alpha = "flint",
+	launch_sound = "default_projectilelauncher_shot4",
+	hit_sound = "default_projectilelauncher_shot12",
+	groups={treasure=2,store=15},
+	on_shoot=function(itemstack, user,bullet)
+		local self = bullet:get_luaentity()
+		self.dir.y = 0
+		user:add_velocity(vector.multiply(self.dir,-10))
+	end,
+	on_hit_object=function(self,user,target,pos)
+		self.dir.y = self.dir.y + 0.05
+		target:add_velocity(vector.multiply(self.dir,target:get_luaentity() and 100 or 20))
+	end,
+	craft={
+		{"default:opal","default:iron_ingot"},
 	}
 })
