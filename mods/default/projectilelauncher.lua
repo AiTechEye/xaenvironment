@@ -2,7 +2,7 @@ projectilelauncher={
 	registed_bullets={},
 	user = {},
 }
---[[
+
 minetest.register_craft({
 	output = "default:projectile_launcher",
 	recipe = {
@@ -11,7 +11,7 @@ minetest.register_craft({
 		{"materials:diode","materials:tube_metal","materials:plastic_sheet"}
 	}
 })
---]]
+
 projectilelauncher.register_bullet=function(name,def)
 	if name==nil or name=="" then return false end
 	local defname = minetest.get_current_modname() ..":"..name.."_bullet"
@@ -50,7 +50,7 @@ projectilelauncher.register_bullet=function(name,def)
 end
 
 minetest.register_tool("default:projectile_launcher", {
-	description = "Projectile launcher",
+	description = "Projectile launcher (shoots bullets)",
 	inventory_image = "projectile_launcher.png",
 	wield_scale={x=1.5,y=1.5,z=2},
 	range = 2,
@@ -105,16 +105,12 @@ minetest.register_tool("default:projectile_launcher", {
 
 projectilelauncher.new_inventory=function(itemstack, user)
 	local name = user:get_player_name()
+
 	if not projectilelauncher.user[name] then
-		local list = {}
-		local m = itemstack:get_meta()
-		projectilelauncher.user[name]={
-			index = (m:get_int("index") > 0 and m:get_int("index") or 1),
-			autoaim = m:get_int("autoaim"),
-			inv=minetest.create_detached_inventory("projectilelauncher", {
-				--allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
-				--	return 0
-				--end,
+		projectilelauncher.user[name] = {
+			index = 0,
+			autoaim = 0,
+			inv = minetest.create_detached_inventory("projectilelauncher_"..name, {
 				allow_put = function(inv, listname, index, stack, player)
 					return minetest.get_item_group(stack:get_name(),"bullet") > 0 and stack:get_count() or 0
 				end,
@@ -122,24 +118,33 @@ projectilelauncher.new_inventory=function(itemstack, user)
 					return stack:get_count()
 				end,
 				on_put = function(inv, listname, index, stack, player)
-					projectilelauncher.update_inventory(itemstack, user,true)
+					local p = projectilelauncher.user[user:get_player_name()]
+					projectilelauncher.update_inventory(p.itemstack, user,true)
 				end,
 				on_take = function(inv, listname, index, stack, player)
-					projectilelauncher.update_inventory(itemstack, user)
+					local p = projectilelauncher.user[user:get_player_name()]
+					projectilelauncher.update_inventory(p.itemstack, user,true)
 				end,
 				on_move = function(inv, listname, index, stack, player)
-					projectilelauncher.update_inventory(itemstack, user)
+					local p = projectilelauncher.user[user:get_player_name()]
+					projectilelauncher.update_inventory(p.itemstack, user,true)
 				end,
-			})
-		}
+			}
+		)}
 		projectilelauncher.user[name].inv:set_size("main", 8)
-		for i,v in pairs(minetest.deserialize(m:get_string("inv")) or {}) do
-			if minetest.get_item_group(v.name,"bullet") > 0 then
-				list[i] = ItemStack(v)
-			end
-		end
-		projectilelauncher.user[name].inv:set_list("main", list)
 	end
+	local p = projectilelauncher.user[name]
+	local list = {}
+	local m = itemstack:get_meta()
+	p.index = m:get_int("index") > 0 and m:get_int("index") or 1
+	p.autoaim = m:get_int("autoaim")
+
+	for i,v in pairs(minetest.deserialize(m:get_string("inv")) or {}) do
+		if minetest.get_item_group(v.name,"bullet") > 0 then
+			list[i] = ItemStack(v)
+		end
+	end
+	projectilelauncher.user[name].inv:set_list("main", list)
 end
 
 projectilelauncher.show_inventory=function(itemstack, user)
@@ -170,10 +175,10 @@ projectilelauncher.show_inventory=function(itemstack, user)
 			"size[9,5]" ..
 			butt ..
 			"listcolors[#77777777;#777777aa;#000000ff]"..
-			"list[detached:projectilelauncher;main;0,0.4;8,1;]" ..
+			"list[detached:projectilelauncher_"..name..";main;0,0.4;8,1;]" ..
 			"list[current_player;main;0,1.5;8,4;]" ..
 			"listring[current_player;main]" ..
-			"listring[detached:projectilelauncher;main]" ..
+			"listring[detached:projectilelauncher_"..name..";main]" ..
 			"image["..(p.index-1)..",0.4;1,1;default_chest_top.png^[colorize:#0f0]" ..
 			"image_button[8,0;1,1;default_watersplash_ring.png"..(p.autoaim == 0 and "^default_cross.png" or "")..";autoaim;]" ..
 			"tooltip[autoaim;Auto aim ("..(p.autoaim == 0 and "OFF" or "ON")..")]"
@@ -187,12 +192,17 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		local p = projectilelauncher.user[player:get_player_name()]
 		if pressed.autoaim then
 			p.autoaim = p.autoaim == 0 and 1 or 0
+			p.itemstack:get_meta():set_int("autoaim",p.autoaim)
+			player:set_wielded_item(p.itemstack)
 			projectilelauncher.show_inventory(p.itemstack, player)
 			return
 		end
 		for i,v in pairs(pressed) do
 			if i:sub(1,9) == "setindex#" then
 				p.index = tonumber(i:sub(10,-1))
+				local m = p.itemstack:get_meta()
+				m:set_int("index",p.index)
+				player:set_wielded_item(p.itemstack)
 				projectilelauncher.show_inventory(p.itemstack, player)
 				break
 			end
