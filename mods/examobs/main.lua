@@ -301,7 +301,7 @@ examobs.register_mob=function(def)
 	end
 	def.hurt=function(self,dmg)
 		self.hp = self.hp - dmg
-		self.object:set_hp(self.hp)
+		--self.object:set_hp(self.hp)
 		if self.dead then
 			if self.dead <= 0 or self.hp <= 0 then
 				self.object:remove()
