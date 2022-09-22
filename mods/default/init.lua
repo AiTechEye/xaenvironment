@@ -75,6 +75,7 @@ dofile(minetest.get_modpath("default") .. "/functions.lua")
 dofile(minetest.get_modpath("default") .. "/furnishings.lua")
 dofile(minetest.get_modpath("default") .. "/plants.lua")
 dofile(minetest.get_modpath("default") .. "/bows.lua")
+dofile(minetest.get_modpath("default") .. "/projectilelauncher.lua")
 
 dofile(minetest.get_modpath("default") .. "/nodes.lua")
 dofile(minetest.get_modpath("default") .. "/mapgen.lua")
