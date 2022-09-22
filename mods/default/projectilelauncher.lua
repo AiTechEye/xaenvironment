@@ -23,7 +23,7 @@ projectilelauncher.register_bullet=function(name,def)
 	def.groups = def.groups or {}
 	def.groups.bullet = 1
 	def.groups.treasure = def.groups.treasure or 1
-	def.bullettexture = def.bullettexture or (def.texture .. "^default_alpha_gem_round.png^[makealpha:0,255,0")
+	def.bullettexture = def.bullettexture or (def.texture .. "^default_alpha_gem_"..(def.bullet_alpha or "round")..".png^[makealpha:0,255,0")
 	def.textures={def.bullettexture}
 
 	--def.on_hit_object
@@ -36,7 +36,7 @@ projectilelauncher.register_bullet=function(name,def)
 
 	minetest.register_craftitem(defname, {
 		description = def.description or name,
-		inventory_image = (def.texture and def.texture .. "^default_alpha_gem_emeald.png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_alpha_gem_emeald.png^[makealpha:0,255,0",
+		inventory_image = (def.texture and def.texture .. "^default_alpha_gem_"..(def.magazine_alpha or "emeald")..".png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_alpha_gem_emeald.png^[makealpha:0,255,0",
 		groups = def.groups,
 	})
 	if def.craft then
@@ -277,6 +277,7 @@ projectilelauncher.shoot=function(itemstack, user)
 			dir = vector.new((obpos2.x-pos.x)/autodis,((obpos2.y-pos.y)-height)/autodis,(obpos2.z-pos.z)/autodis)
 		end
 	end
+	self.dir = dir
 	e:set_yaw(user:get_look_horizontal()-math.pi/2)
 	e:set_velocity({x=num(dir.x*20), y=num(dir.y*20), z=num(dir.z*20)})
 
@@ -352,6 +353,8 @@ projectilelauncher.register_bullet("lazer",{
 	damage=3,
 	craft_count=16,
 	groups={treasure=2,store=2},
+	--bullet_alpha = "round",
+	--magazine_alpha = "emeald",
 	--on_trigger(itemstack, user) then
 	--end
 	--on_shoot(itemstack, user,bullet)
@@ -396,5 +399,24 @@ projectilelauncher.register_bullet("lazer_automatic",{
 	end,
 	craft={
 		{"default:electric_lump","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("lightning_",{
+	description="Lightning bullet",
+	texture="default_wood.png^[colorize:#8000ff",
+	damage=7,
+	craft_count=8,
+	bullet_alpha = "quartz",
+	launch_sound = "default_projectilelauncher_shot12",
+	groups={treasure=2,store=4},
+	on_shoot=function(itemstack, user,bullet)
+		user:add_velocity(vector.multiply(bullet:get_luaentity().dir,-5))
+	end,
+	on_hit_object=function(self,user,target,pos)
+		target:add_velocity(vector.multiply(self.dir,5))
+	end,
+	craft={
+		{"default:amethyst","default:iron_ingot"},
 	}
 })
