@@ -159,3 +159,21 @@ minetest.register_node("materials:gel_flowing2", {
 	post_effect_color = {a=60,r=0,g=150,b=0},
 	groups = {liquid = 4, not_in_creative_inventory = 1,lava=1},
 })
+
+minetest.register_node("materials:candyfloss", {
+	description = "Candyfloss",
+	groups = {crumbly=3},
+	tiles = {"materials_candyfloss.png"},
+	paramtype="light",
+	sunlight_propagates=true,
+	sounds=default.node_sound_snow_defaults(),
+	climbable = true,
+	walkable=false,
+})
+
+minetest.register_node("materials:examobs_candylog", {
+	description = "Candyfloss",
+	groups = {choppy=3},
+	tiles = {"materials_candylog.png"},
+	sounds=default.node_sound_wood_defaults(),
+})
