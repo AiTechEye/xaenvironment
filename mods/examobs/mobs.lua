@@ -753,6 +753,17 @@ examobs.register_mob({
 	on_load=function(self)
 		self.team = self.storage.team or self.team
 	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
+	end,
 })
 
 examobs.register_mob({
@@ -789,6 +800,17 @@ examobs.register_mob({
 	end,
 	on_load=function(self)
 		self.team = self.storage.team or self.team
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
 	end,
 })
 
@@ -827,6 +849,17 @@ examobs.register_mob({
 	on_load=function(self)
 		self.team = self.storage.team or self.team
 	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
+	end,
 })
 
 examobs.register_mob({
@@ -857,6 +890,17 @@ examobs.register_mob({
 	resist_nodes = {["default:lava_source"]=1,["default:lava_flowing"]=1,["fire:basic_flame"]=1,["fire:not_igniter"]=1,["fire:permanent_flame"]=1},
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"meat")> 0 then
+				self:eat_item(item)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+			end
+		end
 	end,
 	step=function(self,dtime)
 		local p = self:pos()
