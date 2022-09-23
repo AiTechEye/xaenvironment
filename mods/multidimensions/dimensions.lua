@@ -15,7 +15,7 @@ multidimensions.register_dimension("maps",{
 })
 
 multidimensions.register_dimension("candyland",{
-	ground_ores = {["materials:marzipan_rose"] = 100,["materials:candy1"] = 100,["materials:candy2"] = 100,["materials:candy3"] = 100,["materials:candy4"] = 1000,["materials:candy5"] = 100,["materials:candy6"] = 100},
+	ground_ores = {["materials:marzipan_rose"] = 100,["materials:candy1"] = 100,["materials:candy2"] = 100,["materials:candy3"] = 100,["materials:candy4"] = 1000,["materials:candy5"] = 100,["materials:candy6"] = 100,["plants:candytree_spawner"] = 1000},
 	water_ores={["materials:gel"]={chance=500,max_heat=20},},
 	stone = "materials:sponge_cake",
 	dirt = "materials:sugar",
