@@ -172,7 +172,7 @@ minetest.register_node("materials:candyfloss", {
 })
 
 minetest.register_node("materials:candylog", {
-	description = "Candyfloss",
+	description = "Candy log",
 	groups = {choppy=3},
 	tiles = {"materials_candylog.png"},
 	sounds=default.node_sound_wood_defaults(),
