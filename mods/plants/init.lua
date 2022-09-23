@@ -1176,3 +1176,23 @@ minetest.register_craft({
 		{"plants:tomato"},
 	},
 })
+
+minetest.register_node("plants:candytree_spawner", {
+	description = "Candy tree spawner",
+	tiles={"materials_sugar.png"},
+	groups={on_load=1},
+	on_load = function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		if math.random(1,9) == 1 then
+			minetest.remove_node(pos)
+			local r = math.random(1,3)
+			local rad = {[1]=12,[2]=5,[3]=8}
+			rad = rad[r]
+			minetest.place_schematic({x=pos.x-rad,y=pos.y,z=pos.z-rad}, minetest.get_modpath("plants").."/schematics/plants_candytree" .. r .. ".mts", "random", nil, false)
+		else
+			return true
+		end
+	end
+})
