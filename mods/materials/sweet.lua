@@ -171,7 +171,7 @@ minetest.register_node("materials:candyfloss", {
 	walkable=false,
 })
 
-minetest.register_node("materials:examobs_candylog", {
+minetest.register_node("materials:candylog", {
 	description = "Candyfloss",
 	groups = {choppy=3},
 	tiles = {"materials_candylog.png"},
