@@ -350,7 +350,7 @@ minetest.register_entity("default:bullet",{
 					local en = v.object:get_luaentity()
 					if not (en and en.user and en.user == self.user) then
 						minetest.sound_play(self.def.hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 20})
-						default.punch(v.object,self.user,self.damage)
+						default.punch(v.object,self.damage_by_bullet and self.object or self.user,self.damage)
 						if self.def.on_hit_object then
 							self.def.on_hit_object(self,self.user,v.object,pos)
 						end
@@ -370,6 +370,7 @@ projectilelauncher.register_bullet("lazer",{
 	damage=3,
 	craft_count=16,
 	groups={treasure=2,store=2},
+	--damage_by_bullet = true,
 	--bullet_alpha = "round",
 	--magazine_alpha = "emeald",
 	--on_trigger(itemstack, user) then
@@ -495,6 +496,7 @@ projectilelauncher.register_bullet("blob_",{
 	launch_sound = "default_projectilelauncher_shot4",
 	hit_sound = "default_projectilelauncher_shot12",
 	groups={treasure=2,store=15},
+	damage_by_bullet = true,
 	on_shoot=function(itemstack, user,bullet)
 		local self = bullet:get_luaentity()
 		self.dir.y = 0
