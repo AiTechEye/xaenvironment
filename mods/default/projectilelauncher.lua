@@ -11,6 +11,10 @@ minetest.register_craft({
 		{"materials:diode","materials:tube_metal","materials:plastic_sheet"}
 	}
 })
+minetest.register_craft({
+	output = "default:lazer_automatic_bullet",
+	recipe = {{"default:lazer_bullet"}}
+})
 
 projectilelauncher.register_bullet=function(name,def)
 	if name==nil or name=="" then return false end
@@ -37,7 +41,7 @@ projectilelauncher.register_bullet=function(name,def)
 
 	minetest.register_craftitem(defname, {
 		description = def.description or name,
-		inventory_image = (def.texture and def.texture .. "^default_alpha_gem_"..(def.magazine_alpha or "emeald")..".png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_alpha_gem_emeald.png^[makealpha:0,255,0",
+		inventory_image = (def.itemtexture or def.texture and def.texture .. "^default_alpha_gem_"..(def.magazine_alpha or "emeald")..".png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_alpha_gem_emeald.png^[makealpha:0,255,0",
 		groups = def.groups,
 	})
 	if def.craft then
@@ -341,7 +345,7 @@ minetest.register_entity("default:bullet",{
 				if v.type == "node" then
 					minetest.sound_play(self.def.hit_sound, {pos=pos, gain = 1.0, max_hear_distance = 20})
 					minetest.check_for_falling(pos)
-					if def.on_hit_node then
+					if self.def.on_hit_node then
 						self.def.on_hit_node(self,self.user,pos)
 					end
 					self.object:remove()
@@ -372,6 +376,8 @@ projectilelauncher.register_bullet("lazer",{
 	groups={treasure=2,store=2},
 	--damage_by_bullet = true,
 	--bullet_alpha = "round",
+	--itemtexture = "",
+	--bullettexture="",
 	--magazine_alpha = "emeald",
 	--on_trigger(itemstack, user) then
 	--end
@@ -508,5 +514,44 @@ projectilelauncher.register_bullet("blob_",{
 	end,
 	craft={
 		{"default:opal","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("torch",{
+	description="Torch bullet",
+	damage=5,
+	craft_count=6,
+	groups={treasure=2,store=4},
+	itemtexture = "default_torch.png^default_alpha_stick.png^[makealpha:0,255,0",
+	bullettexture="default:torch",
+	visual = "wielditem",
+	visual_size = {x=0.3,y=0.3},
+	launch_sound = "default_projectilelauncher_shot9",
+	on_shoot=function(itemstack, user, bullet)
+		local pos1=bullet:get_pos()
+		local pos2=vector.add(pos1,bullet:get_velocity())
+		local v = {x=pos1.x-pos2.x, y=(pos1.y+1.4)-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(v.z/v.x)
+		local z = math.atan(v.y/math.sqrt(v.x^2+v.z^2))
+		if pos1.x >= pos2.x then y = y+math.pi end
+		bullet:set_rotation({x=0,y=y,z=z+(math.pi/2)})
+	end,
+	on_hit_node=function(self,user,pos)
+		local player = minetest.is_player(user)
+		if not minetest.is_protected(pos, player and user:get_player_name() or "") and default.defpos(pos,"buildable_to") then
+			minetest.place_node(pos,{name="default:torch"})
+			if player then
+				default.def("default:torch").on_place(ItemStack("default:torch"), user, {above=pos,under=vector.add(pos,self.dir)})
+			end
+		end
+	end,
+	on_hit_object=function(self,user,target,pos)
+		local player = minetest.is_player(user)
+		if not minetest.is_protected(pos, player and user:get_player_name() or "") and default.defpos(pos,"buildable_to") then
+			minetest.set_node(pos,{name="fire:basic_flame"})
+		end
+	end,
+	craft={
+		{"default:torch","default:iron_ingot"},
 	}
 })
