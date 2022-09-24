@@ -1040,7 +1040,9 @@ examobs.register_mob({
 		self.inv={["examobs:icecreamball"]=9}
 	end,
 	step=function(self,dtime)
-		if not self.throwing and self.fight and self.fight:get_pos() and examobs.visiable(self.object,self.fight) and examobs.viewfield(self,self.fight) then
+		if self.dying or self.dead then
+			return
+		elseif not self.throwing and self.fight and self.fight:get_pos() and examobs.visiable(self.object,self.fight) and examobs.viewfield(self,self.fight) then
 			local pos2=self.fight:get_pos()
 			local pos1=self.object:get_pos()
 			local d=vector.distance(pos1,pos2)
@@ -1054,7 +1056,7 @@ examobs.register_mob({
 				d=d*0.05
 				local p=examobs.pointat(self,4)
 				minetest.after(0.7, function(p,d,self)
-					if self.fight then
+					if self.fight and not (self.dying or self.dead) then
 						local pos2=self.fight:get_pos()
 						local pos1=self.object:get_pos()
 						if not (pos1 and pos2 and self) then return end
@@ -1064,8 +1066,10 @@ examobs.register_mob({
 					end
 				end,p,d,self)
 					minetest.after(1.2, function(self)
-						if not self.object:get_pos() then return end
 						self.throwing=nil
+						if not self.object:get_pos() or self.dying or self.dead then
+							return
+						end
 						examobs.stand(self)
 					end,self)
 				return self
@@ -1107,7 +1111,9 @@ examobs.register_mob({
 	end,
 	on_punched=function(self,puncher)
 		local pos=self:pos()
-		examobs.anim(self,"throw")
+		if not (self.dying or self.dead) then
+			examobs.anim(self,"throw")
+		end
 		minetest.add_particlespawner({
 			amount = 5,
 			time =0.05,
