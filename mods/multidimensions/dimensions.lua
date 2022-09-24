@@ -1,7 +1,8 @@
 multidimensions.register_dimension("maps",{
+	custom_y = true,
 	dim_y = 26000,
 	dim_height = 5000,
-	dirt_start = 2498,
+	dirt_start = 21000,
 	bedrock_depth = 50,
 	dirt_depth = 0,
 	ground_limit = 0,

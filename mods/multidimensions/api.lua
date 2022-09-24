@@ -2,7 +2,7 @@ multidimensions.register_dimension=function(name,def,self)
 
 	local y = multidimensions.first_dimensions_appear_at
 	for i,v in pairs(multidimensions.registered_dimensions) do
-		if v.dim_y >= multidimensions.calculating_dimensions_from_min_y then
+		if v.dim_y >= multidimensions.calculating_dimensions_from_min_y and not v.custom_y then
 			y = y + v.dim_height
 		end
 	end
