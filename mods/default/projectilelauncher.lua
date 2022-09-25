@@ -28,6 +28,15 @@
 projectilelauncher={
 	registed_bullets={},
 	user = {},
+	zoom_check=function(user)
+		minetest.after(0.1,function(user)
+			if user and user:get_pos() and user:get_wielded_item():get_name() ~= "default:projectile_launcher" then
+				user:set_fov(0,false,0.01)
+			else
+				projectilelauncher.zoom_check(user)
+			end
+		end,user)
+	end,
 }
 
 minetest.register_craft({
@@ -80,14 +89,44 @@ minetest.register_tool("default:projectile_launcher", {
 	range = 2,
 	groups = {store=5000},
 	on_use =function(itemstack, user, pointed_thing)
+		local p = projectilelauncher.user[user:get_player_name()]
+		local z = user:get_fov()
+		local key=user:get_player_control()
+		if p and key.aux1 and p.zoom == 1 then
+			if z == 0 then
+				z = 30
+			elseif z <= 5 then
+				z = 5
+			else
+				z = z - 5
+			end
+			user:set_fov(z,false,0.1)
+			projectilelauncher.zoom_check(user)
+			return itemstack
+		end
+
 		projectilelauncher.shoot(itemstack, user)
 	end,
 	on_place = function(itemstack, user, pointed_thing)
 		projectilelauncher.show_inventory(itemstack, user)
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
-		projectilelauncher.new_inventory(itemstack, user)
 		local p = projectilelauncher.user[user:get_player_name()]
+		local z = user:get_fov()
+		local key=user:get_player_control()
+		if p and key.aux1 and p.zoom == 1 then
+			if z >= 30 then
+				z = 30
+			else
+				z = z + 5
+			end
+			user:set_fov(z,false,0.1)
+			projectilelauncher.zoom_check(user)
+			return itemstack
+		end
+
+		projectilelauncher.new_inventory(itemstack, user)
+
 		local index = p.index
 		for i=1,15 do
 			index = index +1
@@ -134,11 +173,21 @@ projectilelauncher.new_inventory=function(itemstack, user)
 		projectilelauncher.user[name] = {
 			index = 0,
 			autoaim = 0,
+			zoom = 0,
 			inv = minetest.create_detached_inventory("projectilelauncher_"..name, {
+				allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+					return (to_index ~= 9 and from_index ~= 9) and count or 0
+				end,
 				allow_put = function(inv, listname, index, stack, player)
-					return minetest.get_item_group(stack:get_name(),"bullet") > 0 and stack:get_count() or 0
+					return (index < 9 and minetest.get_item_group(stack:get_name(),"bullet") > 0 and stack:get_count()) or (index == 9 and stack:get_name() == "default:telescopic" and stack:get_count()) or 0
 				end,
 				allow_take = function(inv, listname, index, stack, player)
+					if index == 9 then
+						local p = projectilelauncher.user[player:get_player_name()]
+						player:set_fov(0,false,0.01)
+						p.zoom = 0
+						projectilelauncher.update_inventory(p.itemstack, user,true)
+					end
 					return stack:get_count()
 				end,
 				on_put = function(inv, listname, index, stack, player)
@@ -155,16 +204,17 @@ projectilelauncher.new_inventory=function(itemstack, user)
 				end,
 			}
 		)}
-		projectilelauncher.user[name].inv:set_size("main", 8)
+		projectilelauncher.user[name].inv:set_size("main", 9)
 	end
 	local p = projectilelauncher.user[name]
 	local list = {}
 	local m = itemstack:get_meta()
 	p.index = m:get_int("index") > 0 and m:get_int("index") or 1
+	p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and m:get_int("zoom") or 0
 	p.autoaim = m:get_int("autoaim")
 
 	for i,v in pairs(minetest.deserialize(m:get_string("inv")) or {}) do
-		if minetest.get_item_group(v.name,"bullet") > 0 then
+		if minetest.get_item_group(v.name,"bullet") > 0 or v.name == "default:telescopic" then
 			list[i] = ItemStack(v)
 		end
 	end
@@ -180,9 +230,7 @@ projectilelauncher.show_inventory=function(itemstack, user)
 	local list = {}
 
 	for i,v in pairs(minetest.deserialize(m:get_string("inv")) or {}) do
-		if minetest.get_item_group(v.name,"bullet") > 0 then
-			list[i] = ItemStack(v)
-		end
+		list[i] = ItemStack(v)
 	end
 
 	p.inv:set_list("main", list)
@@ -199,13 +247,15 @@ projectilelauncher.show_inventory=function(itemstack, user)
 			"size[9,5]" ..
 			butt ..
 			"listcolors[#77777777;#777777aa;#000000ff]"..
-			"list[detached:projectilelauncher_"..name..";main;0,0.4;8,1;]" ..
+			"list[detached:projectilelauncher_"..name..";main;0,0.4;9,1;]" ..
 			"list[current_player;main;0,1.5;8,4;]" ..
 			"listring[current_player;main]" ..
 			"listring[detached:projectilelauncher_"..name..";main]" ..
 			"image["..(p.index-1)..",0.4;1,1;default_chest_top.png^[colorize:#0f0]" ..
-			"image_button[8,0;1,1;default_watersplash_ring.png"..(p.autoaim == 0 and "^default_cross.png" or "")..";autoaim;]" ..
-			"tooltip[autoaim;Auto aim ("..(p.autoaim == 0 and "OFF" or "ON")..")]"
+			"image_button[8,1.5;1,1;default_watersplash_ring.png"..(p.autoaim == 0 and "^default_cross.png" or "")..";autoaim;]" ..
+			"tooltip[autoaim;Auto aim ("..(p.autoaim == 0 and "OFF" or "ON")..")]"..
+
+			"image[8,0.4;1,1;default_telescopic.png"..(p.zoom == 0 and "^default_cross.png" or "").."]button[8,-0.1;1,0.5;zoom;]"
 		)
 	end, name,p)
 	return itemstack
@@ -217,6 +267,17 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		if pressed.autoaim then
 			p.autoaim = p.autoaim == 0 and 1 or 0
 			p.itemstack:get_meta():set_int("autoaim",p.autoaim)
+			player:set_wielded_item(p.itemstack)
+			projectilelauncher.show_inventory(p.itemstack, player)
+			return
+		end
+		if pressed.zoom then
+			p.zoom = p.zoom == 0 and 1 or 0
+			p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and p.zoom or 0
+			p.itemstack:get_meta():set_int("zoom",p.zoom)
+			if p.zoom == 0 then
+				player:set_fov(0,false,0.01)
+			end
 			player:set_wielded_item(p.itemstack)
 			projectilelauncher.show_inventory(p.itemstack, player)
 			return
@@ -245,6 +306,7 @@ projectilelauncher.update_inventory=function(itemstack, user, add)
 	m:set_string("inv",minetest.serialize(list))
 	m:set_int("index",p.index)
 	m:set_int("autoaim",p.autoaim)
+	m:set_int("zoom",p.zoom)
 	user:set_wielded_item(itemstack)
 
 	if add then
