@@ -28,12 +28,12 @@
 projectilelauncher={
 	registed_bullets={},
 	user = {},
-	zoom_check=function(user)
+	zoom_check=function(user,index)
 		minetest.after(0.1,function(user)
-			if user and user:get_pos() and user:get_wielded_item():get_name() ~= "default:projectile_launcher" then
+			if user and user:get_pos() and user:get_wield_index() ~= index then
 				user:set_fov(0,false,0.01)
 			else
-				projectilelauncher.zoom_check(user)
+				projectilelauncher.zoom_check(user,index)
 			end
 		end,user)
 	end,
@@ -89,10 +89,11 @@ minetest.register_tool("default:projectile_launcher", {
 	range = 2,
 	groups = {store=5000},
 	on_use =function(itemstack, user, pointed_thing)
+		projectilelauncher.new_inventory(itemstack, user)
 		local p = projectilelauncher.user[user:get_player_name()]
 		local z = user:get_fov()
 		local key=user:get_player_control()
-		if p and key.aux1 and p.zoom == 1 then
+		if key.aux1 and p.zoom == 1 then
 			if z == 0 then
 				z = 30
 			elseif z <= 5 then
@@ -101,7 +102,7 @@ minetest.register_tool("default:projectile_launcher", {
 				z = z - 5
 			end
 			user:set_fov(z,false,0.1)
-			projectilelauncher.zoom_check(user)
+			projectilelauncher.zoom_check(user,user:get_wield_index())
 			return itemstack
 		end
 
@@ -111,21 +112,32 @@ minetest.register_tool("default:projectile_launcher", {
 		projectilelauncher.show_inventory(itemstack, user)
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
+		projectilelauncher.new_inventory(itemstack, user)
 		local p = projectilelauncher.user[user:get_player_name()]
 		local z = user:get_fov()
 		local key=user:get_player_control()
-		if p and key.aux1 and p.zoom == 1 then
+		if key.aux1 and p.zoom == 1 then
+
+print(z)
+
+			--if z >= 30 then
+			--	z = 30
+			--else
+			--	z = z + 5
+			--end
+
+
 			if z >= 30 then
-				z = 30
-			else
+				z = 0
+			elseif z > 0 then
 				z = z + 5
 			end
+
+
 			user:set_fov(z,false,0.1)
-			projectilelauncher.zoom_check(user)
+			projectilelauncher.zoom_check(user,user:get_wield_index())
 			return itemstack
 		end
-
-		projectilelauncher.new_inventory(itemstack, user)
 
 		local index = p.index
 		for i=1,15 do
@@ -168,7 +180,6 @@ minetest.register_tool("default:projectile_launcher", {
 
 projectilelauncher.new_inventory=function(itemstack, user)
 	local name = user:get_player_name()
-
 	if not projectilelauncher.user[name] then
 		projectilelauncher.user[name] = {
 			index = 0,
@@ -187,6 +198,9 @@ projectilelauncher.new_inventory=function(itemstack, user)
 						player:set_fov(0,false,0.01)
 						p.zoom = 0
 						projectilelauncher.update_inventory(p.itemstack, user,true)
+						minetest.after(0.1, function(user,p)
+							projectilelauncher.show_inventory(p.itemstack, user)
+						end,user,p)
 					end
 					return stack:get_count()
 				end,
@@ -209,16 +223,20 @@ projectilelauncher.new_inventory=function(itemstack, user)
 	local p = projectilelauncher.user[name]
 	local list = {}
 	local m = itemstack:get_meta()
-	p.index = m:get_int("index") > 0 and m:get_int("index") or 1
-	p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and m:get_int("zoom") or 0
-	p.autoaim = m:get_int("autoaim")
 
 	for i,v in pairs(minetest.deserialize(m:get_string("inv")) or {}) do
 		if minetest.get_item_group(v.name,"bullet") > 0 or v.name == "default:telescopic" then
 			list[i] = ItemStack(v)
 		end
 	end
+
 	projectilelauncher.user[name].inv:set_list("main", list)
+
+	p.index = m:get_int("index") > 0 and m:get_int("index") or 1
+	p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and m:get_int("zoom") or 0
+	p.autoaim = m:get_int("autoaim")
+
+
 end
 
 projectilelauncher.show_inventory=function(itemstack, user)
@@ -525,7 +543,7 @@ projectilelauncher.register_bullet("lightning_",{
 })
 
 projectilelauncher.register_bullet("flash_",{
-	description="Flash bullet",
+	description="Flash bullet (Digg)",
 	texture="default_ironblock.png^[colorize:#005",
 	itemtexture = "default_ironblock.png^[colorize:#005^default_alpha_stick.png^[makealpha:0,255,0",
 	damage=0,
@@ -533,12 +551,13 @@ projectilelauncher.register_bullet("flash_",{
 	launch_sound = "default_projectilelauncher_shot8",
 	groups={treasure=2,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
-		local pos2 = vector.add(pos1,vector.multiply(dir,100))
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
 		local ob = c:next()
 		while ob do
 			if ob.type == "node" and default.defpos(ob.under,"walkable") then
 				pos2 = ob.intersection_point
+				pos3 = ob.under
 				minetest.check_for_falling(ob.under)
 				break
 			elseif ob.type == "object" and ob.ref ~= user and not default.is_decoration(ob.ref,true) then
@@ -560,6 +579,13 @@ projectilelauncher.register_bullet("flash_",{
 			textures = {t,t,t,t,t,t},
 			glow = 1
 		})
+
+		if pos3 and not minetest.is_protected(pos3, user:get_player_name()) then
+			local n = minetest.get_node(pos3)
+			if minetest.get_item_group(n.name,"unbreakable") == 0 then
+				minetest.node_dig(pos3, n, user)
+			end
+		end
 		return true
 	end,
 	craft={
