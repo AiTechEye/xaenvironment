@@ -118,21 +118,11 @@ minetest.register_tool("default:projectile_launcher", {
 		local key=user:get_player_control()
 		if key.aux1 and p.zoom == 1 then
 
-print(z)
-
-			--if z >= 30 then
-			--	z = 30
-			--else
-			--	z = z + 5
-			--end
-
-
 			if z >= 30 then
 				z = 0
 			elseif z > 0 then
 				z = z + 5
 			end
-
 
 			user:set_fov(z,false,0.1)
 			projectilelauncher.zoom_check(user,user:get_wield_index())
@@ -257,7 +247,7 @@ projectilelauncher.show_inventory=function(itemstack, user)
 	minetest.after(0.1, function(name,p)
 		local butt = ""
 		for i=1,8 do
-			butt = butt .. "button[" .. (i-1) .. ",-0.1;1,0.5;setindex#" .. i .. ";]"..
+			butt = butt .. "button[" .. (i-1) .. ",-0.1;1,0.5;setindex#" .. i .. ";"..i.."]"..
 			"item_image[" .. (i-1) .. ",0.4;1,1;default:lazer_bullet]"
 		end
 
@@ -272,8 +262,8 @@ projectilelauncher.show_inventory=function(itemstack, user)
 			"image["..(p.index-1)..",0.4;1,1;default_chest_top.png^[colorize:#0f0]" ..
 			"image_button[8,1.5;1,1;default_watersplash_ring.png"..(p.autoaim == 0 and "^default_cross.png" or "")..";autoaim;]" ..
 			"tooltip[autoaim;Auto aim ("..(p.autoaim == 0 and "OFF" or "ON")..")]"..
-
-			"image[8,0.4;1,1;default_telescopic.png"..(p.zoom == 0 and "^default_cross.png" or "").."]button[8,-0.1;1,0.5;zoom;]"
+			"image_button[8,4;1,1;default_unknown.png;help;]"..
+			"image[8,0.4;1,1;default_telescopic.png"..(p.zoom == 0 and "^default_cross.png" or "").."]button[8,-0.1;1,0.5;zoom;"..(p.zoom == 0 and "OFF" or "ON").."]"
 		)
 	end, name,p)
 	return itemstack
@@ -281,15 +271,15 @@ end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
 	if form == "projectilelauncher" then
-		local p = projectilelauncher.user[player:get_player_name()]
+		local name = player:get_player_name()
+		local p = projectilelauncher.user[name]
 		if pressed.autoaim then
 			p.autoaim = p.autoaim == 0 and 1 or 0
 			p.itemstack:get_meta():set_int("autoaim",p.autoaim)
 			player:set_wielded_item(p.itemstack)
 			projectilelauncher.show_inventory(p.itemstack, player)
 			return
-		end
-		if pressed.zoom then
+		elseif pressed.zoom then
 			p.zoom = p.zoom == 0 and 1 or 0
 			p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and p.zoom or 0
 			p.itemstack:get_meta():set_int("zoom",p.zoom)
@@ -299,7 +289,33 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			player:set_wielded_item(p.itemstack)
 			projectilelauncher.show_inventory(p.itemstack, player)
 			return
+		elseif pressed.help then
+			local c = 0
+			local butt = "size[8,5]listcolors[#77777777;#777777aa;#000000ff]"
+			.."label[0,1;This tool/weapon uses bullets."
+			.."\nItems that looks like those above."
+			.."\nPut those in the tool's inventory."
+			.."\nOr put a telescopic in the right slot,"
+			.."\nand enable on the button above,"
+			.."\nhold aux/use and left click to zoom,"
+			.."\nright for the opposite."
+			.."\nClick right in air to change bullets"
+			.."\n"
+			.."]"
+
+			for i,v in pairs(projectilelauncher.registed_bullets) do
+				butt = butt  .. "item_image["..c..",0;1,1;"..i.."]"
+				c = c + 1
+				if c == 7 then
+					break
+				end
+			end
+			minetest.after(0.1, function(name,butt)
+				return minetest.show_formspec(name, "projectilelauncher",butt)
+			end,name,butt)
+			return
 		end
+
 		for i,v in pairs(pressed) do
 			if i:sub(1,9) == "setindex#" then
 				p.index = tonumber(i:sub(10,-1))
