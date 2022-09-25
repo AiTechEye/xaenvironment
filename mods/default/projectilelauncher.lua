@@ -1,3 +1,30 @@
+--projectilelauncher.register_bullet("bullet",{
+--	description="Bullet",
+--	texture="default_wood.png^[colorize:#050",
+--	itemtexture = "",
+--	bullettexture="",
+--	damage=3,
+--	craft_count=16,
+--	groups={treasure=2,store=2},
+--	damage_by_bullet = false,				--object punched by bullet, not user
+--	on_trigger=function(itemstack, user) then
+--		return true to cancel
+--	end,
+--	before_bullet_released=function(itemstack, user,pos, dir)
+--		return cancel=false,take_bullet=nil (true to take)
+--	end,
+--	on_shoot=function(itemstack, user,bullet)
+--	end,
+--	on_hit_node=function(self,user,pos)
+--	end,
+--	on_hit_object=function(self,user,target,pos)
+--	end,
+--	craft={
+--		{"default:ruby","default:iron_ingot"},
+--	}
+--})
+
+
 projectilelauncher={
 	registed_bullets={},
 	user = {},
@@ -23,25 +50,18 @@ projectilelauncher.register_bullet=function(name,def)
 
 	def.launch_sound = def.launch_sound or "default_projectilelauncher_shot13"
 	def.hit_sound = def.hit_sound or "default_projectilelauncher_shot11"
-
+	def.texture = def.texture or "default_ironblock.png"
 	def.groups = def.groups or {}
 	def.groups.bullet = 1
 	def.groups.treasure = def.groups.treasure or 1
-	def.bullettexture = def.bullettexture or (def.texture .. "^default_alpha_gem_"..(def.bullet_alpha or "round")..".png^[makealpha:0,255,0")
+	def.bullettexture = def.bullettexture or (def.texture .. "^default_alpha_gem_round.png^[makealpha:0,255,0")
 	def.textures={def.bullettexture}
-
-	--def.on_hit_object
-	--def.on_hit_node
-	--def.on_step
-	--def.on_trigger
-	--def.on_bullet_used
-	--def.on_shoot
 
 	projectilelauncher.registed_bullets[defname]=def
 
 	minetest.register_craftitem(defname, {
 		description = def.description or name,
-		inventory_image = (def.itemtexture or def.texture and def.texture .. "^default_alpha_gem_"..(def.magazine_alpha or "emeald")..".png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_alpha_gem_emeald.png^[makealpha:0,255,0",
+		inventory_image = (def.itemtexture or def.texture and def.texture .. "^armor_alpha_hand.png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^armor_alpha_hand.png^[makealpha:0,255,0",
 		groups = def.groups,
 	})
 	if def.craft then
@@ -257,10 +277,6 @@ projectilelauncher.shoot=function(itemstack, user)
 	local height = (user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.6 or 1.5
 	local bulletpos = vector.add(vector.new(pos.x, pos.y+height, pos.z),vector.multiply(dir,height == 1.5 and 0.1 or 0.5))
 
-	stack:set_count(stack:get_count()-1)
-	p.inv:set_stack("main",p.index,stack)
-	projectilelauncher.update_inventory(itemstack, user)
-
 	if p.autoaim > 0 then
 		local obpos2,autodis = nil,100
 		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 100)) do
@@ -290,8 +306,20 @@ projectilelauncher.shoot=function(itemstack, user)
 			dir = vector.new((obpos2.x-pos.x)/autodis,((obpos2.y-pos.y)-height)/autodis,(obpos2.z-pos.z)/autodis)
 		end
 	end
-	if def.before_bullet_released and def.before_bullet_released(itemstack, user, bulletpos, dir) then
-		return
+	if def.before_bullet_released then
+		local cancel,takebullet = def.before_bullet_released(itemstack, user, bulletpos, dir)
+		if takebullet == nil then
+			stack:set_count(stack:get_count()-1)
+			p.inv:set_stack("main",p.index,stack)
+			projectilelauncher.update_inventory(itemstack, user)
+		end
+		if cancel then
+			return
+		end
+	else
+		stack:set_count(stack:get_count()-1)
+		p.inv:set_stack("main",p.index,stack)
+		projectilelauncher.update_inventory(itemstack, user)
 	end
 
 	local e = minetest.add_entity(bulletpos, "default:bullet")
@@ -374,21 +402,6 @@ projectilelauncher.register_bullet("lazer",{
 	damage=3,
 	craft_count=16,
 	groups={treasure=2,store=2},
-	--damage_by_bullet = true,
-	--bullet_alpha = "round",
-	--itemtexture = "",
-	--bullettexture="",
-	--magazine_alpha = "emeald",
-	--on_trigger(itemstack, user) then
-	--end
-	--before_bullet_released(itemstack, user,pos, dir)
-	--end,
-	--on_shoot(itemstack, user,bullet)
-	--end
-	--on_hit_node=function(self,user,pos)
-	--end,
-	--on_hit_object=function(self,user,target,pos)
-	--end,
 	craft={
 		{"default:ruby","default:iron_ingot"},
 	}
@@ -430,10 +443,10 @@ projectilelauncher.register_bullet("lazer_automatic",{
 
 projectilelauncher.register_bullet("lightning_",{
 	description="Lightning bullet",
-	texture="default_wood.png^[colorize:#8000ff",
+	texture="default_amethystblock.png",
+	bullettexture = "default_amethystblock.png^default_alpha_gem_crystal.png^[makealpha:0,255,0",
 	damage=7,
 	craft_count=8,
-	bullet_alpha = "quartz",
 	launch_sound = "default_projectilelauncher_shot12",
 	groups={treasure=2,store=8},
 	on_shoot=function(itemstack, user,bullet)
@@ -451,10 +464,10 @@ projectilelauncher.register_bullet("lightning_",{
 
 projectilelauncher.register_bullet("flash_",{
 	description="Flash bullet",
-	texture="default_wood.png^[colorize:#00f",
+	texture="default_ironblock.png^[colorize:#005",
+	itemtexture = "default_ironblock.png^[colorize:#005^default_alpha_stick.png^[makealpha:0,255,0",
 	damage=0,
 	craft_count=8,
-	magazine_alpha = "longcrystal",
 	launch_sound = "default_projectilelauncher_shot8",
 	groups={treasure=2,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
@@ -495,6 +508,7 @@ projectilelauncher.register_bullet("flash_",{
 projectilelauncher.register_bullet("blob_",{
 	description="Blob bullet",
 	texture="default_wood.png^[colorize:#00ff80",
+	bullettexture = "default_wood.png^[colorize:#00ff80^default_alpha_gem_flint.png^[makealpha:0,255,0",
 	damage=5,
 	craft_count=8,
 	bullet_alpha = "flint",
@@ -553,5 +567,92 @@ projectilelauncher.register_bullet("torch",{
 	end,
 	craft={
 		{"default:torch","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("hookshot",{
+	description="Hookshot bullet",
+	itemtexture = "default_ironblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_ironblock.png^default_arrow.png^[makealpha:0,255,0)",
+	craft_count=4,
+	launch_sound = "default_projectilelauncher_shot10",
+	groups={treasure=2,store=15},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2 
+		local c = minetest.raycast(pos1,vector.add(pos1, vector.multiply(dir,30)))
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos2 = ob.intersection_point
+				break
+			elseif ob.type == "object" and ob.ref ~= user and not default.is_decoration(ob.ref,true) then
+				default.punch(ob.ref,user,5)
+				pos2 = ob.ref:get_pos()
+				break
+			end
+			ob = c:next()
+		end
+
+		if not pos2 then
+			return true,true
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#555"
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local hook = minetest.add_entity(pos1, "default:arrow_lightning")
+		hook:get_luaentity().t = 10
+		hook:set_rotation({x=0,y=y,z=z})
+		hook:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		hook:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+
+		local cart = minetest.add_entity(pos1, "default:arrow_lightning")
+		user:set_attach(cart, "",{x=0, y=0, z=0}, {x=0, y=0,z=0})
+		cart:get_luaentity().t = 10
+		cart:set_properties({
+			physical = true,
+			textures = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","default_air.png"},
+			collisionbox = {-0.5,-0.5,-0.5,0.5,2,0.5},
+		})
+		cart:get_luaentity().on_step=function(self,dtime)
+			local pos = self.object:get_pos()
+			local d = vector.distance(pos,pos2)
+			local grab = user:get_player_control().LMB
+
+			local vec = vector.subtract(pos2,pos)
+			self.object:set_velocity(vector.multiply(vec,vector.distance(pos1,pos2)/10))
+			local y = math.atan(vec.z/vec.x)
+			local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+			hook:set_rotation({x=0,y=y,z=z})
+			hook:set_pos({x=pos.x+(pos2.x-pos.x)/2,y=pos.y+(pos2.y-pos.y)/2,z=pos.z+(pos2.z-pos.z)/2})
+			hook:set_properties({visual_size={x=d,y=0.03,z=0.03}})
+
+			if self.grab or grab == false  or d <= 1 then
+				if not self.grab and hook:get_pos() then
+					hook:remove()
+				end
+
+				if user and user:get_pos() then
+					if d <= 1 and grab then
+						self.grab = true
+						self.object:set_velocity(vector.new())
+						return
+					else
+						user:set_detach()
+						user:set_pos(self.object:get_pos())
+					end
+				end
+				self.object:remove()
+			end
+		end
+		return true
+	end,
+	craft={
+		{"default:steel_ingot","default:iron_ingot"},
 	}
 })
