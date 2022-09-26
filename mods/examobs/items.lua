@@ -758,7 +758,7 @@ minetest.register_entity("examobs:torpedo_ray",{
 					end
 					self.hit.hit = true
 					local pos=self.user:get_pos()
-					local e = minetest.add_entity(pos,"examobs:"..torpedo)
+					local e = minetest.add_entity({x=pos.x,y=pos.y+1.5,z=pos.z},"examobs:"..torpedo)
 					e:get_luaentity().target = v.object
 					minetest.sound_play("nitroglycerin_activated", {object=self.user, gain = 1, max_hear_distance = 7})
 					break
