@@ -3532,3 +3532,59 @@ examobs.register_bird({
 		end
 	end,
 })
+
+examobs.register_mob({
+	description = "A living phenomenon made of slime, came from nowhere",
+	name = "slime",
+	type = "monster",
+	team = "slime",
+	hp = 5,
+	light_min = 1,
+	light_max = 15,
+	reach = 2,
+	min_spawn_y = 5000,
+	max_spawn_y = 6000,
+	speaking = 0,
+	dmg = 1,
+	coin = 1,
+	aggressivity = 2,
+	walk_speed = 3,
+	run_speed = 6,
+	animation = "default",
+	textures = {"player_style_slime.png"},
+	spawn_chance = 100,
+	lay_on_death = 0,
+	inv={["materials:slime"]=1},
+	spawn_on={"materials:slime"},
+	on_click=function(self,clicker)
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if item == "materials:slime" then
+				self:eat_item(item)
+				default.take_item(clicker)
+			end
+		end
+	end,
+	is_food=function(self,item)
+		return item == "materials:slime"
+	end,
+	death=function(self)
+		local pos=apos(self:pos(),0,1.5)
+		minetest.add_particlespawner({
+			amount = 100,
+			time =0.1,
+			minpos = pos,
+			maxpos = pos,
+			minvel = {x=-4, y=-4, z=-4},
+			maxvel = {x=4, y=8, z=4},
+			minacc = {x=0, y=-8, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 0.1,
+			maxsize = 2,
+			texture = "default_water.png^[colorize:#0f0c",
+			collisiondetection = true,
+		})
+	end,
+})
