@@ -104,3 +104,36 @@ multidimensions.register_dimension("macro",{
 		{"default:emerald", "default:goldblock", "exatec:pcb"},
 	}
 })
+
+multidimensions.register_dimension("slime",{
+	--ground_ores = {["plants:candytree_spawner"] = 100},
+	--water_ores={["materials:gel"]={chance=500,max_heat=20},},
+	stone = "materials:slime_source",
+	dirt = "materials:slime_source",
+	grass = "materials:slime",
+	water = "materials:slime_source",
+	sand = "materials:slime_source",
+	sky = {base_color={r=0, g=255, b=0},type="plain"},
+	sun = {scale=2,visible=true,texture="default_amberblock.png^[colorize:#0f0a"},
+	moon = {scale=2,visible=true,texture="default_lava.png^[colorize:#0f0a"},
+	node={
+		description="Slime world",
+		tiles = {"default_water.png^[colorize:#0f0c"},
+		use_texture_alpha = true,
+	},
+	craft = {
+		{"materials:gel2", "materials:gel2", "plants:macro_tree"},
+		{"materials:gel2","materials:gel2","plants:macro_tree",},
+		{"materials:gel2", "materials:gel2", "plants:macro_tree"},
+	},
+	gravity = 0.5,
+	ground_limit=505,
+	terrain_density=1,
+	map={
+		spread={x=190,y=500,z=190},
+		octaves=2,
+		persist=0.2,
+		lacunarity=2,
+		flags="eased",
+	},
+})
