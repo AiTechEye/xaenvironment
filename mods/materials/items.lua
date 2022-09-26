@@ -569,3 +569,54 @@ minetest.register_node("materials:asphalt",{
 	sounds = default.node_sound_stone_defaults(),
 })
 default.register_stair("materials:asphalt")
+
+minetest.register_node("materials:slime_source", {
+	description = "Source slime",
+	drawtype = "liquid",
+	use_texture_alpha = "blend",
+	tiles = {"default_stone.png^[colorize:#0f05"},
+	paramtype = "light",
+	walkable = false,
+	buildable_to = true,
+	pointable = false,
+	drowning = 1,
+	liquidtype = "source",
+	liquid_range = 2,
+	liquid_alternative_flowing = "materials:slime_flowing",
+	liquid_alternative_source = "materials:slime_source",
+	liquid_viscosity = 20,
+	post_effect_color = {a=60,r=0,g=150,b=0},
+	groups = {liquid = 1,water=1},
+})
+
+minetest.register_node("materials:slime_flowing", {
+	description = "Flowing slime",
+	drawtype = "liquid",
+	use_texture_alpha = "blend",
+	tiles = {"default_stone.png^[colorize:#0f15"},
+	paramtype = "light",
+	walkable = false,
+	buildable_to = true,
+	pointable = false,
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_range = 2,
+	liquid_alternative_flowing = "materials:slime_flowing",
+	liquid_alternative_source = "materials:slime_source",
+	liquid_viscosity = 20,
+	post_effect_color = {a=60,r=0,g=150,b=0},
+	groups = {liquid = 1,water=1},
+})
+
+minetest.register_node("materials:slime", {
+	description = "Slime block",
+	drawtype = "glasslike",
+	tiles = {"default_water.png^[colorize:#0f0c"},
+	paramtype = "light",
+	use_texture_alpha = "blend",
+	drowning = 1,
+	sunlight_propagates = true,
+	liquid_viscosity = 30,
+	post_effect_color = {a=60,r=0,g=150,b=0},
+	groups = {crumbly = 1, fall_damage_add_percent=-100,bouncy=99},
+})
