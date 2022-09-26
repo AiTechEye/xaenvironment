@@ -306,7 +306,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			for i,v in pairs(projectilelauncher.registed_bullets) do
 				butt = butt  .. "item_image["..c..",0;1,1;"..i.."]"
 				c = c + 1
-				if c == 7 then
+				if c == 8 then
 					break
 				end
 			end
@@ -561,9 +561,9 @@ projectilelauncher.register_bullet("lightning_",{
 projectilelauncher.register_bullet("flash_",{
 	description="Flash bullet (Digg)",
 	texture="default_ironblock.png^[colorize:#005",
-	itemtexture = "default_ironblock.png^[colorize:#005^default_alpha_stick.png^[makealpha:0,255,0",
+	itemtexture = "default_ironblock.png^[colorize:#00f^armor_alpha_hand.png^[makealpha:0,255,0^(default_ironblock.png^[colorize:#00a^default_alpha_stick.png^[makealpha:0,255,0)",
 	damage=0,
-	craft_count=8,
+	craft_count=10,
 	launch_sound = "default_projectilelauncher_shot8",
 	groups={treasure=2,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
@@ -609,6 +609,125 @@ projectilelauncher.register_bullet("flash_",{
 	}
 })
 
+projectilelauncher.register_bullet("build_",{
+	description="Build bullet (places items from inventory (index))",
+	itemtexture = "default_ironblock.png^[colorize:#0ff^armor_alpha_hand.png^[makealpha:0,255,0^(default_ironblock.png^[colorize:#0aa^default_alpha_stick.png^[makealpha:0,255,0)",
+	damage=0,
+	craft_count=10,
+	launch_sound = "default_projectilelauncher_shot8",
+	groups={treasure=2,store=15},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
+		local c = minetest.raycast(pos1,pos2)
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos2 = ob.intersection_point
+				pos3 = ob.above
+				minetest.check_for_falling(ob.under)
+				break
+			end
+			ob = c:next()
+		end
+
+		if not pos3 then
+			return true, true
+		end
+
+		projectilelauncher.new_inventory(itemstack, user)
+		local name = user:get_player_name()
+		local p = projectilelauncher.user[name]
+
+		local inv=user:get_inventory()
+		local stackplace = inv:get_stack("main",p.index)
+
+		if not (minetest.registered_nodes[stackplace:get_name()] and pos3 and not minetest.is_protected(pos3, name) and default.defpos(pos3,"buildable_to")) then
+			return true,true
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#055"
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		lightning:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+
+		if bows.creative == false then
+			local stackcount = inv:set_stack("main",p.index,ItemStack(stackplace:get_name() .. " " .. (stackplace:get_count() -1)))
+		end
+
+		minetest.set_node(pos3, {name=stackplace:get_name()})
+
+		return true
+	end,
+	craft={
+		{"default:opal","default:iron_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("activate_",{
+	description="Activate/rightclick bullet",
+	itemtexture = "default_ironblock.png^[colorize:#ff0^armor_alpha_hand.png^[makealpha:0,255,0^(default_ironblock.png^[colorize:#aa0^default_alpha_stick.png^[makealpha:0,255,0)",
+	damage=0,
+	craft_count=10,
+	launch_sound = "default_projectilelauncher_shot8",
+	groups={treasure=2,store=2},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
+		local c = minetest.raycast(pos1,pos2)
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos2 = ob.intersection_point
+				pos3 = ob.under
+				minetest.check_for_falling(ob.under)
+				break
+			end
+			ob = c:next()
+		end
+
+		if not pos3 then
+			return true, true
+		end
+
+		local name = user:get_player_name()
+		local node = minetest.get_node(pos3)
+		local def = minetest.registered_nodes[node.name]
+
+		if not (def and def.on_rightclick and not minetest.is_protected(pos3, name)) then
+			return true, true
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#550"
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		lightning:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+
+		def.on_rightclick(pos3, node, user, itemstack, {under=pos3,above=pos2})
+
+		return true
+	end,
+	craft={
+		{"exetec:wire","default:iron_ingot"},
+	}
+})
+
 projectilelauncher.register_bullet("blob_",{
 	description="Blob bullet",
 	texture="default_wood.png^[colorize:#00ff80",
@@ -640,7 +759,7 @@ projectilelauncher.register_bullet("torch",{
 	damage=5,
 	craft_count=6,
 	groups={treasure=2,store=4},
-	itemtexture = "default_torch.png^default_alpha_stick.png^[makealpha:0,255,0",
+	itemtexture = "default_ironblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_torch.png^default_alpha_stick.png^[makealpha:0,255,0)",
 	bullettexture="default:torch",
 	visual = "wielditem",
 	visual_size = {x=0.3,y=0.3},
