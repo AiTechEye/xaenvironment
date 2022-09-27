@@ -724,7 +724,7 @@ projectilelauncher.register_bullet("activate_",{
 		return true
 	end,
 	craft={
-		{"exetec:wire","default:iron_ingot"},
+		{"exatec:wire","default:iron_ingot"},
 	}
 })
 
@@ -750,7 +750,7 @@ projectilelauncher.register_bullet("blob_",{
 		target:add_velocity(vector.multiply(self.dir,target:get_luaentity() and 100 or 20))
 	end,
 	craft={
-		{"default:opal","default:iron_ingot"},
+		{"materials:slime","default:iron_ingot"},
 	}
 })
 
