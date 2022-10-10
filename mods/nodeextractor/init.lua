@@ -69,11 +69,49 @@ nodeextractor.create=function(pos1,pos2,filename)
 	return minetest.serialize({nodes=m,size=s})
 end
 
-nodeextractor.set=function(pos,filepath,clearspace)
+nodeextractor.mirror_param2=function(node,m)
+	local def = minetest.registered_items[node.name]
+	local p = node.param2
+	if not p then
+		return node
+	elseif def.paramtype2 == "wallmounted" then
+		p = minetest.wallmounted_to_dir(p)
+		p = vector.new(p.x*m.x,p.y*m.y,p.z*m.z)
+		p = minetest.dir_to_wallmounted(p)
+	elseif def.paramtype2 == "facedir" then
+		if def.groups.tree then
+			local f = {}
+			if m.z == -1 then
+				f[7]=9
+				f[9]=7
+			end
+			if m.x == -1 then
+				f[18]=12
+				f[12]=18
+			end
+			if m.y == -1 then
+				f[22]=2
+				f[2]=22
+			end
+			p = f[p] or p
+		else
+			p = minetest.facedir_to_dir(p)
+			p = vector.new(p.x*m.x,p.y*m.y,p.z*m.z)
+			p = minetest.dir_to_facedir(p)
+		end
+	end
+	node.param2 = p
+	return node
+end
+
+nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	if not filepath then
 		print("nodeextractor set: filepath is missing")
 		return false
 	end
+
+	mirror = mirror or vector.new(0,0,0)
+	mirror = vector.new(mirror.x == 0 and 1 or -1,mirror.y == 0 and 1 or -1,mirror.z == 0 and 1 or -1)
 
 	local file = io.open(filepath, "r") or {}
 	local f = file:read()
@@ -89,6 +127,16 @@ nodeextractor.set=function(pos,filepath,clearspace)
 	local data = vox:get_data()
 	local contens = {}
 
+	if mirror.x == -1 then
+		pos.x = pos.x + dat.size.x
+	end
+	if mirror.y == -1 then
+		pos.y = pos.y + dat.size.y
+	end
+	if mirror.z == -1 then
+		pos.z = pos.z + dat.size.z
+	end
+
 	if clearspace == true then
 		local air = minetest.get_content_id("air")
 		local clearpos2 = vector.add(pos,dat.size)
@@ -103,7 +151,7 @@ nodeextractor.set=function(pos,filepath,clearspace)
 
 	for i,v in pairs(dat.nodes) do
 		local p = i.split(i,",")
-		local pos2 = vector.add(pos,vector.new(tonumber(p[1]),tonumber(p[2]),tonumber(p[3])))
+		local pos2 = vector.add(pos,vector.new(tonumber(p[1]*mirror.x),tonumber(p[2])*mirror.y,tonumber(p[3])*mirror.z))
 		local id = area:index(pos2.x,pos2.y,pos2.z)
 		contens[v.node.name] = contens[v.node.name] or minetest.get_content_id(v.node.name)
 		data[id] = contens[v.node.name]
@@ -115,7 +163,7 @@ nodeextractor.set=function(pos,filepath,clearspace)
 
 	for i,v in pairs(dat.nodes) do
 		local p = i.split(i,",")
-		local pos2 = vector.add(pos,vector.new(tonumber(p[1]),tonumber(p[2]),tonumber(p[3])))
+		local pos2 = vector.add(pos,vector.new(tonumber(p[1])*mirror.x,tonumber(p[2])*mirror.y,tonumber(p[3])*mirror.z))
 		local meta
 
 		local def = minetest.registered_items[v.node.name]
@@ -124,7 +172,7 @@ nodeextractor.set=function(pos,filepath,clearspace)
 		--end
 
 		if v.node.param1 or v.node.param2 then
-			minetest.set_node(pos2,v.node)
+			minetest.set_node(pos2,nodeextractor.mirror_param2(v.node,mirror))
 		end
 
 		if v.inventory then
