@@ -109,9 +109,13 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 		print("nodeextractor set: filepath is missing")
 		return false
 	end
-
+	local mirror_disabled = false
 	mirror = mirror or vector.new(0,0,0)
 	mirror = vector.new(mirror.x == 0 and 1 or -1,mirror.y == 0 and 1 or -1,mirror.z == 0 and 1 or -1)
+
+	if mirror.x == 1 and mirror.y == 1 and mirror.z == 1 then
+		mirror_disabled = true
+	end
 
 	local file = io.open(filepath, "r") or {}
 	local f = file:read()
@@ -127,16 +131,18 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	local data = vox:get_data()
 	local contens = {}
 
-	if mirror.x == -1 then
-		pos.x = pos.x + dat.size.x
-	end
-	if mirror.y == -1 then
-		pos.y = pos.y + dat.size.y
-	end
-	if mirror.z == -1 then
-		pos.z = pos.z + dat.size.z
-	end
 
+	if not mirror_disabled then
+		if mirror.x == -1 then
+			pos.x = pos.x + dat.size.x
+		end
+		if mirror.y == -1 then
+			pos.y = pos.y + dat.size.y
+		end
+		if mirror.z == -1 then
+			pos.z = pos.z + dat.size.z
+		end
+	end
 	if clearspace == true then
 		local air = minetest.get_content_id("air")
 		local clearpos2 = vector.add(pos,dat.size)
@@ -172,7 +178,11 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 		--end
 
 		if v.node.param1 or v.node.param2 then
-			minetest.set_node(pos2,nodeextractor.mirror_param2(v.node,mirror))
+			if mirror_disabled then
+				minetest.set_node(pos2,v.node,mirror)
+			else
+				minetest.set_node(pos2,nodeextractor.mirror_param2(v.node,mirror))
+			end
 		end
 
 		if v.inventory then
