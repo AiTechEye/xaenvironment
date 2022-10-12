@@ -20,4 +20,6 @@ xaenvironment_survivorstart (Start with helpful items) bool false
 
 xaenvironment_keystrokes (Shows keystrokes) bool false
 
+xaenvironment_singleplayer_bloom (Bloom effects in single player, experimental) bool false
+
 
