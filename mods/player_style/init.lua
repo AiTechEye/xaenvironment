@@ -14,6 +14,7 @@ player_style={
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
+	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
 	bloom = {
 		status="",
 		air={radius=10,intensity=0.1},
@@ -33,7 +34,7 @@ dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 
 player_style.set_bloom=function(stat)
-	if minetest.is_singleplayer() then
+	if minetest.is_singleplayer() and player_style.bloom_effects then
 		local s = player_style.bloom[stat]
 		if player_style.bloom.status ~= stat and s then
 			player_style.bloom.status = stat
