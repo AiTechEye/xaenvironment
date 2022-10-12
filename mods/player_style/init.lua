@@ -14,6 +14,11 @@ player_style={
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
+	bloom = {
+		status="",
+		air={radius=10,intensity=0.1},
+		liquid={radius=16,intensity=0.6},
+	},
 }
 
 if player_style.damage == false then
@@ -27,6 +32,16 @@ dofile(minetest.get_modpath("player_style") .. "/store.lua")
 dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 
+player_style.set_bloom=function(stat)
+	if minetest.is_singleplayer() then
+		local s = player_style.bloom[stat]
+		if player_style.bloom.status ~= stat and s then
+			player_style.bloom.status = stat
+			minetest.settings:set("bloom_intensity",s.intensity)
+			minetest.settings:set("bloom_radius",s.radius)
+		end
+	end
+end
 
 player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
@@ -132,6 +147,7 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	player_style.set_profile(player,"default")
+	player_style.set_bloom("air")
 end)
 
 player_style.set_profile=function(player,pr)
@@ -467,6 +483,7 @@ minetest.register_globalstep(function(dtime)
 
 		if minetest.get_item_group(minetest.get_node({x=p.x,y=p.y+0.6,z=p.z}).name,"water") > 0 then
 			if not ppr.dive_sound.dive then
+				player_style.set_bloom("liquid")
 				ppr.dive_sound.dive = true
 				ppr.dive_sound.time = 4
 			end
@@ -477,6 +494,7 @@ minetest.register_globalstep(function(dtime)
 
 			end
 		elseif ppr.dive_sound.dive then
+			player_style.set_bloom("air")
 			ppr.dive_sound.dive = false
 			minetest.sound_stop(ppr.sounds["default_underwater"])
 		end
@@ -925,7 +943,6 @@ player_style.player_diveing=function(name,player,a,water,kong)
 				minetest.sound_play("default_clay_step", {object=player, gain = 4,max_hear_distance = 10})
 			end
 		end
-
 	else
 
 		local pr =  player_style.player_dive[name]
