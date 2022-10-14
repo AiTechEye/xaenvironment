@@ -36,13 +36,40 @@ dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 player_style.set_bloom=function(stat)
 	if minetest.is_singleplayer() and player_style.bloom_effects then
 		local s = player_style.bloom[stat]
-		if player_style.bloom.status ~= stat and s then
+		if stat == "setup" then
+			local i = minetest.settings:get("bloom_intensity") or 0.05
+			local r = minetest.settings:get("bloom_radius") or 16
+			local storage = true
+			for ii, v in pairs(player_style.bloom) do
+				if type(v) == "table" and v.radius == r and i == v.intensity then
+					storage = false
+					break
+				end
+			end
+			if storage then
+				default.storage:set_int("bloom_radius",r)
+				default.storage:set_float("bloom_intensity",i)
+			end
+			return
+		elseif stat == "reset" then
+			minetest.settings:set("bloom_intensity",default.storage:get_float("bloom_intensity"))
+			minetest.settings:set("bloom_radius",default.storage:get_int("bloom_radius"))
+			return
+		elseif player_style.bloom.status ~= stat and s then
 			player_style.bloom.status = stat
 			minetest.settings:set("bloom_intensity",s.intensity)
 			minetest.settings:set("bloom_radius",s.radius)
 		end
 	end
 end
+
+minetest.register_on_mods_loaded(function(player)
+	player_style.set_bloom("setup")
+end)
+
+minetest.register_on_shutdown(function(player)
+	player_style.set_bloom("reset")
+end)
 
 player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
