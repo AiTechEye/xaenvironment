@@ -510,6 +510,13 @@ examobs.fly=function(self,run)
 end
 
 examobs.walk=function(self,run)
+	if self.storage.code_execute_interval and walkable(examobs.pointat(self,1)) then
+		examobs.jump(self)
+		minetest.after(0.1,function(self)
+			examobs.walk(self)
+		end, self)
+	end
+
 	if self.is_floating and examobs.fly(self,run) then return end
 	local yaw=examobs.num(self.object:get_yaw())
 	local running = run
@@ -529,10 +536,6 @@ examobs.walk=function(self,run)
 		examobs.anim(self,"run")
 	else
 		examobs.anim(self,"walk")
-	end
-
-	if self.storage.code_execute_interval and walkable(examobs.pointat(self,0.5)) then
-		examobs.jump()
 	end
 
 	return self
