@@ -531,6 +531,10 @@ examobs.walk=function(self,run)
 		examobs.anim(self,"walk")
 	end
 
+	if self.storage.code_execute_interval and walkable(examobs.pointat(self,0.5)) then
+		examobs.jump()
+	end
+
 	return self
 end
 
