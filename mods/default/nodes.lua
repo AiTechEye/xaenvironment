@@ -1284,7 +1284,7 @@ minetest.register_node("default:oil_flowing", {
 	post_effect_color = {a = 255, r = 0, g = 0, b = 0},
 	liquid_viscosity = 25,
 	on_burn=function(pos)
-		default.def(minetest.get_node(pos).name).on_ignite(pos)
+		default.def("default:oil_flowing").on_ignite(pos)
 	end,
 	on_ignite=function(pos)
 		minetest.set_node(pos,{name="fire:basic_flame"})
