@@ -18,7 +18,7 @@ rnd = {
 			paramtype2 = "facedir",
 			mesh = "materials_cylinder.obj",
 			on_place = minetest.rotate_node,
-			alpha = 0.5,
+			use_texture_alpha = "blend",
 		},
 		unknowns = {
 			tiles = {"default_amberblock.png^[colorize:#f9a38c03^[invert:rg"},
@@ -38,7 +38,7 @@ rnd = {
 			paramtype2 = "facedir",
 			mesh = "materials_orb.obj",
 			on_place = minetest.rotate_node,
-			alpha = 0.5,
+			use_texture_alpha = "blend",
 		},
 		asdasdasdore = {
 			tiles = {"materials_granite.png^[colorize:#22cc7755"},
@@ -56,8 +56,7 @@ rnd = {
 			paramtype = "light",
 			paramtype2 = "facedir",
 			on_place = minetest.rotate_node,
-			alpha = 0.2,
-			use_texture_alpha = "clip",
+			use_texture_alpha = "blend",
 			drawtype = "nodebox",
 			node_box = {
 			type = "fixed",
