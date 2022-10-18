@@ -202,6 +202,7 @@ minetest.register_node("materials:cup_plate", {
 	sounds = default.node_sound_glass_defaults(),
 	groups = {dig_immediate = 3,treasure=1},
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	walkable = false,
 	paramtype = "light",
 	palette="default_palette.png",
@@ -221,6 +222,7 @@ minetest.register_node("materials:plate", {
 	paramtype = "light",
 	palette="default_palette.png",
 	paramtype2="color",
+	use_texture_alpha = "clip",
 	on_punch=default.dye_coloring,
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}}
 })
@@ -567,6 +569,7 @@ minetest.register_node("materials:asphalt",{
 	tiles = {"default_oil.png^[colorize:#9995"},
 	groups = {cracky=2,asphalt=1,treasure=1,store=100},
 	sounds = default.node_sound_stone_defaults(),
+	use_texture_alpha = "clip",
 })
 default.register_stair("materials:asphalt")
 

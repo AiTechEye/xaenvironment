@@ -43,6 +43,7 @@ minetest.register_node("materials:candy" .. i, {
 	buildable_to=true,
 	paramtype="light",
 	sunlight_propagates=true,
+	use_texture_alpha = "clip",
 	node_box = {
 		type = "fixed",
 		fixed = {
