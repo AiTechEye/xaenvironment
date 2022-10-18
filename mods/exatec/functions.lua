@@ -330,11 +330,16 @@ exatec.run_code=function(text,A)
 	local s,err = pcall(F)
 	debug.sethook()
 	exatec.temp.constructor = nil
-
 	if err then
-		local e1,e2 = err:find(": ")
+		local efb = err:find("%.%.",5)
+		if efb then
+			print("EXETEC RUNCODE ERROR: "..err:sub(efb+2,-1))
+		elseif err ~= "" then
+			print("EXETEC RUNCODE ERROR: "..err)
+		end
+		local e1,e2 = err:find(".lua:")
 		if type(e2) == "number" then
-			err = err:sub(e2,-1)
+			err = err:sub(e2+1,-1)
 		end
 	end
 	return err,g.count
@@ -347,8 +352,18 @@ exatec.create_env=function(A,g,self)
 		apos=apos,
 		apos_text = "apos(pos,x,y,z) add to pos/vector",
 		event=g,
-		mob= self and {
-			get_pos_text = "(id/nil) get pos from object",
+		mob_color = "#ffeeee",
+		mob = self and {
+			self_return = "object",
+			self_text = "() get self object",
+			self=function()
+				self.objects = self.objects or {}
+				self.objects[self.examob] = self.object
+				return self.examob
+			end,
+			get_pos_return = "pos",
+			get_pos_params = "object",
+			get_pos_text = "(object/nil) get pos from object or self",
 			get_pos=function(n)
 				if not n then
 					return self.object:get_pos()
@@ -357,102 +372,47 @@ exatec.create_env=function(A,g,self)
 				local ob = self.objects[n]
 				return ob and ob:get_pos() or nil
 			end,
-			self_text = "() get self object id",
-			self=function()
-				self.objects = self.objects or {}
-				self.objects[self.examob] = self.object
-				return self.examob
-			end,
-			exists_text = "(id) returns true if object exists in object list",
-			exists=function(id)
-				self.objects = self.objects or {}
-				local ob = self.objects[id]
-				if ob and not ob:get_pos() then
-					self.objects[id] = nil
-					return false
+			get_object_radius_return = "object",
+			get_object_radius_params = "20",
+			get_object_radius_text = "(rad) return the nearest visiable object",
+			get_object_radius=function(d)
+				local obs = {}
+				local nob
+				local nd = d or self.range
+				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or self.range*3)) do
+					local en = ob:get_luaentity()
+					if not en or ob ~= self.object and en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(self.object,ob:get_pos()) then
+						obs[ob_id(ob)] = ob
+						local d2 = vector.distance(g.pos,ob:get_pos())
+						if nd >= d2 then
+							nd = d2
+							nob = ob_id(ob)
+						end
+					end
 				end
-				return ob ~= nil
+				self.objects = obs
+				return nob
 			end,
-			walk_text = "(nil/true) walk/run",
-			walk=function(run)
-				examobs.walk(self,run)
-			end,
-			jump_text = "() jump",
-			jump=function()
-				examobs.jump(self)
-			end,
-			stand_text = "(id/pos) look at object or pos",
-			stand=function()
-				examobs.stand(self)
-			end,
-			lookat_text = "(id/pos/nil) look at object/pos/random",
-			lookat=function(n)
-				local ob = self.objects and self.objects[n] or n
-				if ob then
-					examobs.lookat(self,ob)
-				else
-					self.object:set_yaw(math.random(0,6.28))
+			get_objects_radius_return = "table",
+			get_objects_radius_params = "20",
+			get_objects_radius_text = "(rad/nil) return a table of objects in radius",
+			get_objects_radius=function(d)
+				local obs = {}
+				local obs2 = {}
+				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or self.range)) do
+					local en = ob:get_luaentity()
+					if not en or en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(self.object,ob:get_pos()) then
+						local id = ob_id(ob)
+						obs[id] = ob
+						table.insert(obs2,id)
+					end
 				end
+				self.objects = obs
+				return obs2
 			end,
-			visiable_text = "(pos) if pos is visiable (not blocked)",
-			visiable=function(pos)
-				return examobs.visiable(self.object,pos)
-			end,
-			team_text = "(id/nil) get object/self team",
-			team=function(n)
-				local ob = self.objects and self.objects[n] or self.object
-				examobs.team(ob)
-			end,
-			gethp_text = "(id/nil) get object/self health",
-			gethp=function(n)
-				local ob = self.objects and self.objects[n] or self.objects
-				examobs.gethp(ob)
-			end,
-			viewfield_text = "(id) if object is in viewfield",
-			viewfield=function(n)
-				local ob = self.objects and self.objects[n]
-				examobs.viewfield(self,ob)
-			end,
-			dropall_text = "() drop all items",
-			dropall=function()
-				examobs.dropall(self)
-			end,
-			dying_text = "(n) 1 = dying, 2 = dead, 3 = relive",
-			dying=function(n)
-				examobs.dying(self,n)
-			end,
-			distance_text = "(object1/pos1,object2/pos2)",
-			distance=function(pos1,pos2)
-				self.objects = self.objects or {}
-				local p1 = type(pos1) ~= "table" and self.objects[pos1] or pos1 == nil and self.object or pos1
-				local p2 = type(pos2) ~= "table" and self.objects[pos2] or pos2
-				if not p1 then
-					error("mob.distance: pos1/object1 is nil")
-				elseif not p2 then
-					error("mob.distance: pos2/object2 is nil")
-				end
-				return examobs.distance(p1,p2)
-			end,
-			pointat_text = "(n) pos front of self",
-			pointat=function(d)
-				examobs.pointat(self,d)
-			end,
-			punch_text = "(id)",
-			punch=function(n)
-				local ob = self.objects and self.objects[n] or self.object
-				if examobs.distance(self.object,ob) <= self.reach  then
-					examobs.punch(self.object,ob,self.dmg)
-				end
-			end,
-			showtext_text = "(text,nil/hexcolor) temporary change the nametag, do not add # to the color code",
-			showtext=function(text,color)
-				examobs.showtext(self,text,color)
-			end,
-			set_texture_text = '("texture.png") set texture',
-			set_texture=function(t)
-				self.object:set_properties({textures={t}})
-			end,
-			get_object_text = "(type) get object id from fight, flee, folow, target",
+			get_object_return = "object",
+			get_object_params = '"fight"',
+			get_object_text = "(type) get the fight/flee/folow/target object",
 			get_object=function(typ)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] then
@@ -471,7 +431,8 @@ exatec.create_env=function(A,g,self)
 					error("mob.get_object(fight/flee/folow/target)")
 				end
 			end,
-			set_object_text = "(type,id) set object as fight, flee, folow, target",
+			set_object_params = '"fight",object',
+			set_object_text = "(type,object) set object as fight/flee/folow/target",
 			set_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
 				if types[typ] and n then
@@ -485,6 +446,102 @@ exatec.create_env=function(A,g,self)
 					error("mob.set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
 				end
 			end,
+			walk_color="#00ffff",
+			walk_text = "(nil/true) walk/run",
+			walk_params = "false",
+			walk=function(run)
+				examobs.walk(self,run)
+			end,
+			jump_color="#00ffff",
+			jump_text = "() jump",
+			jump=function()
+				examobs.jump(self)
+			end,
+			stand_color="#00ffff",
+			stand_text = "() stand",
+			stand=function()
+				examobs.stand(self)
+			end,
+			lookat_color="#00ffff",
+			lookat_params = "pos",
+			lookat_text = "(object/pos/nil) look at object/pos/random",
+			lookat=function(n)
+				local ob = self.objects and self.objects[n] or n
+				if ob then
+					examobs.lookat(self,ob)
+				else
+					self.object:set_yaw(math.random(0,6.28))
+				end
+			end,
+			visiable_params = "pos",
+			visiable_if = true,
+			visiable_text = "(pos) if pos is visiable (not blocked)",
+			visiable=function(pos)
+				return examobs.visiable(self.object,pos)
+			end,
+			team_text = "(object/nil) get object/self team",
+			team=function(n)
+				local ob = self.objects and self.objects[n] or self.object
+				examobs.team(ob)
+			end,
+			gethp_return = "count",
+			gethp_params = "object",
+			gethp_text = "(object/nil) get object/self health",
+			gethp=function(n)
+				local ob = self.objects and self.objects[n] or self.objects
+				return examobs.gethp(ob)
+			end,
+			viewfield_params = "object",
+			viewfield_if = true,
+			viewfield_text = "(object) if object is in viewfield",
+			viewfield=function(n)
+				local ob = self.objects and self.objects[n]
+				return examobs.viewfield(self,ob)
+			end,
+			dropall_color="#ffff00",
+			dropall_text = "() drop all items",
+			dropall=function()
+				examobs.dropall(self)
+			end,
+			dying_text = "(n) 1 = dying, 2 = dead, 3 = relive",
+			dying=function(n)
+				examobs.dying(self,n)
+			end,
+			distance_return = "count",
+			distance_params = "pos,pos2",
+			distance_text = "(pos1/self,pos2)",
+			distance=function(pos1,pos2)
+				self.objects = self.objects or {}
+				local p1 = type(pos1) == "table" and pos1 or self.object:get_pos() or pos1
+				local p2 = pos2
+				if not p2 then
+					error("mob.distance: pos2 is nil")
+				end
+				return examobs.distance(p1,p2)
+			end,
+			pointat_params = "count",
+			pointat_return = "pos",
+			pointat_text = "(n/nil) pos*n front of self",
+			pointat=function(d)
+				return examobs.pointat(self,d or 0)
+			end,
+			punch_params = "object",
+			punch_text = "(object) punch object",
+			punch=function(n)
+				local ob = self.objects and self.objects[n]-- or self.object
+				if examobs.distance(self.object,ob) <= self.reach  then
+					examobs.punch(self.object,ob,self.dmg)
+				end
+			end,
+			showtext_text = "(text,nil/hexcolor) temporary change the nametag, do not add # to the color code",
+			showtext_params = 'text,"0f0"',
+			showtext=function(text,color)
+				examobs.showtext(self,text,color)
+			end,
+			set_texture_text = '("texture.png") set texture',
+			set_texture=function(t)
+				self.object:set_properties({textures={t}})
+			end,
 			remove_object_text = "(id/nil,type/nil) remove object from list, and or from fight, flee, folow, target",
 			remove_object=function(typ,n)
 				local types = {fight=true,flee=true,folow=true,target=true}
@@ -496,43 +553,31 @@ exatec.create_env=function(A,g,self)
 					self.objects[n] = nil
 				end
 			end,
-			collect_objects_inside_radius_text = "(rad/nil) adds object in radius to list",
-			collect_objects_inside_radius=function(d)
-				local obs = {}
-				for _, ob in pairs(minetest.get_objects_inside_radius(g.pos, d or self.range)) do
-					local en = ob:get_luaentity()
-					if not en or en and en.examob and examobs.gethp(ob) > 0 and examobs.visiable(self,ob) then
-						obs[ob_id(ob)] = ob
-					end
-				end
-				self.objects = obs
-			end,
-			get_objects_text = "(rad/nil) return object in list",
-			get_objects=function(d)
-				local p1 = self.object:get_pos()
-				local l = {}
-				self.objects = self.objects or {}
-				for i, v in pairs(self.objects or {}) do
-					local p2 = v:get_pos()
-					if d then
-						if p2 and examobs.distance(p1,p2) <= d then
-							table.insert(l,i)
-						end
-					elseif p2 then
-						table.insert(l,i)
-					end
-				end
-				return l
-			end,
+			say_color="#00ffff",
 			say_text = "(text) send chat text",
 			say=function(t)
-				self:say(t)
+				t = tostring(t)
+				if self.say then
+					self:say(t)
+				end
 			end,
-			standby_text = "(true/false) waiting mode",
-			standby=function(toggle)
-				self.standby = toggle
+			standard_mode_color="#ff0000",
+			standard_mode_params = "true",
+			standard_mode_text = "(true/false) letting it act by itself",
+			standard_mode=function(toggle)
+				self.cmdphone_standard_mode = toggle
 			end,
-			dig_text = "(pos) dig",
+			no_jumping_color="#ff0000",
+			no_jumping_params = "false",
+			no_jumping_text = "(true/false) prevent any jumps (false by default)",
+			no_jumping=function(toggle)
+				self.cmdphone_no_jumping = toggle
+			end,
+			dig_color="#00eeff",
+			dig_return = "bool",
+			dig_if = true,
+			dig_params = "pos",
+			dig_text = "(pos) dig, returns true if done",
 			dig=function(pos)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
@@ -549,7 +594,10 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
-			place_text = "(pos,node_name) place",
+			place_color="#00eeff",
+			place_text = "(pos,node_name) place node, returns true if done",
+			place_return = "bool",
+			place_params = "pos,item",
 			place=function(pos,item)
 				local n = minetest.get_node(pos).name
 				local sp = self:pos()
@@ -564,8 +612,10 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
-			new_path_text = "(pos) create new path to pos",
-			new_path=function(pos)
+			path_new_color="#00ff00",
+			path_new_text = "(pos) create new path to pos",
+			path_new_params = "pos",
+			path_new=function(pos)
 				if default.defpos(pos,"walkable") then
 					for y=-1,1 do
 					for x=-1,1 do
@@ -598,12 +648,21 @@ exatec.create_env=function(A,g,self)
 				end
 				return self.path ~= nil
 			end,
-			get_path_text = "() return path/nil",
-			get_path=function(pos)
+			path_get_color="#00ff00",
+			path_get_text = "() returns path",
+			path_get=function()
 				return self.path
 			end,
-			folow_path_text = "(rad/nil) folow created path, finish when inside rad or near it",
-			folow_path=function(rad)
+			path_has_color="#00ff00",
+			path_has_if = true,
+			path_has_text = "() if a path is created",
+			path_has=function()
+				return self.path ~= nil
+			end,
+			path_folow_color="#00ff00",
+			path_folow_text = "(rad/nil) folow created path, finish when inside rad or near it",
+			path_folow_params = "2",
+			path_folow=function(rad)
 				if self.path then
 					local p = self:pos()
 					local c = self.path[self.path_index]
@@ -630,126 +689,80 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
-			get_item_count_text = "(item_name) return item count",
-			get_item_count=function(item)
+			item_get_count_color="#ffff00",
+			item_get_count_return = "count",
+			item_get_count_params = "text",
+			item_get_count_text = "(item) return item count",
+			item_get_count=function(item)
 				return self.inv[item] or 0
 			end,
-			add_item_text = "(pos,item,count/nil) add as much as possible from mob inventory to node inventory",
-			add_item=function(pos,item,c)
-				local def = minetest.registered_items[item]
-				local inv = self.inv[item]
-				if not (def and inv) or (c and type(c) ~= "number") or vector.distance(self:pos(),pos) > self.reach  then
+			item_add_color="#ffff00",
+			item_add_return = "bool",
+			item_add_if =  true,
+			item_add_params = "pos",
+			item_add_text = "(pos) add all items from mob inventory to node inventory, returns true if done",
+			item_add=function(pos)
+				if not pos or not (pos.z) then
+					error("mob.item_add_all: invalid pos")
 					return false
 				end
-				local added = false
-				local add = c or 99999
-				for i=0,32 do
-					c = c and c <= inv and c or def.stack_max <= self.inv[item] and def.stack_max or self.inv[item]
-					local stack=ItemStack(item.." "..c)
-					if exatec.test_input(pos,stack,pos,pos) then
-						exatec.input(pos,stack,pos,pos)
-						added = true
-						self.inv[item] = self.inv[item] - c
-						add = add - c
-						if self.inv[item] <= 0 then
-							self.inv[item] = nil
-							break
-						elseif add <= 0 then
-							break
-						end
-					else
-						break
-					end
-				end
-				return added
-			end,
-			add_all_items_text = "(pos,item,count/nil) add as much items as possible from mob inventory to node inventory",
-			add_all_items=function(pos)
-				local added = false
 				if vector.distance(self:pos(),pos) > self.reach then
 					return false
 				end
-				for i,v in pairs(self.inv) do
+				local inv = table.copy(self.inv)
+				for i,v in pairs(inv) do
 					local stack=ItemStack(i.." "..v)
-					if minetest.registered_items[i] and exatec.test_input(pos,stack,pos,pos) then
+					if v == 0 or not minetest.registered_items[stack:get_name()] then
+						self.inv[i] = nil
+					elseif exatec.test_input(pos,stack,pos,pos) then
 						exatec.input(pos,stack,pos,pos)
-						self.inv[i] = self.inv[i] - v
-						added = true
-						if self.inv[i] <= 0 then
-							self.inv[i] = nil
-						end
+						self.inv[i] = nil
 					else
-						break
+						return false
 					end
 				end
-				return added
+				return true
 			end,
-			take_item_text = "(pos,item,count/nil) take as much as possible from the node inventory",
-			take_item=function(pos,item,c)
-				local def = minetest.registered_items[item]
-				if not def or (c and type(c) ~= "number") or vector.distance(self:pos(),pos) > self.reach then
-					return false
-				end
-				self.inv[item] = self.inv[item] or 0
-				local taken = false
-				local take = c or 99
-				for i=0,32 do
-					local stack=ItemStack(item.." "..c)
-					local test = exatec.test_output(pos,stack,pos,pos)
-					if test then
-						local nstack = exatec.output(pos,stack,pos,pos)
-						taken = true
-						self.inv[item] = self.inv[item] + nstack:get_count()
-						take = take - c
-						if take <= 0 then
-							break
-						end
-					else
-						break
-					end
-				end
-				return taken
-			end,
-			take_all_items_text = "(pos) take all items from the node inventory",
-			take_all_items=function(pos,item,c)
-				local can_take
+			item_take_color="#ffff00",
+			item_take_return = "bool",
+			item_take_params = "pos",
+			item_take_if = true,
+			item_take_text = "(pos) take all items from the node inventory, returns true when done",
+			item_take=function(pos)
 				local a = exatec.def(pos)
 				if not a.output_list or vector.distance(self:pos(),pos) > self.reach then
 					return false
 				end
 				for i,stack in pairs(minetest.get_meta(pos):get_inventory():get_list(a.output_list)) do
-					if not can_take then
-						if exatec.test_output(pos,stack,pos,pos) then
-							can_take = true
-						else
-							return false
-						end
+					if stack:get_name() ~= "" and exatec.test_output(pos,stack,pos,pos) then
+						local n = stack:get_name()
+						self.inv[n] = (self.inv[n] or 0) + stack:get_count()
+						exatec.output(pos,stack,pos,pos)
 					end
-					local n = stack:get_name()
-					self.inv[n] = (self.inv[n] or 0) + stack:get_count()
-					exatec.output(pos,stack,pos,pos)
 				end
 				return true
 			end,
-			pick_up_items_text = "() pick up items around the mob",
-			pick_up_items=function()
+			item_pick_up_color = "#ffff00",
+			item_pick_up_text = "() pick up items around the mob",
+			item_pick_up=function()
 				for _, ob in ipairs(minetest.get_objects_inside_radius(self:pos(), self.reach)) do
 					local en = ob:get_luaentity()
 					if en and en.name == "__builtin:item" then
 						local st = en.itemstring.split(en.itemstring," ")
 						local item = st[1]
-						local count = st[2] and tonumber(st[2]) or 0
+						local count = st[2] and tonumber(st[2]) or 1
 						self.inv[item] = (self.inv[item] or 0) + count
 						ob:remove()
 					end
 				end
 			end,
-			give_text = "(id,item,count/nil) give items to object and player",
+			give_color = "#ffff00",
+			give_return = "bool",
+			give_text = "(id,item,count/nil) give items to object and player, returns true if done",
 			give=function(id,item,c)
 				self.objects = self.objects or {}
 				local ob = self.objects[id]
 				c = c or 1
-
 				if type(c) ~= "number" or not self.inv[item] then
 					return false
 				end
@@ -778,13 +791,26 @@ exatec.create_env=function(A,g,self)
 				end
 				return false
 			end,
-			get_nodes_in_area_text = "(pos,nodes,rad/nil) return list of positions of nodes in area, rad max is 20",
-			get_nodes_in_area=function(pos,nodes,rad)
+			get_nodes_area_return = "table",
+			get_nodes_area_params = 'pos,{"",},20',
+			get_nodes_area_text = "(pos,nodes,rad/nil) return a table of positions of nodes in area, rad max is 20",
+			get_nodes_area=function(pos,nodes,rad)
 				rad = math.abs(rad or 5)
 				rad = rad <= 20 and rad or 20
+				pos = pos or self.object:get_pos()
 				return minetest.find_nodes_in_area(vector.add(pos,rad),vector.subtract(pos,rad),nodes)
 			end,
+			get_node_nearest_return = "table",
+			get_node_nearest_params = 'pos,{"",},20',
+			get_node_nearest_text = "(pos,nodes,rad/nil) return nearest node positions, rad max is 20",
+			get_node_nearest=function(pos,nodes,rad)
+				rad = math.abs(rad or 5)
+				rad = rad <= 20 and rad or 20
+				pos = pos or self.object:get_pos()
+				return minetest.find_node_near(pos,rad,nodes)
+			end,
 			rightclick_text = "(pos) rightclick",
+			rightclick_params = "pos",
 			rightclick=function(pos)
 				if vector.distance(self:pos(),pos) <= self.reach then
 					local n = minetest.get_node(pos).name
@@ -797,14 +823,18 @@ exatec.create_env=function(A,g,self)
 					end
 				end
 			end,
+			colliding_with_object_params = "pos",
+			colliding_with_object_if = true,
 			colliding_with_object_text = "() if colliding with objects",
 			colliding_with_object=function(pos)
 				return self.colliding_with_object
 			end,
+			touching_ground_if = true,
 			touching_ground_text = "() if touching on ground",
 			touching_ground=function(pos)
 				return self.moveresult.touching_ground
 			end,
+			standing_on_object_if = true,
 			standing_on_object_text = "() if standing on object",
 			standing_on_object=function(pos)
 				return self.moveresult.standing_on_object
@@ -865,6 +895,8 @@ exatec.create_env=function(A,g,self)
 			minetest.chat_send_player(A.user,dump(p))
 			g.count = g.count + 4000
 		end,
+		same_pos_params = "pos,pos2",
+		same_pos_if = true,
 		same_pos_text = "(pos1,pos2) if pos1 and pos2 is same position",
 		same_pos=function(pos1,pos2)
 			return (pos1.x..","..pos1.y..","..pos1.z) == (pos2.x..","..pos2.y..","..pos2.z)
@@ -876,6 +908,7 @@ exatec.create_env=function(A,g,self)
 		ipairs=ipairs,
 		next=next,
 		unpack=unpack,
+		string_color = "#aaaaff",
 		string = {
 			byte=string.byte,
 			char=string.char,
@@ -893,6 +926,7 @@ exatec.create_env=function(A,g,self)
 				return a:gsub(b,c)
 			end
 		},
+		math_color = "#ffaa00",
 		math = {
 			abs=math.abs,
 			cos=math.cos,
@@ -915,6 +949,7 @@ exatec.create_env=function(A,g,self)
 			sin=math.sin,
 			tan=math.tan,
 		},
+		table_color = "#ff22aa",
 		table = {
 			insert=table.insert,
 			remove=table.remove,
@@ -922,6 +957,8 @@ exatec.create_env=function(A,g,self)
 			maxn=table.maxn,
 			sort=table.sort,
 		},
+		vector_color = "#ff22ff",
+		vector=vector,
 		os = {
 			difftime=os.difftime,
 			clock=os.clock,
