@@ -227,7 +227,7 @@ examobs.register_fish=function(def)
 
 	examobs.register_mob(def)
 
-	if lay_on_death == 0 then
+	if def.lay_on_death == 0 then
 		minetest.register_node(mobname, {
 			description = "Dead " .. def.name,
 			wield_scale = {x=0.3,y=0.3,z=0.3},
