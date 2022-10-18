@@ -111,7 +111,7 @@ end
 
 examobs.jump=function(self,y)
 	local v = self.object:get_velocity() or {x=0, y=0, z=0}
-	if v.y == 0 then
+	if v.y == 0 and self.cmdphone_no_jumping ~= true then
 		y = y or self.jump or 5.5
 		self.object:set_velocity({x=v.x, y=y, z=v.z})
 	end

@@ -61,10 +61,10 @@ examobs.main=function(self, dtime,moveresult)
 				self.cmdphone_error = err
 			end
 			return
-		elseif self.standby then
+		end
+		if not self.cmdphone_standard_mode then
 			return
 		end
-		return
 	end
 	if self.step(self,dtime) or self.targetthen then
 		return
