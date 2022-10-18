@@ -417,7 +417,7 @@ examobs.register_mob=function(def)
 			visual_scale=0.1,
 			walkable = true,
 			pointable = false,
-			use_texture_alpha = def.use_texture_alpha,
+			use_texture_alpha = def.use_texture_alpha or "clip",
 			on_place = function(itemstack, user, pointed_thing)
 				if pointed_thing.type=="node" then
 					local p = pointed_thing.above
