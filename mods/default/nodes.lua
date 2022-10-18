@@ -104,6 +104,7 @@ minetest.register_node("default:lamp", {
 	on_place = minetest.rotate_node,
 	sunlight_propagates = true,
 	light_source = 14,
+	use_texture_alpha = "clip",
 	exatec={
 		on_wire = function(pos)
 			minetest.set_node(pos,{name="default:lamp_off",param2=minetest.get_node(pos).param2})
@@ -122,6 +123,7 @@ minetest.register_node("default:lamp_off", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
+	use_texture_alpha = "clip",
 	exatec={
 		on_wire = function(pos)
 			minetest.set_node(pos,{name="default:lamp",param2=minetest.get_node(pos).param2})
@@ -151,6 +153,7 @@ minetest.register_node("default:cloud_thick", {
 	light_source = 13,
 	post_effect_color = {a = 220, r = 255, g = 255, b = 255},
 	drowning = 1,
+	use_texture_alpha = "clip",
 })
 
 default.register_stair("default:cloud_thick")
@@ -350,6 +353,7 @@ minetest.register_node("default:torch", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	on_place=function(itemstack, placer, pointed_thing)
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"attached_node")>0 then
 			return itemstack
@@ -397,6 +401,7 @@ minetest.register_node("default:torch_floor", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	walkable = false,
 	light_source = 10,
 	damage_per_second = 2,
@@ -423,6 +428,7 @@ minetest.register_node("default:torch_lean", {
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	walkable = false,
 	light_source = 10,
 	damage_per_second = 2,
