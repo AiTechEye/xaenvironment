@@ -32,6 +32,7 @@ minetest.register_node("clock:clock" .. i, {
 	groups = {dig_immediate=3,flammable=2,not_in_creative_inventory = i ~= 1 and 1 or nil,used_by_npc=i == 1 and 2 or nil,store= i == 1 and 170 or nil},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
+	use_texture_alpha = "clip",
 	node_box = {
 		type = "fixed",
 		fixed = {
