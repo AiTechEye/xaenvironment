@@ -236,6 +236,7 @@ examobs.register_fish=function(def)
 				type = "fixed",
 				fixed = {-0.2,-0.2,-0.2,0.2,0.2,0.2}
 			},
+			use_texture_alpha = "clip",
 			drawtype = "mesh",
 			mesh = def.mesh,
 			tiles=def.textures,
