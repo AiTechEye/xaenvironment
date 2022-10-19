@@ -104,9 +104,6 @@ exatec.show_cmdphone=function(player,pressed)
 		m:set_int("visualcode",m:get_int("visualcode") == 0 and 1 or 0)
 	end
 
---	m:set_string("text",minetest.serialize(text))
---	player:set_wielded_item(item)
-
 	local list = ""
 	local listn = 0
 	local listin = pressed.posinput or ""
@@ -356,14 +353,8 @@ exatec.show_cmdphone=function(player,pressed)
 					ix = ix:sub(1,-3)
 					ix2 = "  "
 				elseif v:sub(1,4) == "end" then
-					--if ix:len() > 2 then
-						ix = ix:sub(1,-3)
-					--else
-					--	ix = ""
-					--end
+					ix = ix:sub(1,-3)
 				end
-
-
 				ltext = ltext .. ix ..v .."\n"
 				ix = ix .. ix2
 				ix2 = ""
@@ -371,7 +362,6 @@ exatec.show_cmdphone=function(player,pressed)
 
 			text = ltext
 		end
-
 
 		textx = textx +4.5
 
@@ -401,7 +391,6 @@ exatec.show_cmdphone=function(player,pressed)
 	local showfosp = "size["..(visualcode_enabled and 20 or 14)..",11]"
 	.."box[-0.2,1;"..(visualcode_enabled and 20 or 14)..",10.4;#ffff]"
 	.."style[text;textcolor=black;noclip=true]"
-
 
 	.."button[-0.2,-0.4;1,1;save;Save]"
 	.."label[3.7,-0.2;"..(self and minetest.colorize("#00FF00",self.examob.." is connected") or minetest.colorize("#FFFF00","No mob connected")).."]"
