@@ -17,7 +17,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				pass = true
 				m:set_int("visualcode-move",0)
 				player:set_wielded_item(item)
-			elseif pressed.addfor then
+			elseif pressed.addfor or pressed.indent then
 				pass = true
 			else
 				for i,v in pairs(pressed) do
@@ -176,6 +176,7 @@ exatec.show_cmdphone=function(player,pressed)
 	local visualcode = ""
 
 	if visualcode_enabled then
+
 		if pressed.addfor then
 			listin = 'for i,v in pairs() do\nend'
 		end
@@ -183,8 +184,6 @@ exatec.show_cmdphone=function(player,pressed)
 		local move = m:get_int("visualcode-move")
 		local addhere = m:get_int("visualcode-add")
 		local color = {IF="ff0f",pos="0f0f",count="3a3f",id="ffff"}
-
-		visualcode = ""--"box[-0.3,1.2;10.5,10.2;#fff]"
 		local vtext = text:split("\n")
 		local x = -0.2
 		local y = -0.2
@@ -264,8 +263,23 @@ exatec.show_cmdphone=function(player,pressed)
 			m:set_int("visualcode-moveto",0)
 		end
 		
+--remove spaces
 
+
+		local labeltext = ""
 		for i,v in ipairs(text:split("\n")) do
+			for c=1,v:len() do
+				if v:sub(c,c) ~= " " then
+					labeltext = labeltext .. v:sub(c,-1) .."\n"
+					break
+				end
+			end
+		end
+		if pressed.indent then
+			text = labeltext
+		end
+
+		for i,v in ipairs(labeltext:split("\n")) do
 
 -- label
 			local addx = 0
@@ -329,6 +343,35 @@ exatec.show_cmdphone=function(player,pressed)
 			textx = textx < x and x or textx
 		end
 
+-- add spaces
+
+		if pressed.indent then
+			local ltext = ""
+			local ix = ""
+			local ix2 = ""
+			for i,v in ipairs(text:split("\n")) do
+				if v:sub(1,3) == "if " or v:find(" do\n") then
+					ix2 = "  "
+				elseif v:sub(1,7) == "elseif " or v:sub(1,5) == "else\n" then
+					ix = ix:sub(1,-3)
+					ix2 = "  "
+				elseif v:sub(1,4) == "end" then
+					--if ix:len() > 2 then
+						ix = ix:sub(1,-3)
+					--else
+					--	ix = ""
+					--end
+				end
+
+
+				ltext = ltext .. ix ..v .."\n"
+				ix = ix .. ix2
+				ix2 = ""
+			end
+
+			text = ltext
+		end
+
 
 		textx = textx +4.5
 
@@ -356,17 +399,21 @@ exatec.show_cmdphone=function(player,pressed)
 
 
 	local showfosp = "size["..(visualcode_enabled and 20 or 14)..",11]"
-	.."button[-0.2,-0.2;1,1;save;Save]"
+	.."box[-0.2,1;"..(visualcode_enabled and 20 or 14)..",10.4;#ffff]"
+	.."style[text;textcolor=black;noclip=true]"
+
+
+	.."button[-0.2,-0.4;1,1;save;Save]"
 	.."label[3.7,-0.2;"..(self and minetest.colorize("#00FF00",self.examob.." is connected") or minetest.colorize("#FFFF00","No mob connected")).."]"
-	.."button[2.5,-0.2;1,1;setmob;Set]tooltip[setmob;Select mob from the list]"
-	.."button[1.6,-0.2;1,1;interval;"..(self and self.storage.code_execute_interval and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[interval;Code exacute interval]"
-	.."dropdown[1.6,0.5;2;mobs;" ..mlist..";"..(self and self.examob or "").."]"
+	.."button[2.5,-0.4;1,1;setmob;Set]tooltip[setmob;Select mob from the list]"
+	.."button[1.6,-0.4;1,1;interval;"..(self and self.storage.code_execute_interval and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[interval;Code exacute interval]"
+	.."dropdown[1.6,0.3;2;mobs;" ..mlist..";"..(self and self.examob or "").."]"
 
-	.."button[0.8,-0.2;1,1;visualcode;"..(m:get_int("visualcode") == 1 and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[visualcode;Visual programmingl]"
+	.."button[0.8,-0.4;1,1;visualcode;"..(m:get_int("visualcode") == 1 and minetest.colorize("#00FF00","on") or minetest.colorize("#FF0000","off")).."]tooltip[visualcode;Visual programmingl]"
 
-	..(visualcode_enabled == false and "textarea[0,1;10.5,12;text;;"..text.."]" or "textarea["..(textx+0.8)..",1;"..(15.8-textx)..",12;text;;"..text.."]button[7.6,0.3;1,1;addfor;for]tooltip[addfor;Add a for block]")
+	..(visualcode_enabled == false and "textarea[0,1;10.5,12.2;text;;"..text.."]" or "textarea["..(textx+0.8)..",1;"..(15.8-textx)..",12.2;text;;"..text.."]button[7.6,0.3;1,1;addfor;for]tooltip[addfor;Add a for block]button[8.6,0.3;1,1;indent;_]tooltip[indent;Autoset indent spaces]")
 
-	.."textlist["..(visualcode_enabled and 16 or 10)..",-0.3;4.1,11.5;list;"..list.."]"
+	.."textlist["..(visualcode_enabled and 16 or 10)..",-0.3;4.1,11.7;list;"..list.."]"
 	.."field[3.7,1;1.5,0.1;description;;"..description.."]tooltip[description;Item description]"
 	.."field[5,1;1.5,0.1;listin;;"..listin.."]"
 	.."field[6.3,1;1.5,0.1;listin2;;"..listin2.."]"
