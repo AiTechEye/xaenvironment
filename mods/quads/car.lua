@@ -17,6 +17,7 @@ minetest.register_node("quads:car", {
 	wield_scale={x=0.05,y=0.05,z=0.05},
 	visual_scale = 0.05,
 	paramtype = "light",
+	use_texture_alpha = "clip",
 	walkable=false,
 	pointable=false,
 	buildable_to=true,
