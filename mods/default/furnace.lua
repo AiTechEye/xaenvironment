@@ -199,6 +199,7 @@ minetest.register_node("default:furnace", {
 	tiles = {"default_cobble.png","default_air.png"},
 	groups = {stone=2,cracky=3,used_by_npc=1,exatec_tube_connected = 1},
 	drawtype="mesh",
+	use_texture_alpha = "blend",
 	mesh="default_furnace.b3d",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -237,6 +238,7 @@ minetest.register_node("default:furnace", {
 minetest.register_node("default:furnace_active", {
 	description = "Furnace",
 	drop = "default:furnace",
+	use_texture_alpha = "opaque",
 	tiles = {"default_cobble.png","default_fire.png"},
 	groups = {stone=2,cracky=2,not_in_creative_inventory=1,exatec_tube_connected = 1},
 	drawtype="mesh",

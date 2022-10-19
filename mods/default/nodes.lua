@@ -666,6 +666,7 @@ default.register_blockdetails({
 		tiles={"default_sand.png","default_starfish.png"},
 		drop="default:starfish",
 		block="default:sand",
+		use_texture_alpha = "clip",
 	},
 	item={type="node"},
 })
@@ -675,6 +676,7 @@ default.register_blockdetails({
 		tiles={"default_sand.png","default_shell.png"},
 		drop="default:shell",
 		block="default:sand",
+		use_texture_alpha = "clip",
 	},
 	item={type="node"},
 })

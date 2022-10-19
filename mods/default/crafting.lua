@@ -456,6 +456,7 @@ minetest.register_node("default:craftguide", {
 	paramtype2="wallmounted",
 	paramtype = "light",
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_int("page", 1)

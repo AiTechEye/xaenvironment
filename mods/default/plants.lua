@@ -91,6 +91,7 @@ default.register_blockdetails=function(def)
 	def.node.groups = def.node.groups or {crumbly=3,sand=1,falling_node=1,not_in_creative_inventory=1,not_in_craftguide=1}
 	def.node.drowning = def.node.drowning or 1
 	def.paramtype2 = def.paramtype2 or "facedir"
+	def.use_texture_alpha = def.use_texture_alpha or "clip"
 	def.node.after_destruct = def.node.block and function(pos)
 		minetest.set_node(pos,{name=def.node.block})
 	end or nil
@@ -134,6 +135,7 @@ default.register_blockdetails=function(def)
 			def.item.paramtype2 = def.item.paramtype2 or "wallmounted"
 			def.item.paramtype = def.item.paramtype or "light"
 			def.item.sunlight_propagates = def.item.sunlight_propagates==true
+			def.item.use_texture_alpha = def.item.use_texture_alpha or "clip"
 			def.item.after_place_node = def.item.after_place_node or function(pos, placer, itemstack)
 				minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
 			end
