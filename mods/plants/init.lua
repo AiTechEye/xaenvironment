@@ -1017,6 +1017,7 @@ minetest.register_craft({
 default.register_plant({
 	name="cabbage",
 	tiles={"plants_cabbage.png"},
+	use_texture_alpha = "clip",
 	drawtype = "mesh",
 	inventory_image="plants_cabbage_broken.png",	
 	mesh = "plants_cabbage.obj",
@@ -1040,6 +1041,7 @@ default.register_eatable("node","plants:cabbage_broken",1,4,{
 	mesh = "plants_cabbage.obj",
 	groups = {dig_immediate = 3,flammable=1},
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	walkable = false,
 	paramtype = "light",
 	sounds = default.node_sound_leaves_defaults(),
@@ -1106,6 +1108,7 @@ default.register_eatable("node","plants:tomato",1,2,{
 	mesh = "plants_tomato.obj",
 	groups = {dig_immediate = 3,flammable=1,store=10,tomato=1},
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	walkable = false,
 	paramtype = "light",
 	sounds = default.node_sound_leaves_defaults(),
