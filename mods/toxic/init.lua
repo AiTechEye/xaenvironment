@@ -29,6 +29,7 @@ default.register_fence({
 	texture = "examobs_barbed_wire.png",
 	sounds = default.node_sound_metal_defaults(),
 	groups = {choppy=0,cracky=1,flammable=0,fence=0},
+	use_texture_alpha = "clip",
 	connects_to = {"group:cracky"},
 	damage_per_second = 4,
 	node_box = {
@@ -48,6 +49,7 @@ default.register_fence({
 minetest.register_node("toxic:barbed_wire", {
 	description = "Barbed wire",
 	tiles = {"examobs_barbed_wire.png"},
+	use_texture_alpha = "clip",
 	paramtype = "light",
 	drawtype = "firelike",
 	sunlight_propagates=true,
@@ -108,6 +110,7 @@ minetest.register_node("toxic:barrel", {
 	mesh = "toxic_barrel.obj",
 	drop = "toxic:barrel",
 	wield_scale = {x=1, y=1, z=1},
+	use_texture_alpha = "clip",
 selection_box = {
 		type = "fixed",
 		fixed = {-0.4, -0.5, -0.4, 0.4,  0.9, 0.4}
@@ -136,6 +139,7 @@ default.register_tree({
 	wood={tiles={"default_wood.png^[colorize:#7c775055"},groups={wood=1,choppy=2,flammable=3,toxic_spreading=1}},
 	leaves={
 		tiles={"default_stick.png^[colorize:#7c775055"},
+		use_texture_alpha = "clip",
 		groups={leaves=1,snappy=3,leafdecay=5,flammable=2,toxic_spreading=1},
 		drawtype = "plantlike",
 	},
