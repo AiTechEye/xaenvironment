@@ -680,6 +680,7 @@ minetest.register_node("exatec:wire", {
 	inventory_image="exatec_wire.png",
 	drop="exatec:wire",
 	drawtype="nodebox",
+	use_texture_alpha = "opaque",
 	paramtype = "light",
 	paramtype2="colorwallmounted",
 	palette="default_palette.png",
@@ -713,6 +714,7 @@ minetest.register_node("exatec:datawire", {
 	drop="exatec:datawire",
 	drawtype="nodebox",
 	paramtype = "light",
+	use_texture_alpha = "opaque",
 	paramtype2="colorwallmounted",
 	palette="default_palette.png",
 	sunlight_propagates=true,
@@ -1559,6 +1561,7 @@ minetest.register_node("exatec:light_detector", {
 	drawtype="nodebox",
 	paramtype="light",
 	sunlight_propagates=true,
+	use_texture_alpha = "opaque",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		if minetest.is_protected(pos, player:get_player_name())==false then
