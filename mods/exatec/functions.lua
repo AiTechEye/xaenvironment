@@ -661,7 +661,7 @@ exatec.create_env=function(A,g,self)
 			end,
 			path_folow_color="#00ff00",
 			path_folow_text = "(rad/nil) folow created path, finish when inside rad or near it",
-			path_folow_params = "2",
+			path_folow_params = "",
 			path_folow=function(rad)
 				if self.path then
 					local p = self:pos()
@@ -800,12 +800,12 @@ exatec.create_env=function(A,g,self)
 				pos = pos or self.object:get_pos()
 				return minetest.find_nodes_in_area(vector.add(pos,rad),vector.subtract(pos,rad),nodes)
 			end,
-			get_node_nearest_return = "table",
-			get_node_nearest_params = 'pos,{"",},20',
-			get_node_nearest_text = "(pos,nodes,rad/nil) return nearest node positions, rad max is 20",
+			get_node_nearest_return = "pos",
+			get_node_nearest_params = 'nil,{""},20',
+			get_node_nearest_text = "(pos/nil,nodes,rad/nil) return nearest node position, rad max is 40",
 			get_node_nearest=function(pos,nodes,rad)
-				rad = math.abs(rad or 5)
-				rad = rad <= 20 and rad or 20
+				rad = math.abs(rad or 20)
+				rad = rad <= 40 and rad or 40
 				pos = pos or self.object:get_pos()
 				return minetest.find_node_near(pos,rad,nodes)
 			end,
