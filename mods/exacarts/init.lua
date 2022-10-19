@@ -167,6 +167,7 @@ exacarts.register_rail({
 	tiles = {"(default_ironblock.png^[combine:16x16:0,0=exacarts_rails_alpha.png^[makealpha:0,255,0)^default_crafting_arrowup.png"},
 	add_groups = {exatec_wire_connected=1,store=200},
 	paramtype2 = "facedir",
+	use_texture_alpha = "clip",
 	drawtype = "nodebox",
 	node_box={
 		type = "fixed",
