@@ -29,6 +29,7 @@ minetest.register_node("exa2d:coin", {
 	buildable_to = true,
 	walkable = false,
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	tiles = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","player_style_coin.png"},
 	node_box = {
 		type="fixed",
@@ -55,6 +56,7 @@ minetest.register_node("exa2d:coin_effect", {
 	buildable_to = true,
 	walkable = false,
 	sunlight_propagates = true,
+	use_texture_alpha = "clip",
 	tiles = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","player_style_coin.png"},
 	node_box = {
 		type="fixed",
