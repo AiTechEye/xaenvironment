@@ -365,6 +365,7 @@ default.register_tree=function(def)
 		description = def.wood.description  .. " stair",
 		tiles = def.wood.tiles,
 		drawtype = "nodebox",
+		use_texture_alpha = "clip",
 		paramtype = "light",
 		paramtype2 = "facedir",
 		groups = def.stair.groups,
