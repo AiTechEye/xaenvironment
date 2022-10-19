@@ -187,8 +187,6 @@ minetest.register_craftitem("player_style:coin", {
 	end
 })
 
-
-
 minetest.register_on_cheat(function(ob,cheat)
 	if cheat.type == "interacted_too_far" then
 		local np = minetest.find_node_near(ob:get_pos(),5,"player_style:top_hat_upside_down")
@@ -197,8 +195,6 @@ minetest.register_on_cheat(function(ob,cheat)
 		end
 	end
 end)
-
-
 
 minetest.register_craft({
 	output="player_style:top_hat",
@@ -440,6 +436,7 @@ minetest.register_craft({
 minetest.register_node("player_style:cap_hat", {
 	description = "Cap (hat)",
 	stack_max = 1,
+	use_texture_alpha = "opaque",
 	tiles = {"default_amberblock.png^[colorize:#6b3209aa"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=400},
 	hat_properties={pos={x=-1.5, y=5, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
@@ -493,6 +490,7 @@ minetest.register_craft({
 minetest.register_node("player_style:hat", {
 	description = "Hat",
 	stack_max = 1,
+	use_texture_alpha = "opaque",
 	tiles = {"default_wool.png^[colorize:#a00e"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
 	hat_properties={pos={x=0, y=4, z=0}, rotation={x=0,y=90,z=0},size={x=0.3,y=0.3,z=0.3}},
@@ -517,6 +515,7 @@ minetest.register_craft({
 minetest.register_node("player_style:felt_hat", {
 	description = "Felt hat",
 	stack_max = 1,
+	use_texture_alpha = "opaque",
 	tiles = {"default_wool.png^[colorize:#002e"},
 	groups = {dig_immediate = 3,flammable=3,hat=1,store=500},
 	hat_properties={pos={x=0, y=6, z=0}, rotation={x=0,y=90,z=0},size={x=0.6,y=0.6,z=0.6}},
