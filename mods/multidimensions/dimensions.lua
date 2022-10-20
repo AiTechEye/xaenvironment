@@ -119,7 +119,7 @@ multidimensions.register_dimension("slime",{
 	node={
 		description="Slime world",
 		tiles = {"default_water.png^[colorize:#0f0c"},
-		use_texture_alpha = true,
+		use_texture_alpha = "blend",
 	},
 	craft = {
 		{"materials:gel2", "materials:gel2", "plants:macro_tree"},
