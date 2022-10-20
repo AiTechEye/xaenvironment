@@ -17,8 +17,10 @@ player_style={
 	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
 	bloom = {
 		status="",
+		last="",
 		air={radius=10,intensity=0.1},
 		liquid={radius=16,intensity=0.6},
+		damage={radius=16,intensity=1},
 	},
 }
 
@@ -35,7 +37,6 @@ dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 
 player_style.set_bloom=function(stat)
 	if minetest.is_singleplayer() and player_style.bloom_effects then
-		local s = player_style.bloom[stat]
 		if stat == "setup" then
 			local i = minetest.settings:get("bloom_intensity") or 0.05
 			local r = minetest.settings:get("bloom_radius") or 16
@@ -55,10 +56,19 @@ player_style.set_bloom=function(stat)
 			minetest.settings:set("bloom_intensity",default.storage:get_float("bloom_intensity"))
 			minetest.settings:set("bloom_radius",default.storage:get_int("bloom_radius"))
 			return
-		elseif player_style.bloom.status ~= stat and s then
-			player_style.bloom.status = stat
-			minetest.settings:set("bloom_intensity",s.intensity)
-			minetest.settings:set("bloom_radius",s.radius)
+		elseif player_style.bloom.status ~= stat then
+			if stat == "last" then
+				stat = player_style.bloom.last
+				player_style.bloom.last = ""
+			else
+				player_style.bloom.last = player_style.bloom.status
+			end
+			local s = player_style.bloom[stat]
+			if s then
+				player_style.bloom.status = stat
+				minetest.settings:set("bloom_intensity",s.intensity)
+				minetest.settings:set("bloom_radius",s.radius)
+			end
 		end
 	end
 end
@@ -116,6 +126,12 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	end
 	if player and hp_change < 0 then
 		minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
+		if minetest.is_singleplayer() and player_style.bloom_effects then
+			player_style.set_bloom("damage")
+			minetest.after(0.2,function()
+				player_style.set_bloom("last")
+			end)
+		end
 	end
 	return hp_change
 end,true)
