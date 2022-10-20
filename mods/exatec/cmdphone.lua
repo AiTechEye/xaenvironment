@@ -314,11 +314,9 @@ exatec.show_cmdphone=function(player,pressed)
 				addx = 0.2
 				x = x -0.2
 				labelcolor = color["IF"]
-			elseif v:sub(0,3) == "end" then
-				if x <= -0.2 then
-					labelcolor = "f00f"
-				else
-					labelcolor = color["IF"]
+			elseif v == "end" then
+				labelcolor = color["IF"]
+				if x > -0.2 then
 					x = x - 0.2
 				end
 			end
@@ -349,10 +347,10 @@ exatec.show_cmdphone=function(player,pressed)
 			for i,v in ipairs(text:split("\n")) do
 				if v:sub(1,3) == "if " or v:find(" do\n") then
 					ix2 = "  "
-				elseif v:sub(1,7) == "elseif " or v:sub(1,5) == "else\n" then
+				elseif v:sub(1,7) == "elseif " or v == "else" then
 					ix = ix:sub(1,-3)
 					ix2 = "  "
-				elseif v:sub(1,4) == "end" then
+				elseif v == "end" then
 					ix = ix:sub(1,-3)
 				end
 				ltext = ltext .. ix ..v .."\n"
@@ -406,7 +404,7 @@ exatec.show_cmdphone=function(player,pressed)
 	.."field[3.7,1;1.5,0.1;description;;"..description.."]tooltip[description;Item description]"
 	.."field[5,1;1.5,0.1;listin;;"..listin.."]"
 	.."field[6.3,1;1.5,0.1;listin2;;"..listin2.."]"
-	.."label["..(textx+0.8)..",11;"..err.."]"
+	.."label["..(textx+0.8)..",11;"..minetest.colorize("#000",err).."]"
 	.."tooltip[channel;Channel]"
 	.."label[6.8,-0.2;"..(limit or 0).."/10000 Events]"
 

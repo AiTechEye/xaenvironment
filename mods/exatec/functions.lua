@@ -443,7 +443,7 @@ exatec.create_env=function(A,g,self)
 						self.objects[n] = nil
 					end
 				else
-					error("mob.set_object(fight/flee/folow/target,object) ("..type(typ)..","..type(n)..")")
+					error("mob.set_object ("..type(typ)..","..type(n)..")")
 				end
 			end,
 			walk_color="#00ffff",
@@ -471,6 +471,24 @@ exatec.create_env=function(A,g,self)
 					examobs.lookat(self,ob)
 				else
 					self.object:set_yaw(math.random(0,6.28))
+				end
+			end,
+			look_and_walk_color="#00ffff",
+			look_and_walk_params = "pos",
+			look_and_walk_text = "(object/pos) look at object/pos walk and jump if needed",
+			look_and_walk=function(pos)
+				if pos and pos.z then
+					examobs.lookat(self,pos)
+					examobs.walk(self)
+					local pos2 = self:pos()
+					local a = vector.subtract(pos,pos2)
+					a.y = 0
+					if vector.distance(pos2,pos) > self.range and math.floor(pos.y+0.5) > math.floor(pos2.y+0.5)+2 then
+						examobs.stand(self)
+						examobs.jump(self)
+					end
+				else
+					error("mob.look_and_walk: "..type(typ).." (position required)")
 				end
 			end,
 			visiable_params = "pos",
@@ -682,6 +700,9 @@ exatec.create_env=function(A,g,self)
 						examobs.lookat(self,c)
 						examobs.walk(self)
 						self.path_attempts = self.path_attempts -1
+							if c.y-p.y > 0.5 then
+								examobs.jump(self)
+							end
 						if self.path_attempts < 0 then
 							self.path_index = self.path_index +1
 						end
