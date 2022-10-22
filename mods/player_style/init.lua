@@ -226,7 +226,56 @@ player_style.set_profile=function(player,pr)
 	player:hud_set_hotbar_image(profile.hotbar)
 	player:hud_set_hotbar_selected_image(profile.hotbar_selected)
 
-	if player_style.survive_hunger == true then
+	player_style.set_hunger_thirst_hud(player)
+
+	local skin = player:get_meta():get_string("skin")
+	if skin ~= "" then
+		local skin_prop
+		local ppr = player_style.players[name]
+		ppr.skin_self = {}
+		for i,v in ipairs(player_style.skins.skins) do
+			if v.skin == skin then
+				skin_prop = v
+				break
+			end
+		end
+		if skin_prop then
+
+			local textures = player:get_properties().textures
+			textures[1]=skin
+			player:set_properties({textures = textures})
+			if skin_prop.on_join then
+				skin_prop.on_join(ppr.skin_self,player)
+			end
+			if skin_prop.on_use_join then
+				skin_prop.on_use_join(ppr.skin_self,player)
+			end
+			if skin_prop.on_step then
+				player_style.players[name].on_step_skin = skin_prop.on_step
+			end
+		else
+			player:get_meta():set_string("skin","")
+			minetest.chat_send_player(name,"Your skin where removed, your are reset to the default")
+		end
+	end
+end
+
+player_style.set_hunger_thirst_hud=function(player,remove)
+	local name = player:get_player_name()
+	local p = player_style.players[name]
+	if remove then
+		if p.thirst then
+			player:hud_remove(p.thirst.back)
+			player:hud_remove(p.thirst.bar)
+			p.thirst = nil
+		end
+		if p.hunger then
+			player:hud_remove(p.hunger.back)
+			player:hud_remove(p.hunger.bar)
+			p.hunger = nil
+		end
+		return
+	elseif player_style.survive_hunger == true then
 		player_style.players[name].hunger={
 			level = player:get_meta():get_int("hunger"),
 			step = 0,
@@ -278,37 +327,6 @@ player_style.set_profile=function(player,pr)
 				offset={x=25,y=-150},
 			})
 		}
-	end
-
-	local skin = player:get_meta():get_string("skin")
-	if skin ~= "" then
-		local skin_prop
-		local ppr = player_style.players[name]
-		ppr.skin_self = {}
-		for i,v in ipairs(player_style.skins.skins) do
-			if v.skin == skin then
-				skin_prop = v
-				break
-			end
-		end
-		if skin_prop then
-
-			local textures = player:get_properties().textures
-			textures[1]=skin
-			player:set_properties({textures = textures})
-			if skin_prop.on_join then
-				skin_prop.on_join(ppr.skin_self,player)
-			end
-			if skin_prop.on_use_join then
-				skin_prop.on_use_join(ppr.skin_self,player)
-			end
-			if skin_prop.on_step then
-				player_style.players[name].on_step_skin = skin_prop.on_step
-			end
-		else
-			player:get_meta():set_string("skin","")
-			minetest.chat_send_player(name,"Your skin where removed, your are reset to the default")
-		end
 	end
 end
 
