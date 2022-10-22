@@ -5,7 +5,7 @@ scene = {
 minetest.register_chatcommand("fade", {
 	params = "",
 	description = "",
-	--privs = {teleport=true},
+	privs = {test=true},
 	func = function(name, param)
 		local p = minetest.get_player_by_name(name)
 
@@ -22,7 +22,7 @@ minetest.register_chatcommand("fade", {
 minetest.register_chatcommand("film", {
 	params = "",
 	description = "",
-	--privs = {teleport=true},
+	privs = {test=true},
 	func = function(name, param)
 		local p = minetest.get_player_by_name(name)
 		if param ~= "" then
@@ -35,10 +35,6 @@ minetest.register_chatcommand("film", {
 
 scene.film=function(player,toggle,n)
 	local p = scene.user[player:get_player_name()]
-
---player_style.survive_thirst = false
---player_style.survive_hunger = true
-
 	if toggle and not p.film then
 		player:hud_set_flags({hotbar=false,healthbar=false,crosshair=false,wielditem=false,breathbar=false,minimap=false})
 		player_style.set_hunger_thirst_hud(player,true)
@@ -110,9 +106,10 @@ scene.fade=function(player,fade,remove)
 end
 
 minetest.register_on_joinplayer(function(player)
-	scene.user[player:get_player_name()] = {}
+	if minetest.is_singleplayer() then
+		scene.user[player:get_player_name()] = {}
+	end
 end)
-
 
 --[[
 player:get_meta():get_int("scene")
@@ -121,8 +118,6 @@ end)
 
 minetest.register_on_mods_loaded(function()
 end)
-
-
 
 maps.set_exit_player=function(player)
 end
