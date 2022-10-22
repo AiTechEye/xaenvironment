@@ -473,6 +473,18 @@ exatec.create_env=function(A,g,self)
 					self.object:set_yaw(math.random(0,6.28))
 				end
 			end,
+			lookat_local_color="#00ffff",
+			lookat_local_params = "pos",
+			lookat_local_text = "(pos) look at a local pos",
+			lookat_local=function(pos)
+				if type(pos) =="table" and pos.z then
+					examobs.lookat(self,vector.subtract(self:pos(),pos))
+				elseif type(pos) =="number" then
+					self.object:set_yaw(pos)
+				else
+					error("mob.lookat_local: "..type(pos).." (position or number required)")
+				end
+			end,
 			look_and_walk_color="#00ffff",
 			look_and_walk_params = "pos",
 			look_and_walk_text = "(object/pos) look at object/pos walk and jump if needed",
