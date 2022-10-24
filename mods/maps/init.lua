@@ -7,7 +7,7 @@ maps = {
 			pos={x=0,y=0,z=0},
 			size={y=51,x=133,z=100},
 			--locked=true,
-			--unable=true,
+	unable=true,
 			hide_items = true,
 			singleplayer=true,
 			bones_disabled=true,
