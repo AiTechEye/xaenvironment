@@ -263,7 +263,7 @@ examobs.register_mob({
 			if en then
 				ob:set_velocity(v)
 			else
-				ob:add_player_velocity(v)
+				ob:add_velocity(v)
 			end
 			examobs.punch(self.object,ob,100)
 		end
@@ -393,7 +393,7 @@ examobs.register_mob({
 			if en then
 				ob:set_velocity(v)
 			else
-				ob:add_player_velocity(v)
+				ob:add_velocity(v)
 			end
 			examobs.punch(self.object,ob,100)
 		end
@@ -533,7 +533,7 @@ examobs.register_mob({
 			if en then
 				ob:set_velocity(v)
 			else
-				ob:add_player_velocity(v)
+				ob:add_velocity(v)
 			end
 			examobs.punch(self.object,ob,100)
 		end
@@ -680,7 +680,7 @@ examobs.register_mob({
 			if en then
 				ob:set_velocity(v)
 			else
-				ob:add_player_velocity(v)
+				ob:add_velocity(v)
 			end
 		end
 	end,
@@ -1457,6 +1457,7 @@ examobs.register_mob({
 	type = "npc",
 	dmg = 1,
 	coin = 2,
+	textures={"character.png"},
 	aggressivity = 1,
 	walk_speed = 4,
 	run_speed = 8,
@@ -2166,9 +2167,6 @@ examobs.register_mob({
 		examobs.known(self,clicker,"flee")
 	end,
 })
-
-
-
 
 examobs.register_mob({
 	description = "A new discover but yet unknown creature that farmers using as food source",
