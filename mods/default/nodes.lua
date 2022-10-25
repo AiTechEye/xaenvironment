@@ -331,7 +331,7 @@ minetest.register_node("default:stick_on_ground", {
 	description = "Stick",
 	drop="default:stick",
 	tiles={"default_tree.png"},
-	groups = {stick=1,dig_immediate=3,flammable=2,not_in_craftguide=1},
+	groups = {stick=1,dig_immediate=3,flammable=2,not_in_craftguide=1,not_recycle_return=1},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.05,-0.5,-0.5,0.05,-0.45,0.5}},
@@ -647,7 +647,8 @@ minetest.register_node("default:wet_soil", {
 default.register_pebble({
 	name="stone",
 	block="default:sand",
-	decoration={seed=543}
+	decoration={seed=543},
+	groups={not_recycle_return=1}
 })
 
 default.register_pebble({

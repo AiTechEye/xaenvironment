@@ -125,14 +125,14 @@ minetest.register_craftitem("default:gold_flake", {
 	description = "Gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
 	wield_scale={x=0.3,y=0.3,z=0.3},
-	groups={treasure=1},
+	groups={treasure=1,not_recycle_return=1},
 })
 
 minetest.register_craftitem("default:micro_gold_flake", {
 	description = "Micro gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
 	wield_scale={x=0.1,y=0.1,z=0.1},
-	groups={treasure=1},
+	groups={treasure=1,not_recycle_return=1},
 })
 
 default.registry_mineral({

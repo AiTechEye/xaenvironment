@@ -718,10 +718,8 @@ minetest.register_node("default:recycling_mill", {
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local m = minetest.get_meta(pos)
 		local inv = m:get_inventory()
-		if listname == "input" and inv:is_empty("output") and inv:is_empty("input") and stack:get_wear() == 0 then
-			local i = stack:get_name()
-			if m:get_int(i) == 1 or minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, listname, index, stack, player,stack) then
-				m:set_int(i,1)
+		if listname == "input" and inv:is_empty("output") and inv:is_empty("input") then
+			if minetest.registered_nodes["default:recycling_mill"].on_metadata_inventory_put(pos, listname, index, stack, player,stack) then
 				return 1
 			end
 		end
@@ -762,31 +760,30 @@ minetest.register_node("default:recycling_mill", {
 
 				for i,v in pairs(craft.items) do
 					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
-					if a.item and a.item:get_name()== input_item then
-						return
-					end
-
-					if a.item:get_name() == "default:flitblock" then
+					if a.item:get_name() == input_item or minetest.get_item_group(v,"not_recycle_return") > 0 then
 						return
 					elseif v:sub(1,6) == "group:" then
 						local g = v:sub(7,-1)
 						for i2,v2 in pairs(minetest.registered_items) do
-							if v2.groups and (v2.groups[g] or 0) > 0 then
+							if v2.groups and (v2.groups[g] or 0) > 0 and not v2.groups.not_recycle_return then
 								craft.items[i]=i2
 								break
 							end
 
 						end
 					end
-
 				end
+
+				local w = stack:get_wear()
 				for i,v in pairs(craft.items) do
-					if not minetest.registered_items[v] then
+					if v == input_item or not minetest.registered_items[v] or w > 0 and math.random(1,math.ceil(w*0.00005)) > 1 then
 						craft.items[i] = ""
 					end
 				end
 
-				if test then
+				if #craft.items == 0 then
+					return false
+				elseif test then
 					return true
 				else
 					inv:set_list("output",craft.items)
