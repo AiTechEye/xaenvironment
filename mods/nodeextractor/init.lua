@@ -123,7 +123,7 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	pos = vector.round(pos)
 	local dat = minetest.deserialize(f)
 
-	minetest.emerge_area(vector.add(pos,dat.size),vector.subtract(pos,dat.size))
+	minetest.emerge_area(pos,vector.add(pos,dat.size))
 
 	local vox = minetest.get_voxel_manip()
 	local min, max = vox:read_from_map(vector.add(pos,dat.size), vector.subtract(pos,dat.size))
