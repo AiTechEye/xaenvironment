@@ -7,7 +7,7 @@ maps = {
 			pos={x=0,y=0,z=0},
 			size={y=51,x=133,z=100},
 			--locked=true,
-	unable=true,
+			--unable=true,
 			hide_items = true,
 			singleplayer=true,
 			bones_disabled=true,
@@ -17,12 +17,9 @@ maps = {
 			on_enter=function(player)
 				if default.storage:get_int("Tutorials") < 3 then
 					local pos = maps.get_pos({x=0,y=0,z=0})
-					minetest.emerge_area(vector.add(pos,100),vector.subtract(pos,100))
+					minetest.emerge_area(pos,vector.add(pos,vector.new(51,100,86)))
 					minetest.chat_send_player(player:get_player_name(),"Wait 5 seconds while we builds the map...")
 					minetest.after(5,function()
-						nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
-					end)
-					minetest.after(7,function()
 						nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
 					end)
 					minetest.after(5.5, function(player)
