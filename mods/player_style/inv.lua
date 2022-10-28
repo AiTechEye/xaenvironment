@@ -516,7 +516,7 @@ player_style.manual=function(player,page)
 	local name = player:get_player_name()
 	local ppr = player_style.players[name]
 	ppr.manual = ppr.manual or {}
-	local text = "size[8,8]listcolors[#77777777;#777777aa;#000000ff]"
+	local text = "size[12,10]listcolors[#77777777;#777777aa;#000000ff]"
 
 	if not page then
 		local dir = player:get_look_dir()
@@ -562,7 +562,7 @@ player_style.manual=function(player,page)
 				end
 			end
 		end
-		text = text .. "textlist[0,0;4,8;manuallist;".. items .."]"
+		text = text .. "textlist[0,0;4,10;manuallist;".. items .."]"
 		return minetest.show_formspec(name, "player_style.manual",text)
 	else
 
@@ -572,7 +572,7 @@ player_style.manual=function(player,page)
 			text = text .. p.action(player) or ""
 		end
 
-		text = text .. "button[7.2,-0.3;1,1;close;X]"
+		text = text .. "button[11.2,-0.3;1,1;close;X]"
 		return minetest.show_formspec(name, "player_style.manual",text)
 	end
 end
@@ -609,3 +609,48 @@ player_style.register_manual_page({
 		return t
 	end
 })
+
+player_style.itemstrings_to_image=function(text,x)
+	x = x or 0
+	local i2 = 1
+	local t = ""
+	local text2 = text
+	for i=1,text:len() do
+		if text:sub(i,i) == " " then
+			local item = text:sub(i2,i-1)
+			local def = minetest.registered_items[item]
+			if def and item:find(":") then
+				t = t .. "item_image["..x..",0;1,1;"..item.."]tooltip["..x..",0;1,1;"..(def.description or item).."]"
+				text2 = text2:gsub(item.." ","")
+				x = x + 1
+			end
+			i2 = i+1
+		end
+	end
+	return t .. "textarea[0,1;12,10;;;"..(text2).."]"
+end
+
+minetest.register_on_mods_loaded(function(player)
+	for i,v in pairs(minetest.registered_items) do
+		if v.manual_page then
+			player_style.register_manual_page({
+				name = v.description or i,
+				itemstyle = i,	
+				text = player_style.itemstrings_to_image(v.manual_page,1),
+				action=v.manual_page_action,
+				tags = v.manual_page_tags,
+			})
+		end
+	end
+	for i,v in pairs(minetest.registered_entities) do
+		if v.manual_page then
+			local def = minetest.registered_items[i]
+			player_style.register_manual_page({
+				name = def and def.description or i,
+				text = player_style.itemstrings_to_image(v.manual_page),
+				action=v.manual_page_action,
+				tags = v.manual_page_tags,
+			})
+		end
+	end
+end)
