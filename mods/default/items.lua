@@ -108,7 +108,8 @@ minetest.register_tool("default:telescopic", {
 		end
 		user:set_fov(z,false,0.1)
 		default.telescopic_check(user)
-	end
+	end,
+	manual_page = "default:telescopic Telescopic is used to zoom into the world.\nUse to zoom in\nPalce / secondary use to zoom out",
 })
 
 default.telescopic_check=function(user)
@@ -231,7 +232,8 @@ minetest.register_tool("default:knuckles", {
 			dig_immediate={times={[1]=1.5,[2]=1,[3]=0}, uses=0}
 		},
 		damage_groups = {fleshy=4},
-	}
+	},
+	manual_page = "default:knuckles A weapon used to punch harder",
 })
 
 minetest.register_tool("default:admin_pickaxe", {
@@ -349,6 +351,15 @@ minetest.register_node("default:tankstorage", {
 	drawtype = "glasslike_framed",
 	sunlight_propagates = true,
 	paramtype = "light",
+	manual_page_func=function()
+		local b = "default:tankstorage "
+		for i,v in pairs(minetest.registered_items) do
+			if v.groups and v.groups.bucket then
+				b = b .. i .." "
+			end
+		end
+		return b.." The tankstorage is used as liquid storage.\nPunch with a bucket to add liquid, or right click to take"
+	end,
 })
 
 minetest.register_craftitem("default:ironstick", {
@@ -361,12 +372,14 @@ minetest.register_craftitem("default:stick", {
 	description = "Wooden stick",
 	inventory_image = "default_stick.png",
 	groups = {flammable = 1,stick=1,treasure=1},
+	manual_page = "default:stick default:stick_on_ground Sticks is used to craft the most hand tools.\n- Those are usually found around trees.\n- Can be gotten through by digging leaves.\n- Can be found as treasures .\n- Can be crafted from wood.",
 })
 
 minetest.register_craftitem("default:unknown", {
 	description = "Unknown item",
 	inventory_image = "default_unknown.png",
-	groups = {not_in_creative_inventory=1,store=10000},
+	groups = {not_in_creative_inventory=1,store=100000},
+	manual_page = "default:unknown Simply the most expensive and useless item in the game - it does nothing",
 })
 
 default.register_chest({

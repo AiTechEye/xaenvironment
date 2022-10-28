@@ -385,8 +385,8 @@ minetest.register_node("default:torch", {
 			end
 		end
 		default.wieldlight(user:get_player_name(),user:get_wield_index(),"default:torch")
-	end
-
+	end,
+	manual_page = "default:torch Used for light source and weapon.\nThe torch lifetime on a wall can vary between from 24 to 72 realtime hours before it runs out\nPunch in air to light up the air\nPunch an enimy to set it in fire, in some cases the torch breaks in this way",
 })
 
 minetest.register_node("default:torch_floor", {
@@ -687,6 +687,7 @@ minetest.register_node("default:obsidian", {
 	tiles={"default_obsidian.png"},
 	groups = {cracky=1,level=3,treasure=2,store=200},
 	sounds = default.node_sound_stone_defaults(),
+	manual_page = "default:obsidian This mysterious mineral can be obtained by cool down lava source, with water as an example",
 })
 
 minetest.register_node("default:cooledlava", {
@@ -732,7 +733,8 @@ minetest.register_node("default:lava_cobble", {
 	damage_per_second = 10,
 	after_destruct=function(pos)
 		minetest.set_node(pos,{name="fire:basic_flame"})
-	end
+	end,
+	manual_page = "default:lava_cobble The only known way to find this very rare kind of cobble stone is to find a underground lava castle.",
 })
 
 minetest.register_node("default:stone_hot", {
@@ -989,7 +991,8 @@ minetest.register_node("default:water_source", {
 				minetest.set_node(apos(pos,0,1),{name="plants:lily_pad",param2=math.random(0,3)})
 			end
 		end
-	end
+	end,
+	manual_page = "default:water_source Water is very necessary for survival, but is not the only way to drink on.\nAnyway punch somwehere within the water to drink",
 })
 
 minetest.register_node("default:water_flowing", {
