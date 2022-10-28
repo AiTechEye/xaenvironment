@@ -35,7 +35,7 @@ minetest.register_node("quads:car", {
 })
 
 minetest.register_entity("quads:car",{
-	manual_page = "quads:car quads:petrol_tank quads:petrol_tank_empty Cars is most common cities,was first hand made for cities driven by NPC's.\nTo make it drivable you have to fill it with petrol (8x fills the tank).\nYou can aslo change its color by giving it a block of the most kinds.\nClick with glass to change its glass.\n\nControls:\n\nUp/down = drive\nLeft/right = turn\n- Hurts from fall over 7 blocks\n- Explodes when it dies\n- Can't drive in terrain",
+	manual_page = "quads:car quads:petrol_tank quads:petrol_tank_empty Cars is most common in cities.\nThose was in first hand made for cities driven by NPC's.\nTo make it drivable you have to fill it with petrol (8x fills the tank).\nYou can aslo change its color by giving it a block of the most kinds.\nClick with glass to change its glass.\n\nControls:\n\nUp/down = drive\nLeft/right = turn\n- Hurts from fall over 7 blocks\n- Explodes when it dies\n- Can't drive in terrain",
 	hp_max = 500,
 	physical = true,
 	collisionbox = {-2.2,-0.8,-2.2,2.2,1.2,2.2},
