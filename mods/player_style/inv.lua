@@ -500,7 +500,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			local i = minetest.explode_textlist_event(pressed.manuallist).index
 			player_style.manual(player,i)
 		elseif pressed.close then
-			player_style.manual(player)
+			player_style.manual(player,true)
 		else
 			for i,v in pairs(pressed) do
 				if i:sub(1,7) == "manual_" then
@@ -518,7 +518,7 @@ player_style.manual=function(player,page)
 	ppr.manual = ppr.manual or {}
 	local text = "size[12,10]listcolors[#77777777;#777777aa;#000000ff]"
 
-	if not page then
+	if not page or page == true then
 		local dir = player:get_look_dir()
 		local pos = player:get_pos()
 		local p1 = {x=pos.x+dir.x,y=pos.y+1.4,z=pos.z+dir.z}
@@ -526,7 +526,6 @@ player_style.manual=function(player,page)
 
 		local node
 		local object
-		local sh
 
 		for v in minetest.raycast(p1,p2,true,true) do
 			if v.type == "node" then
@@ -543,24 +542,43 @@ player_style.manual=function(player,page)
 		local item = object or node or player:get_wielded_item():get_name()
 		local items = ""
 		local c = ""
+
+		local def = minetest.registered_items[item] or {}
+		local y = 1
+		local x = 4
 		for i,v in ipairs(player_style.manual_pages) do
 			items = items .. c .. v.name
 			c = ","
-			if not sh and v.tags and item then
-				local def = minetest.registered_items[item] or {}
+
+			if not page and (item == v.name or v.name == def.description) then
+				player_style.manual(player,i)
+				return
+			end
+
+			if v.item then
+				text = text .. "item_image_button["..x..","..y..";1,1;"..v.item..";manual_"..i..";]"
+				x = x + 1
+				if x >= 11 then
+					x = 4
+					y = y + 1
+				end
+			end
+
+			if v.tags and item then
 				local groups = def.groups or {}
 				for i1,v1 in ipairs(v.tags) do
 					if item == v1 or groups[v1] then
 						sh = true
 						if def then
-							text = text .. "item_image_button[7,0;1,1;"..item..";manual_"..i..";]"
+							text = text .. "item_image_button[4,0;1,1;"..item..";manual_"..i..";]"
 						else
-							text = text .. "image_button[7,0;1,1;default_unknown.png;manual_"..i..";]"
+							text = text .. "image_button[4,0;1,1;default_unknown.png;manual_"..i..";]"
 						end
 						break
 					end
 				end
 			end
+
 		end
 		text = text .. "textlist[0,0;4,10;manuallist;".. items .."]"
 		return minetest.show_formspec(name, "player_style.manual",text)
@@ -610,8 +628,8 @@ player_style.register_manual_page({
 	end
 })
 
-player_style.itemstrings_to_image=function(text,x)
-	x = x or 0
+player_style.itemstrings_to_image=function(text,x,label)
+	label = label or ""
 	local i2 = 1
 	local t = ""
 	local text2 = text
@@ -620,23 +638,24 @@ player_style.itemstrings_to_image=function(text,x)
 			local item = text:sub(i2,i-1)
 			local def = minetest.registered_items[item]
 			if def and item:find(":") then
-				t = t .. "item_image["..x..",0;1,1;"..item.."]tooltip["..x..",0;1,1;"..(def.description or item).."]"
+				t = t .. "item_image["..x..",.5;1,1;"..item.."]tooltip["..x..",0.5;1,1;"..(def.description or item).."]"
 				text2 = text2:gsub(item.." ","")
 				x = x + 1
 			end
 			i2 = i+1
 		end
 	end
-	return t .. "textarea[0,1;12,10;;;"..(text2).."]"
+	return t .. "label[0,-0.1;"..label.."]textarea[0,1.5;12,10;;;"..(text2).."]"
 end
 
 minetest.register_on_mods_loaded(function(player)
 	for i,v in pairs(minetest.registered_items) do
 		if v.manual_page then
 			player_style.register_manual_page({
+				item = i,
 				name = v.description or i,
 				itemstyle = i,	
-				text = player_style.itemstrings_to_image(v.manual_page,1),
+				text = player_style.itemstrings_to_image(v.manual_page,1,v.description or i),
 				action=v.manual_page_action,
 				tags = v.manual_page_tags,
 			})
@@ -647,7 +666,7 @@ minetest.register_on_mods_loaded(function(player)
 			local def = minetest.registered_items[i]
 			player_style.register_manual_page({
 				name = def and def.description or i,
-				text = player_style.itemstrings_to_image(v.manual_page),
+				text = player_style.itemstrings_to_image(v.manual_page,0,def and def.description or i),
 				action=v.manual_page_action,
 				tags = v.manual_page_tags,
 			})
