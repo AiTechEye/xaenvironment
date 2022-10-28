@@ -40,6 +40,7 @@ minetest.register_tool("air_balloons:balloon", {
 		end
 		return itemstack	
 	end,
+	manual_page = "air_balloons:balloon air_balloons:gastank air_balloons:gastank_empty Used to fly\nThe vehicle first of all have to be filled with gas to lift from the ground, just right click with a gas tank, max fuel is 1000\nJump to lift, yes it is slow",
 })
 
 minetest.register_node("air_balloons:gastank", {
