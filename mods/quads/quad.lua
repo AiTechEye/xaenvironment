@@ -9,7 +9,7 @@ minetest.register_craft({
 
 minetest.register_node("quads:quad", {
 	stack_max=1,
-	description="Quad (Right click with dye to paint)",
+	description="Quad",
 	drawtype="mesh",
 	groups = {treasure=3,store=4000},
 	mesh="quads_quad.b3d",
@@ -47,6 +47,7 @@ minetest.register_entity("quads:quad",{
 	speed = 0,
 	jump = 0,
 	timer = 0,
+	manual_page = "quads:quad quads:petrol_tank quads:petrol_tank_empty Quads is small vehicles that easily can travel through the most terrains.\nTo make it drivable you have to fill it with petrol (4x fills the tank).\nYou can aslo change its color by right click with a dye.\nControls:\n\nUp/down = drive\nLeft/right = turn\nShift + left/right = turn slowly\nUse + up/down in air = flip\n\n- Hurts from fall over 7 blocks\n- Explodes when it dies\n- You dies if you fails in a flip",
 	get_staticdata = function(self)
 		return minetest.serialize({petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index})
 	end,
