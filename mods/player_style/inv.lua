@@ -544,7 +544,7 @@ player_style.manual=function(player,page)
 		local c = ""
 
 		local def = minetest.registered_items[item] or {}
-		local y = 1
+		local y = 2
 		local x = 4
 		for i,v in ipairs(player_style.manual_pages) do
 			items = items .. c .. v.name
@@ -570,9 +570,9 @@ player_style.manual=function(player,page)
 					if item == v1 or groups[v1] then
 						sh = true
 						if def then
-							text = text .. "item_image_button[4,0;1,1;"..item..";manual_"..i..";]"
+							text = text .. "item_image_button[4,1;1,1;"..item..";manual_"..i..";]"
 						else
-							text = text .. "image_button[4,0;1,1;default_unknown.png;manual_"..i..";]"
+							text = text .. "image_button[4,1;1,1;default_unknown.png;manual_"..i..";]"
 						end
 						break
 					end
@@ -580,7 +580,7 @@ player_style.manual=function(player,page)
 			end
 
 		end
-		text = text .. "textlist[0,0;4,10;manuallist;".. items .."]"
+		text = text .. "textlist[0,0;4,10;manuallist;".. items .."]label[4,0;Look at the things and it opens or shows here\nautomacly if there is information about it]"
 		return minetest.show_formspec(name, "player_style.manual",text)
 	else
 		local p = player_style.manual_pages[page]
