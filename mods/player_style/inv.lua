@@ -649,7 +649,7 @@ end
 
 minetest.register_on_mods_loaded(function(player)
 	for i,v in pairs(minetest.registered_items) do
-		if v.manual_page or v.manual_page_func then
+		if (v.manual_page or v.manual_page_func) and not (v.groups and (v.groups.unbreakable)) then
 			player_style.register_manual_page({
 				name = v.description or i,
 				itemstyle = i,
