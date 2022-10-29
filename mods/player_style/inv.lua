@@ -410,7 +410,6 @@ player_style.inventory=function(player)
 end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
-	
 	if form == "" then
 		local name = player:get_player_name()
 		for i,v in pairs(pressed) do
@@ -420,8 +419,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			end
 		end
 		local invp = player_style.players[name].inv
+
 		if invp then
-			if pressed.quit then
+			if pressed.quit and pressed.key_enter_field == nil then
 				player_style.players[name].inv.clean = nil
 				return
 			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
@@ -448,7 +448,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					end
 					player_style.players[name].inv.clean = nil
 				end
-			elseif pressed.search then
+			elseif pressed.search or pressed.key_enter_field == "searchbox" then
 				local its = {}
 				local s = pressed.searchbox:lower()
 				for i,it in pairs(player_style.inventory_items) do
@@ -462,9 +462,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					items = its
 				}
 				player_style.inventory(player)
-				return
-
-
+				return true
 			elseif pressed.backcraft then
 				local m = player:get_meta()
 				invp.backcraft = m:get_int("backcraftlistring") == 0 and 1 or 0
@@ -568,7 +566,6 @@ player_style.manual=function(player,page)
 				local groups = def.groups or {}
 				for i1,v1 in ipairs(v.tags) do
 					if item == v1 or groups[v1] then
-						sh = true
 						if def then
 							text = text .. "item_image_button[4,1;1,1;"..item..";manual_"..i..";]"
 						else
