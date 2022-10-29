@@ -313,27 +313,27 @@ default.register_bio=function(def)
 	end
 end
 
-default.register_bio({"semi_desert",		100,20,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
-default.register_bio({"desert",		100,0,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
+default.register_bio({"semi_desert",			100,20,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
+default.register_bio({"desert",				100,0,grass="default:desert_sand",dirt="default:desert_sand",stone="default:desert_stone",y_min=-50})
 
-default.register_bio({"swamp",		80,100,grass="default:dirt_with_jungle_grass"})
-default.register_bio({"jungle",		80,80,grass="default:dirt_with_jungle_grass",beach=true})
-default.register_bio({"tropic",		80,50,grass="default:dirt_with_grass",beach=true})
-default.register_bio({"savanna",		80,0,grass="default:dirt_with_dry_grass",beach=true})
+default.register_bio({"swamp",				80,100,grass="default:dirt_with_jungle_grass"})
+default.register_bio({"jungle",				80,80,grass="default:dirt_with_jungle_grass",beach=true})
+default.register_bio({"tropic",				80,50,grass="default:dirt_with_grass",beach=true})
+default.register_bio({"savanna",			80,0,grass="default:dirt_with_dry_grass",beach=true})
 
-default.register_bio({"deciduous",		60,20,grass="default:dirt_with_grass",beach=true})
+default.register_bio({"deciduous",			60,20,grass="default:dirt_with_grass",beach=true})
 default.register_bio({"deciduous_grassland",	60,80,grass="default:dirt_with_grass",beach=true})
 
-default.register_bio({"coniferous",		40,20,grass="default:dirt_with_coniferous_grass",beach=true})
-default.register_bio({"coniferous_foggy",	40,80,grass="default:dirt_with_coniferous_grass",beach=true})
+default.register_bio({"coniferous",			40,20,grass="default:dirt_with_coniferous_grass",beach=true})
+default.register_bio({"coniferous_foggy",		40,80,grass="default:dirt_with_coniferous_grass",beach=true})
 
-default.register_bio({"cold_coniferous",	20,20,grass="default:dirt_with_snow",beach=true})
-default.register_bio({"cold_grassland",		20,80,grass="default:dirt_with_snow",beach=true})
+default.register_bio({"cold_coniferous",		20,20,grass="default:dirt_with_snow",beach=true,node_water_top="default:ice_clear",depth_water_top=1})
+default.register_bio({"cold_grassland",		20,80,grass="default:dirt_with_snow",beach=true,node_water_top="default:ice_clear",depth_water_top=1})
 
-default.register_bio({"tundra_green",		0,80,grass="default:dirt_with_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true})
-default.register_bio({"snowy",		10,50,grass="default:dirt_with_snow",depth_filler=0})
-default.register_bio({"tundra_red",		0,20,grass="default:dirt_with_red_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true})
-default.register_bio({"arctic",			0,50,grass="default:snow",stone="default:ice",dirt="default:ice"})
+default.register_bio({"tundra_green",		0,80,grass="default:dirt_with_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true,node_water_top="default:ice_clear",depth_water_top=4})
+default.register_bio({"snowy",				10,50,grass="default:dirt_with_snow",depth_filler=0,node_water_top="default:ice_clear",depth_water_top=4})
+default.register_bio({"tundra_red",			0,20,grass="default:dirt_with_red_permafrost_grass",dirt="default:permafrost_dirt",y_min=20,y_max=40,beach=true,node_water_top="default:ice_clear",depth_water_top=4})
+default.register_bio({"arctic",				0,50,grass="default:snow",stone="default:ice",dirt="default:ice",node_water_top="default:ice_clear",depth_water_top=20})
 
 
 --||||||||||||||||

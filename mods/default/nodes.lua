@@ -943,6 +943,17 @@ minetest.register_node("default:ice", {
 	sounds = default.node_sound_glass_defaults(),
 })
 
+minetest.register_node("default:ice_clear", {
+	description = "Clear ice",
+	tiles={"default_ice_clear.png"},
+	groups = {cracky=3,slippery=30,treasure=1,store=50},
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+})
+
 minetest.register_node("default:water_source", {
 	description = "Water source (fresh water)",
 	tiles={
