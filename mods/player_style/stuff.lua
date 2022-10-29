@@ -58,6 +58,7 @@ minetest.register_tool("player_style:matel_bottle", {
 	liquids_pointable = true,
 	inventory_image = "materials_metal_bottle.png",
 	groups = {treasure=2},
+	manual_page="player_style:matel_bottle player_style:bottle This bottles can contain water to drink\nUse them on fresh water or a barrel with water a few times to fill them up",
 	on_use=function(itemstack, user, pointed_thing)
 		local wear = itemstack:get_wear()
 		local max = 65535
@@ -165,6 +166,7 @@ minetest.register_tool("player_style:backpack", {
 	inventory_image = "player_style_backpack.png",
 	wield_scale={x=2,y=2,z=3},
 	groups={treasure=1,backpack=2,flammable=1,store=500},
+	manual_page="player_style:backpack Each backpack expands the inventory with 24 slots.\nSimply drag them to a backpack slot and choose whose content with the buttons under that appears.",
 })
 minetest.register_craft({
 	output="player_style:backpack",
