@@ -1516,8 +1516,7 @@ local qblock = function(def)
 	})
 end
 
-
-qblock({color="FF0000",store=20000,description="No hunger",manual_page="default:qblock_FF0000 default:qblock_1c7800 default:qblock_e29f00 default:qblock_800080 default:qblock_0000FF default:qblock_FFFFFF This kind of special blocks gives you abilities.\nPut in the abilities manu, and pay as you go\n\nThe abilities is:\n\n- no hunger/thirst\n- Fly as a bird: transform you to a bird, look up & jump to transform, release jump to transform back, press up to speed up\n- Fire resistance to resistance fire/lava\n- Immortal: immortal to to everything except fire/lava\n- No drowning in water\n- Light in darkness: gives you light in darkness"})
+qblock({color="FF0000",store=20000,description="No hunger",manual_page="default:qblock_FF0000 default:qblock_1c7800 default:qblock_e29f00 default:qblock_800080 default:qblock_0000FF default:qblock_FFFFFF This kind of special blocks gives you abilities.\nPut in the abilities manu, and pay as you go\n\nThe abilities is:\n\n- No hunger/thirst.\n- Fly as a bird: transform you to a bird, look up & jump to transform, release jump to transform back, press up to speed up.\n- Fire resistance: resistance to fire/lava.\n- Immortal: immortal to to everything except fire/lava.\n- No drowning in water.\n- Light in darkness: gives you some light in darkness."})
 qblock({color="1c7800",store=50000,description="Fly as a bird"})
 qblock({color="e29f00",store=30000,description="Fire resistance"})
 qblock({color="800080",store=50000,description="Immortal"})
