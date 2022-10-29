@@ -400,6 +400,7 @@ player_style.inventory=function(player)
 			.."label[13.6,7.9;"..page.."/"..pages.."]"
 
 			.."field[12.3,6.5;3,1;searchbox;;"..(invp.search and invp.search.text or "").."]"
+			.. "field_close_on_enter[searchbox;false]"
 			.."image_button[15,6.3;1,0.8;player_style_search.png;search;]"
 			..model
 			..backpack
