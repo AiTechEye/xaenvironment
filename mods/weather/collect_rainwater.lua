@@ -12,6 +12,7 @@ minetest.register_node("weather:woodenbarrel", {
 	tiles={"default_wood.png","default_wood.png","default_wood.png"},
 	groups = {choppy=3,oddly_breakable_by_hand=3,collect_rainwater=1},
 	sounds = default.node_sound_wood_defaults(),
+	manual_page="weather:woodenbarrel weather:woodenbarrel2 This barrel will be filled with rainwater during rain.\nWater that players can drink from or fill bottles.",
 	paramtype = "light",
 	sunlight_propagates = true,
 	drawtype = "nodebox",
