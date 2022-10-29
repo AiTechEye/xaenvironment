@@ -117,13 +117,16 @@ minetest.register_entity("quads:quad",{
 		elseif (self.user_name =="" or self.user_name == clicker:get_player_name()) and not player_style.player_attached[clicker:get_player_name()] then
 			self.user = clicker
 			self.user_name = clicker:get_player_name()
-			self.user:set_attach(self.object, "",{x=0, y=-10, z=0}, {x=0, y=0,z=0})
-			if minetest.get_item_group(minetest.get_node(clicker:get_pos()).name,"liquid") == 0 then
+			local user=player_style.players[self.user_name]
+
+			self.user:set_attach(self.object, "",{x=0, y=0, z=-5}, {x=0, y=0,z=0})
+			if minetest.get_item_group(minetest.get_node(clicker:get_pos()).name,"liquid") == 0 and user and user.current == "stand" then
 				self.user:set_eye_offset({x=0, y=-3, z=-3}, {x=0, y=0, z=0})
 			else
 				self.user:set_eye_offset({x=0, y=5, z=-3}, {x=0, y=0, z=0})
 			end
 			player_style.player_attached[self.user_name] = true
+			player_style.set_animation(self.user_name,"sit")
 			self.hud={
 				hp_back=clicker:hud_add({
 					hud_elem_type="statbar",
