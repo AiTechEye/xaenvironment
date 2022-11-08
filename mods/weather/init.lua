@@ -28,6 +28,38 @@ weather={
 dofile(minetest.get_modpath("weather") .. "/collect_rainwater.lua")
 dofile(minetest.get_modpath("weather") .. "/wet_stuff.lua")
 
+player_style.register_button({
+	exit=true,
+	type="image",
+	image="player_style_thirst_bar.png",
+	name="setweather",
+	info="Set Weather 100%",
+	action=function(player)
+		local c = minetest.registered_chatcommands["weather"]
+		local name = player:get_player_name()
+		if minetest.check_player_privs(player, c.privs) then
+			c.func(name,weather.strength)
+		else
+			minetest.chat_send_player(name,"The settime privilege is required")
+		end
+	end
+})
+player_style.register_button({
+	exit=true,
+	type="image",
+	image="player_style_thirst_bar.png^default_cross.png",
+	name="clearweather",
+	info="Set clear Weather",
+	action=function(player)
+		local name = player:get_player_name()
+		local c = minetest.registered_chatcommands["weather"]
+		if minetest.check_player_privs(player, c.privs) then
+			c.func(name,0)
+		else
+			minetest.chat_send_player(name,"The settime privilege is required")
+		end
+	end
+})
 
 weather.lightning=function(posA,posB)
 	local pos1,pos2
@@ -52,8 +84,6 @@ weather.lightning=function(posA,posB)
 
 		if minetest.is_protected(posn,"") then
 			return
-
-
 		elseif not default.defpos(posn,"buildable_to") then
 			nitroglycerin.explode(posn,{radius=3})
 			return
@@ -61,7 +91,6 @@ weather.lightning=function(posA,posB)
 		minetest.set_node(posn,{name="weather:lightsning"})
 	end
 end
-
 
 minetest.register_node("weather:lightsning", {
 	drawtype = "glasslike",
