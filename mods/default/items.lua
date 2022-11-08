@@ -339,7 +339,11 @@ minetest.register_craftitem("default:bucket", {
 			if item and item:get_name() ~= "" and itemstack:get_count() == 1 then
 				itemstack:replace(item)
 			elseif item and item:get_name() ~= "" then
-				user:get_inventory():add_item("main",item)
+				if user:get_inventory():room_for_item("main",item) then
+					user:get_inventory():add_item("main",item)
+				else
+					minetest.item_drop(item,user,user:get_pos())
+				end
 				itemstack:take_item()
 			end
 			return itemstack
