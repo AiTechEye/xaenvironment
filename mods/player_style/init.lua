@@ -18,9 +18,9 @@ player_style={
 	bloom = {
 		status="",
 		last="",
-		air={radius=10,intensity=0.1},
+		air={radius=16,intensity=0.05},
 		liquid={radius=16,intensity=0.6},
-		damage={radius=16,intensity=1},
+		damage={radius=16,intensity=2},
 	},
 }
 
