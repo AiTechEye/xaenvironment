@@ -257,20 +257,29 @@ examobs.get_name=function(ob)
 end
 
 examobs.genname=function(self)
-	local r=math.random(3,15)
-	local s=""
-	local rnd
-	for i=1, r do
-		rnd=math.random(1, 4)
-		if rnd==1 then
-			s=s .. string.char(math.random(97, 122))
-		elseif rnd==2 then
-			s=s .. string.char(math.random(48, 57))
-		else
-			s=s .. string.char(math.random(65, 90))
+	local a = "eyuioa"
+	local b = "qwrtpsdfghjklzxcvbnm"
+	local name = ""
+	local r
+
+	for i=1,math.random(1,5) do
+		r = math.random(1,6)
+		name = name .. a:sub(r,r)
+		if i == 1 and math.random(1,5) <= 3 then
+			name = string.upper(name)
+		end
+		if math.random(1,3) == 1 then
+			r = math.random(1,6)
+			name = name .. a:sub(r,r)
+		end
+		r = math.random(1,20)
+		name = name .. b:sub(r,r)
+		if math.random(1,3) == 1 then
+			r = math.random(1,20)
+			name = name .. b:sub(r,r)
 		end
 	end
-	self.storage.npcname = s
+	self.storage.npcname = name
 end
 
 examobs.chat_find_item=function(self,msg)
