@@ -1,4 +1,8 @@
 weather={
+	can_be_wet_nodes={},	--used to find nodes
+	is_wet_nodes={},			--used to find nodes
+	wet_nodes={},			--replace nodes
+	weter_nodes={},			--repalce nodes
 	mintimeout=200,
 	maxtimeout=1000,
 	players={},
@@ -22,6 +26,8 @@ weather={
 }
 
 dofile(minetest.get_modpath("weather") .. "/collect_rainwater.lua")
+dofile(minetest.get_modpath("weather") .. "/wet_stuff.lua")
+
 
 weather.lightning=function(posA,posB)
 	local pos1,pos2
