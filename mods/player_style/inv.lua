@@ -158,7 +158,6 @@ player_style.inventory=function(player)
 		invp.backpacki = m:get_int("backpackindex")
 		invp.backcraft = m:get_int("backcraftlistring")
 
-
 		for i=1,4 do
 			invp["backpackslot"..i] = minetest.create_detached_inventory("backpackslot"..i, {
 				allow_put = function(inv, listname, index, stack, player)
@@ -312,19 +311,20 @@ player_style.inventory=function(player)
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[4,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
-		..player_style.buttons.text
-		.."scroll_container_end[scrollbar]"
+	..player_style.buttons.text
+	.."scroll_container_end[scrollbar]"
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
 		player:set_inventory_formspec(
 			"size[12,8]" 
 			.."listcolors[#77777777;#777777aa;#000000ff]"
-			.."list[current_player;main;4,3;8,4;]"
+			.."list[current_player;main;4,3.2;8,4;]"
 			.."list[current_player;craft;8,0;3,3;]"
 			.."list[current_player;craftpreview;11,1;1,1;]"
 			.."item_image[11,0;1,1;player_style:top_hat]"
 			.."list[detached:hat;main;11,0;1,1;]"
+			.."tooltip[11,0;1,1;Hats]"
 			.."listring[current_player;main]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[7,2;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[7,2;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 			..model
@@ -356,7 +356,7 @@ player_style.inventory=function(player)
 
 		local itemlist = invp.search and invp.search.items or player_style.inventory_items
 		local pages = math.floor(#itemlist/player_style.players[name].inv.size)
-		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)
+		local page = math.floor(player_style.players[name].inv.index/player_style.players[name].inv.size)+1
 		local itembutts = ""
 		local x=12
 		local y=0
@@ -375,28 +375,31 @@ player_style.inventory=function(player)
 		player:set_inventory_formspec(
 			"size[16,8]" 
 			.."listcolors[#77777777;#777777aa;#000000ff]"
-			.."list[current_player;main;4,3;8,4;]"
+			.."list[current_player;main;4,3.2;8,4;]"
 			.."list[current_player;craft;8,0;3,3;]"
 			.."list[current_player;craftpreview;11,1;1,1;]"
 
 			.."item_image[11,0;1,1;player_style:top_hat]"
 
 			.."list[detached:hat;main;11,0;1,1;]"
+			.."tooltip[11,0;1,1;Hats]"
 
 			.."listring[current_player;main]"
-			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[7,2;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[7,2;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[7,2;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[7,2;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 
 			..buttons
 
-			.."image_button[12,7;1,1;default_crafting_arrowleft.png;creinvleft;]"
-			.."image_button[13,7;1,1;default_crafting_arrowright.png;creinvright;]"
-			.."image_button[14,7;1,1;synth_repeat.png;reset;]"
-			.."image_button[15,7;1,1;default_bucket.png;clean;]"
+			.."image_button[13,7;1,1;default_crafting_arrowleft.png;creinvleft;]"
+			.."image_button[14,7;1,1;default_crafting_arrowright.png;creinvright;]"
+			.."image_button[15,7;1,1;synth_repeat.png;reset;]"
+			.."image_button[12,7;1,1;default_bucket.png;clean;]"
+
 			.."tooltip[creinvleft;Back]"
 			.."tooltip[creinvright;Forward]"
-			.."tooltip[reset;Reset]"
-			.."tooltip[clean;Clean your inventory]"
+			.."tooltip[reset;Reset search]"
+			.."tooltip[clean;Clear inventory]"
 			.."image[11,2;1,1;default_bucket.png]list[detached:deleteslot;main;11,2;1,1;]"
+			.."tooltip[11,2;1,1;Destroy item]"
 			.."label[13.6,7.9;"..page.."/"..pages.."]"
 
 			.."field[12.3,6.5;3,1;searchbox;;"..(invp.search and invp.search.text or "").."]"
