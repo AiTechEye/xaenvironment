@@ -329,12 +329,16 @@ minetest.register_craftitem("default:bucket", {
 			elseif no then
 				item = ItemStack(no)
 				minetest.remove_node(p.under)
+			else
+				local d = minetest.registered_items[nn.name]
+				if d and d.on_bucket then
+					item = d.on_bucket(p.under,itemstack, user)
+				end
 			end
 
 			if item and item:get_name() ~= "" and itemstack:get_count() == 1 then
 				itemstack:replace(item)
 			elseif item and item:get_name() ~= "" then
-
 				user:get_inventory():add_item("main",item)
 				itemstack:take_item()
 			end

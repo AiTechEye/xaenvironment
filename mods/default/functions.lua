@@ -848,11 +848,38 @@ default.registry_bucket=function(node_name)
 		inventory_image = tex .. "^default_alpha_bucket.png^[makealpha:0,255,0",
 		groups = {bucket=1,bucket_water=minetest.get_item_group(node_name,"water") > 0 and 1 or nil},
 		liquids_pointable = true,
+		on_usess = function(itemstack, user, pointed_thing) 
+			local d = minetest.registered_tools[minetest.get_node(pointed_thing.under).name]
+			local item
+			if d and d.on_bucket then
+				item = d.on_bucket(pointed_thing.under,itemstack, user)
+			end
+
+			if item and item:get_name() ~= "" and itemstack:get_count() == 1 then
+				itemstack:replace(item)
+			elseif item and item:get_name() ~= "" then
+				user:get_inventory():add_item("main",item)
+				itemstack:take_item()
+			end
+			return itemstack
+		end,	
 		on_place = function(itemstack, user, pointed_thing)
 			local p = pointed_thing
 			local n = user:get_player_name()
 			if p.type == "node" then
 				local no = minetest.get_node(p.under)
+
+				if not minetest.is_protected(p.under,n) then
+					local d = minetest.registered_items[no.name]
+					if d and d.on_bucket_add then
+						local item = d.on_bucket_add(pointed_thing.under,itemstack, user)
+						if item then
+							itemstack:replace(item)
+							return itemstack
+						end
+					end
+				end
+
 				if default.defpos(p.under,"buildable_to") and not minetest.is_protected(p.under,n) then
 					minetest.set_node(p.under,{name=node_name})
 				elseif (no.name == "default:tankstorage" or no.name == tan) and no.param2 < 56 then
