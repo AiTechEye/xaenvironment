@@ -670,6 +670,9 @@ default.node_sound_sand_defaults()
 default.tool_breaks_defaults(a)				-- itemdef tool break sound
 
 
+add to nodedef / functions
+#	on_bucket(pos,itemstack, user)			-- use bucket on node, return itemstack that will be repalced
+#	on_bucket_add(pos,itemstack, user)	-- same as above
 
 
 Mobs ##########################################################
