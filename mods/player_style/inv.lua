@@ -293,7 +293,7 @@ player_style.inventory=function(player)
 	end
 	for i=1,4 do
 		if invp.backpacki ~= i and minetest.get_item_group(invp["backpackslot"..i]:get_stack("main",1):get_name(),"backpack") > 0 then
-			backpack = backpack .. "image_button["..(i-1)..",0.6;1,0.5;default_stone.png;backpack"..i..";"..i.."]"
+			backpack = backpack .. "button["..(i-1)..",0.8;1,0.2;backpack"..i..";"..i.."]"
 		end
 
 		backpack = backpack
@@ -308,6 +308,7 @@ player_style.inventory=function(player)
 		adds = adds .. v
 	end
 
+	local coins = "label[4,-0.3;"..minetest.colorize("#FFFF00",Getcoin(player)).."]"
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[4,0;2,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
@@ -330,6 +331,7 @@ player_style.inventory=function(player)
 			..model
 			..buttons
 			..backpack
+			..coins
 			..adds
 		)
 	else
@@ -407,6 +409,7 @@ player_style.inventory=function(player)
 			..model
 			..backpack
 			..itembutts
+			..coins
 			..adds
 		)
 	end
