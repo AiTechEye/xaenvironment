@@ -284,7 +284,7 @@ player_style.inventory=function(player)
 	local backpack = ""
 
 	if invp.backpacki ~= 0 and minetest.get_item_group(invp["backpackslot"..invp.backpacki]:get_stack("main",1):get_name(),"backpack") > 0 then
-		backpack = "list[detached:backpack;main;0,1;4,7;]listring[current_player;main]listring[detached:backpack;main]" or ""
+		backpack = "list[detached:backpack;main;0,1.2;4,6;]listring[current_player;main]listring[detached:backpack;main]" or ""
 		local list = {}
 		for i,v in pairs(minetest.deserialize(player:get_meta():get_string("backpack"..invp.backpacki) or "") or {}) do
 			list[i]=ItemStack(v)
@@ -309,7 +309,7 @@ player_style.inventory=function(player)
 	end
 
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
-	local model = "model[4,0;3,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
+	local model = "model[4,0;2,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
 	..player_style.buttons.text
 	.."scroll_container_end[scrollbar]"
@@ -322,11 +322,11 @@ player_style.inventory=function(player)
 			.."list[current_player;main;4,3.2;8,4;]"
 			.."list[current_player;craft;8,0;3,3;]"
 			.."list[current_player;craftpreview;11,1;1,1;]"
-			.."item_image[11,0;1,1;player_style:top_hat]"
-			.."list[detached:hat;main;11,0;1,1;]"
-			.."tooltip[11,0;1,1;Hats]"
+			.."item_image[6,0;1,1;player_style:top_hat]"
+			.."list[detached:hat;main;6,0;1,1;]"
+			.."tooltip[6,0;1,1;Hats]"
 			.."listring[current_player;main]"
-			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[7,2;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[7,2;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 			..model
 			..buttons
 			..backpack
@@ -379,13 +379,12 @@ player_style.inventory=function(player)
 			.."list[current_player;craft;8,0;3,3;]"
 			.."list[current_player;craftpreview;11,1;1,1;]"
 
-			.."item_image[11,0;1,1;player_style:top_hat]"
-
-			.."list[detached:hat;main;11,0;1,1;]"
-			.."tooltip[11,0;1,1;Hats]"
+			.."item_image[6,0;1,1;player_style:top_hat]"
+			.."list[detached:hat;main;6,0;1,1;]"
+			.."tooltip[6,0;1,1;Hats]"
 
 			.."listring[current_player;main]"
-			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[7,2;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[7,2;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 
 			..buttons
 
