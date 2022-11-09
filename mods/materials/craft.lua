@@ -236,3 +236,43 @@ minetest.register_craft({
 		{"default:carbon_lump","quads:bottle_with_oil","default:gravel"},
 	}
 })
+
+minetest.register_craft({
+	output="materials:shelf",
+	recipe={
+		{"group:wood","group:wood","group:wood"},
+		{"materials:wood_tabletop","materials:wood_tabletop","materials:wood_tabletop"},
+		{"group:wood","group:wood","group:wood"},
+	}
+})
+
+minetest.register_craft({
+	output="materials:wood_tabletop",
+	recipe={
+		{"materials:wood_tabletop4"},
+	}
+})
+minetest.register_craft({
+	output="materials:wood_tabletop 3",
+	recipe={
+		{"group:wood","group:wood","group:wood"},
+	}
+})
+minetest.register_craft({
+	output="materials:wood_tabletop2",
+	recipe={
+		{"materials:wood_tabletop"},
+	}
+})
+minetest.register_craft({
+	output="materials:wood_tabletop3",
+	recipe={
+		{"materials:wood_tabletop2"},
+	}
+})
+minetest.register_craft({
+	output="materials:wood_tabletop4",
+	recipe={
+		{"materials:wood_tabletop3"},
+	}
+})

@@ -623,3 +623,111 @@ minetest.register_node("materials:slime", {
 	post_effect_color = {a=60,r=0,g=150,b=0},
 	groups = {crumbly = 1, fall_damage_add_percent=-100,bouncy=99},
 })
+
+minetest.register_node("materials:shelf", {
+	description = "Shelf",
+	tiles={"default_wood.png"},
+	groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,used_by_npc=1,treasure=1,exatec_tube_connected=1},
+	sounds = default.node_sound_wood_defaults(),
+	drawtype = "nodebox",
+	paramtype2 = "facedir",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.25, 0.5, -0.4375, 0.5},
+			{-0.5, -0.5, 0.4375, 0.5, 0.5, 0.5},
+			{-0.5, 0.4375, -0.25, 0.5, 0.5, 0.5},
+			{0.4375, -0.5, -0.25, 0.5, 0.5, 0.5},
+			{-0.5, -0.5, -0.25, -0.4375, 0.5, 0.5},
+			{-0.4375, 0, -0.25, 0.4375, 0.0625, 0.4375},
+		}
+	},
+	exatec={
+		input_list="main",
+		output_list="main",
+	},
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 32)
+		m:set_string("infotext","Wooden box")
+		m:set_string("formspec",
+			"size[8,8]listcolors[#77777777;#777777aa;#000000ff]" ..
+			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
+			"list[current_player;main;0,4.2;8,4;]" ..
+			"listring[current_player;main]" ..
+			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+		)
+	end,
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end
+})
+
+minetest.register_node("materials:wood_tabletop", {
+	description = "Wood tabletop",
+	tiles={"default_wood.png"},
+	groups = {wood=1,cracky=3,flammable=1,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+		}
+	},
+})
+
+minetest.register_node("materials:wood_tabletop2", {
+	description = "Wood tabletop (3/4)",
+	tiles={"default_wood.png"},
+	groups = {wood=1,cracky=3,flammable=1,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.3},
+		}
+	},
+})
+
+minetest.register_node("materials:wood_tabletop3", {
+	description = "Wood tabletop (2/4)",
+	tiles={"default_wood.png"},
+	groups = {wood=1,cracky=3,flammable=1,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0},
+		}
+	},
+})
+
+minetest.register_node("materials:wood_tabletop4", {
+	description = "Wood tabletop (1/4)",
+	tiles={"default_wood.png"},
+	groups = {wood=1,cracky=3,flammable=1,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, -0.2},
+		}
+	},
+})
