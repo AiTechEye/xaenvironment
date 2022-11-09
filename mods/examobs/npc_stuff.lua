@@ -262,7 +262,7 @@ examobs.genname=function(self)
 	local name = ""
 	local r
 
-	for i=1,math.random(1,5) do
+	for i=1,math.random(1,4) do
 		r = math.random(1,6)
 		name = name .. a:sub(r,r)
 		if i == 1 and math.random(1,5) <= 3 then
