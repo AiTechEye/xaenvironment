@@ -37,7 +37,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				store.sell = store.sell == false
 				player_style.store(player)
 				return
-			elseif pressed.search then
+			elseif pressed.search or pressed.key_enter_field == "searchbox" then
 				local its = {}
 				local s = pressed.searchbox:lower()
 				for i,it in pairs(player_style.store_items) do
@@ -194,6 +194,7 @@ player_style.store=function(player)
 
 			.."label[7.6,9.9;"..page.."/"..pages.."]"
 			.."field[4,7.3;3,1;searchbox;;"..(store.search and store.search.text or "").."]"
+			.."field_close_on_enter[searchbox;false]"
 			.."image_button[3.2,7.1;0.8,0.8;player_style_search.png;search;]"
 			..itembutts
 		)
