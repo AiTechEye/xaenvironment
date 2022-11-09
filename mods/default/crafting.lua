@@ -95,6 +95,7 @@ default.workbench.set_form=function(pos,add)
 			"image_button[3.6,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
 			"image_button[4.3,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
 			"field[0,4.8;2.5,1;searchbox;;"..meta:get_string("search_text").."]"..
+			"field_close_on_enter[searchbox;false]"..
 			"image_button[2,4.5;" .. but_size ..";player_style_search.png;search;]" ..
 			"image_button[2.8,4.5;" .. but_size ..";synth_repeat.png;reset;]" ..
 			"image_button[5.3,4.5;" .. but_size ..";default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]" ..
@@ -117,6 +118,7 @@ default.workbench.set_form=function(pos,add)
 		"image_button[3,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
 		"image_button[3.5,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
 		"field[0,3.5;2.5,0.5;searchbox;;"..meta:get_string("search_text").."]"..
+		"field_close_on_enter[searchbox;false]"..
 		"image_button[2,3;0.7,0.7;player_style_search.png;search;]" ..
 		"image_button[2.5,3;0.7,0.7;synth_repeat.png;reset;]" ..
 		"image_button[3.5,3.5;0.7,0.7;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]" ..
@@ -149,7 +151,7 @@ local on_receive_fields=function(pos, formname, pressed, sender)
 			meta:set_int("page",1)
 			default.workbench.set_form(pos)
 			return
-		elseif pressed.search then
+		elseif pressed.search or pressed.key_enter_field == "searchbox" then
 			local its = {}
 			local s = pressed.searchbox:lower()
 			for i,it in pairs(default.workbench.items_list) do
