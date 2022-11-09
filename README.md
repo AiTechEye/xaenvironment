@@ -1,10 +1,10 @@
 ![Alt text](screenshot.png)
 
-# XaEnvironment V11.06
+# XaEnvironment V11.08
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
-## Compatible for minetest 5.4
+## Compatible for minetest 5.6
 
 [Releases](https://github.com/AiTechEye/xaenvironment/releases)  
 [Minetest forum topic](https://forum.minetest.net/viewtopic.php?f=15&t=22340)  
