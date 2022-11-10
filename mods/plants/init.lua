@@ -1199,19 +1199,3 @@ minetest.register_node("plants:candytree_spawner", {
 		end
 	end
 })
-
-minetest.register_decoration({
-	deco_type = "simple",
-	place_on = {"group:spreading_dirt_type"},
-	sidelen = 16,
-	noise_params = {
-		offset = 0.003,
-		scale = 0.005,
-		spread = {x = 200, y = 200, z = 200},
-		octaves = 3,
-		persist = 0.6
-	},
-	y_min = -20,
-	y_max = 100,
-	decoration = "plants:rock_spawner",
-})
