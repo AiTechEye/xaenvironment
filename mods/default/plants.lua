@@ -268,6 +268,24 @@ default.register_plant=function(def)
 	def.selection_box = def.selection_box or		{type="fixed",fixed={-0.25,-0.5,-0.25,0.25,0.25,0.25}}
 	def.dye_colors = def.dye_colors or			{palette=90}
 	table.insert(default.registered_plants,mod .. def.name)
+
+
+	if def.on_load == nil and def.on_construct == nil and def.drawtype == "plantlike" then
+		def.groups.on_load = 1
+		def.paramtype2 = def.paramtype2 or "meshoptions"
+		def.on_construct = function(pos)
+			minetest.registered_nodes[def.name].on_load(pos)
+		end
+		def.on_load = function(pos)
+			local n = minetest.get_node(pos)
+			if n.param2 == 0 then
+				local r2 = {8,16,32}
+				n.param2 = math.random(0,4) + r2[math.random(1,3)]
+				minetest.swap_node(pos,n)
+			end
+		end
+	end
+
 	minetest.register_node(mod .. def.name, def)
 
 	if def.decoration == false then
