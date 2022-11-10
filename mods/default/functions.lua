@@ -583,6 +583,7 @@ default.registry_mineral=function(def)
 		def.drop = def.drop.name
 	end
 --ingot
+
 	if not def.not_ingot then
 		def.ingot = def.ingot or {}
 		def.dropingot = mod .. def.name .. "_ingot"
@@ -829,6 +830,20 @@ default.registry_mineral=function(def)
 		for _,c in pairs(def.additional_craft) do
 			minetest.register_craft(c)
 		end
+	end
+
+--armchair
+	if def.armchair then
+		default.register_chair({
+			name=def.name,
+			armchair=true,
+			texture = def.texture,
+			craft={
+				{"materials:piece_of_cloth","materials:piece_of_cloth","default:wool"},
+				{"default:wool",(type(def.armchair) == "string" and def.armchair) or def.drop and def.drop.name or def.drop or def.ingot or def.dropingot ,"default:wool"},
+				{"group:stick","group:wood","group:stick"}
+			}
+		})
 	end
 end
 

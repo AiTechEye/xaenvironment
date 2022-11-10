@@ -138,6 +138,7 @@ minetest.register_craftitem("default:micro_gold_flake", {
 
 default.registry_mineral({
 	name="amber",
+	armchair = true,
 	texture="default_amberblock.png",
 	not_pick=true,
 	not_axe=true,
@@ -417,6 +418,7 @@ default.register_chest({
 
 default.registry_mineral({
 	name="clay",
+	armchair = true,
 	texture="default_snow.png^[colorize:#5556",
 	not_ingot=true,
 	not_pick=true,
@@ -502,6 +504,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="coal",
+	armchair = true,
 	texture="default_coalblock.png",
 	not_pick=true,
 	not_axe=true,
@@ -574,6 +577,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="copper",
+	armchair = true,
 	texture="default_copperblock.png",
 	ingot={groups={treasure=1,store=500}},
 	ore_settings={
@@ -645,6 +649,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="bronze",
+	armchair = true,
 	texture="default_bronzeblock.png",
 	not_ore = true,
 	arrow={damage=4,groups={treasure=1}},
@@ -699,6 +704,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="iron",
+	armchair = true,
 	texture="default_ironblock.png",
 	lump={inventory_image="default_lump_iron.png"},
 	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
@@ -849,6 +855,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="gold",
+	armchair = true,
 	texture="default_goldblock.png",
 	not_pick=true,
 	not_axe=true,
@@ -869,6 +876,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="silver",
+	armchair = true,
 	texture="default_silverblock.png",
 	not_pick=true,
 	not_axe=true,
@@ -889,6 +897,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="amethyst",
+	armchair = true,
 	texture="default_amethystblock.png",
 	drop={inventory_image="quartz",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -940,6 +949,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="peridot",
+	armchair = true,
 	texture="default_peridotblock.png",
 	drop={inventory_image="longcrystal",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -991,6 +1001,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="jadeite",
+	armchair = true,
 	texture="default_jadeiteblock.png",
 	drop={inventory_image="round",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -1042,6 +1053,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="taaffeite",
+	armchair = true,
 	texture="default_taaffeiteblock.png",
 	drop={inventory_image="tinemeald",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -1093,6 +1105,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="opal",
+	armchair = true,
 	texture="default_opalblock.png",
 	drop={inventory_image="oval",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -1144,6 +1157,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="ruby",
+	armchair = true,
 	texture="default_rubyblock.png",
 	drop={inventory_image="crystal",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -1195,6 +1209,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="zirconia",
+	armchair = true,
 	texture="default_zirconiablock.png",
 	drop={inventory_image="emeald",groups={treasure=4,store=1100}},
 	block={groups={cracky=1}},
@@ -1246,6 +1261,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="diamond",
+	armchair = true,
 	texture="default_diamondblock.png",
 	drop={inventory_image="diamond",groups={treasure=3,store=900}},
 	block={groups={cracky=1}},
@@ -1354,6 +1370,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="electric",
+	armchair = true,
 	texture="default_electricblock.png",
 	not_ingot=true,
 	not_pick=true,
@@ -1430,6 +1447,7 @@ default.registry_mineral({
 
 default.registry_mineral({
 	name="uraniumactive",
+	armchair = "default:uraniumactive_ingot",
 	texture="default_uraniumactiveblock.png",
 	not_lump=true,
 	not_ore=true,

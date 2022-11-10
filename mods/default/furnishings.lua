@@ -196,31 +196,39 @@ default.register_chair=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	local name = mod .. def.name .. "_chair"
 	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chair=1,used_by_npc=1}
-
+	local ypos = -0.2
 	groups.flammable = def.burnable and 1 or nil
 
-	minetest.register_node(name,{
-		description = def.description or uname .. " chair",
-		groups = groups,
-		drawtype="nodebox",
-		paramtype="light",
-		paramtype2 = "facedir",
-		use_texture_alpha = def.use_texture_alpha or "opaque",
-		tiles = {def.texture},
-		paramtype = "light",
-		sounds = def.sounds or default.node_sound_wood_defaults(),
-		selection_box={
+	if def.armchair then
+		ypos = -0.4
+		name = mod .. def.name .. "_armchair"
+		def.description = uname .. " armchair"
+		groups.flammable = 3
+		def.texture = def.texture or "default_wool.png^[colorize:#000000cc"
+		def.node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.4375, -0.4375, -0.3125, 0.4375, 0, 0.5},
+				{-0.3125, 0, 0.25, 0.3125, 0.5, 0.5},
+				{-0.3125, -0.25, -0.375, 0.3125, 0, -0.3125},
+				{0.3125, 0, -0.3125, 0.5, 0.1875, 0.5},
+				{-0.5, 0, -0.3125, -0.3125, 0.1875, 0.5},
+				{-0.375, -0.5, -0.25, 0.375, -0.4375, 0.4375},
+			}
+		}
+	else
+		def.selection_box={
 			type="fixed",
 			fixed={-0.3125, -0.5, -0.3125, 0.3125, 0.5, 0.3125}
-		},
-		collision_box={
+		}
+		def.collision_box={
 			type="fixed",
 			fixed={
 				{-0.3125, -0.5, -0.3125, 0.3125, -0.0625, 0.3125},
 				{-0.3125, -0.5, 0.1875, -0.1875, 0.5, 0.3125}
 			}
-		},
-		node_box = {
+		}
+		def.node_box = {
 			type = "fixed",
 			fixed = {
 				{-0.3125, -0.5, 0.1875, -0.1875, 0.5, 0.3125},
@@ -234,11 +242,26 @@ default.register_chair=function(def)
 				{-0.29, -0.4375, -0.3125, -0.23, -0.375, 0.3125},
 				{-0.29, -0.4375, -0.0315, 0.29, -0.375, 0.031},
 			}
-		},
+		}
+	end
+
+	minetest.register_node(name,{
+		description = def.description or uname .. " chair",
+		groups = groups,
+		drawtype="nodebox",
+		paramtype="light",
+		paramtype2 = "facedir",
+		use_texture_alpha = def.use_texture_alpha or "opaque",
+		tiles = {def.texture},
+		paramtype = "light",
+		sounds = def.sounds or default.node_sound_wood_defaults(),
+		node_box = def.node_box,
+		collision_box = def.collision_box,
+		selection_box = def.selection_box,
 		on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-			local v=player:get_player_velocity()
+			local v=player:get_velocity()
 			if v.x~=0 or v.y~=0 or v.z~=0 then return end
-			player:set_pos({x=pos.x,y=pos.y-0.2,z=pos.z})
+			player:set_pos({x=pos.x,y=pos.y+ypos,z=pos.z})
 			local pname=player:get_player_name()
 			if default.player_attached[pname] then
 				player:set_physics_override(1, 1, 1)
@@ -248,7 +271,7 @@ default.register_chair=function(def)
 					default.player_set_animation(player, "stand")
 				end,player,pname)
 			else
-				local v = player:get_player_velocity()
+				local v = player:get_velocity()
 					if math.abs(v.x)+math.abs(v.z) > 0 then
 					return
 				end
