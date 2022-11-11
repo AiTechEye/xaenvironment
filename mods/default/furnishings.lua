@@ -191,6 +191,129 @@ default.register_door=function(def)
 	end
 end
 
+default.register_couch=function(def)
+	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
+	local mod = minetest.get_current_modname() ..":"
+	local name = mod .. def.name .. "_couch"
+	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chair=1,used_by_npc=1}
+	groups.flammable = def.burnable and 1 or nil
+
+	local couchsi = {"left","right","middle","corner"}
+	local couchs = {
+		left = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, -0.5, -0.3125, 0.25, 0.5},
+			{-0.3125, 0, 0.25, 0.5, 0.5, 0.5},
+		},
+		right = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{0.3125, 0, -0.5, 0.5, 0.25, 0.5},
+			{-0.5, 0, 0.25, 0.3125, 0.5, 0.5},
+		},
+		middle = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, 0.25, 0.5, 0.5, 0.5},
+		},
+		corner = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, 0.25, 0.5, 0.5, 0.5},
+			{0.25, 0, -0.5, 0.5, 0.5, 0.25},
+		}
+	}
+
+	for i,v in ipairs(couchsi) do
+		minetest.register_node(name.."_"..v, {
+			description = uname .. " couch "..v.." (rightclick to change in 5s)",
+			tiles = {def.texture},
+			drop = name.."_left",
+			groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,not_in_creative_inventory= i > 1 and 1 or nil},
+			drawtype = "nodebox",
+			paramtype = "light",
+			paramtype2 = "facedir",
+			use_texture_alpha = def.use_texture_alpha or "opaque",
+			sounds = def.sounds or default.node_sound_wood_defaults(),
+			node_box = {
+				type = "fixed",
+				fixed = couchs[v]
+			},
+			can_dig = function(pos, player)
+				for _, ob in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+					return false
+				end
+				return true
+			end,
+			on_construct=function(pos)
+				minetest.get_node_timer(pos):start(5)
+				local meta=minetest.get_meta(pos)
+				meta:set_int("n",20)
+				meta:set_int("y",0)
+			end,
+			on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+				if minetest.get_meta(pos):get_int("timeout") == 0 then
+					minetest.swap_node(pos,{name=name.."_"..(couchsi[i+1] and couchsi[i+1] or couchsi[1]),param2=node.param2})
+					minetest.get_node_timer(pos):start(5)
+				else
+					local v=player:get_velocity()
+					if v.x~=0 or v.y~=0 or v.z~=0 then
+						return
+					end
+					player:set_pos({x=pos.x,y=pos.y-0.3,z=pos.z})
+					local pname=player:get_player_name()
+					if default.player_attached[pname] then
+						player:set_physics_override(1, 1, 1)
+						minetest.after(0.3, function(player,pname)
+							player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
+							default.player_attached[pname]=nil
+							default.player_set_animation(player, "stand")
+						end,player,pname)
+					else
+						local v = player:get_velocity()
+						if math.abs(v.x)+math.abs(v.z) > 0 then
+							return
+						end
+						player:set_physics_override(0, 0, 0)
+						minetest.after(0.3, function(player,pname)
+							player:set_eye_offset({x=0,y=-2,z=2}, {x=0,y=0,z=0})
+							default.player_attached[pname]=true
+							default.player_set_animation(player, "sit")
+						end,player,pname)
+					end
+				end
+			end,
+			on_timer = function (pos, elapsed)
+				minetest.get_meta(pos):set_int("timeout",1)
+				minetest.get_meta(pos):set_int("placed",1)
+			end,
+			on_blast=function(pos)
+				for _, player in ipairs(minetest.get_objects_inside_radius(pos,1)) do
+					if player:is_player() then
+						local pname=player:get_player_name()
+						player:set_physics_override(1, 1, 1)
+						minetest.after(0.3, function(player,pname)
+							player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
+							default.player_attached[pname]=nil
+							default.player_set_animation(player, "stand")
+						end,player,pname)
+					end
+				end
+			end,
+		})
+	end
+
+	minetest.register_craft({
+		output = name.."_left",
+		recipe = def.craft
+	})
+
+	if def.burnable then
+		minetest.register_craft({
+			type = "fuel",
+			recipe = name,
+			burntime = 10,
+		})
+	end
+end
+
 default.register_chair=function(def)
 	local uname = def.name.upper(string.sub(def.name,1,1)) .. string.sub(def.name,2,string.len(def.name))
 	local mod = minetest.get_current_modname() ..":"
@@ -198,6 +321,12 @@ default.register_chair=function(def)
 	local groups = def.groups or {choppy = 2, oddly_breakable_by_hand = 2,chair=1,used_by_npc=1}
 	local ypos = -0.2
 	groups.flammable = def.burnable and 1 or nil
+
+	if def.couch then
+		local def2 = table.copy(def)
+		def2.craft = def.couch_craft
+		default.register_couch(def2)
+	end
 
 	if def.armchair then
 		ypos = -0.4
@@ -272,7 +401,7 @@ default.register_chair=function(def)
 				end,player,pname)
 			else
 				local v = player:get_velocity()
-					if math.abs(v.x)+math.abs(v.z) > 0 then
+				if math.abs(v.x)+math.abs(v.z) > 0 then
 					return
 				end
 				player:set_physics_override(0, 0, 0)

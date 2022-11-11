@@ -837,12 +837,18 @@ default.registry_mineral=function(def)
 		default.register_chair({
 			name=def.name,
 			armchair=true,
+			couch = true,
 			texture = def.texture,
 			craft={
 				{"materials:piece_of_cloth","materials:piece_of_cloth","default:wool"},
 				{"default:wool",(type(def.armchair) == "string" and def.armchair) or def.drop and def.drop.name or def.drop or def.ingot or def.dropingot ,"default:wool"},
 				{"group:stick","group:wood","group:stick"}
-			}
+			},
+			couch_craft={
+				{"materials:piece_of_cloth","materials:piece_of_cloth","default:wool"},
+				{"default:wool",(type(def.armchair) == "string" and def.armchair) or def.drop and def.drop.name or def.drop or def.ingot or def.dropingot ,"default:wool"},
+				{"default:wool","default:wool","default:wool"}
+			},
 		})
 	end
 end
