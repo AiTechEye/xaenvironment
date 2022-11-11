@@ -260,7 +260,7 @@ default.register_couch=function(def)
 					player:set_pos({x=pos.x,y=pos.y-0.3,z=pos.z})
 					local pname=player:get_player_name()
 					if default.player_attached[pname] then
-						player:set_physics_override(1, 1, 1)
+						player:set_physics_override({speed=1,jump=1,gravity=1})
 						minetest.after(0.3, function(player,pname)
 							player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 							default.player_attached[pname]=nil
@@ -271,7 +271,7 @@ default.register_couch=function(def)
 						if math.abs(v.x)+math.abs(v.z) > 0 then
 							return
 						end
-						player:set_physics_override(0, 0, 0)
+						player:set_physics_override({speed=0,jump=0,gravity=0})
 						minetest.after(0.3, function(player,pname)
 							player:set_eye_offset({x=0,y=-2,z=2}, {x=0,y=0,z=0})
 							default.player_attached[pname]=true
@@ -288,7 +288,7 @@ default.register_couch=function(def)
 				for _, player in ipairs(minetest.get_objects_inside_radius(pos,1)) do
 					if player:is_player() then
 						local pname=player:get_player_name()
-						player:set_physics_override(1, 1, 1)
+						player:set_physics_override({speed=1,jump=1,gravity=1})
 						minetest.after(0.3, function(player,pname)
 							player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 							default.player_attached[pname]=nil
@@ -393,7 +393,7 @@ default.register_chair=function(def)
 			player:set_pos({x=pos.x,y=pos.y+ypos,z=pos.z})
 			local pname=player:get_player_name()
 			if default.player_attached[pname] then
-				player:set_physics_override(1, 1, 1)
+				player:set_physics_override({speed=1,jump=1,gravity=1})
 				minetest.after(0.3, function(player,pname)
 					player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 					default.player_attached[pname]=nil
@@ -404,7 +404,7 @@ default.register_chair=function(def)
 				if math.abs(v.x)+math.abs(v.z) > 0 then
 					return
 				end
-				player:set_physics_override(0, 0, 0)
+				player:set_physics_override({speed=0,jump=0,gravity=0})
 				minetest.after(0.3, function(player,pname)
 					player:set_eye_offset({x=0,y=-2,z=2}, {x=0,y=0,z=0})
 					default.player_attached[pname]=true
@@ -427,7 +427,7 @@ default.register_chair=function(def)
 			for _, player in ipairs(minetest.get_objects_inside_radius(pos,1)) do
 				if player:is_player() then
 					local pname=player:get_player_name()
-					player:set_physics_override(1, 1, 1)
+					player:set_physics_override({speed=1,jump=1,gravity=1})
 					minetest.after(0.3, function(player,pname)
 						player:set_eye_offset({x=0,y=0,z=0}, {x=0,y=0,z=0})
 						default.player_attached[pname]=nil
