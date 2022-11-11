@@ -276,3 +276,12 @@ minetest.register_craft({
 		{"materials:wood_tabletop3"},
 	}
 })
+
+minetest.register_craft({
+	output="materials:fridge 2",
+	recipe={
+		{"materials:fanblade_metal","default:steel_ingot","default:steel_ingot"},
+		{"materials:diode","materials:metal_beam","default:steel_ingot"},
+		{"materials:gear_metal","default:steel_ingot","default:steel_ingot"},
+	}
+})
