@@ -24,9 +24,9 @@ minetest.register_node("materials:wood_table", {
 	end,
 	on_timer = function (pos, elapsed)
 		minetest.get_meta(pos):set_int("timeout",1)
-	end,
-
+	end
 })
+
 minetest.register_node("materials:wood_table_center_leg", {
 	description = "Wooden table center leg",
 	tiles = {"plants_apple_wood.png"},
@@ -735,7 +735,7 @@ minetest.register_node("materials:wood_tabletop4", {
 minetest.register_node("materials:fridge", {
 	description = "Fridge",
 	tiles={"default_steelblock.png"},
-	groups = {cracky=2,used_by_npc=1,treasure=1,exatec_tube_connected=1},
+	groups = {cracky=2,used_by_npc=1,treasure=1,exatec_tube_connected=1,store=2000},
 	sounds = default.node_sound_metal_defaults(),
 	drawtype = "nodebox",
 	paramtype2 = "facedir",
@@ -743,7 +743,7 @@ minetest.register_node("materials:fridge", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{-0.5, -0.5, -0.375, 0.5, 0.5, 0.5}, -- NodeBox1
+			{-0.5, -0.5, -0.375, 0.5, 0.5, 0.5},
 			{-0.375, -0.1875, -0.5, -0.3125, 0.125, -0.4375}, -- NodeBox2
 			{-0.4375, -0.5, -0.4375, 0.4375, 0.4375, -0.375}, -- NodeBox3
 		}
@@ -773,5 +773,5 @@ minetest.register_node("materials:fridge", {
 	},
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		return (minetest.get_item_group(stack:get_name(),"eatable") > 0 or minetest.get_item_group(stack:get_name(),"drinkable") > 0) and stack:get_count() or 0
-	end,
+	end
 })
