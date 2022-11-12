@@ -262,20 +262,25 @@ examobs.genname=function(self)
 	local name = ""
 	local r
 
+	if math.random(1,2) == 1 then
+		a = "qwrtpsdfghjklzxcvbnm"
+		b = "eyuioa"
+	end
+
 	for i=1,math.random(1,4) do
-		r = math.random(1,6)
+		r = math.random(1,a:len())
 		name = name .. a:sub(r,r)
 		if i == 1 and math.random(1,5) <= 3 then
 			name = string.upper(name)
 		end
 		if math.random(1,3) == 1 then
-			r = math.random(1,6)
+			r = math.random(1,a:len())
 			name = name .. a:sub(r,r)
 		end
-		r = math.random(1,20)
+		r = math.random(1,b:len())
 		name = name .. b:sub(r,r)
 		if math.random(1,3) == 1 then
-			r = math.random(1,20)
+			r = math.random(1,b:len())
 			name = name .. b:sub(r,r)
 		end
 	end
