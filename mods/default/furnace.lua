@@ -308,7 +308,7 @@ minetest.register_node("default:furnace_industrial", {
 		local inv = meta:get_inventory()
 		inv:set_size("cook", 9)
 		inv:set_size("fried", 9)
-		meta:set_string("infotext", "Furnace (inactive)")
+		meta:set_string("infotext", "Furnace (inactive) connect to a power generator through gray wires")
 		minetest.registered_nodes["default:furnace_industrial"].update_form(pos)
 	end,
 	update_form=function(pos,effect)
@@ -355,6 +355,7 @@ minetest.register_node("default:furnace_industrial", {
 		meta:set_string("formspec",
 		"size[8,8]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]" ..
+		(stat == "" and "image[3.1,0.5;2,2;fire_basic_flame.png^[colorize:#333]" or "animated_image[3.1,0.5;2,2;fire;fire_basic_flame_animated.png;8;1;1]") ..
 		a..
 		"list[context;cook;0,0;3,3;]" ..
 		"list[context;fried;5,0;3,3;]" ..
@@ -501,14 +502,28 @@ minetest.register_node("default:steam_powered_generator", {
 	groups = {cracky=3,exatec_tube_connected=1,tech_connect=1,used_by_npc=1,store=500},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
+		local x = 0
+		local y = 0
+		local f = ""
 		m:get_inventory():set_size("main", 32)
+
+		for i=1,32 do
+			f = f .. "image["..x..","..y..";1,1;fire_basic_flame.png]"
+			x = x + 1
+			if x == 8 then
+				x = 0
+				y =y +1
+			end
+		end
+
 		m:set_string("formspec",
-			"size[8,8]" ..
-			"listcolors[#77777777;#777777aa;#000000ff]" ..
-			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
-			"list[current_player;main;0,4.2;8,4;]" ..
-			"listring[current_player;main]" ..
-			"listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+			"size[8,8]"
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]"
+			.."list[current_player;main;0,4.2;8,4;]"
+			.."listring[current_player;main]"
+			.."listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+			..f
 		)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
