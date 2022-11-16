@@ -1072,7 +1072,7 @@ default.effect=function(pos,effect,originalpos)
 			name=minetest.get_name_from_content_id(data[area:indexp(p)])
 		end
 
-		if minetest.get_item_group(name,"wire") > 0 then
+		if minetest.get_item_group(name,"tech_connect") > 0 then
 			local ex = 0
 			if name == "default:wire" then
 				local k = minetest.pos_to_string(p)

@@ -282,8 +282,18 @@ local craftitempos = {
 
 minetest.register_node("default:furnace_industrial", {
 	description = "Industrial furnace (Power required)",
+	manual_page_func=function()
+		local a = ""
+		for i,v in pairs(minetest.registered_nodes) do
+			if v.groups and v.groups.tech_connect then
+				a = a .. v.name .." "
+			end
+		end
+		a = a .. "\nFurnaces is very important to craft things, but when you want to fry things faster you can use the Industrial furnace.\nTo use it you need a generator, like the 'Steam powered generator'.\nConnect it through gray wires to the furnace.\nThe more working generatorns that is connected to the gray wire network the more power you gets and faster it goes."
+		return a
+	end,
 	tiles = {"default_steelblock.png","default_glass.png"},
-	groups = {cracky=2,used_by_npc=1,wire=1,exatec_tube_connected = 1,on_load=1},
+	groups = {cracky=2,used_by_npc=1,tech_connect=1,exatec_tube_connected = 1,on_load=1},
 	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -488,7 +498,7 @@ minetest.register_node("default:steam_powered_generator", {
 	description = "Steam powered generator (Fuel power)",
 	tiles = {"default_ironblock.png^default_glass.png^default_chest_top.png"},
 	sounds = default.node_sound_glass_defaults(),
-	groups = {cracky=3,exatec_tube_connected=1,wire=1,used_by_npc=1,store=500},
+	groups = {cracky=3,exatec_tube_connected=1,tech_connect=1,used_by_npc=1,store=500},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
@@ -572,8 +582,8 @@ minetest.register_node("default:wire", {
 		fixed = {-0.05, -0.5, -0.05, 0.05, -0.45, 0.05},
 	},
 	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.-0.4,0.5}},
-	connects_to={"group:wire","group:wire_connected"},
-	groups = {dig_immediate = 3,wire=1,treasure=1,store=100},
+	connects_to={"group:tech_connect"},
+	groups = {dig_immediate = 3,tech_connect=1,treasure=1,store=100},
 	after_destruct=function(pos)
 		default.effects[minetest.pos_to_string(pos)] = nil
 	end,
