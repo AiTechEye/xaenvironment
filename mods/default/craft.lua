@@ -166,6 +166,33 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="default:furnace_industrial",
+	recipe={
+		{"default:steel_ingot","default:wire","default:steel_ingot"},
+		{"default:steel_ingot","materials:gear_metal","default:steel_ingot"},
+		{"default:steel_ingot","default:glass_tabletop","default:steel_ingot"},
+	}
+})
+
+minetest.register_craft({
+	output="default:steam_powered_generator",
+	recipe={
+		{"default:steel_ingot","default:bucket_with_water_source","materials:diode"},
+		{"default:steel_ingot","default:wire","materials:fanblade_metal"},
+		{"default:steel_ingot","materials:gear_metal","materials:tube_metal"},
+	}
+})
+
+minetest.register_craft({
+	output="default:wire 9",
+	recipe={
+		{"group:metalstick","group:metalstick","group:metalstick"},
+		{"materials:diode","default:copper_ingot","default:tin_ingot"},
+		{"group:metalstick","group:metalstick","group:metalstick"},
+	}
+})
+
+minetest.register_craft({
 	output="default:workbench",
 	recipe={
 		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},

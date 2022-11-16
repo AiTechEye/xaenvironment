@@ -281,9 +281,9 @@ local craftitempos = {
 }
 
 minetest.register_node("default:furnace_industrial", {
-	description = "Industrial furnace (Fuel power) (unfinished)",
+	description = "Industrial furnace (Power required)",
 	tiles = {"default_steelblock.png","default_glass.png"},
-	groups = {stone=2,cracky=3,used_by_npc=1,wire=1,exatec_tube_connected = 1},
+	groups = {cracky=2,used_by_npc=1,wire=1,exatec_tube_connected = 1,on_load=1},
 	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -314,13 +314,14 @@ minetest.register_node("default:furnace_industrial", {
 			local burn = meta:get_int("burntime"..i)
 
 			if time > 0 then
-				local description = default.def(meta:get_string("itemname"..i))
-				stat = stat .. "\n" .. (description and description.description or meta:get_string("itemname"..i)) .. " " .. (time/burn*100).."%"
+				local def = default.def(meta:get_string("itemname"..i)) or {}
+				stat = stat .. "\n" .. (def.description or meta:get_string("itemname"..i)) .. " " .. (time/burn*100).."%"
 				local n = math.ceil((time/burn*150)*0.1)
 				a = a .. "box["..x..","..y..";0.8,0.9;#"..c:sub(n,n).."00F]"
 			elseif fried ~= "" then
-				local description = default.def(fried)
-				stat = stat .. "\n" .. (description and description.description or fried) .. " 100%"
+				meta:set_string("fried"..i,"")
+				local def= default.def(fried) or {}
+				stat = stat .. "\n" .. (def.description or fried) .. " 100%"
 				a = a .. "box["..x..","..y..";0.8,0.9;#F00F]"
 			else
 				a = a .. "box["..x..","..y..";0.8,0.9;#000F]"
@@ -334,6 +335,10 @@ minetest.register_node("default:furnace_industrial", {
 
 		if stat == "" then
 			meta:set_string("infotext","Furnace (inactive)")
+			for i=1,9 do
+				meta:set_int("time"..i,0)
+				meta:set_string("itemname"..i,"")
+			end
 		else
 			meta:set_string("infotext", "Furnace: (Heat: "..effect..")"..stat)
 		end
@@ -343,7 +348,6 @@ minetest.register_node("default:furnace_industrial", {
 		a..
 		"list[context;cook;0,0;3,3;]" ..
 		"list[context;fried;5,0;3,3;]" ..
-		"image[3.5,1;1,1;default_fire_bg.png]" ..
 		"list[current_player;main;0,4;8,4;]" ..
 		"listring[current_player;main]"..
 		"listring[current_name;cook]"..
@@ -399,35 +403,48 @@ minetest.register_node("default:furnace_industrial", {
 		for i=1,9 do
 			meta:set_int("time"..i,0)
 			meta:set_string("itemname"..i,"")
+			meta:set_string("fried"..i,"")
 		end
 		minetest.registered_nodes["default:furnace_industrial"].update_form(pos,0)
+	end,
+	on_load=function(pos)
+		minetest.get_meta(pos):set_int("update",1)
 	end,
 	on_effect=function(pos,effect)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local t = minetest.get_node_timer(pos)
-
+		local update1
 		if t:is_started() then
 			t:set(5,0)
 		else
 			t:start(5)
 		end
 
+		if meta:get_int("update") == 1 then
+			update1 = true
+			meta:set_int("update",0)
+		end
+
 		for i=1,9 do
 			local time = meta:get_int("time"..i)
 			local itemname = meta:get_string("itemname"..i)
 			local stack = inv:get_stack("cook",i)
-
+			local update2
 			if stack:get_name() ~= "" then
 				local result,after=minetest.get_craft_result({method="cooking", width=1, items={stack}})
 
-				if time == 0 or stack:get_name() ~= itemname then
+				if time == 0 or itemname == "" then
 					time = 0
 					meta:set_int("time"..i,0)
 					meta:set_string("fried"..i,"")
 					meta:set_string("burntime"..i,result.time)
 					meta:set_string("itemname"..i,stack:get_name())
+					update2 = itemname ~= stack:get_name()
 					itemname = stack:get_name()
+				end
+
+				if update1 or update2 then
 					local self = minetest.add_entity(vector.add(pos,craftitempos[i]),"default:wielditem"):get_luaentity()
 					self.object:set_properties({
 						automatic_rotate = 0.5,
@@ -454,7 +471,6 @@ minetest.register_node("default:furnace_industrial", {
 						inv:set_stack("cook",i,stack)
 						meta:set_int("time"..i,0)
 						meta:set_string("fried"..i,stack:get_name())
-						meta:set_string("itemname"..i,"")
 					end
 				else
 					meta:set_int("time"..i,time)
@@ -469,10 +485,10 @@ minetest.register_node("default:furnace_industrial", {
 })
 
 minetest.register_node("default:steam_powered_generator", {
-	description = "Steam powered generator (Fuel power) (unfinished)",
+	description = "Steam powered generator (Fuel power)",
 	tiles = {"default_ironblock.png^default_glass.png^default_chest_top.png"},
 	sounds = default.node_sound_glass_defaults(),
-	groups = {cracky=3,exatec_tube_connected=1,wire=1,store=500},
+	groups = {cracky=3,exatec_tube_connected=1,wire=1,used_by_npc=1,store=500},
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
@@ -516,7 +532,7 @@ minetest.register_node("default:steam_powered_generator", {
 		local heat = meta:get_int("heat")
 		local burning
 		for i,v in pairs(inv:get_list("main")) do
-			if v:get_name() ~= "" then
+			if v:get_name() ~= "" and heat < 100 then
 				burning = true
 				heat = heat + default.get_fuel(v)
 				v:take_item()
@@ -527,53 +543,14 @@ minetest.register_node("default:steam_powered_generator", {
 		heat = heat + (burning and 1 or -1)
 		meta:set_int("heat",heat)
 		local effect = math.ceil(heat*0.1)
-		meta:set_string("infotext", "Steam powered generator\nHeat: "..heat.."\nEffect: "..effect)
+		meta:set_string("infotext", "Steam powered generator\nHeat: "..heat.."\nPower: "..effect)
 		default.effect(pos,effect)
 		return heat > 0
 	end
 })
 
-default.effects = {}
-
-default.effect=function(pos,effect,originalpos)
-	local rules = {{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}}
-	originalpos = originalpos or minetest.pos_to_string(pos)
-
-	for i,v in pairs(rules) do
-		local p = vector.add(pos,v)
-		local n = minetest.get_node(p)
-		if minetest.get_item_group(n.name,"wire") > 0 then
-			local ex = 0
-			if n.name == "default:wire" then
-				local k = minetest.pos_to_string(p)
-				default.effects[k] = default.effects[k] or {}
-				if not default.effects[k][originalpos] then
-					default.effects[k][originalpos] = effect
-					local t = minetest.get_node_timer(p)
-					if t:is_started() then
-						t:set(1.5,0)
-					else
-						t:start(1.5)
-						minetest.swap_node(p,{name="default:wire",param2=133})
-					end
-					default.effect(p,effect,originalpos)
-				end
-			else
-				local def = minetest.registered_nodes[n.name] or {}
-				if def.on_effect then
-					local k = minetest.pos_to_string(pos)
-					for i2,v2 in pairs(default.effects[k] or {}) do
-						ex = ex + v2
-					end
-					def.on_effect(p,ex)
-				end
-			end
-		end
-	end
-end
-
 minetest.register_node("default:wire", {
-	description = "Effect Wire (Fuel power wire) (unfinished)",
+	description = "Power Wire",
 	tiles = {{name="default_cloud.png"}},
 	wield_image="exatec_wire.png^[colorize:#555f",
 	inventory_image="exatec_wire.png^[colorize:#555f",
@@ -596,7 +573,7 @@ minetest.register_node("default:wire", {
 	},
 	selection_box={type="fixed",fixed={-0.5,-0.5,-0.5,0.5,0.-0.4,0.5}},
 	connects_to={"group:wire","group:wire_connected"},
-	groups = {dig_immediate = 3,wire=1,store=100},
+	groups = {dig_immediate = 3,wire=1,treasure=1,store=100},
 	after_destruct=function(pos)
 		default.effects[minetest.pos_to_string(pos)] = nil
 	end,

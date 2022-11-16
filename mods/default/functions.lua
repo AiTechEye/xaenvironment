@@ -1055,3 +1055,49 @@ default.surfaceheight=function(pos)
 	end
 	return pos.y+h
 end
+
+default.effect=function(pos,effect,originalpos)
+	local rules = {{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}}
+	originalpos = originalpos or minetest.pos_to_string(pos)
+
+	for i,v in pairs(rules) do
+		local p = vector.add(pos,v)
+		local name = minetest.get_node(p).name
+
+		if name=="ignore" then
+			local vox=minetest.get_voxel_manip()
+			local min, max=vox:read_from_map(pos, pos)
+			local area=VoxelArea:new({MinEdge = min, MaxEdge = max})
+			local data=vox:get_data()
+			name=minetest.get_name_from_content_id(data[area:indexp(p)])
+		end
+
+		if minetest.get_item_group(name,"wire") > 0 then
+			local ex = 0
+			if name == "default:wire" then
+				local k = minetest.pos_to_string(p)
+				default.effects[k] = default.effects[k] or {}
+				if not default.effects[k][originalpos] then
+					default.effects[k][originalpos] = effect
+					local t = minetest.get_node_timer(p)
+					if t:is_started() then
+						t:set(1.5,0)
+					else
+						t:start(1.5)
+						minetest.swap_node(p,{name="default:wire",param2=133})
+					end
+					default.effect(p,effect,originalpos)
+				end
+			else
+				local def = minetest.registered_nodes[name] or {}
+				if def.on_effect then
+					local k = minetest.pos_to_string(pos)
+					for i2,v2 in pairs(default.effects[k] or {}) do
+						ex = ex + v2
+					end
+					def.on_effect(p,ex)
+				end
+			end
+		end
+	end
+end
