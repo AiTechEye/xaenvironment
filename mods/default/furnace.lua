@@ -294,9 +294,13 @@ minetest.register_node("default:furnace_industrial", {
 	end,
 	tiles = {"default_steelblock.png","default_glass.png"},
 	groups = {cracky=2,used_by_npc=1,tech_connect=1,exatec_tube_connected = 1,on_load=1},
+	drop="default:furnace_industrial",
 	use_texture_alpha = "blend",
 	paramtype = "light",
-	paramtype2 = "facedir",
+
+	paramtype2 = "color4dir",
+	palette="default_palette64x.png",
+
 	drawtype="mesh",
 	mesh="default_furnace_industrial.b3d",
 	sounds = default.node_sound_metal_defaults(),
@@ -306,6 +310,7 @@ minetest.register_node("default:furnace_industrial", {
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
+		meta:set_int("param2", minetest.get_node(pos).param2)
 		inv:set_size("cook", 9)
 		inv:set_size("fried", 9)
 		meta:set_string("infotext", "Furnace (inactive) connect to a power generator through gray wires")
@@ -411,15 +416,41 @@ minetest.register_node("default:furnace_industrial", {
 	},
 	on_timer = function(pos, elapsed)
 		local meta = minetest.get_meta(pos)
-		for i=1,9 do
-			meta:set_int("time"..i,0)
-			meta:set_string("itemname"..i,"")
-			meta:set_string("fried"..i,"")
+		local timeout = meta:get_int("timeout")
+		timeout = timeout + 1
+		meta:set_int("timeout",timeout)
+		if timeout >= 7 then
+			meta:set_int("timeout",0)
+			for i=1,9 do
+				meta:set_int("time"..i,0)
+				meta:set_string("itemname"..i,"")
+				meta:set_string("fried"..i,"")
+			end
+			minetest.registered_nodes["default:furnace_industrial"].update_form(pos,0)
+			minetest.swap_node(pos,{name="default:furnace_industrial",param2=minetest.get_meta(pos):get_int("param2")})
+			return
+		elseif timeout > 1 then
+			local a = {8,16,17,18,19}
+			minetest.swap_node(pos,{name="default:furnace_industrial",param2=minetest.get_meta(pos):get_int("param2")+4*a[timeout-1]})
 		end
-		minetest.registered_nodes["default:furnace_industrial"].update_form(pos,0)
+		return true
 	end,
 	on_load=function(pos)
 		minetest.get_meta(pos):set_int("update",1)
+	end,
+	color=function(pos,e)
+		local meta = minetest.get_meta(pos)
+		if meta:get_int("timeout") == 0 then
+			local color = 0
+			local n = {9,7,5,3,0}
+			for i,v in ipairs({8,16,17,18,19}) do
+				if e >= n[i] then
+					color = v*4
+					break
+				end
+			end
+			minetest.swap_node(pos,{name="default:furnace_industrial",param2=meta:get_int("param2")+color})
+		end
 	end,
 	on_effect=function(pos,effect)
 		local meta = minetest.get_meta(pos)
@@ -427,10 +458,11 @@ minetest.register_node("default:furnace_industrial", {
 		local t = minetest.get_node_timer(pos)
 		local update1
 		if t:is_started() then
-			t:set(5,0)
+			t:set(1,0)
 		else
-			t:start(5)
+			t:start(1)
 		end
+		meta:set_int("timeout",0)
 
 		if meta:get_int("update") == 1 then
 			update1 = true
@@ -492,6 +524,7 @@ minetest.register_node("default:furnace_industrial", {
 			end
 		end
 		minetest.registered_nodes["default:furnace_industrial"].update_form(pos,effect)
+		minetest.registered_nodes["default:furnace_industrial"].color(pos,effect)
 	end
 })
 
