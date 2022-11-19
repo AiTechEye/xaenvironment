@@ -458,11 +458,11 @@ minetest.register_node("default:furnace_industrial", {
 		local t = minetest.get_node_timer(pos)
 		local update1
 		if t:is_started() then
-			t:set(1,0)
+			t:set(1.2,0)
 		else
-			t:start(1)
+			t:start(1.2)
 		end
-		meta:set_int("timeout",0)
+		meta:set_int("timeout",5-math.floor(effect/2))
 
 		if meta:get_int("update") == 1 then
 			update1 = true
