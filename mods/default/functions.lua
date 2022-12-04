@@ -224,10 +224,12 @@ default.flowing=function(object)
 	end
 end
 
-Coin=function(player,count,set)
-	player = type(player) == "string" and player or player:get_player_name()
-	local c = set and 0 or default.storage:get_int(player.."_coins")
-	default.storage:set_int(player.."_coins",c+count)
+Coin=function(name,count,set)
+	local name = type(name) == "string" and name or name:get_player_name()
+	local c = set and 0 or default.storage:get_int(name .. "_coins")
+	default.storage:set_int(name .. "_coins", c + count)
+	local player = minetest.get_player_by_name(name)
+	if player then player_style.inventory(player) end
 --old system
 	--local m = player:get_meta()
 	--m:set_int("coins",m:get_int("coins")+count)
