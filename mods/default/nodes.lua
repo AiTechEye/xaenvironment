@@ -685,7 +685,7 @@ default.register_blockdetails({
 minetest.register_node("default:brickblock", {
 	description = "Brick block",
 	tiles={"default_brick.png"},
-	groups = {cracky=1,level=2,treasure=2,store=100},
+	groups = {cracky=1,level=2,treasure=1,store=200,stone=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
