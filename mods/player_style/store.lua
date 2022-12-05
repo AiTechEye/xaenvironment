@@ -1,5 +1,3 @@
-local ITEMS_PER_PAGE = 8 * 5
-
 player_style.register_button({
 	name="Store",
 	image="player_style_coin.png",
@@ -22,18 +20,17 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			if pressed.quit then
 				player_style.players[name].store.clean = nil
 				return
-			elseif pressed.creinvright and store.index + ITEMS_PER_PAGE < #store.items then
-				store.index = store.index + ITEMS_PER_PAGE
+			elseif pressed.creinvright and store.index+store.size < (store.search and #store.search.items or #player_style.store_items) then
+				store.index = store.index + store.size+1
 				player_style.store(player)
 				return
 			elseif pressed.creinvleft and store.index > 1 then
-				store.index = store.index - ITEMS_PER_PAGE
+				store.index = store.index - store.size-1
 				player_style.store(player)
 				return
 			elseif pressed.reset then
 				store.index = 1
-				store.search_text = nil
-				store.items = player_style.store_items
+				store.search = nil
 				player_style.store(player)
 				return
 			elseif pressed.sell then
@@ -49,8 +46,10 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					end
 				end
 				store.index = 1
-				store.search_text = s
-				store.items = its
+				store.search={
+					text = s,
+					items = its
+				}
 				player_style.store(player)
 				return
 			end
@@ -68,15 +67,13 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						if inv:contains_item("main",s) then
 
 							if b ~= "confirm_" and c >= 1000 then
-								minetest.after(0.2, function()
-									if not minetest.get_player_by_name(name) then return end
-									minetest.show_formspec(name, "store",
-										"size[3,2]" 
-										.."listcolors[#77777777;#777777aa;#000000ff]"
-										.."label[0,0;Sell item?\n(Worth: "..c..")]"
-										.."button[0,1;1.5,1;confirm_"..t..";Sell]button[1.5,1;1.5,1;cancel;Cancel]"
-									)
-								end)
+								minetest.after(0.2, function(name,t)
+									return minetest.show_formspec(name, "store",
+									"size[3,2]" 
+									.."listcolors[#77777777;#777777aa;#000000ff]"
+									.."label[0,0;Sell item?\n(Worth: "..c..")]"
+									.."button[0,1;1.5,1;confirm_"..t..";Sell]button[1.5,1;1.5,1;cancel;Cancel]"
+									)end,name,t)
 								return
 							end
 
@@ -98,15 +95,13 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						if Getcoin(player) >= c and inv:room_for_item("main",t) then
 
 							if b ~= "confirm_" and player_style.store_items_cost[t] >= 1000 then
-								minetest.after(0.2, function()
-									if not minetest.get_player_by_name(name) then return end
-									minetest.show_formspec(name, "store",
-										"size[3,2]" 
-										.."listcolors[#77777777;#777777aa;#000000ff]"
-										.."label[0,0;Confirm purchase?\n(Cost: "..c..")]"
-										.."button[0,1;1.5,1;confirm_"..t..";Buy]button[1.5,1;1.5,1;cancel;Cancel]"
-									)
-								end)
+								minetest.after(0.2, function(name,t)
+									return minetest.show_formspec(name, "store",
+									"size[3,2]" 
+									.."listcolors[#77777777;#777777aa;#000000ff]"
+									.."label[0,0;Confirm purchase?\n(Cost: "..c..")]"
+									.."button[0,1;1.5,1;confirm_"..t..";Buy]button[1.5,1;1.5,1;cancel;Cancel]"
+									)end,name,t)
 								return
 							end
 							inv:add_item("main",t.." 1")
@@ -132,107 +127,76 @@ player_style.open_store=function()
 			end
 		end
 		table.sort(player_style.store_items)
-		minetest.chat_send_all(dump(#player_style.store_items))
 	end
 end
 
 player_style.store=function(player)
 	local name = player:get_player_name()
-	local balance = Getcoin(name)
-	local inv = minetest.get_inventory({ type = "player", name = name})
-	player_style.players[name].store = player_style.players[name].store or { index = 1, sell = false }
+	player_style.players[name].store = player_style.players[name].store or {size=63,index=1,sell=false}
 	local store = player_style.players[name].store
 
 	player_style.open_store()
+		
+	store.search = store.search and store.search.text ~= "" and store.search or nil
 
-	store.items = store.items or player_style.store_items
+	local itemlist = store.search and store.search.items or player_style.store_items
+	local pages = math.floor(#itemlist/player_style.players[name].store.size)
+	local page = math.floor(player_style.players[name].store.index/player_style.players[name].store.size)
+	local itembutts = ""
+	local x=0
+	local y=0
 
-	local item_list = store.items
-	local pages = math.ceil(#item_list / ITEMS_PER_PAGE)
-	local page = math.ceil(store.index / ITEMS_PER_PAGE)
-	local item_buttons = ""
-
-	local screen_index = -1
-	local _end = math.min(store.index + ITEMS_PER_PAGE - 1, #item_list)
-	for i = store.index, _end do
-		local item = item_list[i]
-
-		local value = player_style.store_items_cost[item]
-		if store.sell then
-			value = value * 0.1
-			if value >= 1 then
-				value = math.floor(value)
+	for i=store.index,store.index+store.size do
+		local it = itemlist[i]
+		if it then
+			local s
+			if store.sell then
+				local ss = player_style.store_items_cost[it]*0.1
+				if ss >= 1 then
+					s = math.floor(ss)
+				end
+			else
+				s = player_style.store_items_cost[it]
 			end
-		end
-		screen_index = screen_index + 1
-		local x = 0.2 + screen_index % 8 * 1.2
-		local y = 2 + math.floor(screen_index / 8) * 1.2
-		local def = minetest.registered_items[item]
-		if
-			not store.sell and value <= balance or
-			store.sell and inv:contains_item("main", item)
-		then
-			item_buttons = item_buttons
-				.. "item_image_button[" .. x .. "," .. y .. ";1.2,1.2;" .. item .. ";itembut_" .. item ..";" .. value .. "]"
-				.. "tooltip[itembut_" .. item .. ";" .. (def and def.description or item) .. "]"
+
+			if s then
+				local def = minetest.registered_items[it]
+				itembutts = itembutts.."item_image_button["..x..","..y..";1,1;"..it..";itembut_"..it..";]tooltip[itembut_"..it..";"..(def and def.description or it).."\n"..(store.sell and "Worth " or "Cost ")..s.."]"
+				x = x + 0.8
+				if x >= 6 then
+					y = y + 0.8
+					x = 0
+				end
+			end
 		else
-			item_buttons = item_buttons
-				.. "item_image[" .. x .. "," .. y .. ";1.2,1.2;" .. item .. "]"
-				.. "label[" .. x .. "," .. y + 0.6 .. ";" .. value .. "]"
-				.. "tooltip[" .. x .. "," .. y .. ";1.2,1.2;" .. (def and def.description or item) .. "]"
+			break
 		end
 	end
 
-	minetest.after(0.2, function()
-		if not player:get_look_horizontal() then return end
-		minetest.show_formspec(name, "store",
-			"formspec_version[2]" -- MT 5.1+
-			.. "size[10,10.5]"
-			.. "listcolors[#77777777;#777777aa;#000000ff]"
+	minetest.after(0.2, function(name,page,pages,store,itembutts)
+		return minetest.show_formspec(name, "store",
+			"size[6.7,8]" 
+			.."listcolors[#77777777;#777777aa;#000000ff]"
 
-			.. "style_type[label;font_size=+5]"
-			.. "label[1,0.6;" .. (store.sell and "Sell" or "Buy") .. "]"
-			.. "style_type[label;font_size=]"
+			.."tooltip[creinvleft;Back]"
+			.."tooltip[creinvright;Forward]"
+			.."tooltip[reset;Reset]"
+			.."tooltip[search;Search]"
+			.."tooltip[sell;"..(store.sell and "Buy" or "Sell").."]"
 
-			.. "label[1,1.5;Balance: " .. minetest.colorize("#FFFF00", balance) .. " coins]"
+			.."image_button[0,7;1,1;default_crafting_arrowleft.png;creinvleft;]"
+			.."image_button[0.8,7;1,1;default_crafting_arrowright.png;creinvright;]"
+			.."image_button[1.6,7;1,1;synth_repeat.png;reset;]"
+			.."image_button[2.4,7;1,1;player_style_coin.png;sell;]"
 
-			.. "button[6,0.3;3.6,0.75;sell;Switch to " .. (store.sell and "buying" or "selling") .. "]"
+			
+			.."label[0,-0.35;"..minetest.colorize("#FFFF00",Getcoin(player)).."]"
 
-			.. item_buttons
-
-			.. "tooltip[creinvleft;Back]"
-			.. "image_button[0.4,8.5;0.8,0.8;default_crafting_arrowleft.png;creinvleft;]"
-
-			.. "label[1.7,8.9;" .. page .. "/" .. pages .. "]"
-
-			.. "tooltip[creinvright;Forward]"
-			.. "image_button[3,8.5;0.8,0.8;default_crafting_arrowright.png;creinvright;]"
-
-			.. "field[5.2,8.5;3,0.8;searchbox;;" .. (store.search_text or "") .. "]"
-			.. "field_close_on_enter[searchbox;false]"
-
-			.. "tooltip[search;Search]"
-			.. "image_button[8,8.5;0.8,0.8;player_style_search.png;search;]"
-
-			.. "tooltip[reset;Reset search]"
-			.. "image_button[8.8,8.5;0.8,0.8;synth_repeat.png;reset;]"
+			.."label[7.6,9.9;"..page.."/"..pages.."]"
+			.."field[4,7.3;3,1;searchbox;;"..(store.search and store.search.text or "").."]"
+			.."field_close_on_enter[searchbox;false]"
+			.."image_button[3.2,7.1;0.8,0.8;player_style_search.png;search;]"
+			..itembutts
 		)
-	end)
+	end,name,page,pages,store,itembutts)
 end
-
-minetest.register_chatcommand("set_coins", {
-	params = "<name> <coins amount>",
-	description = "Set the player's coin balance to the number specified",
-	privs = { debug = true },
-	func = function(name, param)
-		local name, count = string.match(param, "(%w+) (%d*)")
-		local player
-		if count then count = tonumber(count) end
-		if count and name and minetest.get_player_by_name(name) then
-			Coin(name, count, true)
-			minetest.chat_send_all("Set " .. name .. "'s balance to " .. count .. " coins.")
-		else
-			minetest.chat_send_all("Invalid parameters")
-		end
-	end
-})
