@@ -7,6 +7,16 @@ places.citybuildings = {
 	{name="places_portal_service",chance=30,size=1,freespace={{0,-1}}},
 }
 
+minetest.register_tool("places:genc", {
+	groups = {not_in_creative_inventory=1,},
+	inventory_image = "default_stick.png",
+	on_use=function(itemstack, user, pointed_thing)
+		if minetest.check_player_privs(user:get_player_name(), {server=true}) then
+			places.city(vector.round(user:get_pos()))
+		end
+	end
+})
+
 places.buildings.city={
 	chance=50,sx=100,sy=100,miny=-50,maxy=150,spawn_at={"default:dirt"},
 	on_spawn=function(pos)
