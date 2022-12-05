@@ -682,6 +682,13 @@ default.register_blockdetails({
 	item={type="node"},
 })
 
+minetest.register_node("default:brickblock", {
+	description = "Brick block",
+	tiles={"default_brick.png"},
+	groups = {cracky=1,level=2,treasure=2,store=100},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},

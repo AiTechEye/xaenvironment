@@ -2,6 +2,7 @@ minetest.register_craft({
 	type = "toolrepair",
 	additional_wear = -0.4
 })
+
 --||||||||||||||||
 -- ======================= Tools
 --||||||||||||||||
@@ -250,9 +251,28 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="default:clay_brick",
+	recipe={{"default:clay_lump"}},
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output="default:brick",
+	recipe="default:clay_brick"
+})
+
 --||||||||||||||||
 -- ======================= Nodes
 --||||||||||||||||
+
+minetest.register_craft({
+	output="default:brickblock",
+	recipe={
+		{"default:brick","default:brick",""},
+		{"default:brick","default:brick",""},
+	},
+})
 
 minetest.register_craft({
 	output="default:stone_spike 4",

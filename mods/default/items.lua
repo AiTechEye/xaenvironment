@@ -384,6 +384,18 @@ minetest.register_craftitem("default:stick", {
 	manual_page = "default:stick default:stick_on_ground Sticks is used to craft the most hand tools.\n- Those are usually found around trees.\n- Can be gotten through by digging leaves.\n- Can be found as treasures .\n- Can be crafted from wood.",
 })
 
+minetest.register_craftitem("default:clay_brick", {
+	description = "Clay brick",
+	inventory_image = "default_snow.png^[colorize:#5556^default_alpha_ingot.png^[makealpha:0,255,0",
+	groups = {brick=1,treasure=1},
+})
+
+minetest.register_craftitem("default:brick", {
+	description = "Brick",
+	inventory_image = "default_snow.png^[colorize:#ac482b^default_alpha_ingot.png^[makealpha:0,255,0",
+	groups = {brick=1,treasure=1},
+})
+
 minetest.register_craftitem("default:unknown", {
 	description = "Unknown item",
 	inventory_image = "default_unknown.png",
