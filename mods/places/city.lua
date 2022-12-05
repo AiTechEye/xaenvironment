@@ -5,6 +5,19 @@ places.citybuildings = {
 	{name="places_shop",chance=20,size=1,freespace={{0,-1}}},
 	{name="places_burnserivce",chance=20,size=1,freespace={{-1,0}}},
 	{name="places_portal_service",chance=30,size=1,freespace={{0,-1}}},
+	{name="places_general_shop",chance=20,size=1,freespace={{0,-1}},
+		on_spawn=function(pos)
+			local g = {"store","stone","wood","flammable","exatec","eatable","ingot"}
+			local group = g[math.random(1,#g)]
+			local nodes = minetest.find_nodes_in_area(vector.subtract(pos,10),vector.add(pos,10),"xesmartshop:gamerules_shop")
+			for i,v in pairs(nodes) do
+				local m = minetest.get_meta(v)
+				if m:get_string("add_group_stuff") == "" then
+					m:set_string("add_group_stuff",group)
+				end
+			end
+		end
+	}
 }
 
 minetest.register_tool("places:genc", {
