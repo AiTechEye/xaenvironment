@@ -564,6 +564,8 @@ default.registry_mineral=function(def)
 	local mod = minetest.get_current_modname() ..":"
 	if not def.not_lump then
 		def.lump = def.lump or {}
+		def.lump.groups = def.lump.groups or {}
+		def.lump.groups.lump = 1
 		def.drop = mod .. def.name .. "_lump"
 		def.lump.description = def.lump.description or 		uname .." lump"
 		def.lump.inventory_image = def.lump.inventory_image or def.texture .. "^default_alpha_lump.png^[makealpha:0,255,0"
@@ -586,6 +588,8 @@ default.registry_mineral=function(def)
 
 	if not def.not_ingot then
 		def.ingot = def.ingot or {}
+		def.ingot.groups = def.ingot.groups or {}
+		def.ingot.groups.ingot = 1
 		def.dropingot = mod .. def.name .. "_ingot"
 		def.ingot.description = def.ingot.description or 		uname .." ingot"
 		def.ingot.inventory_image = def.texture .. "^default_alpha_ingot.png^[makealpha:0,255,0"
