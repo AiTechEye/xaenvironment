@@ -1,3 +1,9 @@
+minetest.register_node("default:diamondblock_blank", {
+	description="Blank diamond block",
+	tiles={"default_diamondblock_blank.png"},
+	groups = {cracky=2,level=2,store=10000},
+})
+
 minetest.register_node("default:sign", {
 	description = "Sign",
 	tiles={"default_wood.png"},
