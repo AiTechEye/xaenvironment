@@ -1,7 +1,6 @@
 player_style.craftguide = {
 	items = {},
 	groups = {},
-	user = {},
 }
 
 minetest.register_on_mods_loaded(function()
@@ -42,7 +41,7 @@ player_style.craftguide.show2=function(player)
 	local y=0
 	local w = 8
 	local h = 4
-	local search = ""--meta:get_string("search")
+	local search
 	local list = search or player_style.craftguide.items
 --	local craftr = add ~= ""
 
@@ -53,12 +52,13 @@ player_style.craftguide.show2=function(player)
 	local index1 = page <= 1 and 1 or size*page
 	local index2 = page <= 1 and size or size*page+1
 
-	for i=1,size*page do
+	for i=index1,index2 do
 		local item = list[i]
 		if not item then
 			break
 		end
-		items = items .. "item_image_button[" .. x .. "," .. y .. ";1;1;guide_item#" .. item .. ";]"
+
+		items = items .. "item_image_button[" .. x .. "," .. y .. ";1,1;" .. item .. ";guide_item#" .. item .. ";]"
 		x = x + 1
 		if x >= w then
 			x = 0
@@ -72,12 +72,13 @@ player_style.craftguide.show2=function(player)
 		--"size[8,"..(craftr and 12 or 9).. "]"
 		.. items
 		--.. "list[current_player;main;0,"..(craftr and 8 or 5)..".4;8,4;]"
-		.. "image_button[3.6,4.5;5;default_crafting_arrowleft.png;guideback;]"
-		.. "image_button[4.3,4.5;5;default_crafting_arrowright.png;guidefront;]"
-		.. "field[0,4.8;2.5,1;searchbox;;"..search_text.."]"
+
+		.. "image_button[0,4.25;1,1;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]"
+		.. "image_button[1,4.25;1,1;default_crafting_arrowleft.png;guideback;]"
+		.. "image_button[2,4.25;1,1;default_crafting_arrowright.png;guidefront;]"
+		.. "image_button[3,4.25;1,1;synth_repeat.png;reset;]"
+		.. "image_button[4,4.25;1,1;player_style_search.png;search;]"
+		.. "field[5.5,4.5;2.5,1;searchbox;;"..search_text.."]"
 		.. "field_close_on_enter[searchbox;false]"
-		.. "image_button[2,4.5;5;player_style_search.png;search;]"
-		.. "image_button[2.8,4.5;5;synth_repeat.png;reset;]"
-		.. "image_button[5.3,4.5;5;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]"
 		)
 end
