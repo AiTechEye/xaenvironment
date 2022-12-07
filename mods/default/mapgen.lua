@@ -661,21 +661,20 @@ minetest.register_node("default:rock_spawner", {
 				local v = area:index(pos.x+x,pos.y+y,pos.z+z)
 				local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
 				local n = minetest.get_node(p).name
+				local def = minetest.registered_nodes[n]
+				local g = def.groups or {}
 				if not grass then
-					if minetest.get_item_group(n,"spreading_dirt_type") > 0 then
+					if g.spreading_dirt_type or g.ice then
 						grass = minetest.get_content_id(n)
 					end
 				else
-					local def = minetest.registered_nodes[n]
-					local g = def.groups or {}
-
-					if not (g.dirt or g.choppy or g.leaves) and n ~= "default:stone" and n ~= "air" then
+					if (g.snowy or not (g.dirt or g.choppy or g.leaves)) and n ~= "default:stone" and n ~= "air" then
 						table.insert(rndstuff,minetest.get_content_id(n))
 					end
 					data[v+area.ystride] = grass
 					data[v+area.ystride+area.ystride] = rndstuff[math.random(1,#rndstuff)]
 				end
-				if not rndstone2[n] and minetest.get_item_group(n,"stone") > 0 then
+				if not rndstone2[n] and (g.stone and def.drawtype == "normal" or g.ice) then
 					table.insert(rndstone,minetest.get_content_id(n))
 					rndstone2[n] = true
 				end
@@ -693,17 +692,17 @@ minetest.register_node("default:rock_spawner", {
 
 minetest.register_decoration({
 	deco_type = "simple",
-	place_on = {"group:spreading_dirt_type"},
+	place_on = {"group:spreading_dirt_type","group:snowy"},
 	sidelen = 16,
 	noise_params = {
-		offset = 0.003,
-		scale = 0.005,
-		spread = {x = 200, y = 200, z = 200},
+		offset = 0.0003,
+		scale = 0.0005,
+		spread = {x = 300, y = 300, z = 300},
 		octaves = 3,
 		persist = 0.6
 	},
 	y_min = -20,
-	y_max = 100,
+	y_max = 50,
 	decoration = "default:rock_spawner",
 })
 
