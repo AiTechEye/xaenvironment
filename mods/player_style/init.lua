@@ -34,6 +34,7 @@ dofile(minetest.get_modpath("player_style") .. "/stuff.lua")
 dofile(minetest.get_modpath("player_style") .. "/store.lua")
 dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
+dofile(minetest.get_modpath("player_style") .. "/craftguide.lua")
 
 player_style.set_bloom=function(stat)
 	if minetest.is_singleplayer() and player_style.bloom_effects then

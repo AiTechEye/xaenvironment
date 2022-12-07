@@ -327,6 +327,7 @@ player_style.inventory=function(player)
 			.."list[detached:hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
 			.."listring[current_player;main]"
+			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 			..model
 			..buttons
@@ -385,6 +386,7 @@ player_style.inventory=function(player)
 			.."list[detached:hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
 
+			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.."listring[current_player;main]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 
@@ -429,6 +431,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		if invp then
 			if pressed.quit and pressed.key_enter_field == nil then
 				player_style.players[name].inv.clean = nil
+				return
+			elseif pressed.craftguide then
+				player_style.craftguide.show(player)
 				return
 			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
 				invp.index = invp.index + invp.size+1
