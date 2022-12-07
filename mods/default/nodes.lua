@@ -588,7 +588,7 @@ minetest.register_node("default:dirt_with_snow", {
 	description = "Dirt with snow",
 	drop="default:dirt",
 	tiles={"default_snow.png","default_dirt.png","default_dirt.png^default_snow_side.png"},
-	groups = {dirt=1,crumbly=3,cools_lava=1,store=20,snowy=1},
+	groups = {dirt=1,crumbly=3,cools_lava=1,store=20,snowy=1,spreading_dirt_type=1},
 	sounds = default.node_sound_snow_defaults(),
 })
 
@@ -952,14 +952,14 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:ice", {
 	description = "Ice",
 	tiles={"default_ice.png"},
-	groups = {cracky=3,slippery=10,treasure=1,store=50},
+	groups = {cracky=3,slippery=10,treasure=1,store=50,ice=1},
 	sounds = default.node_sound_glass_defaults(),
 })
 
 minetest.register_node("default:ice_clear", {
 	description = "Clear ice",
 	tiles={"default_ice_clear.png"},
-	groups = {cracky=3,slippery=30,treasure=1,store=50},
+	groups = {cracky=3,slippery=30,treasure=1,store=50,ice=1},
 	sounds = default.node_sound_glass_defaults(),
 	use_texture_alpha = "blend",
 	sunlight_propagates=true,
