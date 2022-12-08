@@ -572,12 +572,12 @@ default.registry_mineral({
 		groups={cracky=3,treasure=1,store=500},
 		sounds=default.node_sound_stone_defaults()
 	},
-	pick={groups={not_regular_craft=0,treasure=1}},
-	axe={groups={not_regular_craft=0,treasure=1}},
-	shovel={groups={not_regular_craft=0,treasure=1}},
-	pick={groups={not_regular_craft=0,treasure=1}},
-	vineyardknife={groups={not_regular_craft=0,treasure=1}},
-	hoe={groups={not_regular_craft=0,treasure=1}},
+	pick={groups={treasure=1}},
+	axe={groups={treasure=1}},
+	shovel={groups={treasure=1}},
+	pick={groups={treasure=1}},
+	vineyardknife={groups={treasure=1}},
+	hoe={groups={treasure=1}},
 	additional_craft={
 		{output="default:flint",
 			recipe={
@@ -832,7 +832,6 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=3}
 	}},
-	lump={groups={not_regular_craft=1}},
 	shovel={	groups={treasure=2},
 		tool_capabilities={
 		full_punch_interval = 1.5,
