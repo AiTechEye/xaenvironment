@@ -162,11 +162,12 @@ player_style.store=function(player)
 		local x = 0.2 + screen_index % 8 * 2
 		local y = 2 + math.floor(screen_index / 8) * 2
 		local def = minetest.registered_items[item]
+		local val = store.sell and "\nWorth: " .. minetest.colorize("#FFFF00", value) or "\nCost: " .. minetest.colorize("#FFFF00", value)
 
 		if not store.sell and value <= coins or store.sell and inv:contains_item("main", item) then
 			item_buttons = item_buttons
 				.. "item_image_button[" .. x .. "," .. y .. ";2,2;" .. item .. ";itembut_" .. item ..";" .. value .. "]"
-				.. "tooltip[itembut_" .. item .. ";" .. (def and def.description or item) .. ";#555;#FFF]"
+				.. "tooltip[itembut_" .. item .. ";" .. (def and def.description or item) .. val .. ";#555;#FFF]"
 		else
 			local tool_tip = store.sell and "\nNot in your inventory"
 				or "\nYou can't afford this (need " .. minetest.colorize("#FFFF00", value - coins) .. " more coins)"
@@ -174,7 +175,7 @@ player_style.store=function(player)
 			item_buttons = item_buttons
 				.. "item_image[" .. x .. "," .. y .. ";2,2;" .. item .. "]"
 				.. "label[" .. x + 0.2 .. "," .. y + 1 .. ";" .. value .. "]"
-				.. "tooltip[" .. x .. "," .. y .. ";2,2;" .. (def and def.description or item) .. tool_tip .. ";#555;#FFF]"
+				.. "tooltip[" .. x .. "," .. y .. ";2,2;" .. (def and def.description or item) .. val .. tool_tip .. ";#555;#FFF]"
 		end
 	end
 
