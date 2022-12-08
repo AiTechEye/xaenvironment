@@ -149,7 +149,7 @@ player_style.store=function(player)
 	local item_list = store.items
 	local pages = math.ceil(#item_list / ITEMS_PER_PAGE)
 	local page = math.ceil(store.index / ITEMS_PER_PAGE)
-	local item_buttons = "bgcolor[#555F]style_type[item_image_button;bgcolor=#FFFF]"
+	local item_buttons = "style_type[item_image_button;bgcolor=#0F0F]"
 
 	local screen_index = -1
 	local _end = math.min(store.index + ITEMS_PER_PAGE - 1, #item_list)
@@ -159,56 +159,58 @@ player_style.store=function(player)
 		local value = player_style.store_items_cost[item]
 		value = store.sell and math.ceil(value*0.1) or value
 		screen_index = screen_index + 1
-		local x = 0.2 + screen_index % 8 * 1.2
-		local y = 2 + math.floor(screen_index / 8) * 1.2
+		local x = 0.2 + screen_index % 8 * 2
+		local y = 2 + math.floor(screen_index / 8) * 2
 		local def = minetest.registered_items[item]
-		local val = store.sell and "\nWorth: " .. minetest.colorize("#FFFF00", value) or "\nCost: " .. minetest.colorize("#FFFF00", value)
 
 		if not store.sell and value <= coins or store.sell and inv:contains_item("main", item) then
 			item_buttons = item_buttons
-			.. "item_image_button[" .. x .. "," .. y .. ";1.2,1.2;" .. item .. ";itembut_" .. item ..";]"
-			.. "tooltip[itembut_" .. item .. ";" .. (def and def.description or item) .. val .. ";#555;#FFF]"
+				.. "item_image_button[" .. x .. "," .. y .. ";2,2;" .. item .. ";itembut_" .. item ..";" .. value .. "]"
+				.. "tooltip[itembut_" .. item .. ";" .. (def and def.description or item) .. ";#555;#FFF]"
 		else
+			local tool_tip = store.sell and "\nNot in your inventory"
+				or "\nYou can't afford this (need " .. minetest.colorize("#FFFF00", value - coins) .. " more coins)"
+			
 			item_buttons = item_buttons
-			.. "item_image[" .. x .. "," .. y .. ";1.2,1.2;" .. item .. "]"
-			.. "label[" .. x .. "," .. y + 0.6 .. ";]"
-			.. "tooltip[" .. x .. "," .. y .. ";1.2,1.2;" .. (def and def.description or item) .. val .. (store.sell and "\nNot in your inventory" or "\nYou can't afford this (need "..minetest.colorize("#FFFF00", value-coins).." more coins)") .. ";#555;#FFF]"
-	end
+				.. "item_image[" .. x .. "," .. y .. ";2,2;" .. item .. "]"
+				.. "label[" .. x + 0.2 .. "," .. y + 1 .. ";" .. value .. "]"
+				.. "tooltip[" .. x .. "," .. y .. ";2,2;" .. (def and def.description or item) .. tool_tip .. ";#555;#FFF]"
+		end
 	end
 
 	minetest.after(0.2, function()
 		if not player:get_look_horizontal() then return end
 		minetest.show_formspec(name, "store",
 			"formspec_version[2]" -- MT 5.1+
-			.. "size[10,9.5]"
-			.. "listcolors[#77777777;#777777aa;#000000ff]"
+			.. "size[16.4,12.2]"
+			.. "bgcolor[#555F]"
+
+			.. "button[0.2,0.5;5,1;sell;Switch to " .. (store.sell and "buying" or "selling") .. "]"
 
 			.. "style_type[label;font_size=+5]"
-			.. "label[1,0.6;" .. (store.sell and "Sell" or "Buy") .. "]"
+			.. "label[7.5,0.5;" .. (store.sell and "Sell" or "Buy") .. "]"
 			.. "style_type[label;font_size=]"
 
-			.. "label[1,1.5;Coins: " .. minetest.colorize("#FFFF00", coins) .. "]"
-
-			.. "button[6,0.3;3.6,0.75;sell;Switch to " .. (store.sell and "buying" or "selling") .. "]"
-
-			.. item_buttons
+			.. "label[11.6,0.5;Coins: " .. minetest.colorize("#FFFF00", coins) .. "]"
 
 			.. "tooltip[creinvleft;Back]"
-			.. "image_button[0.4,8.5;0.8,0.8;default_crafting_arrowleft.png;creinvleft;]"
+			.. "image_button[6,1;0.8,0.8;default_crafting_arrowleft.png;creinvleft;]"
 
-			.. "label[1.7,8.9;" .. page .. "/" .. pages .. "]"
+			.. "label[7.7,1.4;" .. page .. "/" .. pages .. "]"
 
 			.. "tooltip[creinvright;Forward]"
-			.. "image_button[3,8.5;0.8,0.8;default_crafting_arrowright.png;creinvright;]"
+			.. "image_button[9.6,1;0.8,0.8;default_crafting_arrowright.png;creinvright;]"
 
-			.. "field[5.2,8.5;3,0.8;searchbox;;" .. (store.search_text or "") .. "]"
+			.. "field[11.6,1;3,0.8;searchbox;;" .. (store.search_text or "") .. "]"
 			.. "field_close_on_enter[searchbox;false]"
 
 			.. "tooltip[search;Search]"
-			.. "image_button[8,8.5;0.8,0.8;player_style_search.png;search;]"
+			.. "image_button[14.6,1;0.8,0.8;player_style_search.png;search;]"
 
 			.. "tooltip[reset;Reset search]"
-			.. "image_button[8.8,8.5;0.8,0.8;synth_repeat.png;reset;]"
+			.. "image_button[15.4,1;0.8,0.8;synth_repeat.png;reset;]"
+
+			.. item_buttons
 		)
 	end)
 end
