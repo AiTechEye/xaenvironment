@@ -1,337 +1,9 @@
-minetest.register_on_mods_loaded(function()
-	default.workbench.items_list = {}
-	default.workbench.groups_list = {}
-	for i,it in pairs(minetest.registered_items) do
-		if not (it.groups and (it.groups.not_in_creative_inventory or it.groups.not_in_craftguide)) then
-			table.insert(default.workbench.items_list,it.name)
-		end
-	end
-	table.sort(default.workbench.items_list)
-	for n,it1 in pairs(minetest.registered_items) do
-		if it1.groups and not it1.groups.not_in_creative_inventory then
-			for g,it2 in pairs(it1.groups) do
-				default.workbench.groups_list["group:" .. g] = default.workbench.groups_list["group:" .. g] or {}
-				table.insert(default.workbench.groups_list["group:" .. g],n)
-			end
-		end
-	end
-end)
-player_style.register_manual_page({
-	name = "Workbench",
-	itemstyle = "default:workbench",
-	text = "The workbench contains a craft guide and a crafting grid that makes things less messy to craft.\nSome items like steel lumps can only be crafted in this way.",
-	tags = {"default:workbench"},
-})
-
-
-player_style.register_manual_page({
-	name = "Dye workbench",
-	itemstyle = "default:dye_workbench",
-	text = "Use this workbench to craft dye.\nAdd a bucket of water or water source, and colored items to mix the dye",
-	tags = {"default:dye_workbench"},
-})
-
-player_style.register_manual_page({
-	name = "Paper compressor",
-	itemstyle = "default:paper_compressor",
-	text = "Use the paper compressor to craft paper.\nAdd a bucket of water and pieces of wood",
-	tags = {"default:paper_compressor"},
-})
-
-player_style.register_manual_page({
-	name = "Recycling mill",
-	itemstyle = "default:recycling_mill",
-	text = "The recycling mill is used to recycling items / demount items so you get the items it is made of",
-	tags = {"default:recycling_mill"},
-})
-
-
-
 minetest.register_craft_predict(function(itemstack, player, old_craft_grid, craft_inv)
 	if minetest.get_item_group(itemstack:get_name(),"not_regular_craft") > 0 then
 		return ""
 	end
 	return itemstack
 end)
-
-default.workbench.set_form=function(pos,add)
-	local meta = minetest.get_meta(pos)
-	local page = meta:get_int("page")
-
-	local but_size = meta:get_string("but_size")
-	local x_add = tonumber(meta:get_string("x_add"))
-	local y_add = tonumber(meta:get_string("y_add"))
-
-	local but_am = meta:get_int("but_am")
-	local but_am_w = meta:get_int("but_am_w")
-
-	local craftguide_items = ""
-	add = add or ""
-	local x=-0.2
-	local y=0
-	local search = meta:get_string("search")
-	local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
-	local craftr = add ~= ""
-
-
-	for i=page,page+but_am,1 do
-		local it = itemlist[i]
-		if not it then
-			break
-		end
-		craftguide_items = craftguide_items .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. it ..";guide_item#" .. it .. ";]"
-		x = x + x_add
-		if x >= x_add*but_am_w then
-			x = -0.2
-			y = y + y_add
-		end
-	end
-
-	if meta:get_int("craftguide") == 1 then
-		meta:set_string("formspec",
-			"size[8,"..(craftr and 12 or 9).. "]" ..
-			craftguide_items ..
-			"list[current_player;main;0,"..(craftr and 8 or 5)..".4;8,4;]" ..
-			"image_button[3.6,4.5;" .. but_size ..";default_crafting_arrowleft.png;guideback;]" ..
-			"image_button[4.3,4.5;" .. but_size ..";default_crafting_arrowright.png;guidefront;]" ..
-			"field[0,4.8;2.5,1;searchbox;;"..meta:get_string("search_text").."]"..
-			"field_close_on_enter[searchbox;false]"..
-			"image_button[2,4.5;" .. but_size ..";player_style_search.png;search;]" ..
-			"image_button[2.8,4.5;" .. but_size ..";synth_repeat.png;reset;]" ..
-			"image_button[5.3,4.5;" .. but_size ..";default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]" ..
-			add
-		)
-	else
-		meta:set_string("formspec",
-		"size[8,11]" ..
-		"list[context;craft;4,0;3,3;]" ..
-		"list[context;output;7,1;1,1;]" ..
-		"list[context;stock;4,3.2;4,4;]" ..
-		"list[current_player;main;0,7.3;8,4;]" ..
-		"listring[current_player;main]" ..
-		"listring[current_name;stock]" .. 
-		"listring[current_name;craft]".. 
-		"listring[current_player;main]" ..
-		"listring[current_name;output]".. 
-		"listring[current_player;main]" ..
-		craftguide_items ..
-		"image_button[3,3;0.7,0.7;default_crafting_arrowleft.png;guideback;]" ..
-		"image_button[3.5,3;0.7,0.7;default_crafting_arrowright.png;guidefront;]" ..
-		"field[0,3.5;2.5,0.5;searchbox;;"..meta:get_string("search_text").."]"..
-		"field_close_on_enter[searchbox;false]"..
-		"image_button[2,3;0.7,0.7;player_style_search.png;search;]" ..
-		"image_button[2.5,3;0.7,0.7;synth_repeat.png;reset;]" ..
-		"image_button[3.5,3.5;0.7,0.7;default_craftgreed.png;add2c;]tooltip[add2c;Add to craft grid]" ..
-		add
-		)
-	end
-end
-
-local on_receive_fields=function(pos, formname, pressed, sender)
-		local meta = minetest.get_meta(pos)
-		if pressed.guidefront then
-			local page = meta:get_int("page")
-			local search = meta:get_string("search")
-			local itemlist = search ~= "" and minetest.deserialize(search) or default.workbench.items_list
-			if page + 40 < #itemlist then
-				meta:set_int("page",page + meta:get_int("but_am")+1)
-				default.workbench.set_form(pos)
-			end
-			return
-		elseif pressed.guideback then
-			local page = meta:get_int("page")
-			if page - 40 >= 0 then
-				meta:set_int("page",page - meta:get_int("but_am")-1)
-				default.workbench.set_form(pos)
-			end
-			return
-		elseif pressed.reset then
-			meta:set_string("search","")
-			meta:set_string("search_text","")
-			meta:set_int("page",1)
-			default.workbench.set_form(pos)
-			return
-		elseif pressed.search or pressed.key_enter_field == "searchbox" then
-			local its = {}
-			local s = pressed.searchbox:lower()
-			for i,it in pairs(default.workbench.items_list) do
-				if it:find(s) or (minetest.registered_items[it].description or ""):lower():find(s) then
-					table.insert(its,it)
-				end
-			end
-			meta:set_string("search",minetest.serialize(its))
-			meta:set_string("search_text",s)
-			meta:set_int("page",1)
-			default.workbench.set_form(pos)
-			return
-		elseif pressed.add2c then
-			local craft_item = meta:get_string("craft_item")
-			local craft
-			if craft_item ~= "" then
-				craft = minetest.get_craft_recipe(craft_item)
-				if not (craft.items and craft.type == "normal") then
-					return
-				end
-			else
-				return
-			end
-
-			local take_from
-			local add_to
-			local inv
-
-			if meta:get_int("craftguide") == 1 then
-				inv = sender:get_inventory()
-				take_from = "main"
-				add_to = "craft"
-			elseif meta:get_int("workbench") == 1 then
-				inv = meta:get_inventory()
-				take_from = "stock"
-				add_to = "craft"
-			else
-				return
-			end
-
-			for i,v in pairs(craft.items) do
-				local n =  inv:get_stack(add_to,i):get_name()
-				local c =  inv:get_stack(add_to,i):get_count()
-				local max = n ~= "" and minetest.registered_items[n] and minetest.registered_items[n].stack_max or 99
-				if v:sub(1,6) == "group:" then
-					for i2,v2 in pairs(inv:get_list(take_from)) do
-						if minetest.get_item_group(v2:get_name(),v:sub(7,-1)) > 0 and (n == "" or v2:get_name() == n and c < max) then
-							inv:set_stack(add_to,i,v2:get_name() .. " "..(c+1))
-							inv:remove_item(take_from,v2:get_name() .. " 1")
-							break
-						end
-					end
-				elseif inv:contains_item(take_from,v) and (n == "" or n == v and c < max) then
-					inv:set_stack(add_to,i,v .. " "..(c+1))
-					inv:remove_item(take_from,v .. " 1")
-				end
-				local item = minetest.get_craft_result({method = "normal",width = 3, items = inv:get_list("craft")}).item
-				inv:set_stack("output",1,item:get_name() .. " " .. item:get_count())
-			end
-		end
-
-		local but_size = meta:get_string("but_size")
-		local x_add = tonumber(meta:get_string("x_add"))
-		local y_add = tonumber(meta:get_string("y_add"))
-		local x_start = tonumber(meta:get_string("x_start"))
-		local y_start_crafring = tonumber(meta:get_string("y_start_crafring"))
-		local y_start_cooking = tonumber(meta:get_string("y_start_cooking"))
-		local y_label = tonumber(meta:get_string("y_label"))
-
-		local but_am_w = meta:get_int("but_am_w")
-
-		for i,it in pairs(pressed) do
-			if string.sub(i,1,11) == "guide_item#" or string.sub(i,1,18) == "guide_alternative#" then
-				local item
-				local itlist = ""
-				local craft
-				if string.sub(i,1,18) == "guide_alternative#" then
-					item = string.sub(i,19,-3)
-					local c = minetest.get_all_craft_recipes(item)
-					if c and #c > 1 then
-						for i,v in pairs(c) do
-							itlist = itlist .. "item_image_button[" .. (1.5+i) .. ",5.7;" .. but_size ..";".. v.output ..";guide_alternative#" ..v.output .."="..i..";]"
-						end
-						craft = c[tonumber(string.sub(i,-1,-1))]
-					else
-						item = string.sub(i,12,-1)
-						craft = minetest.get_craft_recipe(item)
-					end
-				else
-					item = string.sub(i,12,-1)
-					craft = minetest.get_craft_recipe(item)
-					meta:set_string("craft_item",item)
-
-				end
-
-				local x = x_start
-				local y = y_start_crafring+0.5
-				
-				if craft.items and craft.type == "normal" then
-					local craftgl = 9
-					for i1=1, craftgl,1 do
-						local it2s = (i1 and craft.items[i1] or "")
-						local label = ""
-						local kind = "item"
-						local but = it2s
-
-						if it2s=="" or minetest.registered_items[it2s] then
-						elseif string.sub(it2s,1,6) == "group:" and default.workbench.groups_list[it2s] then
-							but = it2s
-							it2s = default.workbench.groups_list[it2s][1] or "default:unknown"
-							label = "G"
-							kind = "group"
-						else
-							it2s = "default:unknown"
-							kind = ""
-						end
-						itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. it2s ..";guide_" .. kind .."#" .. but ..";" .. label .."]"
-						x = x + x_add
-						if x >= x_add*2 then
-							x = x_start
-							y = y + y_add
-						end
-					end
-					itlist = itlist .. (minetest.get_item_group(item,"not_regular_craft") > 0 and "item_image_button[" .. (x_start+x_add*4) .. "," .. (y_start_crafring+y_add) .. ";" .. but_size ..";default:workbench;guide_item#default:workbench;]" or "")
-				elseif craft.type and craft.type == "cooking" and craft.items then
-					craft.item = craft.items[1]
-
-					local kind = "item"
-					local label = ""
-					local itkind = craft.item
-					if string.sub(craft.item,1,6) == "group:" and default.workbench.groups_list[craft.item] then
-						craft.item = default.workbench.groups_list[craft.item][1] or "default:unknown"
-						label = "G"
-						kind = "group"
-					end
-
-					itlist = ""
-					.. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. craft.item ..";guide_" .. kind .."#" .. itkind ..";" .. label .. "]"
-					.. "label[" .. (x+0.3) .. "," .. (y-0.4) .. ";Cooking]"
-					.. "item_image_button[" .. (x+x_add) .. "," .. y .. ";" .. but_size ..";default:furnace;guide_item#default:furnace;]"
-					..  "item_image_button[" .. (x+x_add*2) .. "," .. y .. ";" .. but_size ..";".. craft.output ..";guide_item#" .. craft.output ..";]"
-				end
-
-				local c = minetest.get_all_craft_recipes(item)
-				if c and #c > 1 then
-					for i,v in pairs(c) do
-						if i > 5 then
-							break
-						end
-						local na = v.output
-						local s =  string.find(na," ")
-						if s then
-							na = string.sub(na,1,s-1)
-						end
-						itlist = itlist .. "item_image_button[" .. (1.5+i) .. ",6.5;" .. but_size ..";".. na ..";guide_alternative#" ..na .."="..i..";]"
-					end
-				end
-
-				default.workbench.set_form(pos,itlist)
-				return
-			elseif string.sub(i,1,12) == "guide_group#" then
-				local groupname = string.sub(i,13,-1)
-				local group = default.workbench.groups_list[groupname] or {}
-				local x = x_start
-				local y = y_start_cooking
-				local itlist = "label[-0.2," .. (y_label+0.1) .. ";" .. groupname .."]"
-				local bs = tonumber(but_size.split(but_size,",")[1])
-				for _,nam in pairs(group) do
-					itlist = itlist .. "item_image_button[" .. x .. "," .. y .. ";" .. but_size ..";".. nam ..";guide_item#" ..nam ..";]"
-					x = x + x_add
-					if x >= bs*(but_am_w-2)  then
-						x = x_start
-						y = y + y_add
-					end
-				end
-				default.workbench.set_form(pos,itlist)
-				return
-			end
-		end
-end
 
 default.workbench.result=function(pos,form,player)
 	local inv = minetest.get_meta(pos):get_inventory()
@@ -363,34 +35,88 @@ default.workbench.result=function(pos,form,player)
 	inv:set_stack("output",1,craft.item)
 end
 
+player_style.register_manual_page({
+	name = "Workbench",
+	itemstyle = "default:workbench",
+	text = "The workbench contains a craft guide and a crafting grid that makes things less messy to craft.\nSome items like steel lumps can only be crafted in this way.",
+	tags = {"default:workbench"},
+})
+
+
+player_style.register_manual_page({
+	name = "Dye workbench",
+	itemstyle = "default:dye_workbench",
+	text = "Use this workbench to craft dye.\nAdd a bucket of water or water source, and colored items to mix the dye",
+	tags = {"default:dye_workbench"},
+})
+
+player_style.register_manual_page({
+	name = "Paper compressor",
+	itemstyle = "default:paper_compressor",
+	text = "Use the paper compressor to craft paper.\nAdd a bucket of water and pieces of wood",
+	tags = {"default:paper_compressor"},
+})
+
+player_style.register_manual_page({
+	name = "Recycling mill",
+	itemstyle = "default:recycling_mill",
+	text = "The recycling mill is used to recycling items / demount items so you get the items it is made of",
+	tags = {"default:recycling_mill"},
+})
+
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1},
+	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,on_load=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
+	on_load=function(pos)
+		local meta = minetest.get_meta(pos)
+		if meta:get_string("x_add") ~= "" then
+			local inv = meta:to_table()
+			local a = inv
+			minetest.after(0.1,function()
+				local meta = minetest.get_meta(pos)
+				local inv = meta:get_inventory()
+				inv:set_list("output",a.inventory.output)
+				inv:set_list("main",a.inventory.stock)
+				inv:set_list("craft",a.inventory.craft)
+			end)
+			local n = minetest.get_node(pos)
+			minetest.set_node(pos,n)
+		end
+	end,
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_string("owner", placer:get_player_name())
+	end,
+	on_receive_fields=function(pos, formname, pressed, player)
+		if pressed.craftguide then
+			player_style.craftguide.show(player,pos)
+		end
 	end,
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("craft", 9)
 		inv:set_size("output", 1)
-		inv:set_size("stock", 16)
+		inv:set_size("main", 32)
 		meta:set_string("infotext", "Workbench")
-		meta:set_int("workbench", 1)
-		meta:set_int("page", 1)
-		meta:set_string("but_size", "0.7,0.7")
-		meta:set_string("x_start", "-0.2")
-		meta:set_string("x_add", "0.5")
-		meta:set_string("y_add", "0.6")
-		meta:set_string("y_start_crafring", "4")
-		meta:set_string("y_start_cooking", "4.5")
-		meta:set_string("y_label", 4)
-		meta:set_int("but_am", 39)
-		meta:set_int("but_am_w", 7)
-		default.workbench.set_form(pos)
+		meta:set_string("formspec",
+		"size[8,11]"
+		.. "listcolors[#77777777;#777777aa;#000000ff]"
+		.. "list[context;craft;3,0;3,3;]"
+		.. "list[context;output;6,1;1,1;]"
+		.. "list[context;main;0,3.2;8,4;]"
+		.. "list[current_player;main;0,7.3;8,4;]"
+		.. "listring[current_player;main]"
+		.. "listring[current_name;main]"
+		.. "listring[current_name;craft]"
+		.. "listring[current_player;main]"
+		.. "listring[current_name;output]"
+		.. "listring[current_player;main]"
+		.. "image_button[1,1;1,1;default_craftgreed.png^default_unknown.png;craftguide;]"
+		.. "tooltip[craftguide;Craftguide]"
+		)
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if listname=="craft" then
@@ -437,11 +163,11 @@ minetest.register_node("default:workbench", {
 		local inv = minetest.get_meta(pos):get_inventory()
 		local owner = minetest.get_meta(pos):get_string("owner")
 		local name = player:get_player_name()
-		return (inv:is_empty("craft") and inv:is_empty("stock")) and (name == owner or owner == "")
+		return (inv:is_empty("craft") and inv:is_empty("main")) and (name == owner or owner == "")
 	end,
 	exatec={
-		input_list="stock",
-		output_list="stock",
+		input_list="main",
+		output_list="main",
 	},
 })
 
@@ -459,20 +185,17 @@ minetest.register_node("default:craftguide", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	use_texture_alpha = "clip",
-	on_construct=function(pos)
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
-		meta:set_int("page", 1)
-		meta:set_string("but_size", "1,1")
-		meta:set_string("x_start", -0.2)
-		meta:set_string("x_add", "0.8")
-		meta:set_string("y_add", "0.9")
-		meta:set_string("y_start_crafring", "5")
-		meta:set_string("y_start_cooking", "5.5")
-		meta:set_string("y_label", "5")
-		meta:set_int("craftguide", 1)
-		meta:set_int("but_am", 49)
-		meta:set_int("but_am_w", 9)
-		default.workbench.set_form(pos)
+		if meta:get_string("x_add") ~= "" then
+			minetest.after(0.1,function()
+				player_style.craftguide.show(player,pos)
+			end)
+			local n = minetest.get_node(pos)
+			minetest.set_node(pos,n)
+			return
+		end
+		player_style.craftguide.show(player,pos)
 	end,
 	after_place_node = function(pos, placer, itemstack)
 		minetest.rotate_node(itemstack,placer,{under=pos,above=pos})
