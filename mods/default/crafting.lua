@@ -67,7 +67,7 @@ player_style.register_manual_page({
 minetest.register_node("default:workbench", {
 	description = "Workbench",
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
-	groups = {wood=1,oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,on_load=1},
+	groups = {oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,on_load=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_receive_fields=on_receive_fields,
 	on_load=function(pos)
