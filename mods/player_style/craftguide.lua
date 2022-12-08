@@ -34,6 +34,7 @@ player_style.craftguide.show=function(player)
 	local size = player_style.craftguide.width * player_style.craftguide.height
 	local pages = math.ceil(#list/size)
 
+
 	for i=user.index,user.index+size-1 do
 		local item = list[i]
 		if not item then
@@ -62,12 +63,19 @@ player_style.craftguide.show=function(player)
 		end
 	end
 
+	if user.craft_item then
+		items = items .. "image[3,6.5;1,1;default_crafting_arrowright.png]"
+		if craftable then
+			items = items .. "item_image_button[4,6.5;1,1;"..user.craft_item..";craft;]tooltip[craft;Craft it]"
+		else
+			items = items .. "box[4,6.5;0.8,0.9;#333f]item_image[4,6.5;1,1;"..user.craft_item.."]box[4,6.5;0.8,0.9;#555c]tooltip[4,6.5;1,1;"..(craft_status or "").."]"
+		end
+	end
 
 	return minetest.show_formspec(name, "player_style.craftguide",
 		"size[8,"..(user.info and 8.5 or 5).."]"
 		.. "listcolors[#77777777;#777777aa;#000000ff]"
 		.. items
-		--.. "list[current_player;main;0,"..(craftr and 8 or 5)..".4;8,4;]"
 
 		.. "image_button[1,4.25;1,1;default_crafting_arrowleft.png"..(user.page == 1 and "^[colorize:#5555;No" or ";").."guideback;]"
 
@@ -79,7 +87,7 @@ player_style.craftguide.show=function(player)
 		.. "field[6,4.5;2.5,1;searchbox;;"..(user.search_text or "").."]"
 		.. "field_close_on_enter[searchbox;false]"
 		.. (user.info or "")
-		.. (user.craft_item and "image[3,6.5;1,1;default_crafting_arrowright.png]image_button[4,6.5;1,1;default_craftgreed.png"..(craftable and ";craft;]tooltip[craft;Craft it]" or "^[colorize:#555A;NOcraft;]tooltip[NOcraft;"..(craft_status or "").."]") or "")
+
 		)
 end
 
