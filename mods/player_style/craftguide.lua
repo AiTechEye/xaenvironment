@@ -21,11 +21,34 @@ minetest.register_on_mods_loaded(function()
 	table.sort(player_style.craftguide.items)
 end)
 
-player_style.craftguide.show=function(player)
+player_style.craftguide.show=function(player,pos)
 	local name = player:get_player_name()
 	player_style.players[name].craftguide = player_style.players[name].craftguide or {page=1,index=1}
 
 	local user = player_style.players[name].craftguide
+
+	if pos then
+		user.pos = pos
+		local meta = minetest.get_meta(pos):to_table()
+		user.search = nil
+		user.search_text = nil
+		for i,v in pairs(meta.fields) do
+			user[i] = tonumber(v) or v
+		end
+		if meta.fields.search_text then
+			player_style.craftguide.search(player,meta.fields.search_text)
+		end
+	elseif user.pos then
+		local meta = minetest.get_meta(user.pos)
+		for i,v in pairs(user) do
+			if type(v) == "string" and i ~= "search" then
+				meta:set_string(i,v)
+			elseif type(v) == "number" then
+				meta:set_int(i,v)
+			end
+		end
+	end
+
 	local x=0
 	local y=0
 	local craftable,craft_status,missing = player_style.craftguide.autocraft(player,true)
@@ -33,7 +56,6 @@ player_style.craftguide.show=function(player)
 	local items = ""
 	local size = player_style.craftguide.width * player_style.craftguide.height
 	local pages = math.ceil(#list/size)
-
 
 	for i=user.index,user.index+size-1 do
 		local item = list[i]
@@ -87,7 +109,6 @@ player_style.craftguide.show=function(player)
 		.. "field[6,4.5;2.5,1;searchbox;;"..(user.search_text or "").."]"
 		.. "field_close_on_enter[searchbox;false]"
 		.. (user.info or "")
-
 		)
 end
 
@@ -95,11 +116,19 @@ player_style.craftguide.autocraft=function(player,test)
 
 	local name = player:get_player_name()
 	local user = player_style.players[name].craftguide
+	local inv
+	local meta = user.pos and minetest.get_meta(user.pos)
+	if meta and meta:get_inventory():get_list("main") then
+		inv = meta:get_inventory()
+	else
+		inv = player:get_inventory()
+	end
+
 	local craft_item = user.craft_item
 	local craft = minetest.get_craft_recipe(craft_item or "")
 	local take_from = "main"
 	local add_to = "craft"
-	local inv = player:get_inventory()
+
 	local visual_craft_grid = {}
 	local visual_inv = table.copy(inv:get_list(take_from))
 
@@ -108,16 +137,9 @@ player_style.craftguide.autocraft=function(player,test)
 	end
 
 	for i,v in pairs(craft.items) do
-		local n =  inv:get_stack(add_to,i):get_name()
-		local c =  inv:get_stack(add_to,i):get_count()
-		local def = minetest.registered_items[n] or {}
-		local max = def.stack_max or 99
-
 		if v:sub(1,6) == "group:" then
 			local g = v:sub(7,-1)
-
 			for i2,v2 in pairs(visual_inv) do
-			--for i2,v2 in pairs(inv:get_list(take_from)) do
 				if minetest.get_item_group(v2:get_name(),g) > 0 then
 					visual_craft_grid[i] = v2:get_name() .. " 1"
 					visual_inv[i2]:take_item(1)
@@ -160,11 +182,28 @@ player_style.craftguide.autocraft=function(player,test)
 	end
 end
 
+player_style.craftguide.search=function(player,text)
+	local s = text:lower()
+	local items = {}
+	local name = player:get_player_name()
+	local user = player_style.players[name].craftguide
+	for i,it in pairs(player_style.craftguide.items) do
+		if it:find(s) or (default.def(it).description or ""):lower():find(s) then
+			table.insert(items,it)
+		end
+	end
+	user.search = items
+	user.search_text = s
+end
+
 minetest.register_on_player_receive_fields(function(player, form, pressed)
 	if form == "player_style.craftguide" then
 		local name = player:get_player_name()
 		local user = player_style.players[name].craftguide
-		if pressed.guidefront then
+
+		if pressed.quit then
+			user.pos = nil
+		elseif pressed.guidefront then
 			local list = user.search or player_style.craftguide.items
 			local size = player_style.craftguide.width*player_style.craftguide.height
 
@@ -191,15 +230,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			player_style.craftguide.show(player)
 			return
 		elseif pressed.search or pressed.key_enter_field == "searchbox" then
-			local items = {}
-			local s = pressed.searchbox:lower()
-			for i,it in pairs(player_style.craftguide.items) do
-				if it:find(s) or (default.def(it).description or ""):lower():find(s) then
-					table.insert(items,it)
-				end
-			end
-			user.search = items
-			user.search_text = s
+			player_style.craftguide.search(player,pressed.searchbox)
 			user.page = 1
 			user.index = 1
 			player_style.craftguide.show(player)
