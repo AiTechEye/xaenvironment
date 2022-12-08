@@ -305,8 +305,6 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							y = y + 1
 						end
 					end
-					itlist = itlist .. (minetest.get_item_group(item,"not_regular_craft") > 0 and "item_image_button[3,6.5;1,1;default:workbench;guide_item#default:workbench;]" or "")
-
 
 				elseif craft.type and craft.type == "cooking" and craft.items then
 --cooking
