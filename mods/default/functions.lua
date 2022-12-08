@@ -246,7 +246,6 @@ default.register_on_item_drop=function(f)
 end
 
 minetest.register_on_newplayer(function(player)
-	player:get_inventory():add_item("main","default:craftguide")
 	player:get_meta():set_string("spawn_position",minetest.pos_to_string(player:get_pos()))
 end)
 
