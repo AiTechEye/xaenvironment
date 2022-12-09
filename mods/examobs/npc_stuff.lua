@@ -237,11 +237,17 @@ examobs.npc_setup=function(self)
 		end
 	end
 
+	local on_spawn = self.on_spawn
+	local on_load = self.on_load
+
 	self.on_spawn=function(self)
 		table.insert(examobs.npc.list,self.object)
+		on_spawn(self)
 	end
+
 	self.on_load=function(self)
 		table.insert(examobs.npc.list,self.object)
+		on_load(self)
 	end
 end
 
