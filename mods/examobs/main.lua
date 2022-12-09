@@ -19,7 +19,7 @@ examobs.main=function(self, dtime,moveresult)
 			end
 		end
 	end
-	if self:on_abs_step() or self.timer2 < self.updatetime then return end
+	if self:on_abs_step(dtime) or self.timer2 < self.updatetime then return end
 	self.timer2 = 0
 	local p = self.object:get_pos()
 	if p then
