@@ -340,7 +340,7 @@ end
 minetest.register_node("xesmartshop:shop", {
 	description = "Smartshop",
 	tiles = {"default_birch_wood.png^default_glass.png^default_chest_top.png"},
-	groups = {choppy = 2, oddly_breakable_by_hand = 1,on_load=1,exatec_wire=1,exatec_tube_connected=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 1,on_load=1,exatec_wire=1,exatec_tube_connected=1,store=2000},
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.0,0.5,0.5,0.5}},
 	paramtype2="facedir",
@@ -424,7 +424,7 @@ minetest.register_node("xesmartshop:shop", {
 })
 
 minetest.register_node("xesmartshop:gamerules_shop", {
-	description = "Smartshop",
+	description = "Smartshop (Not for usage)",
 	drop = "xesmartshop:shop",
 	tiles = {"default_birch_wood.png^default_glass.png^default_chest_top.png"},
 	groups = {choppy = 2, on_load=1,not_in_creative_inventory=1},
