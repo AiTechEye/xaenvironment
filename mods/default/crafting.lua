@@ -69,7 +69,6 @@ minetest.register_node("default:workbench", {
 	tiles={"default_workbench_table.png","default_wood.png","default_wood.png^default_workbench.png"},
 	groups = {oddly_breakable_by_hand=3,choppy=3,flammable=2,used_by_npc=1,exatec_tube_connected=1,on_load=1},
 	sounds = default.node_sound_wood_defaults(),
-	on_receive_fields=on_receive_fields,
 	on_load=function(pos)
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("x_add") ~= "" then
@@ -178,7 +177,6 @@ minetest.register_node("default:craftguide", {
 	inventory_image="default_craftgreed.png^default_unknown.png",
 	groups = {dig_immediate=3,flammable=2,used_by_npc=2},
 	sounds = default.node_sound_wood_defaults(),
-	on_receive_fields=on_receive_fields,
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.49,0.5}},
 	paramtype2="wallmounted",
