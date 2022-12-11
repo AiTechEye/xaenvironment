@@ -1,11 +1,12 @@
 ![Alt text](screenshot.png)
 
-# XaEnvironment V11.1
+# XaEnvironment V11.11
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
 ## Compatible for minetest 5.6
 
+## [YouTube](https://www.youtube.com/@XaEnvironment/videos)  
 [Releases](https://github.com/AiTechEye/xaenvironment/releases)  
 [Minetest forum topic](https://forum.minetest.net/viewtopic.php?f=15&t=22340)  
 [game api & gameplay info](game_api.txt)  
