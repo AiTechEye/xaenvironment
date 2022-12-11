@@ -5,6 +5,7 @@ examobs={
 	global_lifetime=0,
 	hiding={},
 	storage = minetest.get_mod_storage(),
+	paths={},
 --	interact_map = {},
 	interact_map_timer = -60,
 	terminal_users={},
