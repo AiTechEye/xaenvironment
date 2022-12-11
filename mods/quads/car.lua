@@ -51,7 +51,7 @@ minetest.register_entity("quads:car",{
 	jump = 0,
 	timer = 0,
 	get_staticdata = function(self)
-		return minetest.serialize({citycar=self.citycar,petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
+		return minetest.serialize({carname=self.carname,citycar=self.citycar,petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
 	end,
 	anim=function(self,s)
 		if self.an ~= s then
@@ -61,7 +61,7 @@ minetest.register_entity("quads:car",{
 	end,
 	on_activate=function(self, staticdata)
 		local s = minetest.deserialize(staticdata) or {}
-		if s.citycar and (s.petrol or 0) == 0 then
+		if s.citycar then
 			self.object:remove()
 			return
 		end
@@ -284,20 +284,22 @@ minetest.register_entity("quads:car",{
 				end
 				return
 			end
+--makes drivers just turning around
+		--	self.lerp_start = self.object:get_yaw()
+		--	self.lerp_end = self.user:get_yaw() or self.lerp_start
+		--	self.lerp_cur = self.lerp_start + (self.lerp_end-self.lerp_start) * 0.2 -- lerp
+		--	self.object:set_yaw(self.lerp_cur)
 
-			self.lerp_start = self.object:get_yaw()
-			self.lerp_end = self.user:get_yaw() or self.lerp_start
-			self.lerp_cur = self.lerp_start + (self.lerp_end-self.lerp_start) * 0.2 -- lerp
-			self.object:set_yaw(self.lerp_cur)
+			self.object:set_yaw(self.user:get_yaw())
 
 			if self.bot.walking then
 				key.up = true
 			end
 			self.petrol = 100
 
-			local target = self.bot.storage.exatec and self.bot.storage.exatec.target
+			local target = self.bot.drive_to_pos or self.bot.storage.exatec and self.bot.storage.exatec.target
 
-			if target and type(target) == "table" and self.speed > 5 and vector.distance(p,target) < 10 then
+			if target and type(target) == "table" and self.speed > 5 and vector.distance(p,target) < 50 then
 				self.speed = self.speed + (1-self.speed) * 0.2
 			end
 		end
@@ -438,10 +440,14 @@ minetest.register_entity("quads:car",{
 		if moveresult and moveresult.collides then
 			for i,v in pairs(moveresult.collisions) do
 				if v.type == "object" and v.object then
-					v.object:add_velocity({x=x*2,y=v.object:get_velocity().y,z=z*2})
-					local en=v.object:get_luaentity()
-					if not (en and en.dead) then
-						default.punch(v.object,self.object,self.speed)
+					local vel = v.object:get_velocity()
+					local y = vel and vel.y
+					if y then
+						v.object:add_velocity({x=x*2,y=y,z=z*2})
+						local en=v.object:get_luaentity()
+						if not (en and en.dead) then
+							default.punch(v.object,self.object,self.speed)
+						end
 					end
 				end
 			end
