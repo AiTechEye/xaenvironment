@@ -369,7 +369,7 @@ if 1 then return end
 	pathpoints = pathpoints .."}"
 
 	for i,p in ipairs(sidewalk_paths2) do
-		minetest.set_node(p,{name="places:city_npcspawner"})	
+		minetest.set_node(p,{name="places:city_roadwalker_path"})	
 		minetest.get_meta(p):set_string("paths",pathpoints)
 	end
 
@@ -399,132 +399,116 @@ if 1 then return end
 	road_paths2 = road_paths2 .."}"
 
 	for i,p in ipairs(road_paths) do
-		minetest.set_node(p,{name="places:city_npccarspawner"})	
+		minetest.set_node(p,{name="places:city_roaddriver_path"})	
 		minetest.get_meta(p):set_string("paths",road_paths2)
 	end
 
 end
 
-minetest.register_node("places:city_npcspawner", {
-	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
-	pointable=false,
-	paramtype = "light",
-	drawtype="airlike",
-	drop="",
-	walkable=false,
-	floodable = true,
-	sunlight_propagates = true,
-	on_construct=function(pos)
-		minetest.registered_nodes["places:city_npcspawner"].on_load(pos)
+examobs.register_roadwalker({
+	name = "city_roadwalker",
+	right_hand_traffic = 1.2,
+})
+
+examobs.register_roadwalker({
+	name="city_roaddriver",
+	amount_limit = 15,
+	right_hand_traffic = 4,
+	path_pass_range = 5,
+	new_path=function(self,pos1,pos2)
+		self.carpos = {time=0,pos=pos1}
+		self.drive_to_pos = pos2
 	end,
-	on_load=function(pos)
-		minetest.get_node_timer(pos):start(math.random(1,60))
-	end,
-	on_timer = function (pos, elapsed)
-		if (examobs.active.types["examobs:npc"] or 0) > 30 then
-			for i,v in pairs(examobs.active.ref) do
-				local en = v and v:get_luaentity()
-				if examobs.active.types["examobs:npc"] > 30 then
-					if en and en.name == "examobs:npc" and en.storage.city then
-						v:remove()
+	step=function(self,dtime)
+		if self.c2timer and self.c2timer < 0 then
+			self.c2timer = self.c2timer + (dtime or 0.01)
+			return self
+		end
+
+		local a = self.object:get_attach()
+		if not a or not a:get_luaentity() or a:get_luaentity().name ~= "quads:car" then
+			return
+		end
+		local pos1 = self.object:get_pos()
+
+		self.carpos = self.carpos or {time=0,pos=pos1}
+		self.carpos.time = self.carpos.time + (dtime or 0.01)
+		if self.carpos.time > 1 then
+			self.carpos.time = 0
+			local d = vector.distance(self.carpos.pos,pos1)
+			if d <= 0.5 then
+				self.c2timer = -1
+				self.object:set_yaw(math.random(0,6.28))
+				return self
+			end
+			self.carpos.pos = pos1
+		end
+
+		local pos2 = examobs.pointat(self,10)
+		local c = minetest.raycast(pos1,pos2)
+		local n = c:next()
+		while n do
+			if n and n.type == "object" then
+				local en = n.ref:get_luaentity()
+				if n.ref:is_player() or n.ref ~= self.object and n.ref ~= a then
+					local s = a:get_luaentity().speed
+					a:get_luaentity().speed = math.abs(s) > 0.1 and s*0.5 or 0
+					if n.ref:is_player() == false and not n.ref:get_luaentity().examob then
+						self.object:set_yaw(math.random(0,6.28))
+						self.c2timer = -1
 					end
-				else
 					return true
 				end
 			end
-			return true
+			n = c:next()
 		end
+	end,
+	node = {
+		on_timer = function(pos, elapsed)
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "quads:car" then
+					return false
+				end
+			end
+		end,
+		on_spawn = function(pos,ob)
+			examobs.car_colors = {}
+			for i,v in pairs(minetest.registered_nodes) do
+				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" and not (v.groups and (v.groups.not_in_creative_inventory or v.groups.rail or v.use_texture_alpha)) then
+					table.insert(examobs.car_colors,{name=v.name,texture=v.tiles[1]})
+				end
+			end
+			local ndef = examobs.car_colors[math.random(1,#examobs.car_colors)]
+			local self = ob:get_luaentity()
+			local car = minetest.add_entity(apos(pos,0,1),"quads:car"):get_luaentity()
 
-		local paths = minetest.get_meta(pos):get_string("paths")
-		if paths == "" then
-			minetest.remove_node(pos)
-			return
+			self.object:set_attach(car.object, "",{x=-5, y=-3, z=2})
+
+			car.user = self.object
+			car.user_name= self.examob
+			car.bot = self
+			car.citycar = true
+			car.texture_node = ndef.name
+			car.texture = ndef.texture
+			car.color(car)
+			car.citycar = true
 		end
-		local skin = player_style.skins.skins[math.random(1,26)].skin
-		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
-		local text = file:read("*all")
-		file:close()
+	}
+})
 
-		if text == "" then
-			return
-		end
-
-		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
-		text = text:gsub("#code#",paths)
-		text = text:gsub("#distance#",2.4)
-
-		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-		self.storage.city = true
-		self.storage.code_execute_interval = text
-		self.storage.code_execute_interval_user = "singleplayer"
-		self.object:set_properties({textures={skin},static_save = false})
-		return true
-	end
+minetest.register_node("places:city_npcspawner", {
+	groups = {not_in_creative_inventory=1,on_load=1},
+	drawtype="airlike",
+	on_load=function(pos)
+		minetest.set_node(pos,{name="places:city_roadwalker_path"})
+	end,
 })
 
 minetest.register_node("places:city_npccarspawner", {
-	groups = {attached_node=1,not_in_creative_inventory=1,on_load=1},
-	pointable=false,
-	paramtype = "light",
+	groups = {not_in_creative_inventory=1,on_load=1},
 	drawtype="airlike",
-	drop="",
-	walkable=false,
-	floodable = true,
-	sunlight_propagates = true,
-	on_construct=function(pos)
-		minetest.registered_nodes["places:city_npccarspawner"].on_load(pos)
-	end,
 	on_load=function(pos)
-		minetest.get_node_timer(pos):start(math.random(1,60))
+		minetest.set_node(pos,{name="places:city_roaddriver_path"})
 	end,
-	on_timer = function (pos, elapsed)
-		if (examobs.active.types["examobs:npc"] or 0) > 30 then
-			return true
-		end
-
-		local paths = minetest.get_meta(pos):get_string("paths")
-		if paths == "" then
-			minetest.remove_node(pos)
-			return
-		end
-		local skin = player_style.skins.skins[math.random(1,26)].skin
-		local file = io.open(minetest.get_modpath("places") .. "/city_npc.txt", "r")
-		local text = file:read("*all")
-		file:close()
-
-		if text == "" then
-			return
-		elseif not places.car_colors then
-			places.car_colors = {}
-			for i,v in pairs(minetest.registered_nodes) do
-				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" and not (v.groups and (v.groups.not_in_creative_inventory or v.groups.rail)) then
-					table.insert(places.car_colors,{name=v.name,texture=v.tiles[1]})
-				end
-			end
-		end
-		local ndef = places.car_colors[math.random(1,#places.car_colors)]
-
-		text = text:gsub("#skin#",player_style.skins.skins[math.random(1,26)].skin)
-		text = text:gsub("#code#",paths)
-		text = text:gsub("#distance#",4)
-
-		local self = minetest.add_entity(apos(pos,0,1),"examobs:npc"):get_luaentity()
-		self.storage.city = true
-		self.storage.code_execute_interval = text
-		self.storage.code_execute_interval_user = "singleplayer"
-		self.object:set_properties({textures={skin},static_save = false})
-
-		local car = minetest.add_entity(apos(pos,0,1),"quads:car"):get_luaentity()
-		self.object:set_attach(car.object, "",{x=-5, y=-3, z=2})
-		car.object:set_properties({static_save = false})
-		car.user = self.object
-		car.user_name= self.examob
-		car.bot = self
-		car.citycar = true
-		car.texture_node = ndef.name
-		car.texture = ndef.texture
-		car.color(car)
-
-		return true
-	end
 })
