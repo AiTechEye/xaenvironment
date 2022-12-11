@@ -51,7 +51,7 @@ minetest.register_entity("quads:car",{
 	jump = 0,
 	timer = 0,
 	get_staticdata = function(self)
-		return minetest.serialize({carname=self.carname,citycar=self.citycar,petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
+		return minetest.serialize({citycar=self.citycar,petrol=self.petrol,user_name=self.user_name,palette_index=self.palette_index,texture=self.texture,texture_node=self.texture_node,texture_glass=self.texture_glass})
 	end,
 	anim=function(self,s)
 		if self.an ~= s then
