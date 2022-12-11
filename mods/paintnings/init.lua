@@ -81,7 +81,16 @@ minetest.register_craft({
 })
 minetest.register_node("paintnings:tv_off", {
 	description = "TV (off)",
-	tiles={"default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_stone.png^[colorize:#000f"},
+	drawtype = "mesh",
+	mesh = "paintnings_tv.obj",
+	selection_box = {
+		type = "fixed",
+		fixed = { -0.45, -0.5, -0.45, 0.45, 0.41, 0.45 },
+	},
+	tiles = {
+		"paintnings_tv.png",
+		"paintnings_tv.png^[sheet:4x4:1,0",
+	},
 	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3},
 	paramtype2 = "facedir",
 	on_punch=function(pos, node, player, pointed_thing)
@@ -107,17 +116,23 @@ minetest.register_node("paintnings:tv_"..i, {
 	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3,not_in_creative_inventory=1},
 	paramtype2 = "facedir",
 	light_source = 13,
-	tiles={"default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b","default_ironblock.png^[colorize:#000b",
+	drawtype = "mesh",
+	mesh = "paintnings_tv.obj",
+	selection_box = {
+		type = "fixed",
+		fixed = { -0.45, -0.5, -0.45, 0.45, 0.41, 0.45 },
+	},
+	tiles = {
+		"paintnings_tv.png",
 		{
 			name = v.t..".png",
-			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = v.w,
 				aspect_h = v.h,
 				length = v.s or 1,
 			}
-		}
+		},
 	},
 	on_punch=function(pos, node, player, pointed_thing)
 		minetest.set_node(pos,{name="paintnings:tv_off",param2=node.param2})
