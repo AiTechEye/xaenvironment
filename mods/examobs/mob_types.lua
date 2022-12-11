@@ -248,3 +248,167 @@ examobs.register_fish=function(def)
 		})
 	end
 end
+
+examobs.register_roadwalker=function(def)
+	def = def or {}
+
+	def.name = def.name or "roadwalker"
+	local mobname = minetest.get_current_modname() ..":" .. def.name
+	local step = def.step or function() end
+	local is_food = def.is_food or function(item) return minetest.get_item_group(item,"meat") > 0 end
+
+	local amount_limit = def.amount_limit or 30
+	def.path_range = def.path_range or 20
+	def.path_pass_range = def.path_pass_range or 2
+	def.path_finished = def.path_finished or function() end
+	def.new_path = def.new_path or function() end
+ 	def.right_hand_traffic = def.right_hand_traffic	-- distance
+
+	def.description = def.description or "A random person thats life is to move from a to b"
+	def.static_save = def.static_save or false
+	def.coin = def.coin or 1
+	def.textures = def.textures or {"character.png"}
+	def.type = def.type or "npc"
+	def.team = def.team or "fish"
+	def.dmg = def.dmg or 1
+	def.hp = def.hp or 2
+	def.animation = def.animation or "default"
+	def.spawning = false
+	def.inv = def.inv or {["examobs:flesh"]=1}
+
+	def.on_lifedeadline=function(self)
+		return self.storage.npc_generated
+	end
+
+	def.on_spawn = function(self)
+		local skin = player_style.skins.skins[math.random(1,26)].skin
+		self.object:set_properties({textures={skin}})
+	end
+
+	def.on_abs_step=function(self,dtime)
+		local pos = self.object:get_pos()
+
+		if step(self) then
+			return self
+		elseif self.fight or self.flee then
+			return
+		elseif not self.current_path or pos and vector.distance(self.current_path,pos) <= def.path_pass_range then
+			local paths = {}
+			if self.current_path then
+				def.path_finished(self)
+			end
+
+			for i,v in pairs(examobs.paths[mobname] or {}) do
+				if vector.distance(v,pos) < def.path_range and self.past_path_key ~= i then
+					local c = minetest.raycast(v,pos)
+					local n = c:next()
+					local skip
+					while n do
+						if n and n.type == "node" and default.defpos(n.under,"walkable") then
+							skip = true
+							break
+						end
+						n = c:next()
+					end
+					if not skip then
+						table.insert(paths,{pos=v,key=i})
+					end
+				end
+			end
+			if next(paths) then
+				self.ctimer = 0
+				local r = paths[math.random(1,#paths)]
+				local pos1 = self.current_path or pos
+				local pos2 = r.pos
+
+				if def.right_hand_traffic then
+					local dir = vector.subtract(pos2,pos1)
+					local right_side = vector.normalize(vector.new(dir.z,dir.y,-dir.x))
+					pos2 = vector.add(pos2,vector.multiply(right_side,def.right_hand_traffic))
+				end
+
+				self.past_path_key = self.current_path_key
+				self.current_path_key = r.key
+				self.current_path = pos2
+				self.new_path(self,pos1,pos2)
+				return self
+			else
+				self.object:remove()
+			end
+		elseif self.current_path then
+			self.ctimer = self.ctimer + dtime
+			if self.ctimer > 0.1 then
+				self.ctimer = 0
+				if self.moveresult.collides and next(self.moveresult.collisions) and vector.length(self.moveresult.collisions[1].new_velocity) < 0.1 then
+					self.object:set_yaw(math.random(0,6.28))
+					self.ctimer = -0.5
+				else
+					examobs.lookat(self,self.current_path)
+					examobs.walk(self)
+				end
+			elseif self.ctimer < 0 then
+				examobs.walk(self)
+			end
+			return self
+		end
+	end
+
+	local nodedef = table.copy(def.node or {})
+	local on_load = nodedef.on_load or function() end
+	local on_timer = nodedef.on_timer or function() return true end
+	local on_construct = nodedef.on_construct or function() end
+	local on_destruct = nodedef.on_destruct or function() end
+
+	local on_spawn = nodedef.on_spawn or function() end
+
+	nodedef.groups = nodedef.groups or {on_load=1,attached_node=1,not_in_creative_inventory=1}
+	nodedef.drawtype = nodedef.drawtype or "airlike"
+	nodedef.drop = nodedef.drop or ""
+	nodedef.walkable = nodedef.walkable == true
+	nodedef.pointable = nodedef.pointable or false
+	nodedef.floodable = nodedef.floodable == true
+
+	nodedef.on_load = function(pos)
+		examobs.paths[mobname] = examobs.paths[mobname] or {}
+		examobs.paths[mobname][minetest.pos_to_string(pos)] = pos
+		minetest.get_node_timer(pos):start(math.random(1,60))
+		on_load(pos)
+	end
+	nodedef.on_construct=function(pos)
+		examobs.paths[mobname] = examobs.paths[mobname] or {}
+		examobs.paths[mobname][minetest.pos_to_string(pos)] = pos
+		minetest.get_node_timer(pos):start(math.random(1,60))
+		on_construct(pos)
+	end
+	nodedef.on_destruct=function(pos)
+		examobs.paths[mobname] = examobs.paths[mobname] or {}
+		examobs.paths[mobname][minetest.pos_to_string(pos)] = nil
+		on_destruct(pos)
+	end
+	nodedef.on_timer = function(pos, elapsed)
+		if (examobs.active.types[mobname] or 0) >= amount_limit then
+			for i,v in pairs(examobs.active.ref) do
+				if examobs.active.types[mobname] > amount_limit then
+					v:remove()
+				else
+					return true
+				end
+			end
+			return true
+		end
+
+		if on_timer(pos) == false then
+			return
+		end
+
+		local ob = minetest.add_entity(apos(pos,0,1),mobname)
+		on_spawn(pos,ob)
+		return true
+	end
+
+	def.node = nil
+	def.amount_limit = nil
+
+	examobs.register_mob(def)
+	minetest.register_node(mobname.."_path", nodedef)
+end
