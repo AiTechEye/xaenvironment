@@ -2,15 +2,25 @@
 
 # XaEnvironment V11.11
 
-Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
-
 ## Compatible for minetest 5.6
 
-## [YouTube](https://www.youtube.com/@XaEnvironment/videos)  
+Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
+
+# Contributor: 
+## [MrRar](https://github.com/MrRar)  (code, models, media)
+  [paintnings_tv.obj](mods/paintnings/models/paintnings_tv.obj)  
+  [paintnings_tv.png](mods/paintnings/textures/paintnings_tv.png)  
+
+## [programmerjake](https://github.com/programmerjake) (bug fixes)  
+  
+  
+
+------------------------------------------------------------------------------------------------
+
+### [YouTube/Updates](https://www.youtube.com/@XaEnvironment/videos)  
 [Releases](https://github.com/AiTechEye/xaenvironment/releases)  
 [Minetest forum topic](https://forum.minetest.net/viewtopic.php?f=15&t=22340)  
 [game api & gameplay info](game_api.txt)  
-[See updates](https://www.youtube.com/channel/UCp-XmjVbZiczLcvc4mrbqVw/videos)  
 
 ---
 ## Controls:  
