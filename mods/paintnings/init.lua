@@ -115,6 +115,7 @@ minetest.register_node("paintnings:tv_"..i, {
 	drop="paintnings:tv_off",
 	groups = {choppy = 2, oddly_breakable_by_hand = 2,flammable=3,not_in_creative_inventory=1},
 	paramtype2 = "facedir",
+	use_texture_alpha = "blend",
 	light_source = 13,
 	drawtype = "mesh",
 	mesh = "paintnings_tv.obj",
