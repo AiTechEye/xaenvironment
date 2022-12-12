@@ -8,8 +8,8 @@ Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
 # Contributor: 
 ## [MrRar](https://github.com/MrRar)  (code, models, media)
-  [paintnings_tv.obj](mods/paintnings/models/paintnings_tv.obj)  
-  [paintnings_tv.png](mods/paintnings/textures/paintnings_tv.png)  
+  [paintnings_tv.obj](mods/paintnings/models/paintnings_tv.obj) CC BY-SA-4.0   
+  [paintnings_tv.png](mods/paintnings/textures/paintnings_tv.png)  CC BY-SA-4.0  
 
 ## [programmerjake](https://github.com/programmerjake) (bug fixes)  
   
