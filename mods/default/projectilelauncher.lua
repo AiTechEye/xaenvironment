@@ -880,3 +880,76 @@ projectilelauncher.register_bullet("hookshot",{
 		{"default:steel_ingot","default:iron_ingot"},
 	}
 })
+
+projectilelauncher.register_bullet("uranium",{
+	description="Uranium bullet (Explosive)",
+	itemtexture = "default_uraniumblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_uraniumactiveblock.png^default_alpha_stick.png^[makealpha:0,255,0)",
+	damage=0,
+	craft_count=1,
+	launch_sound = "default_projectilelauncher_shot4",
+	groups={treasure=2,store=50},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
+		local c = minetest.raycast(pos1,pos2)
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos3 = ob.intersection_point
+				minetest.check_for_falling(ob.under)
+				break
+			elseif ob.type == "object" and ob.ref ~= user then
+				pos3 = ob.ref:get_pos()
+				break
+			end
+			ob = c:next()
+		end
+
+		if not pos3 then
+			return true, true
+		end
+
+		projectilelauncher.new_inventory(itemstack, user)
+		local name = user:get_player_name()
+		local p = projectilelauncher.user[name]
+
+		local vec = {x=pos1.x-pos3.x, y=pos1.y-pos3.y, z=pos1.z-pos3.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_uraniumblock.png"
+		if pos1.x >= pos3.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos3.x-pos1.x)/2,y=pos1.y+(pos3.y-pos1.y)/2,z=pos1.z+(pos3.z-pos1.z)/2})
+		lightning:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+
+		local e = minetest.add_entity(pos3,"plasma:impulse")
+		e:set_properties({textures={"default_cloud.png^[colorize:#deed4caa"}})
+		local en = e:get_luaentity()
+		en.charging = true
+		en.scale= 0
+		en.end_scale = 10
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos3,5)) do
+			local en = ob:get_luaentity()
+			local p = ob:get_pos()
+			if ob ~= e and ob ~= user and not default.is_decoration(ob,true) and not (en and en.name == "default:arrow_lightning") then
+				default.punch(ob,user,200)
+			end
+		end
+		minetest.sound_play("plasma_shoot", {pos=pos1, gain = 4,max_hear_distance = 10})
+
+		nitroglycerin.explode(pos3,{
+			radius=4,
+			set="air",
+			user_name=name,
+		})
+
+		return true
+	end,
+	craft={
+		{"default:uraniumactive_ingot","default:steel_ingot"},
+	}
+})
