@@ -950,6 +950,6 @@ projectilelauncher.register_bullet("uranium",{
 		return true
 	end,
 	craft={
-		{"default:uraniumactive_ingot","default:steel_ingot"},
+		{"default:uraniumactive_ingot","default:titanium_ingot"},
 	}
 })
