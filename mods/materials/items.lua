@@ -751,7 +751,7 @@ minetest.register_node("materials:fridge", {
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:get_inventory():set_size("main", 32)
-		m:set_string("infotext","Shelf")
+		m:set_string("infotext","Fridge")
 		m:set_string("formspec",
 			"size[8,8]listcolors[#77777777;#777777aa;#000000ff]" ..
 			"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]" ..
