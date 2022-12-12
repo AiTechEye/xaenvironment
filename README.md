@@ -2,7 +2,7 @@
 
 # XaEnvironment V11.11
 
-## Compatible for minetest 5.6
+## Compatible for minetest 5.7
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
