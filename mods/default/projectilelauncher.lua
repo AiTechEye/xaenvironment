@@ -885,7 +885,7 @@ projectilelauncher.register_bullet("uranium",{
 	description="Uranium bullet (Explosive)",
 	itemtexture = "default_uraniumblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_uraniumactiveblock.png^default_alpha_stick.png^[makealpha:0,255,0)",
 	damage=0,
-	craft_count=1,
+	craft_count=2,
 	launch_sound = "default_projectilelauncher_shot4",
 	groups={treasure=2,store=50},
 	before_bullet_released=function(itemstack, user,pos1, dir)
