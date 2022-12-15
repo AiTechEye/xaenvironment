@@ -1065,16 +1065,16 @@ default.effect=function(pos,effect,originalpos)
 	local rules = {{x=1,y=0,z=0},{x=-1,y=0,z=0},{x=0,y=0,z=1},{x=0,y=0,z=-1},{x=0,y=1,z=0},{x=0,y=-1,z=0}}
 	originalpos = originalpos or minetest.pos_to_string(pos)
 
-	for i,v in pairs(rules) do
+	for i,v in ipairs(rules) do
 		local p = vector.add(pos,v)
 		local name = minetest.get_node(p).name
-
 		if name=="ignore" then
 			local vox=minetest.get_voxel_manip()
 			local min, max=vox:read_from_map(pos, pos)
 			local area=VoxelArea:new({MinEdge = min, MaxEdge = max})
 			local data=vox:get_data()
-			name=minetest.get_name_from_content_id(data[area:indexp(p)])
+			local id = data[area:indexp(p)]
+			name = id and minetest.get_name_from_content_id(id) or "ignore"
 		end
 
 		if minetest.get_item_group(name,"tech_connect") > 0 then
