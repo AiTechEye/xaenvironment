@@ -53,6 +53,24 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				store.items = its
 				player_style.store(player)
 				return
+			elseif pressed.amount then
+				local c = tonumber(pressed.amount) or 1
+				local c2 = c
+				c = c >= 1 and c or 1
+				c = c <= 99 and c or 99
+				if c2 < 1 or c2 > 99 then
+					store.too_high_amount = true
+					store.amount = c2
+					minetest.after(0.5, function()
+						if minetest.get_player_by_name(name) then
+							store.too_high_amount = nil
+							store.amount = c
+							player_style.store(player)
+						end
+					end)
+					player_style.store(player)
+					return
+				end
 			end
 			if pressed.cancel then
 				player_style.store(player)
@@ -95,24 +113,41 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 						local t = i:sub(9,-1)
 						local inv = player:get_inventory()
 						local c = player_style.store_items_cost[t]
-						if Getcoin(player) >= c and inv:room_for_item("main",t) then
-
-							if b ~= "confirm_" and player_style.store_items_cost[t] >= 1000 then
-								minetest.after(0.2, function()
-									if not minetest.get_player_by_name(name) then return end
-									minetest.show_formspec(name, "store",
-										"size[3,2]" 
-										.."listcolors[#77777777;#777777aa;#000000ff]"
-										.."label[0,0;Confirm purchase?\n(Cost: "..c..")]"
-										.."button[0,1;1.5,1;confirm_"..t..";Buy]button[1.5,1;1.5,1;cancel;Cancel]"
-									)
-								end)
+						local room = inv:room_for_item("main",t.." "..store.amount)
+						if Getcoin(player) >= c*store.amount and room then
+							if b ~= "confirm_" and c*store.amount >= 1000 then
+								minetest.show_formspec(name, "store",
+									"size[3,2]" 
+									.."listcolors[#77777777;#777777aa;#000000ff]"
+									.."label[0,0;Confirm purchase?\nCost: "..(c*store.amount).."\n("..c.."x"..store.amount..")]"
+									.."button[0,1;1.5,1;confirm_"..t..";Buy]button[1.5,1;1.5,1;cancel;Cancel]"
+								)
 								return
 							end
-							inv:add_item("main",t.." 1")
-							Coin(player,-c)
+							inv:add_item("main",t.." "..store.amount)
+							Coin(player,-c*store.amount)
 							player_style.store(player)
-							break
+							return
+						elseif Getcoin(player) < c*store.amount and Getcoin(player) >= c then
+							store.too_high_amount = true
+							minetest.after(0.5, function()
+								if minetest.get_player_by_name(name) then
+									store.too_high_amount = nil
+									player_style.store(player)
+								end
+							end)
+							player_style.store(player)
+							return
+						elseif not room then
+							store.no_room = true
+							minetest.after(0.5, function()
+								if minetest.get_player_by_name(name) then
+									store.no_room = nil
+									player_style.store(player)
+								end
+							end)
+							player_style.store(player)
+							return
 						end
 					end
 				end
@@ -139,7 +174,7 @@ player_style.store=function(player)
 	local name = player:get_player_name()
 	local coins = Getcoin(name)
 	local inv = minetest.get_inventory({type = "player",name = name})
-	player_style.players[name].store = player_style.players[name].store or {index = 1, sell = false }
+	player_style.players[name].store = player_style.players[name].store or {index = 1, sell = false,amount=1}
 	local store = player_style.players[name].store
 
 	player_style.open_store()
@@ -184,7 +219,7 @@ player_style.store=function(player)
 		minetest.show_formspec(name, "store",
 			"formspec_version[2]" -- MT 5.1+
 			.. "size[16.4,12.2]"
-			.. "bgcolor[#555F]"
+			.. "bgcolor[#"..(store.no_room and "F00F" or "555F").."]"
 
 			.. "button[0.2,0.5;5,1;sell;Switch to " .. (store.sell and "buying" or "selling") .. "]"
 
@@ -197,10 +232,12 @@ player_style.store=function(player)
 			.. "tooltip[creinvleft;Back]"
 			.. "image_button[6,1;0.8,0.8;default_crafting_arrowleft.png;creinvleft;]"
 
-			.. "label[7.7,1.4;" .. page .. "/" .. pages .. "]"
+			.. "label[7,1.4;" .. page .. "/" .. pages .. "]"
 
 			.. "tooltip[creinvright;Forward]"
-			.. "image_button[9.6,1;0.8,0.8;default_crafting_arrowright.png;creinvright;]"
+			.. "image_button[8,1;0.8,0.8;default_crafting_arrowright.png;creinvright;]"
+
+			.. (not store.sell and  "style[amount;textcolor=#"..(store.too_high_amount and "f00" or "fff").."]field[9,1;2,0.8;amount;Amount;" .. store.amount .. "]" or "")
 
 			.. "field[11.6,1;3,0.8;searchbox;;" .. (store.search_text or "") .. "]"
 			.. "field_close_on_enter[searchbox;false]"
