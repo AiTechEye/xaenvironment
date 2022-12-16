@@ -953,3 +953,82 @@ projectilelauncher.register_bullet("uranium",{
 		{"default:uraniumactive_ingot","default:titanium_ingot"},
 	}
 })
+
+projectilelauncher.register_bullet("bubbelgum",{
+	description="Bubbelgum bullet",
+	texture="default_cloud.png^[colorize:#ed75ff",
+	damage=0,
+	craft_count=4,
+	groups={treasure=2,store=2},
+	on_hit_node=function(self,user,pos)
+		local self = minetest.add_entity(pos,"plasma:impulse"):get_luaentity()
+		self.object:set_properties({physical = true, object_use_texture_alpha = "blend"})
+		self.object:set_acceleration({x=math.random(-0.1,0.1), y=0.1, z=math.random(-0.1,0.1)})
+		self.end_scale = 1
+		self.scale = 0
+		self.on_step=function(self,dtime)
+			if self.timer > 5 then
+				self.object:remove()
+				return
+			elseif self.scale < self.end_scale then
+				self.scale = self.scale + dtime * self.end_scale
+				self.object:set_properties({visual_size = {x=self.scale,y=self.scale,z=self.scale}})
+				return
+			end
+			self.timer = self.timer + dtime
+		end
+	end,
+	on_hit_object=function(self,user,target,pos)
+		local en = target:get_luaentity()
+		if en and en.name == "plasma:impulse" then
+			return
+		end
+
+		local c = target:get_properties().collisionbox
+		local b = {}
+		b[1] = math.max(c[1],c[4]) - math.min(c[1],c[4])
+		b[2] = math.max(c[2],c[5]) - math.min(c[2],c[5])
+		b[3] = math.max(c[3],c[6]) - math.min(c[3],c[6])
+		local size = math.max(unpack(b))
+
+		local self = minetest.add_entity(pos,"plasma:impulse"):get_luaentity()
+		local bubble = self.object
+
+		bubble:set_properties({physical = true, object_use_texture_alpha = "blend"})
+		bubble:set_acceleration({x=math.random(-1,1), y=1, z=math.random(-1,1)})
+		self.end_scale = size*10
+		self.scale = 0
+		self.on_step=function(self,dtime,moveresult)
+			if self.timer > 10 or (moveresult and moveresult.collides and not moveresult.touching_ground) then
+				self.object:remove()
+				return
+			elseif self.scale < self.end_scale then
+				self.scale = self.scale + dtime * self.end_scale
+				self.object:set_properties({visual_size = {x=self.scale,y=self.scale,z=self.scale}})
+				return
+			end
+			self.timer = self.timer + dtime
+		end
+
+		local cart = minetest.add_entity(pos, "default:arrow_lightning")
+		target:set_attach(cart, "",{x=0, y=0, z=0}, {x=0, y=0,z=0})
+		cart:set_properties({
+			physical = true,
+			textures = {"default_air.png","default_air.png","default_air.png","default_air.png","default_air.png","default_air.png"},
+			collisionbox = {-0.5,-0.5,-0.5,0.5,2,0.5},
+		})
+		cart:get_luaentity().on_step=function(self)
+			local pos1 = self.object:get_pos()
+			local pos2 = bubble:get_pos()
+			if not (pos2 and pos.x and bubble:get_luaentity()) then
+				self.object:remove()
+				return
+			end 
+			local v = vector.multiply(vector.subtract(pos2,pos1),10)
+			self.object:set_velocity(v)
+		end
+	end,
+	craft={
+		{"default:taaffeite","default:steel_ingot"},
+	}
+})
