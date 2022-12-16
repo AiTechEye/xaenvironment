@@ -58,6 +58,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local c2 = c
 				c = c >= 1 and c or 1
 				c = c <= 99 and c or 99
+				store.amount = c
 				if c2 < 1 or c2 > 99 then
 					store.too_high_amount = true
 					store.amount = c2
