@@ -319,12 +319,14 @@ vexcazer.form_update=function(user,index,info)
 	local mb_posy=-0.2
 
 	for i, func in pairs(vexcazer.registry_modes) do
-
 		if not (vex.default and func.hide_mode_default)
 		and not (vex.mod and func.hide_mode_mod)
 		and not (vex.admin and func.hide_mode_admin) then
-			gui=gui .."button_exit[" ..mb_posx .."," .. mb_posy.. "; 2.5,1;m" .. i .."; ".. func.name.. " " .. i .. "]"
-			gui=gui .."button_exit[" ..(mb_posx+2.2) .."," .. mb_posy.. "; 0.6,1;m" .. i .."info;?]"
+			gui=gui
+			.. "style[m" .. i ..";font_size=-3]"
+			.. "tooltip[m" .. i ..";".. func.name.. " "..i.."]"
+			.. "button_exit[" ..mb_posx .."," .. mb_posy.. "; 2.5,1;m" .. i .."; ".. func.name.. " " .. i .. "]"
+			.. "button_exit[" ..(mb_posx+2.2) .."," .. mb_posy.. "; 0.6,1;m" .. i .."info;?]"
 
 			mb_posx=mb_posx+2.6
 			if mb_posx>=5 then
@@ -333,9 +335,7 @@ vexcazer.form_update=function(user,index,info)
 			end
 		end
 	end
-	minetest.after(0.1, function(name,gui)
-		return minetest.show_formspec(name, "vexcazer_gui",gui)
-	end,name, gui)
+	minetest.show_formspec(name, "vexcazer_gui",gui)
 end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
