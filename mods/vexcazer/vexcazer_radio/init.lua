@@ -89,14 +89,14 @@ local radio=function(itemstack, user, pointed_thing,input,selective)
 		if dig then
 			count_right = -count_right
 		end
-		
-		for y = 0,count_right,dig and -1 or 1 do
-		for i = 1,360 do
+
+		for y = 1,count_right,dig and -1 or 1 do
+		for i = 1,360+stack_count do
 			local a = i * math.pi / 180
-			local c = vector.new(p.x+stack_count*math.cos(a),p.y+y,p.z+stack_count*math.sin(a))
+			local c = vector.new(p.x+stack_count*math.cos(a),p.y+y-1,p.z+stack_count*math.sin(a))
 			if dig and vexcazer.dig(c,input,nolazer) == false then
 				break
-			elseif dig == false and vexcazer.place({pos=c,node={name=stack}},input) == false and minetest.get_node(c).name ~= stack then
+			elseif dig == false and vexcazer.place({pos=c,node={name=stack}},input) == false and (minetest.registered_nodes[minetest.get_node(c).name] or {}).buildable == false then
 				break
 			end
 		end
