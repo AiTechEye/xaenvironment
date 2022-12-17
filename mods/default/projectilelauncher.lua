@@ -509,7 +509,7 @@ projectilelauncher.register_bullet("lazer_automatic",{
 	texture="default_wood.png^[colorize:#00f",
 	damage=3,
 	craft_count=16,
-	groups={treasure=2,store=2},
+	groups={treasure=1,store=2},
 	on_trigger=function(itemstack, user)
 		local p = projectilelauncher.user[user:get_player_name()]
 		if not p.auto then
@@ -545,7 +545,7 @@ projectilelauncher.register_bullet("lightning_",{
 	damage=7,
 	craft_count=8,
 	launch_sound = "default_projectilelauncher_shot12",
-	groups={treasure=2,store=8},
+	groups={treasure=1,store=8},
 	on_shoot=function(itemstack, user,bullet)
 		local dir = bullet:get_luaentity().dir
 		dir.y = 0
@@ -566,7 +566,7 @@ projectilelauncher.register_bullet("flash_",{
 	damage=0,
 	craft_count=10,
 	launch_sound = "default_projectilelauncher_shot8",
-	groups={treasure=2,store=15},
+	groups={treasure=1,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
@@ -616,7 +616,7 @@ projectilelauncher.register_bullet("build_",{
 	damage=0,
 	craft_count=10,
 	launch_sound = "default_projectilelauncher_shot8",
-	groups={treasure=2,store=15},
+	groups={treasure=1,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
@@ -679,7 +679,7 @@ projectilelauncher.register_bullet("activate_",{
 	damage=0,
 	craft_count=10,
 	launch_sound = "default_projectilelauncher_shot8",
-	groups={treasure=2,store=2},
+	groups={treasure=1,store=2},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
@@ -739,7 +739,7 @@ projectilelauncher.register_bullet("blob_",{
 	magazine_alpha = "flint",
 	launch_sound = "default_projectilelauncher_shot4",
 	hit_sound = "default_projectilelauncher_shot12",
-	groups={treasure=2,store=15},
+	groups={treasure=1,store=15},
 	damage_by_bullet = true,
 	on_shoot=function(itemstack, user,bullet)
 		local self = bullet:get_luaentity()
@@ -759,7 +759,7 @@ projectilelauncher.register_bullet("torch",{
 	description="Torch bullet",
 	damage=5,
 	craft_count=6,
-	groups={treasure=2,store=4},
+	groups={treasure=1,store=4},
 	itemtexture = "default_ironblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_torch.png^default_alpha_stick.png^[makealpha:0,255,0)",
 	bullettexture="default:torch",
 	visual = "wielditem",
@@ -799,7 +799,7 @@ projectilelauncher.register_bullet("hookshot",{
 	itemtexture = "default_ironblock.png^armor_alpha_hand.png^[makealpha:0,255,0^(default_ironblock.png^default_arrow.png^[makealpha:0,255,0)",
 	craft_count=4,
 	launch_sound = "default_projectilelauncher_shot10",
-	groups={treasure=2,store=15},
+	groups={treasure=1,store=15},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2 
 		local c = minetest.raycast(pos1,vector.add(pos1, vector.multiply(dir,30)))
@@ -887,7 +887,7 @@ projectilelauncher.register_bullet("uranium",{
 	damage=0,
 	craft_count=2,
 	launch_sound = "default_projectilelauncher_shot4",
-	groups={treasure=2,store=50},
+	groups={treasure=1},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
@@ -950,7 +950,7 @@ projectilelauncher.register_bullet("uranium",{
 		return true
 	end,
 	craft={
-		{"default:uraniumactive_ingot","default:titanium_ingot"},
+		{"default:uraniumactive_ingot","default:titanium_ingot","default:emerald"},
 	}
 })
 
@@ -959,7 +959,7 @@ projectilelauncher.register_bullet("bubbelgum",{
 	texture="default_cloud.png^[colorize:#ed75ff",
 	damage=0,
 	craft_count=4,
-	groups={treasure=2,store=2},
+	groups={treasure=1},
 	on_hit_node=function(self,user,pos)
 		local self = minetest.add_entity(pos,"plasma:impulse"):get_luaentity()
 		self.object:set_properties({physical = true, object_use_texture_alpha = "blend"})
@@ -1029,6 +1029,6 @@ projectilelauncher.register_bullet("bubbelgum",{
 		end
 	end,
 	craft={
-		{"default:taaffeite","default:steel_ingot"},
+		{"default:taaffeite","default:steel_ingot","materials:marzipan_rose"},
 	}
 })
