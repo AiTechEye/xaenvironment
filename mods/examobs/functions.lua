@@ -361,7 +361,7 @@ examobs.def=function(name)
 end
 
 examobs.following=function(self)
-	if self.folow and examobs.visiable(self.object,self.folow) then
+	if self.folow and self.folow:get_pos().x and examobs.visiable(self.object,self.folow) then
 		local d = examobs.distance(self.object,self.folow)
 		if d > self.range/2 then
 			examobs.lookat(self,self.folow)
