@@ -1239,15 +1239,23 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 		if minetest.is_protected(pos, player:get_player_name())==false then
 			local m = minetest.get_meta(pos)
 			local i = m:get_int("toggleable") == 1 and 0 or 1
+			local a = m:get_int("auto")
 			m:set_int("toggleable",i)
-			m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable")
+			m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable, auto: "..(a == 1 and "On" or "Off"))
 		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		local m = minetest.get_meta(pos)
+		local a = m:get_int("auto") == 1 and 0 or 1
+		local i = m:get_int("toggleable")
+		m:set_int("auto",a)
+		m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable, auto: "..(a == 1 and "On" or "Off"))
 	end,
 	on_construct=function(pos)
 		local m = minetest.get_meta(pos)
 		m:set_int("toggleable",1)
 		m:set_int("on",1)
-		m:set_string("infotext","On, toggleable")
+		m:set_string("infotext","On, toggleable, auto: Off")
 	end,
 	exatec={
 		on_wire = function(pos,opos)
@@ -1256,10 +1264,18 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 			local f = {x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z}
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
 			local toggleable = m:get_int("toggleable")
-			if toggleable == 1 and not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
+			local a = m:get_int("auto") == 1
+			local auto = a and (exatec.samepos(opos,f) or exatec.samepos(opos,b))
+
+			if auto or toggleable == 1 and not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
+				if auto and m:get_int("on") == 1 then
+					exatec.send(f,true,true)
+				elseif auto then
+					return
+				end
 				local on = m:get_int("on") == 1 and 0 or 1
 				m:set_int("on",on)
-				m:set_string("infotext",on == 1 and "On, toggleable" or "Off, toggleable")
+				m:set_string("infotext",(on == 1 and "On" or "Off") .. ", toggleable, auto: " .. (a and "On" or "Off"))
 			elseif m:get_int("on") == 1 then
 				exatec.send(f,true,true)
 			end
