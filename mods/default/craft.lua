@@ -393,6 +393,14 @@ minetest.register_craft({
 		{"default:glass","default:glass"},
 	},
 })
+minetest.register_craft({
+	output="default:glass_corner 3",
+	recipe={
+		{"default:glass","default:glass",""},
+		{"","default:glass",""},
+	},
+})
+
 
 minetest.register_craft({
 	output="default:glass_frosted 2",

@@ -506,6 +506,26 @@ minetest.register_node("default:glass_tabletop", {
 	},
 })
 
+minetest.register_node("default:glass_corner", {
+	description = "Glass corner",
+	tiles={"default_glass_with_frame.png"}, --,"default_glass.png"
+	groups = {glass=1,cracky=3,oddly_breakable_by_hand=3,treasure=1},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	use_texture_alpha = "blend",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+			{-0.5, -0.5, -0.5, -0.45, 0.5, 0.5},
+		}
+	},
+})
+
 minetest.register_node("default:glass", {
 	description = "Glass",
 	tiles={"default_glass_with_frame.png","default_glass.png"},
