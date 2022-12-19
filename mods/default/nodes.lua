@@ -688,6 +688,20 @@ default.register_pebble({
 })
 
 default.register_blockdetails({
+	name="flint",
+	node={
+		tiles={"default_sand.png","default_flintblock.png^default_alpha_gem_flint.png^[makealpha:0,255,0"},
+		drop="default:flint",
+		block="default:sand",
+		use_texture_alpha = "clip",
+	},
+	ddef = {
+		y_min = -100,
+		y_max = 5,
+	}
+})
+
+default.register_blockdetails({
 	name="starfish",
 	node={
 		tiles={"default_sand.png","default_starfish.png"},
@@ -697,6 +711,7 @@ default.register_blockdetails({
 	},
 	item={type="node"},
 })
+
 default.register_blockdetails({
 	name="shell",
 	node={
@@ -1580,7 +1595,7 @@ minetest.register_ore({
 	ore_type = "blob",
 	ore="default:oddstone"..i,
 	wherein= "default:stone",
-	clust_scarcity = 5 * 5 * 5,
+	clust_scarcity = 25 * 25 * 25,
 	clust_size = 5,
 	y_min= -31000,
 	y_max= -50,

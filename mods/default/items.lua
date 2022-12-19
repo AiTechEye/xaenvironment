@@ -553,6 +553,7 @@ default.registry_mineral({
 		}},
 	},
 	ore_settings={
+		clust_scarcity = 6 * 6 * 6,
 		clust_num_ores=5,
 		clust_size=5,
 		y_max=50,
@@ -598,7 +599,7 @@ default.registry_mineral({
 		clust_size=6,
 		y_max=-50,
 	},
-	pick={	groups={treasure=1},
+	pick={groups={treasure=1},
 		tool_capabilities={
 		full_punch_interval = 1.2,
 		max_drop_level = 1,
@@ -626,7 +627,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	vineyardknife={	groups={treasure=1},
+	vineyardknife={groups={treasure=1},
 		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 1,
@@ -722,12 +723,11 @@ default.registry_mineral({
 	ore={tiles={"default_stone.png^default_ore_iron.png"},groups={cracky=3}},
 	ingot={groups={treasure=1,store=500}},
 	ore_settings={
-		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=4,
 		clust_size=7,
 		y_max=5,
 	},
-	pick={	groups={treasure=1},
+	pick={groups={treasure=1},
 		tool_capabilities={
 		full_punch_interval = 1.1,
 		max_drop_level = 1,
@@ -745,7 +745,7 @@ default.registry_mineral({
 		},
 		damage_groups={fleshy=2}
 	}},
-	axe={	groups={treasure=1},
+	axe={groups={treasure=1},
 		tool_capabilities={
 		full_punch_interval = 1.5,
 		max_drop_level = 2,
@@ -767,6 +767,8 @@ default.registry_mineral({
 	arrow={damage=7,groups={treasure=1}},
 	bow={uses=700,level=9,groups={treasure=1}},
 })
+
+
 
 default.registry_mineral({
 	name="cloud",
@@ -904,6 +906,52 @@ default.registry_mineral({
 	arrow={damage=5,groups={treasure=3}},
 	bow={uses=750,level=10,shots=2,groups={treasure=3}},
 	hoe={uses=500,groups={treasure=3}},
+})
+
+default.registry_mineral({
+	name="aluminium",
+	armchair = true,
+	texture="default_silverblock.png^[colorize:#fff8",
+	ingot={groups={treasure=1,store=500}},
+	arrow={damage=2,groups={treasure=1}},
+	bow={uses=550,level=7,shots=2,groups={treasure=3}},
+	hoe={uses=200,groups={treasure=3}},
+	pick={groups={treasure=2},
+		tool_capabilities={
+		full_punch_interval = 1,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky={times={[1]=2,[2]=1,[3]=0.5},uses=10,maxlevel=2}
+		},
+		damage_groups={fleshy=3}
+	}},
+	shovel={	groups={treasure=2},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			crumbly={times={[1]=5,[2]=1.6,[3]=1},uses=15,maxlevel=3}
+		},
+		damage_groups={fleshy=2}
+	}},
+	axe={groups={treasure=2},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 3,
+		groupcaps = {
+			choppy={times={[1]=2.5,[2]=1.2,[3]=0.9},uses=15,maxlevel=2}
+		},
+		damage_groups={fleshy=4}
+	}},
+	vineyardknife={groups={treasure=2},
+		tool_capabilities={
+		full_punch_interval = 1.5,
+		max_drop_level = 1,
+		groupcaps = {
+			snappy={times={[1]=2,[2]=1,[3]=0.5},uses=15,maxlevel=2}
+		},
+		damage_groups={fleshy=2}
+	}},
 })
 
 default.registry_mineral({

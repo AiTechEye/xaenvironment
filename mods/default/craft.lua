@@ -207,6 +207,13 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:stick",
+	recipe={
+		{"group:leaves"},
+	},
+})
+
+minetest.register_craft({
 	output="default:wrench",
 	recipe={
 		{"","","default:iron_ingot"},
