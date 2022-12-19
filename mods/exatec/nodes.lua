@@ -1264,7 +1264,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 		local m = minetest.get_meta(pos)
 		m:set_int("toggleable",1)
 		m:set_int("on",1)
-		m:set_string("infotext","On, toggleable, auto: Off")
+		m:set_string("infotext","On, toggleable, auto closing: Off")
 	end,
 	exatec={
 		on_wire = function(pos,opos)
@@ -1274,18 +1274,16 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 			local b = {x=pos.x-d.x,y=pos.y-d.y,z=pos.z-d.z}
 			local toggleable = m:get_int("toggleable")
 			local a = m:get_int("auto") == 1
-			local auto = a and (exatec.samepos(opos,f) or exatec.samepos(opos,b))
-
-			if auto or toggleable == 1 and not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
-				if auto and m:get_int("on") == 1 then
-					exatec.send(f,true,true)
-				elseif auto then
-					return
-				end
-				local on = m:get_int("on") == 1 and 0 or 1
+			local on = m:get_int("on")
+			if on == 1 and a and exatec.samepos(opos,b) then
+				exatec.send(f,true,true)
+				m:set_int("on",0)
+				m:set_string("infotext","Off, toggleable, auto: " .. (a and "On" or "Off"))
+			elseif toggleable == 1 and not exatec.samepos(opos,f) and not exatec.samepos(opos,b) then
+				on = on == 1 and 0 or 1
 				m:set_int("on",on)
 				m:set_string("infotext",(on == 1 and "On" or "Off") .. ", toggleable, auto: " .. (a and "On" or "Off"))
-			elseif m:get_int("on") == 1 then
+			elseif on == 1 and exatec.samepos(opos,b) then
 				exatec.send(f,true,true)
 			end
 		end,
