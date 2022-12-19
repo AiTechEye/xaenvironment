@@ -1088,12 +1088,21 @@ minetest.register_node("exatec:delayer", {
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name())==false then
+		if minetest.is_protected(pos, player:get_player_name()) == false then
 			local meta = minetest.get_meta(pos)
-			local time=meta:get_int("time")
-			time = time < 10 and time or 0
-			meta:set_int("time",time+1)
-			meta:set_string("infotext","Delayer (" .. (time+1) ..")")
+			local time = meta:get_int("time") + 1
+			time = time < 601 and time or 1
+			meta:set_int("time",time)
+			meta:set_string("infotext","Delayer (" .. time ..")")
+		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name()) == false then
+			local meta = minetest.get_meta(pos)
+			local time = meta:get_int("time") + 10
+			time = time < 601 and time or 1
+			meta:set_int("time",time)
+			meta:set_string("infotext","Delayer (" .. time ..")")
 		end
 	end,
 	on_construct = function(pos)
