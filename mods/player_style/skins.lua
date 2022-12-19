@@ -17,6 +17,7 @@ player_style.skins = {
 		{name="Sneaky",skin="player_style_sneaky.png",cost=200,info="Light shade stealing npc from aliveai",origin="Aliveai"},
 		{name="Stubborn",skin="player_style_stubborn.png",cost=200,info="Stubborn half npc from aliveai",origin="Aliveai"},
 		{name="Admin",skin="player_style_admin.png",cost=200,info="Admin npc from aliveai",origin="Aliveai"},
+		{name="Police",skin="player_style_police.png",cost=500,info="Pilice officer npc",origin="XaEnvironment"},
 		{name="Old Dan",skin="player_style_old_dan.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
 		{name="Trader",skin="player_style_trader.png",cost=200,info="Trader npc from aliveai",origin="Aliveai"},
 		{name="Clown",skin="player_style_clown.png",cost=200,info="The juggling clown npc from aliveai",origin="Aliveai"},
