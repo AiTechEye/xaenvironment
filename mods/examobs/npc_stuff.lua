@@ -140,11 +140,12 @@ examobs.npc_setup=function(self)
 		local pos=self:pos()
 		examobs.last_spoken=text
 		addressed = addressed or ""
-		for _,player in ipairs(minetest.get_connected_players()) do
-			if vector.distance(player:get_pos(),pos) < 50 then
-				minetest.chat_send_player(player:get_player_name(), "<" .. self.storage.npcname .."> " .. text:gsub("@",addressed))
-			end
-		end
+		examobs.showtext(self,"☻ " .. text:gsub("@",addressed),"8cf",nil,3)
+--		for _,player in ipairs(minetest.get_connected_players()) do
+--			if vector.distance(player:get_pos(),pos) < 50 then
+--				minetest.chat_send_player(player:get_player_name(), "<" .. self.storage.npcname .."> " .. text:gsub("@",addressed))
+--			end
+--		end
 		examobs.on_chat(pos,self.storage.npcname,text,self,self.object)
 	end
 

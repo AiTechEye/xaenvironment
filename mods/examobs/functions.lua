@@ -732,12 +732,16 @@ examobs.punch=function(puncher,target,damage)
 	target:punch(puncher,1,{full_punch_interval=1,damage_groups={fleshy=damage}},{x=0,y=0,z=0})
 end
 
-examobs.showtext=function(self,text,color)
+examobs.showtext=function(self,text,color,bgcolor,timeout)
 	self.delstatus=math.random(0,1000) 
 	local del=self.delstatus
 	color=color or "ff0000"
-	self.object:set_properties({nametag=text,nametag_color="#" ..  color})
-	minetest.after(1.5, function(self,del)
+	self.object:set_properties({
+		nametag=text,
+		nametag_color = "#" ..  color,	
+		nametag_bgcolor = (bgcolor and "#" ..  bgcolor) or "0000"
+	})
+	minetest.after(timeout or 1.5, function(self,del)
 		if self and self.object and self.delstatus==del then
 			self.delstatus = nil
 			if self.storage.npcname then
