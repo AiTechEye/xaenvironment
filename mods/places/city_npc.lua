@@ -78,7 +78,7 @@ minetest.register_node("places:jailspot",{
 		end
 		for i,v in ipairs(prisoner[spos]) do
 			local ppos = v.ob and v.ob:get_pos()
-			if default.date("s",v.date) > 0 then-- v.timeout then
+			if default.date("s",v.date) > v.timeout then
 				if not ppos then
 				elseif v.ob:is_player() then
 					local pos1 = minetest.string_to_pos(m:get_string("pos1l"))
