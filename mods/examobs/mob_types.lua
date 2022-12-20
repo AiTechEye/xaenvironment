@@ -254,7 +254,6 @@ examobs.register_roadwalker=function(def)
 
 	def.name = def.name or "roadwalker"
 	local mobname = minetest.get_current_modname() ..":" .. def.name
-	local step = def.step or function() end
 	local is_food = def.is_food or function(item) return minetest.get_item_group(item,"meat") > 0 end
 
 	local amount_limit = def.amount_limit or 30
@@ -276,6 +275,8 @@ examobs.register_roadwalker=function(def)
 	def.spawning = false
 	def.inv = def.inv or {["examobs:flesh"]=1}
 
+	def.step = def.step or function() end
+
 	def.on_lifedeadline=function(self)
 		return self.storage.npc_generated
 	end
@@ -288,7 +289,7 @@ examobs.register_roadwalker=function(def)
 	def.on_abs_step=function(self,dtime)
 		local pos = self.object:get_pos()
 
-		if step(self) then
+		if self.step(self) then
 			return self
 		elseif self.fight or self.flee then
 			return
