@@ -209,7 +209,8 @@ minetest.register_node("spacestuff:door_1", {
 	is_ground_content = false,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local p={x=pos.x,y=pos.y+1,z=pos.z}
-		if minetest.registered_nodes[minetest.get_node(p).name].walkable then
+		local def = minetest.registered_nodes[minetest.get_node(p).name] or {}
+		if def.walkable then
 			return false
 		else
 			minetest.set_node(p, {name = "spacestuff:door_2",param2=minetest.get_node(pos).param2})
@@ -292,7 +293,7 @@ minetest.register_node("spacestuff:door_open_1", {
 			minetest.swap_node(pos, {name="spacestuff:door_1", param2=minetest.get_node(pos).param2})
 		end
 	end,
-	after_dig_node = function (pos, name, digger)
+	after_dig_node = function(pos, name, digger)
 		local p = apos(pos,0,1)
 		if minetest.get_node(p).name == "spacestuff:door_open_2" then
 			minetest.remove_node(p)
@@ -528,7 +529,8 @@ minetest.register_node("spacestuff:door_1_safe", {
 	is_ground_content = false,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local p={x=pos.x,y=pos.y+1,z=pos.z}
-		if minetest.registered_nodes[minetest.get_node(p).name].walkable then
+		local def = minetest.registered_nodes[minetest.get_node(p).name] or {}
+		if def.walkable then
 			return false
 		else
 			minetest.set_node(p, {name = "spacestuff:door_2_safe",param2=minetest.get_node(pos).param2})
@@ -538,6 +540,10 @@ minetest.register_node("spacestuff:door_1_safe", {
 		if not minetest.is_protected(pos, player:get_player_name()) then
 			minetest.add_item(pos,"spacestuff:door_1_safe")
 			minetest.remove_node(pos)
+			local upos = apos(pos,0,1)
+			if minetest.get_node(upos).name == "spacestuff:door_2_safe" then
+				minetest.remove_node(upos)
+			end
 		end
 	end,
 	exatec={
@@ -548,12 +554,6 @@ minetest.register_node("spacestuff:door_1_safe", {
 			minetest.get_node_timer(pos):start(2)
 		end
 	},
-	after_destruct = function (pos, onode)
-		local p = apos(pos,0,1)
-		if minetest.get_node(p).name == "spacestuff:door_2_safe" then
-			minetest.remove_node(p)
-		end
-	end
 })
 
 minetest.register_node("spacestuff:door_2_safe", {
@@ -574,6 +574,16 @@ minetest.register_node("spacestuff:door_2_safe", {
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
 	is_ground_content = false,
+	on_punch=function(pos, node, player, pointed_thing)
+		if not minetest.is_protected(pos, player:get_player_name()) then
+			minetest.add_item(pos,"spacestuff:door_1_safe")
+			minetest.remove_node(pos)
+			local dpos = apos(pos,0,-1)
+			if minetest.get_node(dpos).name == "spacestuff:door_1_safe" then
+				minetest.remove_node(dpos)
+			end
+		end
+	end,
 	exatec={
 		on_wire = function(pos)
 			minetest.swap_node(apos(pos,0,-1), {name="spacestuff:door_open_1_safe", param2=minetest.get_node(pos).param2})
@@ -581,13 +591,7 @@ minetest.register_node("spacestuff:door_2_safe", {
 			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
 			minetest.get_node_timer(pos):start(2)
 		end
-	},
-	after_destruct = function (pos, onode)
-		local p = apos(pos,0,-1)
-		if minetest.get_node(p).name == "spacestuff:door_1_safe" then
-			minetest.remove_node(p)
-		end
-	end
+	}
 })
 
 minetest.register_node("spacestuff:door_open_1_safe", {
@@ -613,23 +617,15 @@ minetest.register_node("spacestuff:door_open_1_safe", {
 			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
 			minetest.swap_node(apos(pos,0,1), {name="spacestuff:door_2_safe", param2=minetest.get_node(pos).param2})
 			minetest.swap_node(pos, {name="spacestuff:door_1_safe", param2=minetest.get_node(pos).param2})
-
 		end,
 	},
 	on_timer=function(pos, elapsed)
 		if minetest.get_node(pos).name=="spacestuff:door_open_1_safe" then
-			--local p={x=pos.x,y=pos.y+1,z=pos.z}
 			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
 			minetest.swap_node(apos(pos,0,1), {name="spacestuff:door_2_safe", param2=minetest.get_node(pos).param2})
 			minetest.swap_node(pos, {name="spacestuff:door_1_safe", param2=minetest.get_node(pos).param2})
 		end
 	end,
-	after_destruct = function (pos, onode)
-		local p = apos(pos,0,1)
-		if minetest.get_node(p).name == "spacestuff:door_open_2_safe" then
-			minetest.remove_node(p)
-		end
-	end
 })
 
 minetest.register_node("spacestuff:door_open_2_safe", {
@@ -657,17 +653,11 @@ minetest.register_node("spacestuff:door_open_2_safe", {
 			minetest.swap_node(pos, {name="spacestuff:door_2_safe", param2=minetest.get_node(pos).param2})
 		end
 	},
-	on_timer = function (pos, elapsed)
+	on_timer = function(pos, elapsed)
 		if minetest.get_node(pos).name=="spacestuff:door_open_2_safe" then
 			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
 			minetest.swap_node(apos(pos,0,-1), {name="spacestuff:door_1_safe", param2=minetest.get_node(pos).param2})
 			minetest.swap_node(pos, {name="spacestuff:door_2_safe", param2=minetest.get_node(pos).param2})
 		end
 	end,
-	after_destruct = function (pos, onode)
-		local p = apos(pos,0,-1)
-		if minetest.get_node(p).name == "spacestuff:door_open_1_safe" then
-			minetest.remove_node(p)
-		end
-	end
 })
