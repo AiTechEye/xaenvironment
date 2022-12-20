@@ -5,6 +5,7 @@ places.citybuildings = {
 	{name="places_shop",chance=20,size=1,freespace={{0,-1}}},
 	{name="places_burnserivce",chance=20,size=1,freespace={{-1,0}}},
 	{name="places_portal_service",chance=30,size=1,freespace={{0,-1}}},
+	{name="places_police_station",chance=30,size=1,freespace={{0,1}}},
 	{name="places_general_shop",chance=20,size=1,freespace={{0,-1}},
 		on_spawn=function(pos)
 			local g = {"store","stone","wood","flammable","exatec","eatable","ingot"}
@@ -402,113 +403,4 @@ if 1 then return end
 		minetest.set_node(p,{name="places:city_roaddriver_path"})	
 		minetest.get_meta(p):set_string("paths",road_paths2)
 	end
-
 end
-
-examobs.register_roadwalker({
-	name = "city_roadwalker",
-	right_hand_traffic = 1.2,
-})
-
-examobs.register_roadwalker({
-	name="city_roaddriver",
-	amount_limit = 15,
-	right_hand_traffic = 4,
-	path_pass_range = 5,
-	new_path=function(self,pos1,pos2)
-		self.carpos = {time=0,pos=pos1}
-		self.drive_to_pos = pos2
-	end,
-	step=function(self,dtime)
-		if self.c2timer and self.c2timer < 0 then
-			self.c2timer = self.c2timer + (dtime or 0.01)
-			return self
-		end
-
-		local a = self.object:get_attach()
-		if not a or not a:get_luaentity() or a:get_luaentity().name ~= "quads:car" then
-			return
-		end
-		local pos1 = self.object:get_pos()
-
-		self.carpos = self.carpos or {time=0,pos=pos1}
-		self.carpos.time = self.carpos.time + (dtime or 0.01)
-		if self.carpos.time > 1 then
-			self.carpos.time = 0
-			local d = vector.distance(self.carpos.pos,pos1)
-			if d <= 0.5 then
-				self.c2timer = -1
-				self.object:set_yaw(math.random(0,6.28))
-				return self
-			end
-			self.carpos.pos = pos1
-		end
-
-		local pos2 = examobs.pointat(self,10)
-		local c = minetest.raycast(pos1,pos2)
-		local n = c:next()
-		while n do
-			if n and n.type == "object" then
-				local en = n.ref:get_luaentity()
-				if n.ref:is_player() or n.ref ~= self.object and n.ref ~= a then
-					local s = a:get_luaentity().speed
-					a:get_luaentity().speed = math.abs(s) > 0.1 and s*0.5 or 0
-					if n.ref:is_player() == false and not n.ref:get_luaentity().examob then
-						self.object:set_yaw(math.random(0,6.28))
-						self.c2timer = -1
-					end
-					return true
-				end
-			end
-			n = c:next()
-		end
-	end,
-	node = {
-		on_timer = function(pos, elapsed)
-			for _, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
-				local en = ob:get_luaentity()
-				if en and en.name == "quads:car" then
-					return false
-				end
-			end
-		end,
-		on_spawn = function(pos,ob)
-			examobs.car_colors = {}
-			for i,v in pairs(minetest.registered_nodes) do
-				if v.tiles and type(def.tiles) == "table" and type(def.tiles[1]) == "string" and not (v.groups and (v.groups.not_in_creative_inventory or v.groups.rail or v.use_texture_alpha)) then
-					table.insert(examobs.car_colors,{name=v.name,texture=v.tiles[1]})
-				end
-			end
-			local ndef = examobs.car_colors[math.random(1,#examobs.car_colors)]
-			local self = ob:get_luaentity()
-			local car = minetest.add_entity(apos(pos,0,1),"quads:car"):get_luaentity()
-
-			self.object:set_attach(car.object, "",{x=-5, y=-3, z=2})
-
-			car.user = self.object
-			car.user_name= self.examob
-			car.bot = self
-			car.citycar = true
-			car.texture_node = ndef.name
-			car.texture = ndef.texture
-			car.color(car)
-			car.citycar = true
-		end
-	}
-})
-
-minetest.register_node("places:city_npcspawner", {
-	groups = {not_in_creative_inventory=1,on_load=1},
-	drawtype="airlike",
-	on_load=function(pos)
-		minetest.set_node(pos,{name="places:city_roadwalker_path"})
-	end,
-})
-
-minetest.register_node("places:city_npccarspawner", {
-	groups = {not_in_creative_inventory=1,on_load=1},
-	drawtype="airlike",
-	on_load=function(pos)
-		minetest.set_node(pos,{name="places:city_roaddriver_path"})
-	end,
-})
