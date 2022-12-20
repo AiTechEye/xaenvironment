@@ -65,6 +65,27 @@ local dig = function(pos, player)
 	return inv:is_empty("fuel") and inv:is_empty("fried") and inv:is_empty("cook")
 end
 
+local function create_furnace_formspec(meta, fire_image_append, append)
+	fire_image_append = fire_image_append or ""
+	append = append or ""
+	meta:set_string("formspec",
+		"size[8,9]" ..
+		"listcolors[#77777777;#777777aa;#000000ff]" ..
+		"list[context;cook;1.5,0;2,2;]" ..
+		"list[context;fried;4.5,0;2,2;]" ..
+		"label[0,2.5;Fuel:]" ..
+		"list[context;fuel;0,3;8,2;]" ..
+		"image[3.5,0.5;1,1;default_crafting_arrowright.png]" ..
+		"image[3.5,1.5;1,1;default_fire_bg.png" .. fire_image_append .. "]" ..
+		"list[current_player;main;0,5.3;8,4;]" ..
+		"listring[current_player;main]" ..
+		"listring[current_name;fuel]" .. 
+		"listring[current_name;fried]" .. 
+		"listring[current_name;cook]" ..
+		append
+	)
+end
+
 local timer =  function (pos, elapsed)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
@@ -180,26 +201,31 @@ local timer =  function (pos, elapsed)
 		end
 	end
 --formspec
+	local progress_bar = ""
+	local progress_percent = ""
+	if cooking_time > 0 and cook_slot > 0 then
+		local pos_x = 1.5 + (cook_slot - 1) % 2
+		local pos_y = math.floor((cook_slot - 1) / 2)
+		local required_time = meta:get_int("cooking_fulltime")
+		local percent = 100 - math.floor((cooking_time - 1) / required_time * 100)
+		local progress = 0.8 - (cooking_time - 1) / required_time * 0.8
+		progress_bar = "box[" .. pos_x .. "," .. pos_y .. ";" .. progress .. ",0.9;green]"
+		progress_percent = "label[" .. pos_x .. "," .. pos_y .. ";" .. percent .. "%]"
+	end
+	
+	local new_fuel_append = ""
+	if new_fuel then
+		local pos_x = (new_fuel - 1) % 8
+		local pos_y = 3 + math.floor((new_fuel - 1) / 8)
+		new_fuel_append = "box[" .. pos_x .. "," .. pos_y .. ";0.8,0.9;#f70F]"
+	end
+	
+	local fire_image_append = ""
+	if burntime > 0 then
+		fire_image_append = "^[lowpart:" .. math.floor(burntime / fulltime * 100) .. ":default_fire.png"
+	end
 
-	local label = cooking_time > 0 and ("label[3.6,0.2;" .. (100 - math.floor((cooking_time-1) / meta:get_int("cooking_fulltime") * 100)) .."%]") or ""
-	local ipos = {"1.5,0","2.5,0","1.5,1","2.5,1"}
-
-	meta:set_string("formspec",
-	"size[8,9]" ..
-	"listcolors[#77777777;#777777aa;#000000ff]"..
-	(cooking_time > 0 and cook_slot > 0 and "box["..ipos[cook_slot]..";0.8,0.9;#f70F]" or "") ..
-	(new_fuel and "box[".. (new_fuel <= 8 and new_fuel-1 or new_fuel-9) ..","..(new_fuel > 8 and 4 or 3) ..";0.8,0.9;#f70F]" or "") ..
-	"list[context;cook;1.5,0;2,2;]" ..
-	"list[context;fried;4.5,0;2,2;]" ..
-	"list[context;fuel;0,3;8,2;]" ..
-	 label ..
-	"image[3.5,1;1,1;default_fire_bg.png"..(burntime > 0 and "^[lowpart:" .. math.floor(burntime / fulltime * 100) .. ":default_fire.png" or "").."]" ..
-	"list[current_player;main;0,5.3;8,4;]" ..
-	"listring[current_player;main]" ..
-	"listring[current_name;fuel]" .. 
-	"listring[current_name;fried]" .. 
-	"listring[current_name;cook]"
-	)
+	create_furnace_formspec(meta, fire_image_append, progress_bar .. progress_percent .. new_fuel_append)
 	return burntime > 0
 end
 
@@ -255,18 +281,7 @@ minetest.register_node("default:furnace", {
 		inv:set_size("fuel", 16)
 		inv:set_size("fried", 4)
 		meta:set_string("infotext", "Furnace (inactive)")
-		meta:set_string("formspec",
-		"size[8,9]" ..
-		"list[context;cook;1.5,0;2,2;]" ..
-		"list[context;fried;4.5,0;2,2;]" ..
-		"list[context;fuel;0,3;8,2;]" ..
-		"image[3.5,1;1,1;default_fire_bg.png]" ..
-		"list[current_player;main;0,5.3;8,4;]" ..
-		"listring[current_player;main]" ..
-		"listring[current_name;fuel]" .. 
-		"listring[current_name;fried]" .. 
-		"listring[current_name;cook]"
-		)
+		create_furnace_formspec(meta)
 	end,
 	allow_metadata_inventory_put = put,
 	allow_metadata_inventory_take = take,
