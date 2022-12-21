@@ -148,7 +148,7 @@ minetest.register_node("places:jailspot",{
 places.make_police=function(ob)
 	ob:set_properties({textures={"player_style_police.png"}})
 	local self = ob:get_luaentity()
-	self.hp = 200
+	self.hp = 40
 
 	self.before_punching=function(self)
 		if self.fight:is_player() then
