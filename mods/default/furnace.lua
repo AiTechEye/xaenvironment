@@ -125,7 +125,7 @@ local timer =  function (pos, elapsed)
 		local slots={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}
 		local slot = math.random(1,16)
 		for i=slot,slot+16 do
-			fuel_slot=slots[i]
+			local fuel_slot = slots[i]
 			fuel_stack=inv:get_stack("fuel",fuel_slot)
 			if fuel_stack:get_count() > 0 then
 				new_fuel = fuel_slot
@@ -266,8 +266,8 @@ minetest.register_node("default:furnace", {
 	tiles = {"default_cobble.png","default_air.png"},
 	groups = {stone=2,cracky=3,used_by_npc=1,exatec_tube_connected = 1},
 	drawtype="mesh",
-	use_texture_alpha = "blend",
-	mesh="default_furnace.b3d",
+	use_texture_alpha = "clip",
+	mesh = "default_furnace.obj",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sounds = default.node_sound_stone_defaults(),
@@ -295,11 +295,19 @@ minetest.register_node("default:furnace", {
 minetest.register_node("default:furnace_active", {
 	description = "Furnace",
 	drop = "default:furnace",
-	use_texture_alpha = "opaque",
-	tiles = {"default_cobble.png","default_fire.png"},
+	use_texture_alpha = "clip",
+	tiles = {
+		"default_cobble.png",
+		{ name = "fire_basic_flame_animated.png", animation = {
+			type = "vertical_frames",
+			aspect_w = 16,
+			aspect_h = 16,
+			length = 3.0,
+		} }
+	},
 	groups = {stone=2,cracky=2,not_in_creative_inventory=1,exatec_tube_connected = 1},
 	drawtype="mesh",
-	mesh="default_furnace.b3d",
+	mesh = "default_furnace.obj",
 	light_source = 10,
 	paramtype = "light",
 	paramtype2 = "facedir",
