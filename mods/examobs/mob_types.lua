@@ -366,10 +366,11 @@ examobs.register_roadwalker=function(def)
 
 	nodedef.groups = nodedef.groups or {on_load=1,attached_node=1,not_in_creative_inventory=1}
 	nodedef.drawtype = nodedef.drawtype or "airlike"
+	nodedef.sunlight_propagates = nodedef.sunlight_propagates ~= false
 	nodedef.drop = nodedef.drop or ""
-	nodedef.walkable = nodedef.walkable == true
+	nodedef.walkable = nodedef.walkable ~= false
 	nodedef.pointable = nodedef.pointable or false
-	nodedef.floodable = nodedef.floodable == true
+	nodedef.floodable = nodedef.floodable ~= false
 
 	nodedef.on_load = function(pos)
 		examobs.paths[mobname] = examobs.paths[mobname] or {}
