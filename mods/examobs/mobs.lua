@@ -1418,7 +1418,7 @@ examobs.register_mob({
 		self.bow_t2 = "default_iron.png^default_bow_loaded.png^[makealpha:0,255,0"
 		self.inv["default:bow_iron"] = math.random(0,1)
 		self.inv["default:arrow_lightning"] = math.random(0,3)
-		self.object:set_properties({textures={self.storage.skin,t}})
+		self.object:set_properties({textures={self.storage.skin,self.bow_t1}})
 	end,
 	step=function(self)
 		if self.fight and (self.aim > 0 or math.random(1,3)) and examobs.distance(self.object,self.fight) > self.reach then
