@@ -50,6 +50,10 @@ places.city=function(pos)
 	local houses = 0
 	local map = {}
 	local ignore = {}
+	local sewer_map = {}
+	local sr1 = {{1,0},{-1,0},{0,1},{0,-1}}
+	local sr2 = {{2,0},{-2,0},{0,2},{0,-2}}
+	local sr3 = {{3,0},{-3,0},{0,3},{0,-3}}
 
 --test map
 	for y=math.floor(pos.y),0,-1 do
@@ -115,6 +119,30 @@ places.city=function(pos)
 				fil = true
 			end
 		end
+
+		if math.random(0,2) == 0 then
+			sewer_map[x..","..z] = {
+				manhole_cover = map[x..","..z].street,
+				pos = vector.new(x,0,z),
+			}
+
+			for i,v in ipairs(sr2) do
+				if sewer_map[x+sr3[i][1]..","..z+sr3[i][2]] then
+					local s = x+sr2[i][1]..","..z+sr2[i][2]
+					sewer_map[s] = {
+						manhole_cover = map[s].street,
+						pos = vector.new(x+sr2[i][1],0,z+sr2[i][2])
+					}
+				end
+				if sewer_map[x+v[1]..","..z+v[2]] then
+					local s = x+sr1[i][1]..","..z+sr1[i][2]
+					sewer_map[s] = {
+						manhole_cover = map[s].street,
+						pos = vector.new(x+sr1[i][1],0,z+sr1[i][2])
+					}
+				end
+			end
+		end
 	end
 	end
 
@@ -172,6 +200,7 @@ places.city=function(pos)
 		end
 	end
 --testing
+
 --[[
 	for i,v in pairs(map) do
 		local n = "default:bedrock"
@@ -183,6 +212,14 @@ places.city=function(pos)
 			n = "default:dirt_with_grass"
 		end
 		minetest.set_node(apos(pos,v.pos.x,0,v.pos.z),{name=n})
+		local smap = sewer_map[i]
+		if smap then
+			minetest.set_node(apos(pos,v.pos.x,-2,v.pos.z),{name="default:stone"})
+			if smap.manhole_cover then
+				minetest.set_node(apos(pos,v.pos.x,-1,v.pos.z),{name="default:glass"})
+			end
+		end
+
 	end
 
 if 1 then return end
@@ -196,12 +233,15 @@ if 1 then return end
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 
-	local road = minetest.get_content_id("materials:asphalt_slab")
+	local road = minetest.get_content_id("materials:asphalt") --materials:asphalt_slab
 	local dirt = minetest.get_content_id("default:dirt")
 	local stone = minetest.get_content_id("default:stone")
 	local sidewalk = minetest.get_content_id("materials:concrete")
 	local grass = minetest.get_content_id("default:dirt_with_grass")
 	local air = minetest.get_content_id("air")
+	local water = minetest.get_content_id("default:salt_water_source")
+	local brick = minetest.get_content_id("default:brickblock")
+
 	protect.add_game_rule_area(vector.add(pos,citysize2+scale),vector.subtract(pos,citysize2+scale),"City")
 
 --roads
@@ -235,7 +275,160 @@ if 1 then return end
 	end
 	end
 
+
+--make more complex sewer systems
+
+
+	for i,v in pairs(sewer_map) do
+		local dirs = 0
+		for i2,sr in ipairs(sr1) do
+			if sewer_map[v.pos.x+sr[1]..","..v.pos.z+sr[2]] then
+				dirs = dirs + 1
+			end
+		end
+		if dirs > 2 and math.random(1,6-dirs) == 1 then
+			sewer_map[i] = nil
+		end
+	end
+
+
+--sewer
+
+
+	for i1,v in pairs(sewer_map) do
+		local dpos = vector.add(apos(pos,0,-11,0),vector.multiply(v.pos,16))
+		local uy = math.random(1,5) == 1 and -scale*2 or -1
+		local underroom_width = math.random(1,4)
+		local hole = math.random(1,4) == 1
+		local deep_treasure
+
+		for y=uy,10 do
+		for x=-8,8 do
+		for z=-8,8 do
+			local id = area:index(dpos.x+x,dpos.y+y,dpos.z+z)
+			data[id] = brick
+			if hole and y < 7 and y > uy and math.abs(x) <= underroom_width and math.abs(z) < underroom_width then
+				minetest.after(1,function()
+					minetest.set_node(vector.new(dpos.x+x,dpos.y+y,dpos.z+z),{name="air"})
+				end)
+			elseif y > uy and y <= -1 and math.abs(x) <= underroom_width and math.abs(z) < underroom_width then
+				data[id] = water
+				if not deep_treasure and y+1 == uy and math.random(1,3) == 1 then
+					deep_treasure = true
+					minetest.after(1,function()
+						default.treasure({level=math.random(1,3),pos=vector,new(dpos.x+x,dpos.y+y,dpos.z+z)})
+					end)
+				end
+			end
+		end
+		end
+		end
+
+		for i2,sr in ipairs(sr1) do
+			local neighbour = sewer_map[v.pos.x+sr[1]..","..v.pos.z+sr[2]]
+			local mx = sr[1] * 4
+			local mz = sr[2] * 4
+			local X = 4
+			local Z = 4
+			local width = 4
+			local r = math.random(1,3)
+			local treasure_pos
+			local treasure_id
+
+			if i2 <= 2 then
+				Z = neighbour and neighbour.width or v.width or math.random(1,4)
+				sewer_map[i1].width = Z
+				width = Z
+			else
+				X = neighbour and neighbour.width or v.width or math.random(1,4)
+				sewer_map[i1].width = X
+				width = X
+			end
+
+			for y=0,5 do
+			for x=-X,X do
+			for z=-Z,Z do
+				local id = area:index(dpos.x+x+mx,dpos.y+y,dpos.z+z+mz)
+				local absx = math.abs(x)
+				local absz = math.abs(z)
+
+				if not treasure_pos and y == 0 and math.random(1,10) == 1 then
+					treasure_pos = vector.new(dpos.x+x+mx,dpos.y+y,dpos.z+z+mz)
+					treasure_id = id
+				end
+
+				if neighbour and data[id] == brick then
+					data[id] = air
+					if y <= 2 then
+						data[id] = water
+					end
+					if width <= 2 then
+						if r == 1 and y > 1 or r == 2 and y > 2 or r == 3 and (y < 1 or y > 1) then
+							data[id] = brick
+						end
+					elseif width >= 3 and y <= 2 then
+						if sr[1] > 0 and x > -2 and absz >= 3
+						or sr[1] < 0 and x < 2 and absz >= 3
+						or sr[2] > 0 and z > -2 and absx >= 3
+						or sr[2] < 0 and z < 2 and absx >= 3 then
+							data[id] = sidewalk
+						elseif y < 2 and absx < 3 or absz < 3 then
+							data[id] = water
+						end
+					end
+				elseif data[id] == brick then
+					if width >= 3 and y <= 2 then
+						if sr[1] > 0 and x <= 0 and x > -2
+						or sr[1] < 0 and x >= 0 and x < 2
+						or sr[2] > 0 and z <= 0 and z > -2
+						or sr[2] < 0 and z >= 0 and z < 2 then
+							data[id] = sidewalk
+						end
+					end
+				end
+			end
+			end
+			end
+			if treasure_pos  and math.random(1,4) == 1 and (data[treasure_id] == water or data[treasure_id+area.ystride] == water) then
+				local y = data[treasure_id] == water and 0 or 1
+				minetest.after(5,function()
+					default.treasure({level=math.random(1,10) == 1 and 2 or 1,pos=apos(treasure_pos,0,y)})
+				end)
+			end
+
+			if v.manhole_cover then
+				local dir
+				for i,v in ipairs(sr1) do
+					local id = area:index(dpos.x+width+v[1],dpos.y+1,dpos.z+v[2])
+					if data[id] == brick then
+						dir = vector.new(v[1],0,v[2])
+						break
+					end
+				end
+
+				local a = area:index(dpos.x+width,dpos.y+2,dpos.z)
+				if sidewalk == data[a] or water == data[a] then
+					for y=3,11 do
+						if dir then
+							minetest.after(1,function()
+								minetest.set_node(vector.new(dpos.x+width,dpos.y+y,dpos.z),{name="default:ladder_metal",param2=minetest.dir_to_wallmounted(dir)})
+							end)
+						else
+							data[area:index(dpos.x+width,dpos.y+y,dpos.z)] = air
+						end
+					end
+					minetest.after(5,function()
+						minetest.set_node(vector.new(dpos.x+width,dpos.y+12,dpos.z),{name="places:manhole_cover"})
+					end)
+				end
+			end
+		end
+	end
+
+
 --build city
+
+
 	local sidewalk_paths1 = {}
 	local sidewalk_paths2 = {}
 	local road_paths = {vector.new(pos.x,pos.y+1,pos.z+scale)}
@@ -288,6 +481,7 @@ if 1 then return end
 			end
 		end
 	end
+
 	vox:set_data(data)
 	vox:write_to_map()
 	vox:update_map()
@@ -404,3 +598,53 @@ if 1 then return end
 		minetest.get_meta(p):set_string("paths",road_paths2)
 	end
 end
+
+minetest.register_node("places:manhole_cover", {
+	description = "Manhole cover",
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		minetest.swap_node(pos,{name="places:manhole_cover_open"})
+		minetest.sound_play("default_metal_place", {pos=pos, gain = 2,max_hear_distance = 5})
+	end,
+	on_construct=function(pos)
+		minetest.get_meta(pos):set_string("infotext","Manhole cover")
+	end,
+	tiles={"default_ironblock.png"},
+	groups = {cracky=2,treasure=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+		}
+	}
+})
+minetest.register_node("places:manhole_cover_open", {
+	description = "Manhole cover open",
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		minetest.swap_node(pos,{name="places:manhole_cover"})
+		minetest.sound_play("default_metal_place", {pos=pos, gain = 2,max_hear_distance = 5})
+	end,
+	drop = "places:manhole_cover",
+	tiles={"default_ironblock.png"},
+	groups = {cracky=2},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{0.5, -0.5, -0.5, 1.5, -0.45, 0.5},
+		}
+	},
+})
+
+minetest.register_craft({
+	output="places:manhole_cover",
+	recipe={
+		{"default:ironingot","default:ironlump","default:ironingot"},
+	},
+})
