@@ -534,7 +534,7 @@ minetest.register_node("default:glass", {
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
 	paramtype = "light",
-	use_texture_alpha = "blend",
+	use_texture_alpha = "clip",
 	palette="default_palette.png",
 	paramtype2 = "color",
 	on_punch=default.dye_coloring
