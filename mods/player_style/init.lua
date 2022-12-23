@@ -747,11 +747,12 @@ minetest.register_globalstep(function(dtime)
 				end
 				goto setp
 			elseif key.up or key.down or key.left or key.right then
-				hunger = -0.0002
 				a="walk"
+				hunger = -0.0002
 				local p = player:get_pos()
 				local pr = player_style.player_dive[name]
 				local v = player:get_velocity()
+
 				ppr.rolltimer = ppr.rolltimer and ppr.rolltimer > 0 and ppr.rolltimer - dtime or nil
 				if pr and pr.kong then
 					if default.defpos({x=p.x,y=p.y-0.1,z=p.z},"walkable") then
@@ -904,6 +905,16 @@ minetest.register_globalstep(function(dtime)
 				ppr.ability2d.time = 0
 			elseif player:get_hp()<=0 then
 				a="lay"
+			end
+
+			if ppr.inv.itemmagnet == 1 then
+				local p = apos(player:get_pos(),0,1)
+				for _, ob in pairs(minetest.get_objects_inside_radius(p, 2)) do
+					local en = ob:get_luaentity()
+					if en and en.name == "__builtin:item" then
+						en.moveto_object = player
+					end
+				end
 			end
 
 			if player_style.player_dive[name] and not (a == "fly" or a == "dive") then

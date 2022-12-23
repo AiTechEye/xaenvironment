@@ -139,7 +139,8 @@ end
 
 player_style.inventory=function(player)
 	local name = player:get_player_name()
-	player_style.players[name].inv = player_style.players[name].inv or {adds={},adds_func={}}
+	local m = player:get_meta()
+	player_style.players[name].inv = player_style.players[name].inv or {adds={},adds_func={},itemmagnet=m:get_int("itemmagnet")}
 	local invp = player_style.players[name].inv
 
 --detached inventory (backpack)
@@ -147,7 +148,7 @@ player_style.inventory=function(player)
 	if not invp.backpack then
 		
 -- Backpack
-		local m = player:get_meta()
+		
 		if player:get_meta():get_string("backpack") ~= "" then
 			m:set_string("backpack1",m:get_string("backpack"))
 			m:set_string("backpackslot1",m:get_string("backpackslot"))
@@ -311,6 +312,7 @@ player_style.inventory=function(player)
 	local coins = "label[4,-0.3;"..minetest.colorize("#FFFF00",Getcoin(player)).."]tooltip[4,-0.3;2,0.4;Coins]"
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[4,0.3;2,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
+	local itemmagnet = "image_button[7,1;1,1;default_megenet.png" .. (invp.itemmagnet == 1 and "" or "^default_cross.png") .. ";itemmagnet;]tooltip[itemmagnet;Item Magnet]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
 	..player_style.buttons.text
 	.."scroll_container_end[scrollbar]"
@@ -329,6 +331,7 @@ player_style.inventory=function(player)
 			.."listring[current_player;main]"
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. itemmagnet
 			..model
 			..buttons
 			..backpack
@@ -389,6 +392,7 @@ player_style.inventory=function(player)
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.."listring[current_player;main]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. itemmagnet
 
 			..buttons
 
@@ -431,6 +435,11 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 		if invp then
 			if pressed.quit and pressed.key_enter_field == nil then
 				player_style.players[name].inv.clean = nil
+				return
+			elseif pressed.itemmagnet then
+				invp.itemmagnet = invp.itemmagnet == 0 and 1 or 0
+				player:get_meta():set_int("itemmagnet",invp.itemmagnet)
+				player_style.inventory(player)
 				return
 			elseif pressed.craftguide then
 				player_style.craftguide.show(player)
