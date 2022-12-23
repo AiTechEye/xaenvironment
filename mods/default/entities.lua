@@ -100,10 +100,11 @@ local item = {
 					if d < 0.2 then
 						self:on_punch(self.moveto_object)
 						return
-					elseif d < 2 then
+					elseif d < 3 then
 						self.object:set_acceleration({x=0, y=0, z=0})
 						local v = vector.distance(obpos,self.moveto_startpos)*2
 						self.object:set_velocity(vector.multiply(vector.subtract(obpos,pos),v))
+						return
 					else
 						self.object:set_acceleration({x=0, y=-self.gravity, z=0})
 						self.moveto_object = nil
