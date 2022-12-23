@@ -11,6 +11,7 @@ local item = {
 	on_activate=function(self,staticdata,dtime_s)
 		builtin_item.on_activate(self,staticdata,dtime_s)
 		local pos = self.object:get_pos()
+		self.gravity = 9
 		if pos then
 			local def = minetest.registered_items[minetest.get_node(pos).name]
 			if def and not self.in_viscosity and def.liquid_viscosity > 0 then
@@ -22,9 +23,10 @@ local item = {
 
 		for i,v in pairs(multidimensions.registered_dimensions) do
 			if pos.y >= v.dim_y and pos.y <= v.dim_y+v.dim_height then
-				local acc = self.object:get_acceleration({x=0, y=0, z=0})
+				local acc = self.object:get_acceleration()
 				acc.y = acc.y*v.gravity
 				self.object:set_acceleration(acc)
+				self.gravity = acc.y
 				break
 			end
 		end
@@ -66,7 +68,9 @@ local item = {
 		self.nodetriggerd = nil
 	end,
 	on_step = function(self,dtime,moveresult)
-		if not self.object:get_attach() then
+		local pos = self.object:get_pos()
+
+		if pos and not self.object:get_attach() then
 			if not self.nodetriggerd and moveresult and moveresult.collides then
 				self.nodetriggerd = true
 				for i,v in pairs(moveresult.collisions) do
@@ -83,10 +87,35 @@ local item = {
 					end
 				end
 			end
+
+			if self.age > 2 and self.moveto_object and not not self.just_spawned then
+				local pos = self.object:get_pos()
+				local obpos = self.moveto_object:get_pos()
+
+				self.moveto_startpos = self.moveto_startpos or pos
+
+				if obpos then
+					obpos = self.moveto_object:is_player() and apos(obpos,0,0.5) or obpos
+					local d = vector.distance(pos,obpos)
+					if d < 0.2 then
+						self:on_punch(self.moveto_object)
+						return
+					elseif d < 2 then
+						self.object:set_acceleration({x=0, y=0, z=0})
+						local v = vector.distance(obpos,self.moveto_startpos)*2
+						self.object:set_velocity(vector.multiply(vector.subtract(obpos,pos),v))
+					else
+						self.object:set_acceleration({x=0, y=-self.gravity, z=0})
+						self.moveto_object = nil
+						self.moveto_startpos = nil
+					end
+				end
+			end
+
 			builtin_item.on_step(self,dtime,moveresult)
 		end
 		
-		local pos = self.object:get_pos()
+
 		if not pos then
 			self.object:remove()
 			return self
