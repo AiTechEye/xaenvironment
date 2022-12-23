@@ -344,7 +344,7 @@ default.register_bio({"arctic",				0,50,grass="default:snow",stone="default:ice"
 
 minetest.register_on_generated(function(minp, maxp, seed)
 
-	if minp.y> -30000 and maxp.y< 50 then
+	if minp.y> -30000 and maxp.y< 50 and not minetest.is_protected(maxp, "") then
 -- ground cracks
 
 		local height = 0
