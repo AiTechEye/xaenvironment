@@ -593,6 +593,28 @@ if 1 then return end
 	end
 	road_paths2 = road_paths2 .."}"
 
+	for _, player in pairs(minetest.get_connected_players()) do
+		local pp = player:get_pos()
+		if pp.x <= pos.x+citysize2 and pp.x >= pos.x-citysize2
+		or pp.z <= pos.z+citysize2 and pp.z >= pos.z-citysize2
+		or pp.y <= pos.y+citysize2 and pp.y >= pos.y-citysize2 then
+			local nearest_d
+			local nearest_path
+			for i,p in ipairs(road_paths) do
+				local d = vector.distance(pp,p)
+				if not nearest_path or d < nearest_d then
+					nearest_d = d
+					nearest_path = p
+				end
+			end
+			if nearest_path then
+				player:set_pos(nearest_path)
+			end
+		end
+	end
+	
+
+
 	for i,p in ipairs(road_paths) do
 		minetest.set_node(p,{name="places:city_roaddriver_path"})	
 		minetest.get_meta(p):set_string("paths",road_paths2)
