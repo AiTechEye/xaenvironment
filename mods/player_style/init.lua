@@ -158,8 +158,12 @@ minetest.register_on_respawnplayer(function(player)
 	local rpos = vector.new(math.random(-size,size),math.random(1,30),math.random(-size,-size))
 	local ppr = player_style.players[player:get_player_name()]
 	local timeout = 0
+	local meta = player:get_meta()
 
-	if player_style.survive_respawn_anywhere == false or player_style.static_spawnpoint then
+	if player_style.survive_respawn_anywhere == false
+	or player_style.static_spawnpoint
+	or meta:get_string("beds_position") ~= ""
+	or meta:get_int("respawn_disallowed") == 1 then
 		player_style.respawn(player)
 		return
 	elseif ppr.respawn then
