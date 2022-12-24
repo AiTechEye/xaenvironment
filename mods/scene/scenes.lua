@@ -3,24 +3,18 @@ minetest.register_chatcommand("play_scene", {
 	description = "",
 	privs = {server=true},
 	func = function(name, param)
-		local pos = vector.new(-50,28501,0)
-		minetest.emerge_area(vector.add(pos,50),vector.subtract(pos,50))
-		minetest.after(3,function(pos)
-			nodeextractor.set(pos,minetest.get_modpath("scene").."/nodeextractor/scene1.exexn")
-		end,pos)
-		minetest.after(4,function()
-			scene.fade(minetest.get_player_by_name("singleplayer"),true)
-		end)
-		minetest.after(6,function()
-			minetest.get_player_by_name("singleplayer"):set_pos(vector.new(-14,28502,19))
-		end)
-		minetest.after(8,function()
-			scene.scenes["all gets started"]()
-		end)
-
---
 		scene.resetplayerpos = minetest.get_player_by_name("singleplayer"):get_pos()
---
+		scene.fade(minetest.get_player_by_name("singleplayer"),true)
+		local pos = vector.new(-50,28501,0)
+		minetest.emerge_area(vector.add(pos,50),vector.subtract(pos,50),function(pos2, action, calls_remaining, param)
+			if calls_remaining == 0 then
+				nodeextractor.set(pos,minetest.get_modpath("scene").."/nodeextractor/scene1.exexn")
+				minetest.after(2,function()
+					minetest.get_player_by_name("singleplayer"):set_pos(vector.new(-14,28502,19))
+					scene.scenes["all gets started"]()
+				end)
+			end
+		end)
 	end
 })
 

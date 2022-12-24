@@ -132,7 +132,7 @@ scene.fade=function(player,fade,black)
 		return
 	elseif p.fade and (fade == false or p.fade and p.fade.opacity < #l) then
 		p.fade.opacity = p.fade.opacity + (fade and 1 or -1)
-		player:hud_change(p.fade.id, "text","scene_fade.png^[colorize:#000000".. l[p.fade.opacity])
+		player:hud_change(p.fade.id, "text","scene_fade.png^[colorize:#000000".. (l[p.fade.opacity] or "00"))
 		if fade and p.fade.opacity >= #l or fade == false and p.fade.opacity <= 1 then
 			if fade == false and p.fade.opacity <= 1 then
 				player:hud_remove(p.fade.id)
