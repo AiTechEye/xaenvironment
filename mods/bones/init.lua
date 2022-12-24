@@ -115,9 +115,6 @@ minetest.register_on_dieplayer(function(player)
 	bones.drop(player)
 	local name = player:get_player_name()
 	local p = minetest.pos_to_string(vector.round(player:get_pos()))
-	if m:get_int("bones_drop_only") == 0 then
-		minetest.chat_send_player(name,p)
-	end
 	minetest.log("action",name.."died at "..p)
 end)
 bones.drop=function(player)
