@@ -14,6 +14,7 @@ player_style={
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
+	survive_far_respawn = minetest.settings:get_bool("xaenvironment_far_respawn") ~= false,
 	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
 	bloom = {
 		status="",
@@ -151,12 +152,89 @@ minetest.register_on_dieplayer(function(player)
 	end
 end)
 
+minetest.register_tool("player_style:res", {
+	on_use=function(itemstack, user, pointed_thing)
+		user:respawn()
+	end,
+})
+
 minetest.register_on_respawnplayer(function(player)
-	player_style.respawn(player)
+	local size = default.mapgen_limit-1100
+	local rpos = vector.new(math.random(-size,size),math.random(1,30),math.random(-size,-size))
+	local ppr = player_style.players[player:get_player_name()]
+	local timeout = 0
+
+	if player_style.survive_far_respawn == false then
+		player_style.respawn(player)
+		return
+	elseif ppr.respawn then
+		return true
+	end
+
+	if not ppr.black_death_id then
+		ppr.black_death_id = player:hud_add({
+			hud_elem_type="image",
+			scale = {x=-100, y=-100},
+			name="black_death",
+			position={x=0,y=0},
+			text="player_style_black.png",
+			alignment = {x=1, y=1},
+		})
+	end
+
+	ppr.respawn = {
+		hud = player:hud_add({
+			hud_elem_type = "statbar",
+			text ="quads_petrolbar.png",
+			text2 ="quads_backbar.png",
+			number = 1,
+			item = 40,
+			size = {x=10,y=50},
+			position = {x=0.5,y=0.5},
+			offset = {x=-40*2.5,y=-20},
+		}),
+		text = player:hud_add({
+			hud_elem_type="text",
+			scale = {x=1,y=1},
+			text="Respawning...",
+			number=0xFFFFFF,
+			offset={x=0,y=0},
+			position={x=0.5,y=0.5},
+			alignment=0,
+		})
+	}
+
+	minetest.after(2,function()
+		if timeout == 0 and ppr then
+			timeout = 1
+			player_style.respawn(player,rpos)
+		end
+	end)
+
+	minetest.emerge_area(vector.add(rpos,50),vector.subtract(rpos,50),function(pos, action, calls_remaining, param)
+		if not ppr or not ppr.respawn or timeout == 1 then
+			return
+		elseif not ppr.respawn.load then
+			timeout = 2
+			ppr.respawn.load = calls_remaining
+			player:hud_change(ppr.respawn.hud, "number", 0)
+		end
+		local r = ppr.respawn.load-calls_remaining
+		player:hud_change(ppr.respawn.hud, "number", (r/ppr.respawn.load)*40)
+		if calls_remaining == 0 then
+			player_style.respawn(player,rpos)
+		end
+	end)
 end)
 
-player_style.respawn=function(player)
+player_style.respawn=function(player,pos)
 	local name = player:get_player_name()
+	local ppr = player_style.players[name]
+
+	if not ppr then
+		return
+	end
+
 	player_style.player_attached[name] = nil
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
@@ -169,6 +247,66 @@ player_style.respawn=function(player)
 	if player_style.players[name].black_death_id then
 		player:hud_remove(player_style.players[name].black_death_id)
 		player_style.players[name].black_death_id = nil
+	end
+
+	if player_style.survive_far_respawn == false then
+		return
+	elseif player_style.players[name].respawn then
+		player:hud_remove(ppr.respawn.hud)
+		player:hud_remove(ppr.respawn.text)
+		ppr.respawn = nil
+	end
+
+	pos = pos or vector.new()
+
+	local zone = 20
+	local spots = {}
+	local nodes = {}
+	local ground_groups = {}
+	local ground_groups_allow = {water=true,stone=true,spreading_dirt_type=true,sand=true,snow=true,ice=true}
+	local vox = minetest.get_voxel_manip()
+	local min, max = vox:read_from_map(vector.add(pos,zone), vector.subtract(pos,zone))
+	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+	local data = vox:get_data()
+	local air = minetest.get_content_id("air")
+
+	for x=-zone,zone do
+	for y=-zone,zone do
+	for z=-zone,zone do
+		local id = area:index(pos.x+x,pos.y+y,pos.z+z)
+		local ground = data[id-area.ystride]
+		local spot = data[id]
+		local spos = vector.new(pos.x+x,pos.y+y,pos.z+z)
+
+		nodes[ground] = nodes[ground] or default.def(minetest.get_name_from_content_id(ground)).walkable
+		nodes[spot] = nodes[spot] or default.def(minetest.get_name_from_content_id(spot)).walkable
+
+		if data[id+area.ystride] == air
+		and not nodes[spot]
+		and nodes[ground] and minetest.get_node_light(spos,0.5) >= 10 then
+			local allow = ground_groups[ground]
+			if allow == nil then
+				local g = default.def(minetest.get_name_from_content_id(ground)).groups or {}
+				for i,v in pairs(ground_groups_allow) do
+					if g[i] then
+						ground_groups[ground] = true
+						table.insert(spots,spos)
+						break
+					end
+				end
+			elseif allow == true then
+				table.insert(spots,spos)
+			end
+		end
+	end
+	end
+	end
+
+	if #spots > 0 then
+		player:set_pos(spots[math.random(1,#spots)])
+		return true
+	--elseif not builtin then
+	--	player:respawn()
 	end
 end
 
@@ -193,6 +331,7 @@ end)
 minetest.register_on_joinplayer(function(player)
 	player_style.set_profile(player,"default")
 	player_style.set_bloom("air")
+
 end)
 
 player_style.set_profile=function(player,pr)
