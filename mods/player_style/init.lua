@@ -154,7 +154,7 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
-	local size = default.mapgen_limit-1100
+	local size = default.mapgen_limit-2000
 	local rpos = vector.new(math.random(-size,size),math.random(1,30),math.random(-size,-size))
 	local ppr = player_style.players[player:get_player_name()]
 	local timeout = 0
