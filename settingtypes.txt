@@ -22,4 +22,6 @@ xaenvironment_keystrokes (Shows keystrokes) bool false
 
 xaenvironment_singleplayer_bloom (Bloom effects in singleplayer, experimental) bool false
 
+xaenvironment_far_respawn (Respawns somewhere far away, you will be lost) bool true
+
 
