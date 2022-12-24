@@ -14,7 +14,7 @@ player_style={
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
-	survive_far_respawn = minetest.settings:get_bool("xaenvironment_far_respawn") ~= false,
+	survive_respawn_anywhere = minetest.settings:get_bool("xaenvironment_respawn_anywhere") ~= false,
 	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
 	static_spawnpoint = minetest.settings:get("static_spawnpoint"),
 	bloom = {
@@ -159,7 +159,7 @@ minetest.register_on_respawnplayer(function(player)
 	local ppr = player_style.players[player:get_player_name()]
 	local timeout = 0
 
-	if player_style.survive_far_respawn == false or player_style.static_spawnpoint then
+	if player_style.survive_respawn_anywhere == false or player_style.static_spawnpoint then
 		player_style.respawn(player)
 		return
 	elseif ppr.respawn then
@@ -244,7 +244,7 @@ player_style.respawn=function(player,pos)
 		player_style.players[name].black_death_id = nil
 	end
 
-	if player_style.survive_far_respawn == false then
+	if player_style.survive_respawn_anywhere == false then
 		return
 	elseif player_style.players[name].respawn then
 		player:hud_remove(ppr.respawn.hud)
