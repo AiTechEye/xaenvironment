@@ -16,6 +16,7 @@ player_style={
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
 	survive_far_respawn = minetest.settings:get_bool("xaenvironment_far_respawn") ~= false,
 	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
+	static_spawnpoint = minetest.settings:get("static_spawnpoint"),
 	bloom = {
 		status="",
 		last="",
@@ -152,19 +153,13 @@ minetest.register_on_dieplayer(function(player)
 	end
 end)
 
-minetest.register_tool("player_style:res", {
-	on_use=function(itemstack, user, pointed_thing)
-		user:respawn()
-	end,
-})
-
 minetest.register_on_respawnplayer(function(player)
 	local size = default.mapgen_limit-1100
 	local rpos = vector.new(math.random(-size,size),math.random(1,30),math.random(-size,-size))
 	local ppr = player_style.players[player:get_player_name()]
 	local timeout = 0
 
-	if player_style.survive_far_respawn == false then
+	if player_style.survive_far_respawn == false or player_style.static_spawnpoint then
 		player_style.respawn(player)
 		return
 	elseif ppr.respawn then
