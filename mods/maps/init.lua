@@ -17,16 +17,13 @@ maps = {
 			on_enter=function(player)
 				if default.storage:get_int("Tutorials") < 3 then
 					local pos = maps.get_pos({x=0,y=0,z=0})
-					minetest.emerge_area(pos,vector.add(pos,vector.new(51,100,86)))
-					minetest.chat_send_player(player:get_player_name(),"Wait 5 seconds while we builds the map...")
-					minetest.after(5,function()
-						nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
+					minetest.emerge_area(vector.add(pos,50),vector.subtract(pos,50),function(pos, action, calls_remaining, param)
+						if calls_remaining == 0 then
+							nodeextractor.set(maps.get_pos({x=0,y=0,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_tutorial.exexn",true)
+							default.storage:set_int("Tutorials",3)
+							maps.set_pos(player,{x=60,y=31,z=42})
+						end
 					end)
-					minetest.after(5.5, function(player)
-						minetest.chat_send_player(player:get_player_name(),"Done!")
-						default.storage:set_int("Tutorials",3)
-						maps.set_pos(player,{x=60,y=31,z=42})
-					end,player)
 					return
 				end
 				minetest.after(0.1, function(player)
