@@ -12,7 +12,9 @@ weather={
 	chance=100,
 	size=500,
 	strength=100,
+	wind_strength = 50,
 	currweather={},
+	leaves = {},
 	perlin={
 		offset=50,
 		scale=50,
@@ -111,11 +113,13 @@ minetest.register_node("weather:lightsning", {
 })
 
 minetest.register_chatcommand("weather", {
-	params = "<0 - "..weather.strength..">",
-	description = "set weather",
+	params = "<0 - "..weather.strength..">,<0 - "..weather.wind_strength..">",
+	description = "set weather & wind strength",
 	privs = {settime=true},
 	func = function(name, param)
-		local num=tonumber(param)
+		local params = param:gsub(" ",""):split(",")
+		local num=tonumber(params[1])
+		local num2 = math.abs(tonumber(params[2]) or 25)
 		local a = not num and 0 or num < 0 and 0 or num <= weather.strength and num or weather.strength
 		local user=minetest.get_player_by_name(name)
 		if not user then return end
@@ -128,6 +132,7 @@ minetest.register_chatcommand("weather", {
 				else
 					weather.currweather[i].strength=a
 					weather.currweather[i].change_strength=1
+					weather.currweather[i].wind_strength = num2 <= weather.wind_strength and num2 or weather.wind_strength
 					return
 				end
 			end
@@ -244,10 +249,43 @@ weather.ac=function()
 						w.bio=bio
 					end
 				end
+
 --rnd change strength
+
 				if math.random(1,100)==1 then
 					weather.currweather[i].strength=math.random(10,weather.strength)
 				end
+				if math.random(1,100)==1 then
+					weather.currweather[i].wind_strength=math.random(0,weather.wind_strength)
+					weather.currweather[i].wind_dir = vector.new(math.random(-100,100)*0.01,0,math.random(-100,100)*0.01)
+				end
+--wind
+				if weather.players[name] and w.wind_strength > 30 then
+					local ppos = apos(player:get_pos(),0,1)
+					local c = minetest.raycast(ppos,vector.add(ppos,vector.multiply(w.wind_dir,-5)))
+					local n = c:next()
+					local s = w.wind_strength * 0.01
+					local wdir = {x=w.wind_dir.x*s,y=0,z=w.wind_dir.z*s}
+
+					while n do
+						if n and n.type == "node" and default.defpos(n.under,"walkable") then
+							break
+						elseif n and n.ref and n.ref == player then
+							local ps = w.wind_strength * 0.05
+							player:add_velocity({x=w.wind_dir.x*ps,y=0,z=w.wind_dir.z*ps})
+							break
+						end
+						n = c:next()
+					end
+
+					for i,v in pairs(examobs.active.ref) do
+						local mp = v:get_pos()
+						if vector.distance(w.pos,mp) <= w.size and minetest.get_item_group(minetest.get_node(mp).name,"water") == 0 then
+							v:add_velocity(wdir)
+						end
+					end
+				end
+
 --wet/rain
 				if w.bio==1 then
 					if not weather.players[name] or weather.players[name].bio~=w.bio or weather.currweather[i].change_strength then
@@ -330,7 +368,7 @@ weather.ac=function()
 							minetest.add_particle({
 								pos=p,
 								velocity={x=math.random(-0.5,0.5),y=-math.random(7,9),z=math.random(-0.5,0.5)},
-								acceleration={x=0,y=-4,z=0},
+								acceleration={x=w.wind_dir.x*w.wind_strength,y=-4,z=w.wind_dir.z*w.wind_strength},
 								expirationtime=3,
 								size=3,
 								collisiondetection=true,
@@ -373,7 +411,7 @@ weather.ac=function()
 							minetest.add_particle({
 								pos=p,
 								velocity={x=math.random(-0.5,0.5),y=-math.random(1,2),z=math.random(-0.5,0.5)},
-								acceleration={x=0,y=0,z=0},
+								acceleration={x=w.wind_dir.x*w.wind_strength,y=-4,z=w.wind_dir.z*w.wind_strength},
 								expirationtime=6,
 								size=1,
 								collisiondetection=true,
@@ -410,14 +448,15 @@ weather.add=function(set)
 			local b=weather.get_bio(set.pos)
 			if b==1 or b==2 or b==3 then
 				table.insert(weather.currweather,{
-					timeout=math.random(weather.mintimeout,
-					weather.maxtimeout),
+					timeout=math.random(weather.mintimeout,weather.maxtimeout),
 					pos=set.pos,
 					size=math.random(20,weather.size),
 					strength=set.strength,
 					sound=1,
 					bio=b,
 					thunder= b==1 and set.strength >= 90 and math.random(1,4) or 0,
+					wind_strength = math.random(0,weather.wind_strength),
+					wind_dir = vector.new(math.random(-100,100)*0.01,0,math.random(-100,100)*0.01),
 				})
 			end
 		end
@@ -456,6 +495,8 @@ weather.add=function(set)
 							sound=1,
 							bio=b,
 							thunder= b==1 and s >= 50 and math.random(1,10) == 1 and math.random(1,4) or 0,
+							wind_strength = math.random(0,weather.wind_strength),
+							wind_dir = vector.new(math.random(-100,100)*0.01,0,math.random(-100,100)*0.01),
 						})
 						return
 					end
