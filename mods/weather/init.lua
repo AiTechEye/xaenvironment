@@ -63,6 +63,14 @@ player_style.register_button({
 	end
 })
 
+weather.get_at_pos=function(pos)
+	for i, w in pairs(weather.currweather) do
+		if vector.distance(pos,w.pos) <= w.size then
+			return w
+		end
+	end
+end
+
 weather.lightning=function(posA,posB)
 	local pos1,pos2
 	if posA and posB then
