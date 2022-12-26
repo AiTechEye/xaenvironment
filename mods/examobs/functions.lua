@@ -231,22 +231,7 @@ examobs.environment=function(self)
 		end
 
 		if minetest.get_item_group(def.name, "igniter") > 0 then
-			minetest.add_particlespawner({
-				amount = 5,
-				time =0.2,
-				minpos = {x=pos.x-0.5, y=pos.y, z=pos.z-0.5},
-				maxpos = {x=pos.x+0.5, y=pos.y, z=pos.z+0.5},
-				minvel = {x=0, y=0, z=0},
-				maxvel = {x=0, y=math.random(3,6), z=0},
-				minacc = {x=0, y=2, z=0},
-				maxacc = {x=0, y=0, z=0},
-				minexptime = 1,
-				maxexptime = 3,
-				minsize = 3,
-				maxsize = 8,
-				texture = "default_item_smoke.png",
-				collisiondetection = true,
-			})
+			default.smoke(pos)
 		end
 	end
 
