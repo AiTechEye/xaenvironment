@@ -1,4 +1,23 @@
-fire = {}
+fire = {particles={}}
+
+fire.add_particle=function(pos)
+	local s = minetest.pos_to_string(pos)
+	fire.particles[s] = {
+		smoke = default.smoke(pos,{time=1}),
+		fx = default.lighteffect(pos)
+	}
+end
+
+fire.remove_particle=function(pos)
+	local s = minetest.pos_to_string(pos)
+	local p = fire.particles[s]
+	if p then
+		minetest.delete_particlespawner(p.smoke)
+		minetest.delete_particlespawner(p.fx)
+		fire.particles[s] = nil
+	end
+end
+
 minetest.register_craft({
 	output="fire:flint_and_steel",
 	recipe={{"default:flint","default:steel_ingot"},},
@@ -43,8 +62,13 @@ minetest.register_node("fire:basic_flame", {
 	},
 	on_construct=function(pos)
 		minetest.get_node_timer(pos):start(1)
+		fire.add_particle(pos)
+	end,
+	on_destruct=function(pos)
+		fire.remove_particle(pos)
 	end,
 	on_timer = function (pos, elapsed)
+		fire.add_particle(pos)
 		local m = minetest.get_meta(pos)
 		local r = m:get_int("radius")
 		local sr
@@ -98,8 +122,13 @@ minetest.register_node("fire:not_igniter", {
 	},
 	on_construct=function(pos)
 		minetest.get_node_timer(pos):start(1)
+		fire.add_particle(pos)
+	end,
+	on_destruct=function(pos)
+		fire.remove_particle(pos)
 	end,
 	on_timer = function (pos, elapsed)
+		fire.add_particle(pos)
 		local m = minetest.get_meta(pos)
 		local r = m:get_int("radius")
 		local sr
@@ -151,6 +180,17 @@ minetest.register_node("fire:permanent_flame", {
 			},
 		},
 	},
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(1)
+		fire.add_particle(pos)
+	end,
+	on_destruct=function(pos)
+		fire.remove_particle(pos)
+	end,
+	on_timer = function (pos, elapsed)
+		fire.add_particle(pos)
+		return true
+	end
 })
 
 minetest.register_abm({
