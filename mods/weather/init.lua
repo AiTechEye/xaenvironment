@@ -40,7 +40,7 @@ player_style.register_button({
 		local c = minetest.registered_chatcommands["weather"]
 		local name = player:get_player_name()
 		if minetest.check_player_privs(player, c.privs) then
-			c.func(name,weather.strength)
+			c.func(name,weather.strength..",25")
 		else
 			minetest.chat_send_player(name,"The settime privilege is required")
 		end
@@ -56,7 +56,7 @@ player_style.register_button({
 		local name = player:get_player_name()
 		local c = minetest.registered_chatcommands["weather"]
 		if minetest.check_player_privs(player, c.privs) then
-			c.func(name,0)
+			c.func(name,"0,0")
 		else
 			minetest.chat_send_player(name,"The settime privilege is required")
 		end
