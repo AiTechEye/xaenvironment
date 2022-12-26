@@ -16,6 +16,7 @@ default={
 	registered_plants={},
 	registered_trees={},
 	registered_bushies={},
+	torch_particles = {},
 	hand_on_secondary_use={},
 	creative = minetest.settings:get_bool("creative_mode") == true,
 	mapgen_limit = tonumber(minetest.settings:get("mapgen_limit")),
