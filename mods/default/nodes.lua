@@ -376,10 +376,6 @@ minetest.register_node("default:torch", {
 			default.torch_particles[s] = nil
 		end
 	end,
-	on_construct = function(pos)
-		default.def("default:torch").add_particles(pos)
-		minetest.get_node_timer(pos):start(1)
-	end,
 	on_destruct = function(pos)
 		default.def("default:torch").remove_particles(pos)
 	end,
@@ -388,9 +384,16 @@ minetest.register_node("default:torch", {
 	end,
 	on_timer = function (pos, elapsed)
 		default.def("default:torch").add_particles(pos)
+		local meta = minetest.get_meta(pos)
+		local date = meta:get_int("date")
+		if date ~= 0 and default.date("h",date) > meta:get_int("hours") then
+			minetest.remove_node(pos)
+			return false
+		end
 		return true
 	end,
 	on_place=function(itemstack, placer, pointed_thing)
+		default.def("default:torch").add_particles(pointed_thing.under)
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"attached_node")>0 then
 			return itemstack
 		end
@@ -455,7 +458,8 @@ minetest.register_node("default:torch_floor", {
 	on_timer = function (pos, elapsed)
 		default.def("default:torch").add_particles(pos)
 		local meta = minetest.get_meta(pos)
-		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+		local date = meta:get_int("date")
+		if date ~= 0 and default.date("h",date) > meta:get_int("hours") then
 			minetest.remove_node(pos)
 			return false
 		end
@@ -496,7 +500,8 @@ minetest.register_node("default:torch_lean", {
 	on_timer = function(pos, elapsed)
 		default.def("default:torch").add_particles(pos)
 		local meta = minetest.get_meta(pos)
-		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+		local date = meta:get_int("date")
+		if date ~= 0 and default.date("h",date) > meta:get_int("hours") then
 			minetest.remove_node(pos)
 			return false
 		end
