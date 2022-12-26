@@ -353,13 +353,43 @@ minetest.register_node("default:torch", {
 	description = "Torch",
 	tiles={"default_torch.png"},
 	wield_scale = {x=2,y=2,z=2},
-	groups = {dig_immediate=3,flammable=3,igniter=1,treasure=1,store=20},
+	groups = {dig_immediate=3,flammable=3,igniter=1,treasure=1,on_load=1,store=20},
 	drawtype = "mesh",
 	mesh="default_torch.obj",
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
 	use_texture_alpha = "clip",
+	add_particles=function(pos)
+		local t = apos(pos,0,0.25)
+		default.torch_particles[minetest.pos_to_string(pos)] = {
+			smoke = default.smoke(pos,{torch=true}),
+			fx = default.lighteffect(pos,{size=3,minpos=t,maxpos=t})
+		}
+	end,
+	remove_particles=function(pos)
+		local s = minetest.pos_to_string(pos)
+		local p = default.torch_particles[s]
+		if p then
+			minetest.delete_particlespawner(p.smoke)
+			minetest.delete_particlespawner(p.fx)
+			default.torch_particles[s] = nil
+		end
+	end,
+	on_construct = function(pos)
+		default.def("default:torch").add_particles(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_destruct = function(pos)
+		default.def("default:torch").remove_particles(pos)
+	end,
+	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		default.def("default:torch").add_particles(pos)
+		return true
+	end,
 	on_place=function(itemstack, placer, pointed_thing)
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name,"attached_node")>0 then
 			return itemstack
@@ -373,7 +403,7 @@ minetest.register_node("default:torch", {
 		local meta = minetest.get_meta(pointed_thing.above)
 		meta:set_int("date",default.date("get"))
 		meta:set_int("hours",math.random(24,72))
-		minetest.get_node_timer(pointed_thing.above):start(10)
+		minetest.get_node_timer(pointed_thing.above):start(1)
 		itemstack:take_item()
 		return itemstack
 	end,
@@ -399,7 +429,7 @@ minetest.register_node("default:torch_floor", {
 	description = "Torch",
 	drop = "default:torch",
 	tiles={"default_torch.png"},
-	groups = {dig_immediate=3,flammable=3,igniter=1,attached_node=1,not_in_creative_inventory=1},
+	groups = {dig_immediate=3,flammable=3,igniter=1,attached_node=1,on_load=1,not_in_creative_inventory=1},
 	sounds = default.node_sound_wood_defaults(),
 	floodable = true,
 	drawtype = "mesh",
@@ -412,7 +442,18 @@ minetest.register_node("default:torch_floor", {
 	light_source = 10,
 	damage_per_second = 2,
 	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.1, 0.1, 0.2, 0.1}},
+	on_construct = function(pos)
+		default.def("default:torch").add_particles(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_destruct = function(pos)
+		default.def("default:torch").remove_particles(pos)
+	end,
 	on_timer = function (pos, elapsed)
+		default.def("default:torch").add_particles(pos)
 		local meta = minetest.get_meta(pos)
 		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
 			minetest.remove_node(pos)
@@ -426,7 +467,7 @@ minetest.register_node("default:torch_lean", {
 	description = "Torch",
 	drop = "default:torch",
 	tiles={"default_torch.png"},
-	groups = {dig_immediate=3,flammable=3,igniter=1,not_in_creative_inventory=1,attached_node=1},
+	groups = {dig_immediate=3,flammable=3,igniter=1,on_load=1,not_in_creative_inventory=1,attached_node=1},
 	sounds = default.node_sound_wood_defaults(),
 	drawtype = "mesh",
 	floodable = true,
@@ -440,12 +481,20 @@ minetest.register_node("default:torch_lean", {
 	damage_per_second = 2,
 	selection_box = {type = "fixed",fixed={-0.1, -0.5, -0.3, 0.1, 0, 0.3}},
 	after_place_node = function(pos, placer)
+		default.def("default:torch").add_particles(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_int("date",default.date("get"))
 		meta:set_int("hours",math.random(24,72))
-		minetest.get_node_timer(pos):start(10)
+		minetest.get_node_timer(pos):start(1)
 	end,
-	on_timer = function (pos, elapsed)
+	on_destruct = function(pos)
+		default.def("default:torch").remove_particles(pos)
+	end,
+	on_load=function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function(pos, elapsed)
+		default.def("default:torch").add_particles(pos)
 		local meta = minetest.get_meta(pos)
 		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
 			minetest.remove_node(pos)

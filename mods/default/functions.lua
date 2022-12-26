@@ -60,7 +60,17 @@ default.smoke=function(pos,def)
 	def.texture = def.texture or "default_item_smoke.png"
 	def.collisiondetection = def.collisiondetection ~= false
 
-	if def.item then
+	if def.torch then
+		def.amount = math.random(1,3)
+		def.minpos = pos
+		def.maxpos = pos
+		def.minvel = wdir1 or {x=-0.1, y=0, z=-0.1}
+		def.maxvel = wdir2 or {x=0.1, y=0.5, z=0.1}
+		def.minexptime = 0.3
+		def.maxexptime = 1
+		def.minsize = 1
+		def.maxsize = 3
+	elseif def.item then
 		def.minpos = pos
 		def.maxpos = pos
 		def.minvel = wdir1 or {x=-0.1, y=0, z=-0.1}
