@@ -32,23 +32,7 @@ local item = {
 		end
 	end,
 	burn = function(self)
-		local pos = self.object:get_pos()
-		minetest.add_particlespawner({
-			amount = math.random(3,7),
-			time =0.2,
-			minpos = pos,
-			maxpos = pos,
-			minvel = {x=-0.1, y=0, z=-0.1},
-			maxvel = {x=0.1, y=1, z=0.1},
-			minacc = {x=0, y=2, z=0},
-			maxacc = {x=0, y=0, z=0},
-			minexptime = 2,
-			maxexptime = 7,
-			minsize = 1,
-			maxsize = 3,
-			texture = "default_item_smoke.png",
-			collisiondetection = true,
-		})
+		default.smoke(self.object:get_pos(),{item=true})
 	end,
 	on_punch = function(self,hitter)
 		if hitter:is_player() then

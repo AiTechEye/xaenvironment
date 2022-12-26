@@ -29,6 +29,51 @@ default.is_decoration=function(object,item)
 	return en and (en.decoration ~= nil or item and en.name == "__builtin:item")
 end
 
+default.smoke=function(pos,def)
+	if not (pos and pos.x) then
+			return
+	end
+
+	local w = weather.get_at_pos(pos)
+	local wdir1
+	local wdir2
+
+	if w then
+		wdir1 = vector.multiply(w.wind_dir,w.wind_strength)
+		wdir1.y = 1
+		wdir2 = vector.new(wdir1.x,math.random(3,6),wdir1.z)
+	end
+
+	def = def or {}
+	def.amount = def.amount or math.random(3,7)
+	def.time = def.time or 0.2
+	def.minpos = def.minpos or {x=pos.x-0.5, y=pos.y, z=pos.z-0.5}
+	def.maxpos = def.maxpos or {x=pos.x+0.5, y=pos.y, z=pos.z+0.5}
+	def.minvel = def.minvel or wdir1 or {x=0, y=0, z=0}
+	def.maxvel = def.maxvel or wdir2 or {x=0, y=math.random(3,6), z=0}
+	def.minacc = def.minacc or {x=0, y=1, z=0}
+	def.maxacc = def.maxacc or {x=0, y=2, z=0}
+	def.minexptime = def.minexptime or 1
+	def.maxexptime = def.maxexptime or 3
+	def.minsize = def.minsize or 3
+	def.maxsize = def.maxsize or 8
+	def.texture = def.texture or "default_item_smoke.png"
+	def.collisiondetection = def.collisiondetection ~= false
+
+	if def.item then
+		def.minpos = pos
+		def.maxpos = pos
+		def.minvel = wdir1 or {x=-0.1, y=0, z=-0.1}
+		def.maxvel = wdir2 or {x=0.1, y=1, z=0.1}
+		def.minexptime = 2
+		def.maxexptime = 7
+		def.minsize = 1
+		def.maxsize = 3
+	end
+
+	return minetest.add_particlespawner(def)
+end
+
 default.watersplash=function(pos,item)
 	local def = default.def(minetest.get_node(pos).name)
 	local s = math.random(10,20)
