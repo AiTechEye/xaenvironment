@@ -12,7 +12,7 @@ weather={
 	chance=100,
 	size=500,
 	strength=100,
-	wind_strength = 50,
+	wind_strength = 30,
 	currweather={},
 	leaves = {},
 	perlin={
@@ -40,7 +40,7 @@ player_style.register_button({
 		local c = minetest.registered_chatcommands["weather"]
 		local name = player:get_player_name()
 		if minetest.check_player_privs(player, c.privs) then
-			c.func(name,weather.strength..",25")
+			c.func(name,weather.strength..",15")
 		else
 			minetest.chat_send_player(name,"The settime privilege is required")
 		end
@@ -268,7 +268,7 @@ weather.ac=function()
 					weather.currweather[i].wind_dir = vector.new(math.random(-100,100)*0.01,0,math.random(-100,100)*0.01)
 				end
 --wind
-				if weather.players[name] and w.wind_strength > 30 then
+				if weather.players[name] and w.wind_strength > 20 then
 					local ppos = apos(player:get_pos(),0,1)
 					local c = minetest.raycast(ppos,vector.add(ppos,vector.multiply(w.wind_dir,-5)))
 					local n = c:next()
