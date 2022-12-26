@@ -70,9 +70,30 @@ default.smoke=function(pos,def)
 		def.minsize = 1
 		def.maxsize = 3
 	end
+	return  minetest.add_particlespawner(def)
+end
+
+default.lighteffect=function(pos,def)
+	if not (pos and pos.x) then
+			return
+	end
+
+	def = def or {}
+	def.amount = def.amount or 1
+	def.time = def.time or 1
+	def.minexptime = def.minexptime or 1
+	def.maxexptime = def.maxexptime or 1
+	def.minpos = def.minpos or pos
+	def.maxpos = def.maxpos or pos
+	def.glow = def.glow or 14
+	def.size = def.size or 5
+	def.color = def.color or "f90"
+	def.texpool = def.texpool or {{name = "default_lighteffect.png^[multiply:#"..def.color,blend="screen",scale=def.size }}
 
 	return minetest.add_particlespawner(def)
 end
+
+
 
 default.watersplash=function(pos,item)
 	local def = default.def(minetest.get_node(pos).name)
