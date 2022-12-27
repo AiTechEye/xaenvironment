@@ -302,9 +302,11 @@ end
 	if node.radius>9 then
 		minetest.sound_play("nitroglycerin_nuke", {pos=pos, gain = 0.5, max_hear_distance = node.radius*30})
 	end
-	minetest.add_particlespawner({
+
+
+	default.smoke(pos,{
 		amount = 20,
-		time =0.2,
+		time = 0.1,
 		minpos = {x=pos.x-1, y=pos.y, z=pos.z-1},
 		maxpos = {x=pos.x+1, y=pos.y, z=pos.z+1},
 		minvel = {x=-5, y=0, z=-5},
@@ -315,9 +317,9 @@ end
 		maxexptime = 2,
 		minsize = 5,
 		maxsize = 10,
-		texture = "default_item_smoke.png",
-		collisiondetection = true,
 	})
+
+	default.lighteffect(pos,{time=0.1,minexptime=0.1,maxexptime=0.2,color="f90a",size=node.radius*2})
 end
 
 
