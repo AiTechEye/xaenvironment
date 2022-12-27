@@ -926,16 +926,10 @@ projectilelauncher.register_bullet("uranium",{
 			glow = 1
 		})
 
-		local e = minetest.add_entity(pos3,"plasma:impulse")
-		e:set_properties({textures={"default_cloud.png^[colorize:#deed4caa"}})
-		local en = e:get_luaentity()
-		en.charging = true
-		en.scale= 0
-		en.end_scale = 10
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos3,5)) do
 			local en = ob:get_luaentity()
 			local p = ob:get_pos()
-			if ob ~= e and ob ~= user and not default.is_decoration(ob,true) and not (en and en.name == "default:arrow_lightning") then
+			if ob ~= user and not default.is_decoration(ob,true) and not (en and en.name == "default:arrow_lightning") then
 				default.punch(ob,user,200)
 			end
 		end
