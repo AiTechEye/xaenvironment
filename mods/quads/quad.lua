@@ -228,19 +228,19 @@ minetest.register_entity("quads:quad",{
 				collisiondetection = true,
 			})
 		end
-		if hp <= 0 then
-			if self.user then
-				self.leave = true
-				self:on_rightclick(self.user)
-			end
-			self.object:remove()
-			nitroglycerin.explode(pos,{radius=3,set="fire:basic_flame"})
-		else
-			self:hud_update()
+		self:hud_update()
+	end,
+	on_death=function(self,killer)
+		if self.user then
+			self.leave = true
+			self:on_rightclick(self.user)
 		end
+		self.object:remove()
+		nitroglycerin.explode(self:pos(),{radius=3,set="fire:basic_flame"})
 	end,
 	pos=function(self)
-		return self.object:get_pos()
+		self.lastpos = self.object:get_pos() or self.lastpos
+		return self.lastpos
 	end,
 	yaw=function(self)
 		local a = self.object:get_yaw()
