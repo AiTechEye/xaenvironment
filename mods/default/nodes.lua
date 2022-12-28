@@ -1113,23 +1113,23 @@ minetest.register_node("default:water_flowing", {
 	special_tiles={
 		tile="default_water.png",
 		{
-			name = "default_water_animated.png",
+			name = "default_water_animated.png^default_flowing_animated17.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 2,
+				aspect_w = 17,
+				aspect_h = 17,
+				length = 1,
 			}
 		},
 		{
-			name = "default_water_animated.png",
+			name = "default_water_animated.png^default_flowing_animated17.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 2,
+				aspect_w = 17,
+				aspect_h = 17,
+				length = 1,
 			}
 		}
 	},
@@ -1160,7 +1160,6 @@ player_style.register_environment_sound({node="default:salt_water_source",sound=
 minetest.register_node("default:salt_water_source", {
 	description = "Salt water source",
 	tiles={
-		tile="default_salt_water.png",
 		{
 			name = "default_salt_water_animated.png",
 			backface_culling = false,
@@ -1187,6 +1186,7 @@ minetest.register_node("default:salt_water_source", {
 	drawtype = "liquid",
 	paramtype = "light",
 	walkable = false,
+	waving = 3,
 	pointable = false,
 	diggable = false,
 	buildable_to = true,
@@ -1204,25 +1204,24 @@ minetest.register_node("default:salt_water_source", {
 minetest.register_node("default:salt_water_flowing", {
 	description = "Salt water flowing",
 	special_tiles={
-		tile="default_salt_water.png",
 		{
-			name = "default_salt_water_animated.png",
+			name = "default_salt_water_animated.png^default_flowing_animated17.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 2,
+				aspect_w = 17,
+				aspect_h = 17,
+				length = 1,
 			}
 		},
 		{
-			name = "default_salt_water_animated.png",
+			name = "default_salt_water_animated.png^default_flowing_animated17.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 2,
+				aspect_w = 17,
+				aspect_h = 17,
+				length = 1
 			}
 		}
 	},
@@ -1230,6 +1229,7 @@ minetest.register_node("default:salt_water_flowing", {
 	drawtype = "flowingliquid",
 	use_texture_alpha = "blend",
 	paramtype = "light",
+	waving = 3,
 	paramtype2 = "flowingliquid",
 	walkable = false,
 	pointable = false,
