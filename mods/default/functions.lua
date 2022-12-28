@@ -1,3 +1,58 @@
+minetest.register_on_mods_loaded(function(player)
+	local a = {craft="register_craftitem",node="register_node",tool="register_tool",none="register_tool"}
+	for i, def in pairs(minetest.registered_items) do
+		if def.type ~= "none" then
+			def = default.item_description(def,nil,true)
+			minetest[a[def.type]](":"..i,def)
+		end
+	end
+end)
+
+default.item_description=function(def,def2,a)
+	local description = def.description or ""
+	local capabilities = def.tool_capabilities
+	local label = function(t)
+		local c = {
+			cracky = minetest.colorize("#aaaaaa","Stone"),
+			crumbly = minetest.colorize("#8e5a17","Dirt"),
+			choppy = minetest.colorize("#c5842e","Wood"),
+			snappy = minetest.colorize("#008e11","Plants"),
+			damage = minetest.colorize("#ff0000","Damage"),
+			burnable = minetest.colorize("#ff9800","Burnable"),
+			uses = minetest.colorize("#cccccc","Uses"),
+		}
+		return c[t] and c[t]..": " or t..": "
+	end
+
+	if capabilities then
+		if capabilities.groupcaps then
+			for i,v in pairs(capabilities.groupcaps) do
+				if v.times and type(v.times) == "table" then
+					description = description .. "\n" .. label(i) .. (v.times[1] or v.times[2] or v.times[3] or 0) .."/s"
+				end
+			end
+		end
+
+		if capabilities.damage_groups and capabilities.damage_groups.fleshy then
+			description = description .. "\n" .. label("damage") .. capabilities.damage_groups.fleshy
+		end
+	end
+
+	if def.uses and type(def.uses) == "number" then
+		description = description .. "\n" .. label("uses") .. def.uses
+	end
+	if def.groups and def.groups.flammable then
+		description = description .. "\n" .. label("burnable") .. def.groups.flammable
+	end
+	if def.damage then
+		description = description .. "\n" .. label("damage") .. (def.damage > 0 and def.damage or "Special")
+	end
+
+	def.description = minetest.get_background_escape_sequence("#222") .. description
+
+	return def
+end
+
 default.pickupable=function(self,player)
 	local name = player:get_player_name()
 	local au = armor.user[name]
@@ -427,28 +482,28 @@ end
 
 default.node_sound_defaults=function(a)
 	a = a or {}
-	a.footstep =	a.footstep or {name = "", gain = 1}
-	a.dig =		a.dig or {name = "", gain = 1}
-	a.dug =		a.dig or {name = "", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.footstep = a.footstep or {name = "", gain = 1}
+	a.dig = a.dig or {name = "", gain = 1}
+	a.dug = a.dig or {name = "", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
 default.node_sound_stone_defaults=function(a)
 	a = a or {}
-	a.footstep =	a.footstep or {name = "default_stone_step", gain = 1}
-	a.dig =		a.dig or {name = "default_stone_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_stone_dug", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
+	a.footstep = a.footstep or {name = "default_stone_step", gain = 1}
+	a.dig = a.dig or {name = "default_stone_dig", gain = 1}
+	a.dug = a.dug or {name = "default_stone_dug", gain = 1}
+	a.place = a.place or {name = "default_place_hard", gain = 1}
 	return a
 end
 
 default.node_sound_wood_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_wood_step", gain = 1}
-	a.dig =		a.dig or {name = "default_wood_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_wood_dug", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
+	a.dig = a.dig or {name = "default_wood_dig", gain = 1}
+	a.dug = a.dug or {name = "default_wood_dug", gain = 1}
+	a.place = a.place or {name = "default_place_hard", gain = 1}
 	return a
 end
 
@@ -460,9 +515,9 @@ end
 
 default.node_sound_metal_defaults=function(a)
 	a = a or {}
-	a.dig =		a.dig or {name = "default_metal_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_metal_dug", gain = 1}
-	a.place =		a.place or {name = "default_metal_place", gain = 1}
+	a.dig = a.dig or {name = "default_metal_dig", gain = 1}
+	a.dug = a.dug or {name = "default_metal_dug", gain = 1}
+	a.place = a.place or {name = "default_metal_place", gain = 1}
 	return default.node_sound_stone_defaults(a)
 end
 
@@ -470,8 +525,8 @@ default.node_sound_dirt_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_leaves_step", gain = 1}
 	a.dig =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dug =		a.dug or {name = "default_leaves_dug", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.dug = a.dug or {name = "default_leaves_dug", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
@@ -479,60 +534,60 @@ end
 default.node_sound_leaves_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dig =		a.footstep or {name = "default_leaves_step", gain = 1}
-	a.dug =		a.dug or {name = "default_leaves_dug", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.dig = a.footstep or {name = "default_leaves_step", gain = 1}
+	a.dug = a.dug or {name = "default_leaves_dug", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
 default.node_sound_gravel_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_gravel_step", gain = 1}
-	a.dig =		a.dig or {name = "default_gravel_step", gain = 1}
-	a.dug =		a.dug or {name = "default_gravel_place", gain = 1}
-	a.place =		a.place or {name = "default_gravel_place", gain = 1}
+	a.dig = a.dig or {name = "default_gravel_step", gain = 1}
+	a.dug = a.dug or {name = "default_gravel_place", gain = 1}
+	a.place = a.place or {name = "default_gravel_place", gain = 1}
 	return a
 end
 
 default.node_sound_glass_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_stone_step", gain = 1}
-	a.dig =		a.dig or {name = "default_glass_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_break_glass", gain = 1}
-	a.place =		a.place or {name = "default_place_hard", gain = 1}
+	a.dig = a.dig or {name = "default_glass_dig", gain = 1}
+	a.dug = a.dug or {name = "default_break_glass", gain = 1}
+	a.place = a.place or {name = "default_place_hard", gain = 1}
 	return a
 end
 
 default.node_sound_clay_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_clay_step", gain = 1}
-	a.dig =		a.dig or {name = "default_clay_step", gain = 1}
-	a.dug =		a.dug or {name = "default_clay_step", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.dig = a.dig or {name = "default_clay_step", gain = 1}
+	a.dug = a.dug or {name = "default_clay_step", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
 default.node_sound_snow_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_snow_step", gain = 1}
-	a.dig =		a.dig or {name = "default_snow_step", gain = 1}
-	a.dug =		a.dug or {name = "default_snow_step", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.dig = a.dig or {name = "default_snow_step", gain = 1}
+	a.dug = a.dug or {name = "default_snow_step", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
 default.node_sound_sand_defaults=function(a)
 	a = a or {}
 	a.footstep =	a.footstep or {name = "default_sand_step", gain = 1}
-	a.dig =		a.dig or {name = "default_sand_dig", gain = 1}
-	a.dug =		a.dug or {name = "default_sand_dig", gain = 1}
-	a.place =		a.place or {name = "default_place", gain = 1}
+	a.dig = a.dig or {name = "default_sand_dig", gain = 1}
+	a.dug = a.dug or {name = "default_sand_dig", gain = 1}
+	a.place = a.place or {name = "default_place", gain = 1}
 	return a
 end
 
 default.tool_breaks_defaults=function(a)
 	a = a or {}
-	a.breaks =	"default_tool_breaks"
+	a.breaks = "default_tool_breaks"
 	return a
 end
 
@@ -688,10 +743,10 @@ default.registry_mineral=function(def)
 --block
 	if not def.not_block then
 		def.block = def.block or {}
-		def.block.tiles =	def.block.tiles or	{def.texture}
-		def.block.description =	def.block.description or	uname .. "block"
-		def.block.sounds =	def.block.sounds or	default.node_sound_metal_defaults()
-		def.block.groups =	def.block.groups or	{cracky=2}
+		def.block.tiles = def.block.tiles or {def.texture}
+		def.block.description = def.block.description or	uname .. "block"
+		def.block.sounds = def.block.sounds or	default.node_sound_metal_defaults()
+		def.block.groups = def.block.groups or {cracky=2}
 		minetest.register_node(mod .. def.name .."block", def.block)
 		if not def.not_block_craft and def.dropingot then
 			minetest.register_craft({
@@ -712,10 +767,10 @@ default.registry_mineral=function(def)
 	if not def.not_ore then
 		def.ore = def.ore or {}
 		def.ore.drop = def.ore.drop or def.drop
-		def.ore.tiles =	def.ore.tiles or			{def.texture .. "^default_alpha_ore.png"}
-		def.ore.description =	def.ore.description or	uname .. " ore"
-		def.ore.sounds =	def.ore.sounds or	default.node_sound_stone_defaults()
-		def.ore.groups =	def.ore.groups or	{cracky=2}
+		def.ore.tiles = def.ore.tiles or			{def.texture .. "^default_alpha_ore.png"}
+		def.ore.description = def.ore.description or	uname .. " ore"
+		def.ore.sounds = def.ore.sounds or	default.node_sound_stone_defaults()
+		def.ore.groups = def.ore.groups or {cracky=2}
 
 		minetest.register_node(mod .. def.name .. "_ore", def.ore)
 	end
@@ -723,14 +778,14 @@ default.registry_mineral=function(def)
 	if not def.not_ore and def.ore_settings ~= false or (def.ore_settings and def.ore_settings.ore) then
 		def.ore_settings = def.ore_settings or {}
 		minetest.register_ore({
-			ore_type		=	"scatter",
-			ore		=	def.ore_settings.ore or		mod .. def.name .. "_ore",
-			wherein		=	def.ore_settings.wherein or		"default:stone",
-			clust_scarcity	=	def.ore_settings.clust_scarcity or	8 * 8 * 8,
-			clust_num_ores	=	def.ore_settings.clust_num_ores or	5,
-			clust_size		=	def.ore_settings.clust_size	or	5,
-			y_min		=	def.ore_settings.y_min	or	-31000,
-			y_max		=	def.ore_settings.y_max	or	-50,
+			ore_type	 = "scatter",
+			ore = def.ore_settings.ore or mod .. def.name .. "_ore",
+			wherein = def.ore_settings.wherein or "default:stone",
+			clust_scarcity = def.ore_settings.clust_scarcity or	8 * 8 * 8,
+			clust_num_ores = def.ore_settings.clust_num_ores or	5,
+			clust_size = def.ore_settings.clust_size or 5,
+			y_min = def.ore_settings.y_min	 or -31000,
+			y_max = def.ore_settings.y_max or -50,
 		})
 	end
 
@@ -742,7 +797,7 @@ default.registry_mineral=function(def)
 		def.pick.sound = default.tool_breaks_defaults()
 		def.pick.description = def.pick.description or 		 uname .." pickaxe"
 		def.pick.inventory_image = def.pick.inventory_image or	def.texture .. "^default_alpha_pick.png^[makealpha:0,255,0"
-		def.pick.tool_capabilities = def.pick.tool_capabilities or		{
+		def.pick.tool_capabilities = def.pick.tool_capabilities or {
 			full_punch_interval = 1,
 			max_drop_level = 0,
 			groupcaps = {
@@ -767,7 +822,7 @@ default.registry_mineral=function(def)
 		def.shovel.description = def.shovel.description or 			uname .." shovel"
 		def.shovel.inventory_image = def.shovel.inventory_image or	def.texture .. "^default_alpha_shovel.png^[makealpha:0,255,0"
 		def.shovel.sound = default.tool_breaks_defaults()
-		def.shovel.tool_capabilities = def.shovel.tool_capabilities or		{
+		def.shovel.tool_capabilities = def.shovel.tool_capabilities or {
 			full_punch_interval = 1.1,
 			max_drop_level = 0,
 			groupcaps = {
@@ -792,7 +847,7 @@ default.registry_mineral=function(def)
 		def.axe.sound = default.tool_breaks_defaults()
 		def.axe.description = def.axe.description or 			uname .." axe"
 		def.axe.inventory_image = def.axe.inventory_image or	def.texture .. "^default_alpha_axe.png^[makealpha:0,255,0"
-		def.axe.tool_capabilities = def.axe.tool_capabilities or		{
+		def.axe.tool_capabilities = def.axe.tool_capabilities or {
 			full_punch_interval = 1,
 			max_drop_level = 0,
 			groupcaps = {
@@ -817,7 +872,7 @@ default.registry_mineral=function(def)
 		def.vineyardknife.sound = default.tool_breaks_defaults()
 		def.vineyardknife.description = def.vineyardknife.description or 		uname .." vineyardknife"
 		def.vineyardknife.inventory_image = def.vineyardknife.inventory_image or	def.texture .. "^default_alpha_vineyardknife.png^[makealpha:0,255,0"
-		def.vineyardknife.tool_capabilities = def.vineyardknife.tool_capabilities or		{
+		def.vineyardknife.tool_capabilities = def.vineyardknife.tool_capabilities or {
 			full_punch_interval = 0.5,
 			max_drop_level = 0,
 			groupcaps = {
@@ -842,11 +897,12 @@ default.registry_mineral=function(def)
 		def.hoe.sound = default.tool_breaks_defaults()
 		def.hoe.description = def.hoe.description or 		uname .." hoe"
 		def.hoe.inventory_image = def.hoe.inventory_image or	def.texture .. "^default_alpha_hoe.png^[makealpha:0,255,0"
-		def.hoe.tool_capabilities = def.tool_capabilities or		{
+		def.hoe.tool_capabilities = def.tool_capabilities or {
 			full_punch_interval = 2,
 			damage_groups={fleshy=5},
 		}
 		local uses = (def.hoe.uses or 5) - 1
+
 		def.hoe.on_place=function(itemstack, user, pointed_thing)
 			local pos = pointed_thing.under
 			if pos

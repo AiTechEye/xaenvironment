@@ -26,6 +26,7 @@ bows.register_arrow=function(name,def)
 		description = def.description or name,
 		inventory_image = (def.texture and def.texture .. "^default_arrow.png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^default_arrow.png^[makealpha:0,255,0",
 		groups = def.groups,
+		damage = def.damage,
 	})
 	if def.craft then
 		def.craft_count= def.craft_count or 4
