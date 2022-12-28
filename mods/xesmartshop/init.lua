@@ -477,7 +477,7 @@ minetest.register_node("xesmartshop:gamerules_shop", {
 			local g = v.groups
 			if g and g.store then
 				if group == "exatec" then
-					if g.exatec or g.tech_connect or g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected or exatec_data_wire or g.exatec_data_wire_connected then
+					if g.exatec or g.tech_connect or g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected or g.exatec_data_wire or g.exatec_data_wire_connected then
 						table.insert(items,{name=v.name,price=g.store})
 					end
 				elseif group == "eatable" then
