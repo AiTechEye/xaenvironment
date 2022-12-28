@@ -75,7 +75,7 @@ default.register_plant({
 		if node.param2 == 0 and minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z}).name,"water") > 0 then
 			local rndh = math.random(4,16)
 			for h=1,16 do
-				if h == rndh or minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+h,z=pos.z}).name,"water") == 0 then
+				if h == rndh or minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+h+1,z=pos.z}).name,"water") == 0 then
 					minetest.set_node(pos,{name="plants:kelp"..i,param2=(h*16)-16})
 					return
 				end
@@ -146,7 +146,7 @@ default.register_plant({
 	on_load=function(pos,node)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z}).name,"water") > 0 then
 			for h=1,5 do
-				if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+h,z=pos.z}).name,"water") == 0 then
+				if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y+h+1,z=pos.z}).name,"water") == 0 then
 					minetest.set_node(pos,{name="plants:seaweedlong",param2=(h*16)-16})
 					return
 				end
