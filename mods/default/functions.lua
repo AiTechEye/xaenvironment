@@ -8,7 +8,7 @@ minetest.register_on_mods_loaded(function(player)
 	end
 end)
 
-default.item_description=function(def,def2,a)
+default.item_description=function(def)
 	local description = def.description or ""
 	local capabilities = def.tool_capabilities
 	local label = function(t)
