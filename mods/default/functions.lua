@@ -20,6 +20,8 @@ default.item_description=function(def)
 			damage = minetest.colorize("#ff0000","Damage"),
 			burnable = minetest.colorize("#ff9800","Burnable"),
 			uses = minetest.colorize("#cccccc","Uses"),
+			water = minetest.colorize("#009aff","Drinkable"),	
+			food = minetest.colorize("#ffff00","Eatable"),	
 		}
 		return c[t] and c[t]..": " or t..": "
 	end
@@ -41,11 +43,26 @@ default.item_description=function(def)
 	if def.uses and type(def.uses) == "number" then
 		description = description .. "\n" .. label("uses") .. def.uses
 	end
-	if def.groups and def.groups.flammable then
-		description = description .. "\n" .. label("burnable") .. def.groups.flammable
-	end
+
 	if def.damage then
 		description = description .. "\n" .. label("damage") .. (def.damage > 0 and def.damage or "Special")
+	end
+
+
+	if def.groups then
+		local g = def.groups
+
+		if g.flammable then
+			description = description .. "\n" .. label("burnable") .. g.flammable
+		end
+
+		if g.eatable then
+			description = description .. "\n" .. label("food") .. minetest.colorize("#"..(g.eatable > 0 and "00FF00" or "FF0000"),g.eatable .. " HP")
+		end
+		if g.wet or g.drinkable then
+			local v = g.wet or g.drinkable
+			description = description .. "\n" .. label("water") .. minetest.colorize("#"..(v > 0 and "00FF00" or "FF0000"),v)
+		end
 	end
 
 	def.description = minetest.get_background_escape_sequence("#222") .. description
