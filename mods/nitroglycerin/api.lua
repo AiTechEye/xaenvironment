@@ -166,143 +166,155 @@ nitroglycerin.explode=function(pos,node)
 	nitroglycerin.exploding_overflow.last_pos=pos
 
 
-if node.blow_nodes==1 then
-	local nodes={}
-	if node.set~="" then node.set=minetest.get_content_id(node.set) end
+	if node.blow_nodes==1 then
+		local nodes={}
+		if node.set~="" then node.set=minetest.get_content_id(node.set) end
 
-	local nodes_n=0
-	for i, v in pairs(node.place) do
-		nodes_n=i
-		nodes[i]=minetest.get_content_id(v)
-	end
+		local nodes_n=0
+		for i, v in pairs(node.place) do
+			nodes_n=i
+			nodes[i]=minetest.get_content_id(v)
+		end
 
-	if node.place_chance<=1 then node.place_chance=2 end
-	if nodes_n<=1 then nodes_n=2 end
+		if node.place_chance<=1 then node.place_chance=2 end
+		if nodes_n<=1 then nodes_n=2 end
 
-	local air=minetest.get_content_id("air")
-	pos=vector.round(pos)
-	local pos1 = vector.subtract(pos, node.radius)
-	local pos2 = vector.add(pos, node.radius)
-	local vox = minetest.get_voxel_manip()
-	local min, max = vox:read_from_map(pos1, pos2)
-	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
-	local data = vox:get_data()
-	local affected_nodes = {}
+		local air=minetest.get_content_id("air")
+		pos=vector.round(pos)
+		local pos1 = vector.subtract(pos, node.radius)
+		local pos2 = vector.add(pos, node.radius)
+		local vox = minetest.get_voxel_manip()
+		local min, max = vox:read_from_map(pos1, pos2)
+		local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
+		local data = vox:get_data()
+		local affected_nodes = {}
 
+		for z = -node.radius, node.radius do
+		for y = -node.radius, node.radius do
+		for x = -node.radius, node.radius do
+			local rad = vector.length(vector.new(x,y,z))
+			local v = area:index(pos.x+x,pos.y+y,pos.z+z)
+			local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
 
-	for z = -node.radius, node.radius do
-	for y = -node.radius, node.radius do
-	for x = -node.radius, node.radius do
-		local rad = vector.length(vector.new(x,y,z))
-		local v = area:index(pos.x+x,pos.y+y,pos.z+z)
-		local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
+			if data[v]~=air and node.radius/rad>=1 and minetest.is_protected(p, node.user_name)==false then
+				local nname = minetest.get_node(p).name
+				local no=minetest.registered_nodes[nname] or {}
+				table.insert(affected_nodes,{pos=p,name=nname})
 
-		if data[v]~=air and node.radius/rad>=1 and minetest.is_protected(p, node.user_name)==false then
-			local nname = minetest.get_node(p).name
-			local no=minetest.registered_nodes[nname] or {}
-			table.insert(affected_nodes,{pos=p,name=nname})
-
-			if not (no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius and no.on_blast(p,node.radius) == true) then
-				if node.set~="" and not (no.groups and no.groups.unbreakable) then
-					data[v]=node.set
+				if not (no.on_blast and nitroglycerin.exploding_overflow.last_radius<node.radius and no.on_blast(p,node.radius) == true) then
+					if node.set~="" and not (no.groups and no.groups.unbreakable) then
+						data[v]=node.set
+					end
+					if math.random(1,node.place_chance)==1 and not (no.groups and no.groups.unbreakable)  then
+						data[v]=nodes[math.random(1,nodes_n)]
+					end
 				end
-				if math.random(1,node.place_chance)==1 and not (no.groups and no.groups.unbreakable)  then
-					data[v]=nodes[math.random(1,nodes_n)]
-				end
-			end
 
-			if node.drops==1 and data[v]==air and math.random(1,4)==1 then
-				local n=minetest.get_node(p)
+				if node.drops==1 and data[v]==air and math.random(1,4)==1 then
+					local n=minetest.get_node(p)
 
-				if no.walkable and math.random(1,2)==1 then
-					nitroglycerin.spawn_dust(p)
-				else
-					for _, item in pairs(minetest.get_node_drops(n.name, "")) do
-						if p and item then minetest.add_item(p, item) end
+					if no.walkable and math.random(1,2)==1 then
+						nitroglycerin.spawn_dust(p)
+					else
+						for _, item in pairs(minetest.get_node_drops(n.name, "")) do
+							if p and item then minetest.add_item(p, item) end
+						end
 					end
 				end
 			end
 		end
-	end
-	end
-	end
-	vox:set_data(data)
-	vox:write_to_map()
-	vox:update_map()
-	vox:update_liquids()
+		end
+		end
+		vox:set_data(data)
+		vox:write_to_map()
+		vox:update_map()
+		vox:update_liquids()
 
-	for z = -node.radius, node.radius,node.radius do
-	for y = -node.radius, node.radius,node.radius do
-	for x = -node.radius, node.radius,node.radius do
-		local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
-		default.update_nodes(p)
-	end
-	end
-	end
+		for z = -node.radius, node.radius,node.radius do
+		for y = -node.radius, node.radius,node.radius do
+		for x = -node.radius, node.radius,node.radius do
+			local p={x=pos.x+x,y=pos.y+y,z=pos.z+z}
+			default.update_nodes(p)
+		end
+		end
+		end
 
-	for i,v in pairs(affected_nodes) do
-		local no = minetest.registered_nodes[v.name]
-		local img
-		if i < 200 and no then
-			local tiles = no.tiles or no.special_tiles or {}
-			if type(tiles[1]) == "table" and tiles[1].name then
-				img = tiles[1].name
-			elseif type(tiles[1]) == "string" then
-				img = tiles[math.random(1,#tiles)]
-			end
+		for i,v in pairs(affected_nodes) do
+			local no = minetest.registered_nodes[v.name]
+			local img
+			if i < 200 and no then
+				local tiles = no.tiles or no.special_tiles or {}
+				if type(tiles[1]) == "table" and tiles[1].name then
+					img = tiles[1].name
+				elseif type(tiles[1]) == "string" then
+					img = tiles[math.random(1,#tiles)]
+				end
 
-			if type(img) == "string" then
-				local d=math.max(1,vector.distance(pos,v.pos))
-				local dmg=(4/d)*node.radius
-				local vl = {x=(v.pos.x-pos.x)*dmg, y=(v.pos.y-pos.y)*dmg, z=(v.pos.z-pos.z)*dmg}
+				if type(img) == "string" then
+					local d=math.max(1,vector.distance(pos,v.pos))
+					local dmg=(4/d)*node.radius
+					local vl = {x=(v.pos.x-pos.x)*dmg, y=(v.pos.y-pos.y)*dmg, z=(v.pos.z-pos.z)*dmg}
 
-				minetest.add_particle({
-					pos=v.pos,
-					velocity=vl,
-					acceleration={x=0,y=-10,z=0},
-					expirationtime=5,
-					size=math.random(5,10),
-					collisiondetection=true,
-					collision_removal=true,
-					texture="[combine:16x16:"..math.random(-16,0)..","..math.random(-16,0).."="..img,
-				})
+					minetest.add_particle({
+						pos=v.pos,
+						velocity=vl,
+						acceleration={x=0,y=-10,z=0},
+						expirationtime=5,
+						size=math.random(5,10),
+						collisiondetection=true,
+						collision_removal=true,
+						texture="[combine:16x16:"..math.random(-16,0)..","..math.random(-16,0).."="..img,
+					})
+				end
 			end
 		end
 	end
-end
-if node.hurt==1 then
-	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
-		if not (ob:get_luaentity() and (ob:get_luaentity().itemstring or ob:get_luaentity().nitroglycerine_dust)) then
-			local pos2=ob:get_pos()
+
+	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*3)) do
+		local pos2 = ob:get_pos()
+		local en = ob:get_luaentity()
+		local impact = true
+
+		if ob:is_player() then
+			pos2 = apos(pos2,0,0.5)
+		end
+
+		for v in minetest.raycast(pos,pos2) do
+			if v.type == "node" and default.defpos(v.under,"walkable") then
+				impact = false
+				break
+			end
+		end
+
+		if impact and node.velocity==1 then
 			local d=math.max(1,vector.distance(pos,pos2 or pos))
-			local dmg=(8/d)*node.radius
-			if ob:get_luaentity() and ob:get_luaentity().on_blow then
-				ob:get_luaentity().on_blow(ob:get_luaentity())
+			local dmg=(4/d)*node.radius
+			if en and not (en.nitroglycerine_dust and en.nitroglycerine_dust==2) then
+				ob:set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
+				if en and en.nitroglycerine_dust then en.nitroglycerine_dust=2 end
+			elseif ob:is_player() then
+				ob:add_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
 			end
-			ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=dmg}})
-		elseif ob:get_luaentity() and ob:get_luaentity().itemstring then
-			ob:get_luaentity().age=890
+		end
+
+		if impact and node.hurt==1 then
+			if not (en and (en.itemstring or en.nitroglycerine_dust)) then
+				local d=math.max(1,vector.distance(pos,pos2 or pos))
+				local dmg=(4/d)*node.radius
+				if en and en.on_blow then
+					en.on_blow(en)
+				end
+				ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=dmg}})
+			elseif en and en.itemstring then
+				en.age=890
+			end
 		end
 	end
-end
-if node.velocity==1 then
-	for _, ob in ipairs(minetest.get_objects_inside_radius(pos, node.radius*2)) do
-		local pos2=ob:get_pos()
-		local d=math.max(1,vector.distance(pos,pos2 or pos))
-		local dmg=(8/d)*node.radius
-		if ob:get_luaentity() and not (ob:get_luaentity().nitroglycerine_dust and ob:get_luaentity().nitroglycerine_dust==2) then
-			ob:set_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
-			if ob:get_luaentity() and ob:get_luaentity().nitroglycerine_dust then ob:get_luaentity().nitroglycerine_dust=2 end
-		elseif ob:is_player() then
-			ob:add_velocity({x=(pos2.x-pos.x)*dmg, y=(pos2.y-pos.y)*dmg, z=(pos2.z-pos.z)*dmg})
-		end
-	end
-end
+
 	minetest.sound_play("nitroglycerin_explode4", {pos=pos, gain = 20, max_hear_distance = node.radius*8})
 	if node.radius>9 then
 		minetest.sound_play("nitroglycerin_nuke", {pos=pos, gain = 0.5, max_hear_distance = node.radius*30})
 	end
-
 
 	default.smoke(pos,{
 		amount = 20,

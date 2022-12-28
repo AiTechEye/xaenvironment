@@ -44,12 +44,25 @@ minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
-		minetest.after(0.1, function(pos)
+		minetest.after(0.1, function()
 			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 60)) do
-				ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=2000}})
+				local pos2 = ob:get_pos()
+				local impact = true
+				if ob:is_player() then
+					pos2 = apos(pos2,0,0.5)
+				end
+				for v in minetest.raycast(pos,pos2) do
+					if v.type == "node" and default.defpos(v.under,"walkable") then
+						impact = false
+						break
+					end
+				end
+				if impact then
+					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=2000}})
+				end
 			end
 			nitroglycerin.explode(pos,{radius=25,set="air",drops=0})
-		end,pos)
+		end)
 	end,
 	on_timer=function(pos, elapsed)
 		minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
