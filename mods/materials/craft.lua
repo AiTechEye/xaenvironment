@@ -1,4 +1,17 @@
 minetest.register_craft({
+	output="materials:xecoke",
+	recipe={
+		{"examobs:bugmeat","examobs:tooth","quads:bottle_with_oil"},
+		{"","materials:aluminium_sheet",""}
+	},
+})
+
+minetest.register_craft({
+	output="materials:aluminium_sheet",
+	recipe={{"default:aluminium_ingot"}}
+})
+
+minetest.register_craft({
 	output="materials:concrete_stair 3",
 	recipe={
 		{"materials:concrete","",""},

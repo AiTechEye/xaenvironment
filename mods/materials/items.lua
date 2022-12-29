@@ -775,3 +775,106 @@ minetest.register_node("materials:fridge", {
 		return (minetest.get_item_group(stack:get_name(),"eatable") > 0 or minetest.get_item_group(stack:get_name(),"drinkable") > 0) and stack:get_count() or 0
 	end
 })
+
+minetest.register_craftitem("materials:aluminium_sheet", {
+	description = "Aluminium sheet",
+	inventory_image = "materials_aluminium_sheet.png",
+	groups = {treasure=1},
+})
+
+minetest.register_node("materials:xecoke",{
+	description = "XECoke",
+	tiles = {"materials_sodacan_xecoke.png"},
+	groups = {cracky=2,dig_immediate = 3,treasure=1,store=100,jumk=1},
+	drawtype = "mesh",
+	paramtype = "light",
+	paramtype2 = "facedir",
+	wield_scale = {x=2,y=-2,z=2},
+	sounds = default.node_sound_stone_defaults(),
+	mesh = "materials_sodacan.obj",
+	walkable = false,
+	selection_box = {
+		type="fixed",
+		fixed={-0.1,-0.5,-0.1,0.1,-0.2,0.1}
+	},
+	on_punch = function(pos, node, player, pointed_thing)
+		local inv = player:get_inventory()
+		if minetest.is_protected(pos,player:get_player_name())
+		and minetest.get_meta(pos):get_int("placed") == 0
+		and inv:room_for_item("main",node.name) then
+			inv:add_item("main",node.name)
+			minetest.remove_node(pos)
+		end
+	end,
+	on_place = function(itemstack, placer, pointed_thing)
+		minetest.rotate_node(itemstack, placer, pointed_thing)
+		minetest.get_meta(pointed_thing.above):set_int("placed",1)
+		return itemstack
+	end
+})
+
+minetest.register_node("materials:plasticbag",{
+	description = "Plastic bag",
+	wield_image = "materials_plasticbag.png^[colorize:#999a",
+	inventory_image = "materials_plasticbag.png",
+	tiles = {"materials_plasticbag.png"},
+	groups = {dig_immediate = 3,treasure=1,jumk=1,flammable=1},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	sounds = default.node_sound_leaves_defaults(),
+	walkable = false,
+	use_texture_alpha = "blend",
+	drawtype = "nodebox",
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,-0.5,0.5,-0.495,0.5}
+	},
+	on_punch = function(pos, node, player, pointed_thing)
+		local inv = player:get_inventory()
+		if minetest.is_protected(pos,player:get_player_name())
+		and minetest.get_meta(pos):get_int("placed") == 0
+		and inv:room_for_item("main",node.name) then
+			inv:add_item("main",node.name)
+			minetest.remove_node(pos)
+		end
+	end,
+	on_place = function(itemstack, placer, pointed_thing)
+		minetest.rotate_node(itemstack, placer, pointed_thing)
+		minetest.get_meta(pointed_thing.above):set_int("placed",1)
+		return itemstack
+	end
+})
+
+minetest.register_node("materials:dirty_papper",{
+	description = "Dirty papper",
+	wield_image = "materials_dirtypapper.png",
+	inventory_image = "materials_dirtypapper.png",
+	tiles = {"materials_dirtypapper.png"},
+	groups = {dig_immediate = 3,treasure=1,papper=1,jumk=1,flammable=1},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	sounds = default.node_sound_leaves_defaults(),
+	walkable = false,
+	use_texture_alpha = "clip",
+	drawtype = "nodebox",
+	node_box = {
+		type="fixed",
+		fixed={-0.5,-0.5,-0.5,0.5,-0.495,0.5}
+	},
+	on_punch = function(pos, node, player, pointed_thing)
+		local inv = player:get_inventory()
+		if minetest.is_protected(pos,player:get_player_name())
+		and minetest.get_meta(pos):get_int("placed") == 0
+		and inv:room_for_item("main",node.name) then
+			inv:add_item("main",node.name)
+			minetest.remove_node(pos)
+		end
+	end,
+	on_place = function(itemstack, placer, pointed_thing)
+		minetest.rotate_node(itemstack, placer, pointed_thing)
+		minetest.get_meta(pointed_thing.above):set_int("placed",1)
+		return itemstack
+	end
+})
