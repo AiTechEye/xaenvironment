@@ -2982,12 +2982,14 @@ examobs.register_mob({
 		if self.fight and math.random(1,10) == 1 and examobs.distance(self.object,self.fight) < 5 then
 			local pos1 = self:pos()
 			local pos2 = self.fight:get_pos()
-			local p = {
-				x=pos2.x+((pos1.x-pos2.x)*-1),
-				y=pos1.y,
-				z=pos2.z+(pos1.z-pos2.z)*-1
-			}
-			self.object:set_pos(p)
+			if pos1 and pos2 then
+				local p = {
+					x=pos2.x+((pos1.x-pos2.x)*-1),
+					y=pos1.y,
+					z=pos2.z+(pos1.z-pos2.z)*-1
+				}
+				self.object:set_pos(p)
+			end
 		elseif walkable(self.object:get_pos()) then
 			self.object:set_velocity({x=0,y=1,z=0})
 		elseif self.object:get_velocity().y == 1 then
