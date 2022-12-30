@@ -232,6 +232,22 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	return true
 end
 
+minetest.register_tool("nodeextractor:nodemetahack", {
+	description = "Node meta hack tool",
+	inventory_image = "default_stick.png^[colorize:#00f",
+	groups={not_in_craftguide=1},
+	range=20,
+	on_use=function(itemstack, user, pointed_thing)
+		if minetest.check_player_privs(user:get_player_name(), {server=true}) then
+			if pointed_thing.under then
+				nodeextractor.metahack(user,pointed_thing.under)
+			end
+		else
+			minetest.chat_send_player(user:get_player_name(),"the server privilege is required")
+		end
+	end
+})
+
 minetest.register_tool("nodeextractor:creater", {
 	description = "Creater\nUse to mark\nPlace to change\nDrop for gui",
 	inventory_image = "default_stick.png^[colorize:#f00",
@@ -331,6 +347,41 @@ nodeextractor.a=function(itemstack, user, pointed_thing,typ)
 	end
 end
 
+nodeextractor.metahack=function(user,pos)
+	local name = user:get_player_name()
+	nodeextractor.user[name] = nodeextractor.user[name] or {metapos = pos}
+
+	local metainv = nodeextractor.user[name].metainv
+	local y = 0
+	local meta = minetest.get_meta(pos)
+	local inv = meta:get_inventory()
+	local timer = minetest.get_node_timer(pos)
+	local gui = "size[10,10]"
+	.. "label[6,0.2;Timeout: "..(math.floor(timer:get_elapsed()*100)*0.01).." / "..timer:get_timeout().."]"
+
+	local tab = meta:to_table()
+	for i,v in pairs(tab.fields) do
+		gui = gui .. "field[0,"..y..";2,1;f_"..i..";;" .. v .."]tooltip[f_"..i..";"..i.."]"
+		y = y + 0.5
+	end
+
+	if y > 0 then
+		gui = gui .. "button[3,0;1.5,1;set;Save]tooltip[set;Save fields]"
+		y = 0
+	end
+
+	for i,v in pairs(tab.inventory) do
+		if i == metainv then
+			gui = gui .. "list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";"..i..";3,1;7,9;]"
+		else
+			gui = gui .. "button[1.5,"..y..";1.5,1;i_"..i..";"..i.."]tooltip[i_"..i..";"..i.."]"
+			y = y + 1
+		end
+	end
+
+	minetest.show_formspec(user:get_player_name(), "nodeextractor.hack",gui)
+end
+
 nodeextractor.b=function(user,text,replace,saved)
 	text = text or nodeextractor.user[user:get_player_name()].name or ""
 	local gui="" ..
@@ -347,7 +398,37 @@ nodeextractor.b=function(user,text,replace,saved)
 end
 
 minetest.register_on_player_receive_fields(function(player, form, pressed)
-	if form=="nodeextractor" then
+	if form == "nodeextractor.hack" then
+		local name = player:get_player_name()
+		local p = nodeextractor.user[name]
+		local meta = minetest.get_meta(p.metapos)
+
+		if pressed.quit then
+			nodeextractor.user[name] = nil
+			return
+		end
+		for i,v in pairs(pressed) do
+			if i:sub(1,2) == "i_" then
+				p.metainv = i:sub(3,-1)
+				break
+			elseif pressed.set and i:sub(1,2) == "f_" then
+				local f = i:sub(3,-1)
+				local n = tonumber(n)
+
+				if n then
+					if type(n) == "float" then
+						meta:set_float(f,n)
+					else
+						meta:set_int(f,n)
+					end
+				else
+					meta:set_string(f,v)
+				end
+			end
+		end
+		nodeextractor.metahack(player,p.metapos)
+		return
+	elseif form == "nodeextractor" then
 		local n = player:get_player_name()
 		if pressed.exit then
 			nodeextractor.user[n] = nil
