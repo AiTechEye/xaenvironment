@@ -1,3 +1,10 @@
+places.buildings.city={
+	chance=50,sx=100,sy=100,miny=-50,maxy=150,spawn_at={"default:dirt"},
+	on_spawn=function(pos)
+		places.city(pos)
+	end
+}
+
 places.citybuildings = {
 	{name="house1",chance=5,size=1},
 	{name="places_plot",chance=30,size=1},
@@ -18,6 +25,18 @@ places.citybuildings = {
 				end
 			end
 		end
+	},
+	{name="places_brickhousing1",chance=5,size=1,
+		on_spawn=function(pos1)
+			local pos = vector.new(pos1.x-8,pos1.y,pos1.z-8)
+			local r = math.random(4,10)
+			local y = 5
+			for i=1,r do
+				nodeextractor.set(apos(pos,0,y),minetest.get_modpath("places").."/nodeextractor/places_brickhousing2.exexn")
+				y = y + 4
+			end
+			nodeextractor.set(apos(pos,0,y),minetest.get_modpath("places").."/nodeextractor/places_brickhousing3.exexn")
+		end
 	}
 }
 
@@ -30,13 +49,6 @@ minetest.register_tool("places:genc", {
 		end
 	end
 })
-
-places.buildings.city={
-	chance=50,sx=100,sy=100,miny=-50,maxy=150,spawn_at={"default:dirt"},
-	on_spawn=function(pos)
-		places.city(pos)
-	end
-}
 
 places.ishouse=function(a)
 	return a and a.house

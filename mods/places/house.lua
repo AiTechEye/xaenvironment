@@ -38,7 +38,7 @@ minetest.register_node("places:rental", {
 	},
 	paramtype2 = "facedir",
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy=3,oddly_breakable_by_hand=3,store=200},
+	groups = {choppy=3,oddly_breakable_by_hand=3,store=200,on_load=1},
 	drawtype="nodebox",
 	node_box = {
 		type = "fixed",
@@ -46,6 +46,22 @@ minetest.register_node("places:rental", {
 			{-0.4, -0.4, 0.5, 0.4, 0.4, 0.45},
 		}
 	},
+	on_load=function(pos)
+		local m = minetest.get_meta(pos)
+		if m:get_int("npc_randomly") == 1 then
+			if math.random(1,10) ~= 1 then
+				local p1 = vector.add(pos,minetest.string_to_pos(m:get_string("pos1")))
+				local p2 = vector.add(pos,minetest.string_to_pos(m:get_string("pos2")))
+				local nodes = minetest.find_nodes_in_area(p1,p2,"places:npc_furniture_spawner")
+				for i,v in pairs(nodes) do
+					minetest.remove_node(v)
+				end
+			else
+				m:set_string("renter","*Someone")
+			end
+			m:set_int("npc_randomly",2)
+		end
+	end,
 	after_place_node=function(pos, placer, itemstack, pointed_thing)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
 	end,
@@ -54,6 +70,7 @@ minetest.register_node("places:rental", {
 		m:set_int("amount",1)
 		m:set_int("price",1)
 		m:set_int("list",3)
+		m:set_int("npc_randomly",0)
 	end,
 	panel=function(pos,user,preview)
 		local m = minetest.get_meta(pos)
@@ -75,10 +92,10 @@ minetest.register_node("places:rental", {
 			if m:get_string("pos1") == "" then
 				form = form .."label[0,-0.3;The panel is not setup]"
 			elseif renter ~= "" and renter ~= name then
-				form = form .."label[0,-0.3;Occupied by "..renter.."]"
+				form = form .."label[0,-0.3;Occupied by\n"..renter.."]"
 			else
 				form = form
-				.. (m:get_string("owner") ~= "" and "label[0.5,0;Owner: "..m:get_string("owner").."]" or "")
+				.. (m:get_string("owner") ~= "" and "label[0.5,0;Owner:\n"..m:get_string("owner").."]" or "")
 				..(user and "label[2,0;"..minetest.colorize("#FFFF00",Getcoin(user)).."]" or "")
 				.."button[0.5,1;2.2,1;"..(renter == name and "cancel;Cancel" or "rent;Rent").."]"
 				.."label[-0.2,2;Price: "..m:get_int("price").."\n"..m:get_int("amount").."'th "..tt[t].."]"

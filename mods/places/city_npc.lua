@@ -350,6 +350,40 @@ examobs.register_roadwalker({
 	}
 })
 
+minetest.register_node("places:npc_furniture_spawner", {
+	tiles={
+		"bubble.png",
+		"bubble.png",
+		"bubble.png",
+		"bubble.png",
+		"bubble.png",
+		"bubble.png^default_crafting_arrowdown.png",
+	},
+	use_texture_alpha = "opaque",
+	groups = {cracky=2,on_load=1},
+	paramtype2 = "facedir",
+	walkable = false,
+	on_load = function(pos)
+		minetest.get_node_timer(pos):start(1)
+	end,
+	on_timer = function (pos, elapsed)
+		local furn_floor = {}
+		local furn_wall = {}
+		for i,v in pairs(minetest.registered_nodes) do
+			if v.groups and v.groups.used_by_npc then
+				if v.groups.used_by_npc == 1 then
+					table.insert(furn_floor,i)
+				elseif v.groups.used_by_npc == 2 then
+					table.insert(furn_wall,i)
+				end
+			end
+		end
+		local n = minetest.get_node(pos)
+		local name = math.random(1,3) == 1 and "air" or default.defpos(apos(pos,0,-1),"walkable") and furn_floor[math.random(1,#furn_floor)] or furn_wall[math.random(1,#furn_wall)]
+		minetest.set_node(pos,{name=name,param2=n.param2})
+	end,
+})
+
 minetest.register_node("places:city_npcspawner", {
 	groups = {not_in_creative_inventory=1,on_load=1},
 	drawtype="airlike",
