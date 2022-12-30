@@ -268,23 +268,9 @@ weather.ac=function()
 					weather.currweather[i].wind_dir = vector.new(math.random(-100,100)*0.01,0,math.random(-100,100)*0.01)
 				end
 --wind
-				if weather.players[name] and w.wind_strength > 20 then
-					local ppos = apos(player:get_pos(),0,1)
-					local c = minetest.raycast(ppos,vector.add(ppos,vector.multiply(w.wind_dir,-5)))
-					local n = c:next()
+				if w.wind_strength > 20 then
 					local s = w.wind_strength * 0.01
 					local wdir = {x=w.wind_dir.x*s,y=0,z=w.wind_dir.z*s}
-
-					while n do
-						if n and n.type == "node" and default.defpos(n.under,"walkable") then
-							break
-						elseif n and n.ref and n.ref == player then
-							local ps = w.wind_strength * 0.05
-							player:add_velocity({x=w.wind_dir.x*ps,y=0,z=w.wind_dir.z*ps})
-							break
-						end
-						n = c:next()
-					end
 
 					for i,v in pairs(examobs.active.ref) do
 						local mp = v:get_pos()
