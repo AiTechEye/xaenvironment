@@ -364,7 +364,7 @@ minetest.register_node("places:npc_furniture_spawner", {
 	paramtype2 = "facedir",
 	walkable = false,
 	on_load = function(pos)
-		minetest.get_node_timer(pos):start(1)
+		minetest.get_node_timer(pos):start(5)
 	end,
 	on_timer = function (pos, elapsed)
 		local furn_floor = {}

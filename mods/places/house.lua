@@ -16,8 +16,6 @@ minetest.register_craft({
 	},
 })
 
-
-
 minetest.register_craft({
 	output="places:rentpanel_copycard",
 	recipe={
@@ -49,15 +47,15 @@ minetest.register_node("places:rental", {
 	on_load=function(pos)
 		local m = minetest.get_meta(pos)
 		if m:get_int("npc_randomly") == 1 then
-			if math.random(1,10) ~= 1 then
+			if math.random(1,10) > 1 then
+				m:set_string("renter","*Someone")
+			else
 				local p1 = vector.add(pos,minetest.string_to_pos(m:get_string("pos1")))
 				local p2 = vector.add(pos,minetest.string_to_pos(m:get_string("pos2")))
 				local nodes = minetest.find_nodes_in_area(p1,p2,"places:npc_furniture_spawner")
 				for i,v in pairs(nodes) do
 					minetest.remove_node(v)
 				end
-			else
-				m:set_string("renter","*Someone")
 			end
 			m:set_int("npc_randomly",2)
 		end
@@ -150,6 +148,9 @@ minetest.register_node("places:rental", {
 			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):start((l== 1 or l == 2) and 1 or 10)
 			Coin(sender,-p)
+			local pm = sender:get_meta()
+			pm:set_string("places_rentpanel_pos",minetest.pos_to_string(pos))
+			pm:set_string("places_rentpanel_node",minetest.get_node(pos).name)
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
 		elseif pressed.cancelrenting then
 			m:set_int("cancel",1)
@@ -157,6 +158,9 @@ minetest.register_node("places:rental", {
 			minetest.chat_send_player(m:get_string("renter"),"The renting is canceling")
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
 		elseif pressed.cancel then
+			local pm = sender:get_meta()
+			pm:set_string("places_rentpanel_pos","")
+			pm:set_string("places_rentpanel_node","")
 			local renter = m:get_string("renter")
 			minetest.chat_send_player(name,name == renter and "You as renter is terminated" or "The renter is terminated")
 			local c = Getcoin(renter)
@@ -440,4 +444,36 @@ minetest.register_tool("places:rentpanel_copycard", {
 			return itemstack
 		end
 	end,
+})
+
+player_style.register_button({
+	name="Rental",
+	image="places_rentalpanel.png",
+	type="image",
+	info="Go to rental",
+	action=function(player)
+		local meta = player:get_meta()
+		local name = player:get_player_name()
+		if meta:get_int("respawn_disallowed") == 1 then
+			minetest.chat_send_player(name,"This function is disallowed in this case")
+		else
+			local pos = minetest.string_to_pos(meta:get_string("places_rentpanel_pos"))
+			local pos2 = player:get_pos()
+			local node_name = meta:get_string("places_rentpanel_node")
+			if pos then
+				player:set_pos(pos)
+				minetest.after(2,function()
+					local n = minetest.get_node(pos).name
+					if n ~= node_name and n ~= "ignore" then
+						meta:set_string("places_rentpanel_pos","")
+						meta:set_string("places_rentpanel_node","")
+						minetest.chat_send_player(name,"Looks like you as renter is terminated")
+						player:set_pos(pos2)
+					end
+				end)
+			else
+				minetest.chat_send_player(name,"You have to rent something first")
+			end
+		end
+	end
 })
