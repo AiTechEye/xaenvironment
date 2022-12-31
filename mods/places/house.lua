@@ -93,9 +93,9 @@ minetest.register_node("places:rental", {
 				form = form .."label[0,-0.3;Occupied by\n"..renter.."]"
 			else
 				form = form
-				.. (m:get_string("owner") ~= "" and "label[0.5,0;Owner:\n"..m:get_string("owner").."]" or "")
-				..(user and "label[2,0;"..minetest.colorize("#FFFF00",Getcoin(user)).."]" or "")
-				.."button[0.5,1;2.2,1;"..(renter == name and "cancel;Cancel" or "rent;Rent").."]"
+				.. (m:get_string("owner") ~= "" and "label[-0.2,0.3;Owner: "..m:get_string("owner").."]" or "")
+				..(user and "label[2,-0.20;"..minetest.colorize("#FFFF00",Getcoin(user)).."]" or "")
+				.."button_exit[0.5,1;2.2,1;"..(renter == name and "cancel;Cancel" or "rent;Rent").."]"
 				.."label[-0.2,2;Price: "..m:get_int("price").."\n"..m:get_int("amount").."'th "..tt[t].."]"
 			end
 
@@ -134,8 +134,12 @@ minetest.register_node("places:rental", {
 		if pressed.rent then
 			local c = Getcoin(sender)
 			local p = m:get_int("price")
+			local pm = sender:get_meta()
 			if c < p then
 				minetest.chat_send_player(name,"You can't afford "..p.." (cons: ".. c ..")")
+				return
+			elseif pm:get_string("places_rentpanel_pos") ~= "" then
+				minetest.chat_send_player(name,"You are already renting")
 				return
 			end
 			local p1 = vector.add(pos,minetest.string_to_pos(m:get_string("pos1")))
@@ -148,7 +152,7 @@ minetest.register_node("places:rental", {
 			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):start((l== 1 or l == 2) and 1 or 10)
 			Coin(sender,-p)
-			local pm = sender:get_meta()
+
 			pm:set_string("places_rentpanel_pos",minetest.pos_to_string(pos))
 			pm:set_string("places_rentpanel_node",minetest.get_node(pos).name)
 			minetest.registered_nodes["places:rental"].panel(pos, sender)
