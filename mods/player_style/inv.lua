@@ -160,7 +160,7 @@ player_style.inventory=function(player)
 		invp.backcraft = m:get_int("backcraftlistring")
 
 		for i=1,4 do
-			invp["backpackslot"..i] = minetest.create_detached_inventory("backpackslot"..i, {
+			invp["backpackslot"..i] = minetest.create_detached_inventory(name .. "_backpackslot"..i, {
 				allow_put = function(inv, listname, index, stack, player)
 					return minetest.get_item_group(stack:get_name(),"backpack") > 0 and stack:get_count() or 0
 				end,
@@ -205,7 +205,7 @@ player_style.inventory=function(player)
 				end,invp,player)
 			end
 		end
-		invp.backpack = minetest.create_detached_inventory("backpack", {
+		invp.backpack = minetest.create_detached_inventory(name .. "_backpack", {
 			allow_put = function(inv, listname, index, stack, player)
 				local p = player_style.players[name]
 				local invps = p and p.inv
@@ -245,7 +245,7 @@ player_style.inventory=function(player)
 
 --hat
 
-		invp.hat = minetest.create_detached_inventory("hat", {
+		invp.hat = minetest.create_detached_inventory(name .. "_hat", {
 			allow_put = function(inv, listname, index, stack, player)
 				return default.def(stack:get_name()).hat_properties and 1 or 0
 			end,
@@ -286,7 +286,7 @@ player_style.inventory=function(player)
 	local backpack = ""
 
 	if invp.backpacki ~= 0 and minetest.get_item_group(invp["backpackslot"..invp.backpacki]:get_stack("main",1):get_name(),"backpack") > 0 then
-		backpack = "list[detached:backpack;main;0,1.2;4,6;]listring[current_player;main]listring[detached:backpack;main]" or ""
+		backpack = "list[detached:"..name.."_backpack;main;0,1.2;4,6;]listring[current_player;main]listring[detached:"..name.."_backpack;main]" or ""
 		local list = {}
 		for i,v in pairs(minetest.deserialize(player:get_meta():get_string("backpack"..invp.backpacki) or "") or {}) do
 			list[i]=ItemStack(v)
@@ -300,7 +300,7 @@ player_style.inventory=function(player)
 
 		backpack = backpack
 		.."image_button["..(i-1)..",-0.2;1,1;player_style_backpack.png;backpack"..i..";]"
-		.."list[detached:backpackslot"..i..";main;"..(i-1)..",-0.2;1,1;]"
+		.."list[detached:"..name.."_backpackslot"..i..";main;"..(i-1)..",-0.2;1,1;]"
 	end
 
 --inventory
@@ -327,11 +327,11 @@ player_style.inventory=function(player)
 			.."list[current_player;craft;8,0;3,3;]"
 			.."list[current_player;craftpreview;11,1;1,1;]"
 			.."item_image[6,0;1,1;player_style:top_hat]"
-			.."list[detached:hat;main;6,0;1,1;]"
+			.."list[detached:"..name.."_hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
 			.."listring[current_player;main]"
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
-			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:"..name.."_backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 			.. itemmagnet
 			..model
 			..buttons
@@ -387,12 +387,12 @@ player_style.inventory=function(player)
 			.."list[current_player;craftpreview;11,1;1,1;]"
 
 			.."item_image[6,0;1,1;player_style:top_hat]"
-			.."list[detached:hat;main;6,0;1,1;]"
+			.."list[detached:"..name.."_hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
 
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.."listring[current_player;main]"
-			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:"..name.."_backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
 			.. itemmagnet
 
 			..buttons
