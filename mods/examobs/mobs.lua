@@ -45,8 +45,11 @@ examobs.register_mob({
 	death=function(self)
 		if not self.ex then
 			self.ex = 1
-			nitroglycerin.explode(self:pos(),{radius=5,set="fire:basic_flame",})
-			self.object:remove()
+			local pos = self.object:get_pos()
+			if pos then
+				nitroglycerin.explode(pos,{radius=5,set="fire:basic_flame",})
+				self.object:remove()
+			end
 		end
 	end,
 	use_bow=function(pos1,pos2,arrow)
