@@ -212,7 +212,8 @@ on_step= function(self, dtime)
 					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=4}},{x=0,y=0,z=0})
 					ob:set_hp(ob:get_hp()-self.damage)
 					if (not ob:get_attach()) and (ob:get_hp()>0 or ob:is_player()) then
-						local c=ob:get_properties().collisionbox
+						local gp = ob:get_properties()
+						local c=gp and gp.collisionbox
 						if c~=nil then
 							local a1=c[1]+c[2]+c[3]
 							local a2=c[4]+c[5]+c[6]
