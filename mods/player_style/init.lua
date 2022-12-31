@@ -335,8 +335,9 @@ end)
 
 player_style.set_profile=function(player,pr)
 	player:set_eye_offset({x=0,y=0,z=0},{x=5,y=0,z=5})
-	player:set_lighting({shadows={intensity=0.1}})
-	
+	if player.set_lighting then
+		player:set_lighting({shadows={intensity=0.1}})
+	end
 	local profile=player_style.registered_profiles[pr]
 	local name=player:get_player_name()
 
