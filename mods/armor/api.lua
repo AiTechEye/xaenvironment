@@ -51,10 +51,10 @@ armor.show=function(player)
 		return minetest.show_formspec(name, "armor",
 		"size[8,6]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]"..
-		"list[detached:armor;main;2,0.5;6,1;]" ..
+		"list[detached:"..name.."_armor;main;2,0.5;6,1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
 		"listring[current_player;main]" ..
-		"listring[detached:armor;main]" ..
+		"listring[detached:"..name.."_armor;main]" ..
 		"item_image[2,0.5;1,1;armor:iron_chestplate]" ..
 		"item_image[3,0.5;1,1;armor:iron_helmet]" ..
 		"item_image[4,0.5;1,1;armor:iron_gloves]" ..
@@ -225,7 +225,7 @@ end)
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	armor.user[name]={}
-	armor.user[name].inv=minetest.create_detached_inventory("armor", {
+	armor.user[name].inv=minetest.create_detached_inventory(name.."_armor", {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
 			return 0
 		end,
