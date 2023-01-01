@@ -166,7 +166,7 @@ minetest.register_tool("default:projectile_launcher", {
 				return itemstack
 			end
 		end
-		minetest.sound_play("default_projectilelauncher_out", {object=user})
+		minetest.sound_play("default_projectilelauncher_out", {pos=user:get_pos()})
 	end,
 })
 
