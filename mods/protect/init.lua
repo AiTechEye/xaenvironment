@@ -10,7 +10,7 @@ protect = {
 minetest.register_on_mods_loaded(function()
 	protect.areas = minetest.deserialize(protect.storage:get_string("areas")) or {}
 	for i,v in pairs(protect.areas) do
-		if v.game_rule and default.date("d",v.date) > 90 then
+		if v.game_rule and v.outdating and default.date(v.outdating.type,v.date) > v.outdating.count then
 			protect.remove_game_rule_area(v.id)
 		end
 	end
@@ -237,7 +237,7 @@ protect.add_area=function(name,title)
 	return false
 end
 
-protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule)
+protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule,outdating)
 	local id = 0
 	local a = {}
 	for i,v in pairs(protect.areas) do
@@ -250,7 +250,23 @@ protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule)
 		end
 	end
 	pos1,pos2 = protect.sort(pos1,pos2)
-	table.insert(protect.areas,{id=id,game_rule=game_rule == nil,owner=name or "*game",pos1=pos1,pos2=pos2,title=title,date=default.date("get")})
+
+	if outdating then
+		outdating = type(outdating) == "table" and outdating or {}
+		outdating.type = outdating.type or "d"
+		outdating.count = outdating.count or 3
+	end
+
+	table.insert(protect.areas,{
+		id=id,
+		game_rule = game_rule == nil,
+		owner = name or "*game",
+		pos1 = pos1,
+		pos2 = pos2,
+		title = title,
+		date = default.date("get"),
+		outdating = outdating,
+	})
 	protect.storage:set_string("areas",minetest.serialize(protect.areas))
 	return id
 end
