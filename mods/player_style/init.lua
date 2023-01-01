@@ -341,7 +341,7 @@ player_style.set_profile=function(player,pr)
 	local profile=player_style.registered_profiles[pr]
 	local name=player:get_player_name()
 
-	player_style.players[name] = {sounds={},dive_sound={dive=false,time=0}}
+	player_style.players[name] = {sounds={},dive_sound={dive=false,time=0},item=""}
 	player_style.players[name].profile = "default"
 	player_style.players[name].player = player
 	player_style.players[name].wield_item = {}
@@ -679,7 +679,7 @@ minetest.register_globalstep(function(dtime)
 	end
 
 	for _, player in pairs(minetest.get_connected_players()) do
-		local name=player:get_player_name()
+		local name = player:get_player_name()
 		local p = player:get_pos()
 		local ppr = player_style.players[name]
 
@@ -745,6 +745,20 @@ minetest.register_globalstep(function(dtime)
 -- ========
 
 		local witem = player:get_wielded_item():get_name()
+		local itemdef = minetest.registered_items[witem] or {}
+
+		if ppr.item ~= witem then
+			local old_itemdef = minetest.registered_items[ppr.item] or {}
+			if old_itemdef.on_previous then
+				old_itemdef.on_previous(player:get_wielded_item(), player)
+			end
+			if itemdef.on_just_selected then
+				itemdef.on_just_selected(player:get_wielded_item(), player)
+			end
+			ppr.item = witem
+		elseif itemdef.on_step then
+			itemdef.on_step(player:get_wielded_item(), player)
+		end
 
 		if ppr.wield_item.item ~= witem then
 			ppr.wield_item.item = witem
