@@ -2,8 +2,23 @@ fire = {particles={}}
 
 fire.add_particle=function(pos)
 	local s = minetest.pos_to_string(pos)
+	local n = 1
+	local smoke = {time=1}
+
+	for i,v in pairs(fire.particles) do
+		n = n + 1
+	end
+
+	if n > 50 then
+		return
+	elseif n > 20 then
+		smoke.minsize = 7
+		smoke.minsize = 10
+		smoke.amount = 1
+	end
+
 	fire.particles[s] = {
-		smoke = default.smoke(pos,{time=1}),
+		smoke = default.smoke(pos,smoke),
 		fx = default.lighteffect(pos)
 	}
 end
