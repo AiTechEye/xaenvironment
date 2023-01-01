@@ -27,13 +27,13 @@ villages = {
 			villages.chests_to_treasures_in_area(pos,16)
 		end},
 		{name="atlantis_building3",chance=15,area=10,spawn=function(pos)
-			protect.add_game_rule_area(apos(pos,6,14,6),apos(pos,-6,-1,-6),"atlantis")
+			protect.add_game_rule_area(apos(pos,6,14,6),apos(pos,-6,-1,-6),"atlantis",nil,nil,true)
 			villages.chests_to_treasures_in_area(pos,17)
 		end},
 		{name="atlantis_building4",chance=15,area=13},
 		{name="atlantis_building5",chance=15,area=16},
 		{name="atlantis_building6",chance=15,area=36,spawn=function(pos)
-			protect.add_game_rule_area(vector.subtract(pos,18),vector.add(pos,18),"atlantis")
+			protect.add_game_rule_area(vector.subtract(pos,18),vector.add(pos,18),"atlantis",nil,nil,true)
 			villages.chests_to_treasures_in_area(pos,18)
 			local code = math.random(0,9)..math.random(0,9)..math.random(0,9)..math.random(0,9)
 			local nodes = minetest.find_nodes_in_area(vector.subtract(pos,18),vector.add(pos,18),{"exatec:codelock","materials:granite_orb"})
@@ -57,7 +57,7 @@ villages = {
 			villages.chests_to_treasures_in_area(pos,16)
 		end},
 		{name="atlantis_building10",chance=15,area=32,spawn=function(pos)
-			protect.add_game_rule_area(vector.subtract(pos,16),vector.add(pos,16),"atlantis")
+			protect.add_game_rule_area(vector.subtract(pos,16),vector.add(pos,16),"atlantis",nil,nil,true)
 			villages.chests_to_treasures_in_area(pos,16)
 		end},
 	},
