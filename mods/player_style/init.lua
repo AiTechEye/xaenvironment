@@ -15,14 +15,13 @@ player_style={
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
 	survive_respawn_anywhere = minetest.settings:get_bool("xaenvironment_respawn_anywhere") ~= false,
-	bloom_effects = minetest.settings:get_bool("xaenvironment_singleplayer_bloom"),
 	static_spawnpoint = minetest.settings:get("static_spawnpoint"),
-	bloom = {
-		status="",
+	saturation = {
 		last="",
-		air={radius=16,intensity=0.05},
-		liquid={radius=16,intensity=0.6},
-		damage={radius=16,intensity=2},
+		status="air",
+		air=1,
+		liquid=2,
+		damage=10,
 	},
 }
 
@@ -38,51 +37,34 @@ dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 dofile(minetest.get_modpath("player_style") .. "/craftguide.lua")
 
-player_style.set_bloom=function(stat)
-	if minetest.is_singleplayer() and player_style.bloom_effects then
-		if stat == "setup" then
-			local i = minetest.settings:get("bloom_intensity") or 0.05
-			local r = minetest.settings:get("bloom_radius") or 16
-			local storage = true
-			for ii, v in pairs(player_style.bloom) do
-				if type(v) == "table" and v.radius == r and i == v.intensity then
-					storage = false
-					break
-				end
-			end
-			if storage then
-				default.storage:set_int("bloom_radius",r)
-				default.storage:set_float("bloom_intensity",i)
-			end
-			return
-		elseif stat == "reset" then
-			minetest.settings:set("bloom_intensity",default.storage:get_float("bloom_intensity"))
-			minetest.settings:set("bloom_radius",default.storage:get_int("bloom_radius"))
-			return
-		elseif player_style.bloom.status ~= stat then
-			if stat == "last" then
-				stat = player_style.bloom.last
-				player_style.bloom.last = ""
-			else
-				player_style.bloom.last = player_style.bloom.status
-			end
-			local s = player_style.bloom[stat]
+player_style.set_saturation=function(player,stat)
+	local name = player and player:get_player_name() or ""
+	local p = player_style.players[name]
+	if p and player.set_lighting and p.saturation.status ~= stat then
+		local max = player:get_properties().hp_max
+		local h = player:get_hp()
+		max = max >= h and max or h
+		local hp = h / max
+		hp = hp+(1-hp)/2
+
+		if stat == "last" then
+			stat = p.saturation.last
+		elseif stat == "update" then
+			local s = p.saturation[p.saturation.status]
 			if s then
-				player_style.bloom.status = stat
-				minetest.settings:set("bloom_intensity",s.intensity)
-				minetest.settings:set("bloom_radius",s.radius)
+				player:set_lighting({saturation=s*hp})
 			end
+			return
+		end
+		local s = p.saturation[stat]
+
+		if s then
+			p.saturation.last = p.saturation.status
+			p.saturation.status = stat
+			player:set_lighting({saturation=s*hp})
 		end
 	end
 end
-
-minetest.register_on_mods_loaded(function(player)
-	player_style.set_bloom("setup")
-end)
-
-minetest.register_on_shutdown(function(player)
-	player_style.set_bloom("reset")
-end)
 
 player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
@@ -127,13 +109,15 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 			end
 		end
 	end
-	if player and hp_change < 0 then
-		minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
-		if minetest.is_singleplayer() and player_style.bloom_effects then
-			player_style.set_bloom("damage")
-			minetest.after(0.2,function()
-				player_style.set_bloom("last")
+	if player then
+		if hp_change < 0 then
+			minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
+			player_style.set_saturation(player,"damage")
+			minetest.after(0.1,function()
+				player_style.set_saturation(player,"last")
 			end)
+		else
+			player_style.set_saturation(player,"update")
 		end
 	end
 	return hp_change
@@ -238,6 +222,7 @@ player_style.respawn=function(player,pos)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
+	player_style.set_saturation(player,"update")
 
 	for i, v in pairs(player_style.players[name].sounds) do
 		minetest.sound_stop(v)
@@ -304,8 +289,6 @@ player_style.respawn=function(player,pos)
 	if #spots > 0 then
 		player:set_pos(spots[math.random(1,#spots)])
 		return true
-	--elseif not builtin then
-	--	player:respawn()
 	end
 end
 
@@ -329,8 +312,10 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	player_style.set_profile(player,"default")
-	player_style.set_bloom("air")
-
+	player_style.set_saturation(player,"update")
+	minetest.after(0.1, function()
+		player_style.set_saturation(player,"update")
+	end)
 end)
 
 player_style.set_profile=function(player,pr)
@@ -346,6 +331,7 @@ player_style.set_profile=function(player,pr)
 	player_style.players[name].player = player
 	player_style.players[name].wield_item = {}
 	player_style.players[name].skin = {}
+	player_style.players[name].saturation = table.copy(player_style.saturation)
 
 	if minetest.check_player_privs(name,{ability2d=true}) then
 		player_style.players[name].ability2d = {joining=0}
@@ -687,7 +673,7 @@ minetest.register_globalstep(function(dtime)
 
 		if minetest.get_item_group(minetest.get_node({x=p.x,y=p.y+0.6,z=p.z}).name,"water") > 0 then
 			if not ppr.dive_sound.dive then
-				player_style.set_bloom("liquid")
+				player_style.set_saturation(player,"liquid")
 				ppr.dive_sound.dive = true
 				ppr.dive_sound.time = 4
 			end
@@ -698,7 +684,7 @@ minetest.register_globalstep(function(dtime)
 
 			end
 		elseif ppr.dive_sound.dive then
-			player_style.set_bloom("air")
+			player_style.set_saturation(player,"air")
 			ppr.dive_sound.dive = false
 			minetest.sound_stop(ppr.sounds["default_underwater"])
 		end
