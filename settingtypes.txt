@@ -20,8 +20,6 @@ xaenvironment_survivorstart (Start with helpful items) bool false
 
 xaenvironment_keystrokes (Shows keystrokes) bool false
 
-xaenvironment_singleplayer_bloom (Bloom effects in singleplayer, experimental) bool false
-
 xaenvironment_respawn_anywhere  (Respawns anywhere on the world) bool true
 
 
