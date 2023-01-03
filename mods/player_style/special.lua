@@ -283,7 +283,7 @@ special.show=function(player)
 		return minetest.show_formspec(name, "special",
 		"size[8,6]" ..
 		"listcolors[#77777777;#777777aa;#000000ff]"..
-		"list[detached:special;main;1,0.2;"..special.num..",1;]" ..
+		"list[detached:"..name.."_special;main;1,0.2;"..special.num..",1;]" ..
 		"list[current_player;main;0,2.3;8,4;]" ..
 		"label[0,-0.35;"..minetest.colorize("#FFFF00",Getcoin(player)).."]" ..
 		slots)
@@ -325,7 +325,7 @@ end)
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	special.user[name]={}
-	special.user[name].inv=minetest.create_detached_inventory("special", {
+	special.user[name].inv=minetest.create_detached_inventory(name.."_special", {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
 			return 0
 		end,
