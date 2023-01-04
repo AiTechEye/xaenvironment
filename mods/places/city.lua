@@ -13,6 +13,7 @@ places.citybuildings = {
 	{name="places_burnserivce",chance=20,size=1,freespace={{-1,0}}},
 	{name="places_portal_service",chance=30,size=1,freespace={{0,-1}}},
 	{name="places_police_station",chance=30,size=1,freespace={{0,1}}},
+	{name="places_building_skeleton",chance=40,size=1},
 	{name="places_general_shop",chance=20,size=1,freespace={{0,-1}},
 		on_spawn=function(pos)
 			local g = {"store","stone","wood","flammable","exatec","eatable","ingot"}
@@ -37,7 +38,7 @@ places.citybuildings = {
 			end
 			nodeextractor.set(apos(pos,0,y),minetest.get_modpath("places").."/nodeextractor/places_brickhousing3.exexn")
 		end
-	}
+	},
 }
 
 minetest.register_tool("places:genc", {
