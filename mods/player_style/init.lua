@@ -743,7 +743,7 @@ minetest.register_globalstep(function(dtime)
 			end
 			ppr.item = witem
 		elseif itemdef.on_step then
-			itemdef.on_step(player:get_wielded_item(), player)
+			itemdef.on_step(player:get_wielded_item(), player,dtime)
 		end
 
 		if ppr.wield_item.item ~= witem then
