@@ -69,6 +69,7 @@ projectilelauncher.register_bullet=function(name,def)
 	projectilelauncher.registed_bullets[defname]=def
 
 	minetest.register_craftitem(defname, {
+		stack_max = def.stack_max or 99,
 		description = def.description or name,
 		inventory_image = (def.itemtexture or def.texture and def.texture .. "^armor_alpha_hand.png^[makealpha:0,255,0") or def.inventory_image or "default_wood.png^armor_alpha_hand.png^[makealpha:0,255,0",
 		groups = def.groups,
@@ -105,6 +106,7 @@ minetest.register_tool("default:projectile_launcher", {
 			end
 			user:set_fov(z,false,0.1)
 			projectilelauncher.zoom_check(user,user:get_wield_index())
+			p.bulletpreview_started = true
 			return itemstack
 		end
 
@@ -140,40 +142,162 @@ minetest.register_tool("default:projectile_launcher", {
 			local item = p.inv:get_stack("main",index):get_name()
 			if item ~= "" then
 				p.index = index
-				projectilelauncher.update_inventory(itemstack, user,true)
-
-				local image = minetest.registered_items[item].inventory_image .."^(default_chest_top.png^[colorize:#0f0)"
-
-				if p.bulletpreview then
-					user:hud_change(p.bulletpreview, "text", image)
-				else
-					p.bulletpreview = user:hud_add({
-						hud_elem_type="image",
-						scale = {x=5,y=5},
-						position={x=1,y=0},
-						text=image,
-						offset={x=-50,y=50},
-					})
-				end
-
-				minetest.after(2,function(user,p,index)
-					if p and p.bulletpreview and p.index == index then
-						user:hud_remove(p.bulletpreview)
-						p.bulletpreview = nil
-					end
-				end,user,p,index)
-
+				projectilelauncher.update_inventory(itemstack, user, true)
+				p.bulletpreview_time = 1
 				return itemstack
 			end
 		end
 		minetest.sound_play("default_projectilelauncher_out", {pos=user:get_pos()})
 	end,
+	on_just_selected=function(itemstack, user)
+		projectilelauncher.new_inventory(itemstack, user)
+
+		local p = projectilelauncher.user[user:get_player_name()]
+		local pos1 = user:get_pos()
+		local stack = p.inv:get_stack("main",p.index)
+		local def = projectilelauncher.registed_bullets[stack:get_name()]
+		if def and def.on_just_selected then
+			def.on_just_selected(itemstack, user, pos1)
+		end
+	end,
+	on_previous=function(itemstack, user)
+		projectilelauncher.new_inventory(itemstack, user)
+
+		local p = projectilelauncher.user[user:get_player_name()]
+		local pos1 = user:get_pos()
+		local stack = p.inv:get_stack("main",p.index)
+		local def = projectilelauncher.registed_bullets[stack:get_name()]
+		if def and def.on_previous then
+			def.on_previous(itemstack, user, pos1)
+		end
+	end,
+	on_step=function(itemstack, user, dtime)
+		local p = projectilelauncher.user[user:get_player_name()]
+		if not p then
+			projectilelauncher.new_inventory(itemstack, user)
+			p = projectilelauncher.user[user:get_player_name()]
+		elseif p.time < 0.1 then
+			p.time = p.time + dtime
+			return
+		end
+
+		p.time = 0
+
+		local pos1 = user:get_pos()
+		local stack = p.inv:get_stack("main",p.index)
+		local def = projectilelauncher.registed_bullets[stack:get_name()]
+		if def and def.on_step then
+			def.on_step(itemstack, user, pos1, dtime)
+		end
+
+		if p.bulletpreview_started then
+			local image = minetest.registered_items[stack:get_name()].inventory_image .."^(default_chest_top.png^[colorize:#0ff)"
+			p.bulletpreview_started = nil
+			p.bulletpreview_time = 1
+
+			if p.bulletpreview then
+				user:hud_change(p.bulletpreview, "text", image)
+				user:hud_change(p.bulletpreview_text, "text", stack:get_count())
+			else
+				p.bulletpreview_text = user:hud_add({
+					hud_elem_type="text",
+					scale = {x=2,y=2},
+					text = stack:get_count(),
+					number=0xFFFFFF,
+					offset={x=-50,y=110},
+					position={x=1,y=0},
+					alignment=-1,
+				})
+				p.bulletpreview = user:hud_add({
+					hud_elem_type="image",
+					scale = {x=5,y=5},
+					position={x=1,y=0},
+					text=image,
+					offset={x=-50,y=50},
+				})
+			end
+		elseif p.bulletpreview_time and p.bulletpreview_time > 0 then
+			p.bulletpreview_time = p.bulletpreview_time - dtime*5
+			if p.bulletpreview_time <= 0 then
+				p.bulletpreview_index = nil
+				user:hud_remove(p.bulletpreview)
+				user:hud_remove(p.bulletpreview_text)
+				p.bulletpreview = nil
+			end
+		end
+
+		if p.autoaim == 1 then
+			local dir, target = projectilelauncher.autoaim(user)
+			if target then
+				if not p.cross_hud then
+					p.cross_hud = user:hud_add({
+						hud_elem_type="image_waypoint",
+						scale = {x=2, y=2},
+						name="aim",
+						text="default_cross.png^[invert:rgb"
+					})
+				end
+				user:hud_change(p.cross_hud, "world_pos", target)
+			elseif p.cross_hud then
+				user:hud_remove(p.cross_hud)
+				p.cross_hud = nill
+			end
+		end
+	end
 })
+
+projectilelauncher.user_height=function(user)
+	local pos = user:get_pos()
+	return (user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.6 or 1.5
+end
+
+projectilelauncher.bulletpos=function(user)
+	local pos = user:get_pos()
+	local height = projectilelauncher.user_height(user)
+	local pos2 = vector.offset(pos, 0, height, 0)
+	local dir = user:get_look_dir()
+	return vector.add(pos2,vector.multiply(dir,height == 1.5 and 0.1 or 0.5))
+end
+
+projectilelauncher.autoaim=function(user)
+	local dir = user:get_look_dir()
+	local pos1 = projectilelauncher.bulletpos(user)
+	local height = projectilelauncher.user_height(user)
+	local target
+	local d = 100
+
+	for _, ob in pairs(minetest.get_objects_inside_radius(pos1, 100)) do
+		local en = ob:get_luaentity()
+		if ob ~= user and (en and en.examob and en.dead == nil or ob:is_player()) then
+			local pos2 = ob:get_pos()
+			local d2 = vector.distance(pos1,pos2)
+			local pos3 = vector.normalize(vector.subtract(pos2, pos1))
+			local deg = math.acos((pos3.x*dir.x)+(pos3.y*dir.y)+(pos3.z*dir.z)) * (180 / math.pi)
+
+			if d2 < d and not (deg < 0 or deg > 50) then		
+				for v in minetest.raycast(pos1,pos2) do
+					if v and v.type == "node" then
+						break
+					elseif v and v.type == "object" and v.ref == ob then
+						d = d2
+						target = pos2
+						break
+					end
+				end
+			end
+		end
+	end
+	if target then
+		return vector.new((target.x-pos1.x)/d,(target.y-pos1.y)/d,(target.z-pos1.z)/d), target
+	end
+end
+
 
 projectilelauncher.new_inventory=function(itemstack, user)
 	local name = user:get_player_name()
 	if not projectilelauncher.user[name] then
 		projectilelauncher.user[name] = {
+			time = 0,
 			index = 0,
 			autoaim = 0,
 			zoom = 0,
@@ -262,7 +386,7 @@ projectilelauncher.show_inventory=function(itemstack, user)
 			"listring[current_player;main]" ..
 			"listring[detached:projectilelauncher_"..name..";main]" ..
 			"image["..(p.index-1)..",0.4;1,1;default_chest_top.png^[colorize:#0f0]" ..
-			"image_button[8,1.5;1,1;default_watersplash_ring.png"..(p.autoaim == 0 and "^default_cross.png" or "")..";autoaim;]" ..
+			"image_button[8,1.5;1,1;default_cross.png"..(p.autoaim == 0 and "" or "^[invert:rgb")..";autoaim;]" ..
 			"tooltip[autoaim;Auto aim ("..(p.autoaim == 0 and "OFF" or "ON")..")]"..
 			"image_button[8,4;1,1;default_unknown.png;help;]"..
 			"image[8,0.4;1,1;default_telescopic.png"..(p.zoom == 0 and "^default_cross.png" or "").."]button[8,-0.1;1,0.5;zoom;"..(p.zoom == 0 and "OFF" or "ON").."]"
@@ -348,6 +472,7 @@ projectilelauncher.update_inventory=function(itemstack, user, add)
 	if add then
 		minetest.sound_play("default_projectilelauncher_load", {object=user})
 	end
+	p.bulletpreview_started = true
 end
 
 minetest.register_on_leaveplayer(function(player)
@@ -360,50 +485,22 @@ projectilelauncher.shoot=function(itemstack, user)
 	local p = projectilelauncher.user[name]
 	local stack = p.inv:get_stack("main",p.index)
 	local def
+
 	if stack:get_name() == "" then
 		minetest.sound_play("default_projectilelauncher_out", {object=user})
 		return
 	else
 		def = projectilelauncher.registed_bullets[stack:get_name()]
-		if def.on_trigger and def.on_trigger(itemstack, user) then
+		if def.on_trigger and def.on_trigger(itemstack, user) or def.on_step then
 			return
 		end
 		minetest.sound_play(def.launch_sound, {object=user})
 	end
-	local pos = user:get_pos()
-	local dir = user:get_look_dir()
-	local height = (user:get_player_control().sneak or minetest.get_item_group(minetest.get_node(pos).name,"liquid") > 0) and 0.6 or 1.5
-	local bulletpos = vector.add(vector.new(pos.x, pos.y+height, pos.z),vector.multiply(dir,height == 1.5 and 0.1 or 0.5))
 
-	if p.autoaim > 0 then
-		local obpos2,autodis = nil,100
-		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 100)) do
-			local en = ob:get_luaentity()
-			if ob ~= user and (en and en.examob and en.dead == nil or ob:is_player()) then
-				local obpos = ob:get_pos()
-				local ob2 = vector.normalize(vector.subtract(obpos, pos))
-				local deg = math.acos((ob2.x*dir.x)+(ob2.y*dir.y)+(ob2.z*dir.z)) * (180 / math.pi)
-				local d = vector.distance(pos,obpos)
-				if d < autodis and not (deg < 0 or deg > 50) then -- and minetest.line_of_sight(vector.new(pos.x,pos.y+height,pos.z),obpos)
-					local c = minetest.raycast(vector.new(pos.x,pos.y+height,pos.z),obpos)
-					local ob2 = c:next()
-					local ex = true
-					while (ob2 and ex) do
-						if ob2 and ob2.type == "node" and default.defpos(ob2.under,"walkable") then
-							ex = nil
-						elseif ob2 and ob2.type == "object" and ob2.ref ~= user and not default.is_decoration(ob2.ref,true) then
-							autodis = d
-							obpos2 = obpos
-						end
-						ob2 = c:next()
-					end
-				end
-			end
-		end
-		if obpos2 then
-			dir = vector.new((obpos2.x-pos.x)/autodis,((obpos2.y-pos.y)-height)/autodis,(obpos2.z-pos.z)/autodis)
-		end
-	end
+	local pos = user:get_pos()
+	local dir = p.autoaim == 1 and projectilelauncher.autoaim(user) or user:get_look_dir()
+	local bulletpos = projectilelauncher.bulletpos(user)
+
 	if def.before_bullet_released then
 		local cancel,takebullet = def.before_bullet_released(itemstack, user, bulletpos, dir)
 		if takebullet == nil then
@@ -1025,5 +1122,67 @@ projectilelauncher.register_bullet("bubbelgum",{
 	end,
 	craft={
 		{"default:taaffeite","default:steel_ingot","materials:marzipan_rose"},
+	}
+})
+
+projectilelauncher.register_bullet("ray",{
+	description="Ray bullet",
+	texture="default_rubyblock.png",
+	itemtexture = "default_ironblock.png^[colorize:#f00^armor_alpha_hand.png^[makealpha:0,255,0^(default_rubyblock.png^[colorize:#a00^default_alpha_stick.png^[makealpha:0,255,0)",
+	damage=0,
+	craft_count=50,
+	launch_sound = "default_projectilelauncher_shot8",
+	groups={treasure=1,store=15},
+	on_step=function(itemstack, user, pos1)
+		if user:get_player_control().LMB == false then
+			return
+		end
+		projectilelauncher.new_inventory(itemstack, user)
+		local p = projectilelauncher.user[user:get_player_name()]
+		local height = projectilelauncher.user_height(user)
+		local dir = p.autoaim == 1 and projectilelauncher.autoaim(user) or user:get_look_dir()
+
+		pos1 = projectilelauncher.bulletpos(user)
+
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
+
+		for v in minetest.raycast(pos1,pos2) do
+			if v and v.type == "node" and default.defpos(v.under,"walkable") then
+				pos2 = v.intersection_point
+				pos3 = v.under
+				minetest.check_for_falling(v.under)
+				break
+			elseif v and v.type == "object" and v.ref ~= user and not default.is_decoration(v.ref,true) then
+				default.punch(v.ref,user,5)
+			end
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#f00"
+		if pos1.x >= pos2.x then y = y+math.pi end
+
+		local p = projectilelauncher.user[user:get_player_name()]
+		local ray = p.raybullet and p.raybullet:get_luaentity() and p.raybullet or minetest.add_entity(pos1, "default:arrow_lightning")
+
+		ray:set_rotation({x=0,y=y,z=z})
+		ray:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		p.raybullet = ray
+
+		ray:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+		minetest.sound_play("default_projectilelauncher_shot5", {pos=pos1, gain = 4,max_hear_distance = 10})
+
+		local stack = p.inv:get_stack("main",p.index)
+		stack:set_count(stack:get_count()-1)
+		p.inv:set_stack("main",p.index,stack)
+		projectilelauncher.update_inventory(itemstack, user)
+	end,
+	craft={
+		{"default:ruby","default:steel_ingot"},
 	}
 })
