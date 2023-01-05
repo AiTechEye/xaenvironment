@@ -351,8 +351,6 @@ projectilelauncher.new_inventory=function(itemstack, user)
 	p.index = m:get_int("index") > 0 and m:get_int("index") or 1
 	p.zoom = p.inv:get_stack("main",9):get_name() ~= "" and m:get_int("zoom") or 0
 	p.autoaim = m:get_int("autoaim")
-
-
 end
 
 projectilelauncher.show_inventory=function(itemstack, user)
@@ -403,6 +401,10 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			p.autoaim = p.autoaim == 0 and 1 or 0
 			p.itemstack:get_meta():set_int("autoaim",p.autoaim)
 			player:set_wielded_item(p.itemstack)
+			if p.cross_hud then
+				player:hud_remove(p.cross_hud)
+				p.cross_hud = nill
+			end
 			projectilelauncher.show_inventory(p.itemstack, player)
 			return
 		elseif pressed.zoom then
