@@ -167,6 +167,12 @@ minetest.register_tool("default:projectile_launcher", {
 		local pos1 = user:get_pos()
 		local stack = p.inv:get_stack("main",p.index)
 		local def = projectilelauncher.registed_bullets[stack:get_name()]
+
+		if p.cross_hud then
+			user:hud_remove(p.cross_hud)
+			p.cross_hud = nill
+		end
+
 		if def and def.on_previous then
 			def.on_previous(itemstack, user, pos1)
 		end
