@@ -176,7 +176,7 @@ minetest.register_tool("default:projectile_launcher", {
 		if not p then
 			projectilelauncher.new_inventory(itemstack, user)
 			p = projectilelauncher.user[user:get_player_name()]
-		elseif p.time < 0.1 then
+		elseif p.time < 0.1 or user:get_player_control().aux1 and p.zoom == 1 then
 			p.time = p.time + dtime
 			return
 		end
