@@ -1,4 +1,57 @@
 examobs.register_mob({
+	description = "The most rideable and useful animal in the history.",
+	name = "horse",
+	team = "horse",
+	type = "animal",
+	hp = 80,
+	coin = 5,
+	dmg = 0,
+	textures = {"examobs_horse_brown.png"},
+	mesh = "examobs_horse.x",
+	aggressivity = 1,
+	walk_speed = 6,
+	run_speed = 20,
+	inv={["examobs:flesh"]=3},
+	collisionbox={-1,-1.1,-1,1,1,1},
+	spawn_on={"group:spreading_dirt_type"},
+	animation = {
+		stand = {x=0,y=5},
+		walk = {x=10,y=20},
+		run = {x=10,y=20,speed=60},
+		lay = {x=60,y=61,speed=0},
+		attack = {x=40,y=54},
+	},
+	punch_timeout = 0,
+	on_punching=function(self)
+		self.punch_timeout = 0.5
+	end,
+	on_abs_step=function(self,dtime)
+		if self.punch_timeout > 0 then
+			self.punch_timeout = self.punch_timeout - dtime
+			local p1 = self:pos()
+			local p2 = self.fight and self.fight:get_pos()
+
+			if not self.hkickedt and p2 and vector.distance(p1,p2) <= 4 and self.punch_timeout < 0.2 then
+				self.hkickedt = true
+
+				local p2 = examobs.pointat(self,50)
+				local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
+				if self.fight:get_luaentity() then
+					self.fight:set_velocity(v)
+				else
+					self.fight:add_velocity(v)
+				end
+				examobs.punch(self.object,self.fight,15)
+			end
+			if self.punch_timeout <= 0 then
+				self.hkickedt = nil
+			end
+			return self
+		end
+	end,
+})
+
+examobs.register_mob({
 	description = "The terminator spider machine shoots barbed wires catch you\nThis mob is also explosive.",
 	name = "terminator_spider",
 	team = "terminator",
