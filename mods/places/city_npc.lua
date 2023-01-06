@@ -241,6 +241,52 @@ end
 examobs.register_roadwalker({
 	name = "city_roadwalker",
 	right_hand_traffic = 1.2,
+	step=function(self)
+		self.junktimmer = (self.junktimmer or math.random(1,30)) + 1
+		if self.junktimmer > 30 then
+			self.junktimmer = 0
+			local r = math.random(1,10)
+			if r == 1 then
+				local pos = self.object:get_pos()
+				local poses = {}
+
+				for i,v in ipairs(minetest.find_nodes_in_area(vector.offset(pos,1,0,1),vector.offset(pos,-1,0,-1),{"air"})) do
+					if default.defpos(vector.offset(v,0,-1,0),"walkable") then
+						table.insert(poses,v)
+					end
+				end
+
+				if #poses > 0 then
+					if not places.junk_items then
+						places.junk_items = {}
+						for i,v in pairs(minetest.registered_nodes) do 
+							if (v.groups or {}).junk then
+								table.insert(places.junk_items,i)
+							end 
+						end
+					end
+					local p = poses[math.random(1,#poses)]
+					local item = places.junk_items[math.random(1,#places.junk_items)]
+					minetest.set_node(p,{name=item,param2=math.random(0,3)})
+					minetest.get_node_timer(p):start(math.random(120,600))
+				end
+
+			elseif r > 2 and (examobs.active.types["places:city_roadwalker"] or 0) < 30 then
+				local pos = self.object:get_pos()
+				local poses = {}
+				for i,v in ipairs(minetest.find_nodes_in_area(vector.offset(pos,-10,0,-10),vector.offset(pos,10,10,10),{"air"})) do
+					if default.defpos(vector.offset(v,0,-1,0),"walkable") then
+						table.insert(poses,v)
+					end
+				end
+				if #poses > 0 then
+					local p = poses[math.random(1,#poses)]
+					local en = minetest.add_entity(p,"places:city_roadwalker"):get_luaentity()
+					en.on_abs_step = nil
+				end
+			end
+		end
+	end,
 	node={
 	on_spawn = function(pos,ob)
 		if ob:get_properties().textures[1] == "player_style_police.png" or #criminals > 0 and math.random(1,10) == 1 or math.random(1,20) == 1 then
