@@ -13,11 +13,12 @@ examobs.register_mob({
 	run_speed = 20,
 	inv={["examobs:flesh"]=3},
 	collisionbox={-1,-1.1,-1,1,1,1},
+	stepheight = 1.5,
 	spawn_on={"group:spreading_dirt_type"},
 	animation = {
 		stand = {x=0,y=5},
-		walk = {x=10,y=20},
-		run = {x=10,y=20,speed=60},
+		walk = {x=10,y=30,speed=50},
+		run = {x=10,y=30,speed=80},
 		lay = {x=60,y=61,speed=0},
 		attack = {x=40,y=54},
 	},
@@ -59,6 +60,38 @@ examobs.register_mob({
 				self.hkickedt = nil
 			end
 			return self
+		elseif self.rider then
+			local key = self.rider and self.rider:get_player_control() or {}
+			if key.right or key.left or key.up then
+				local r = self.rider:get_look_horizontal()
+				self.object:set_yaw(r + (key.right and -math.pi/2 or key.left and math.pi/2 or key.down and math.pi or 0))
+				examobs.walk(self,key.aux1)
+				if key.jump then
+					examobs.jump(self,7)
+				end
+			else
+				examobs.stand(self)
+			end
+			return self
+		end
+	end,
+	on_click=function(self,clicker)
+		if clicker:is_player() and not self.rider or clicker == self.rider then
+			local name = clicker:get_player_name()
+			if not self.rider then
+				self.rider = clicker
+				player_style.player_attached[name] = true
+				clicker:set_attach(self.object, "",{x=0, y=1, z=-3}, {x=0, y=0,z=0})
+				clicker:set_eye_offset({x=0, y=3, z=0}, {x=0, y=0, z=0})
+				player_style.set_animation(name,"sit")
+			else
+				clicker:set_detach()
+				clicker:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+				player_style.player_attached[name] = nil
+
+				--examobs.known(self,clicker,"folow")	-- mess
+				self.rider = nil
+			end
 		end
 	end,
 })
