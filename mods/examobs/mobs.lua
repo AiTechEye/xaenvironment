@@ -21,6 +21,18 @@ examobs.register_mob({
 		lay = {x=60,y=61,speed=0},
 		attack = {x=40,y=54},
 	},
+	on_spawn=function(self)
+		local c = {"2e1c09","37210b","40270d","492c0e","523210","5b3712","6d3700","7c4b19","9e5f1f","bbbbbb","d8d8d8","ededed","2f2f2f","171717"}
+		local color1 = c[math.random(1,#c)]
+		local color2 = c[math.random(1,#c)]
+		self.storage.skin = "examobs_horse.png^[colorize:#" .. color1 .."^examobs_horse_details.png" .. (math.random(1,2) == 1 and "" or "^(examobs_horse_spots.png^[colorize:#" .. color2..")")
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			self.object:set_properties({textures={self.storage.skin}})
+		end
+	end,
 	punch_timeout = 0,
 	on_punching=function(self)
 		self.punch_timeout = 0.5
