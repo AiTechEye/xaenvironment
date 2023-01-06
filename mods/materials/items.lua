@@ -785,7 +785,7 @@ minetest.register_craftitem("materials:aluminium_sheet", {
 minetest.register_node("materials:xecoke",{
 	description = "XECoke",
 	tiles = {"materials_sodacan_xecoke.png"},
-	groups = {cracky=2,dig_immediate = 3,treasure=1,store=100,jumk=1},
+	groups = {cracky=2,dig_immediate = 3,treasure=1,store=100,junk=1},
 	drawtype = "mesh",
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -810,7 +810,10 @@ minetest.register_node("materials:xecoke",{
 		minetest.rotate_node(itemstack, placer, pointed_thing)
 		minetest.get_meta(pointed_thing.above):set_int("placed",1)
 		return itemstack
-	end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.remove_node(pos)
+	end,
 })
 
 minetest.register_node("materials:plasticbag",{
@@ -818,7 +821,7 @@ minetest.register_node("materials:plasticbag",{
 	wield_image = "materials_plasticbag.png^[colorize:#999a",
 	inventory_image = "materials_plasticbag.png",
 	tiles = {"materials_plasticbag.png"},
-	groups = {dig_immediate = 3,treasure=1,jumk=1,flammable=1},
+	groups = {dig_immediate = 3,treasure=1,junk=1,flammable=1},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
@@ -843,7 +846,10 @@ minetest.register_node("materials:plasticbag",{
 		minetest.rotate_node(itemstack, placer, pointed_thing)
 		minetest.get_meta(pointed_thing.above):set_int("placed",1)
 		return itemstack
-	end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.remove_node(pos)
+	end,
 })
 
 minetest.register_node("materials:dirty_papper",{
@@ -851,7 +857,7 @@ minetest.register_node("materials:dirty_papper",{
 	wield_image = "materials_dirtypapper.png",
 	inventory_image = "materials_dirtypapper.png",
 	tiles = {"materials_dirtypapper.png"},
-	groups = {dig_immediate = 3,treasure=1,papper=1,jumk=1,flammable=1},
+	groups = {dig_immediate = 3,treasure=1,papper=1,junk=1,flammable=1},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
@@ -876,5 +882,8 @@ minetest.register_node("materials:dirty_papper",{
 		minetest.rotate_node(itemstack, placer, pointed_thing)
 		minetest.get_meta(pointed_thing.above):set_int("placed",1)
 		return itemstack
-	end
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.remove_node(pos)
+	end,
 })
