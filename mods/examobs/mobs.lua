@@ -3,16 +3,17 @@ examobs.register_mob({
 	name = "horse",
 	team = "horse",
 	type = "animal",
+	reach = 4,
 	hp = 80,
 	coin = 5,
 	dmg = 0,
 	textures = {"examobs_horse_brown.png"},
 	mesh = "examobs_horse.x",
-	aggressivity = 1,
+	aggressivity = 0,
 	walk_speed = 6,
 	run_speed = 20,
 	inv={["examobs:flesh"]=3},
-	collisionbox={-1,-1.1,-1,1,1,1},
+	collisionbox={-0.9,-1.1,-0.9, 0.9,0.4,0.9},
 	stepheight = 1.5,
 	spawn_on={"group:spreading_dirt_type"},
 	animation = {
@@ -38,59 +39,163 @@ examobs.register_mob({
 	on_punching=function(self)
 		self.punch_timeout = 0.5
 	end,
+	on_lifedeadline=function(self)
+		return self.storage.tamed
+	end,
+	death=function(self)
+		if self.rider then
+			self.rider:set_detach()
+			self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+			player_style.player_attached[self.rider:get_player_name()] = nil
+			self.rider = nil
+		end
+	end,
 	on_abs_step=function(self,dtime)
-		if self.punch_timeout > 0 then
+		if self.dead or self.dying then
+			if self.rider and self.rider then
+				self:on_click(self.rider)
+			end
+			return
+		elseif self.punch_timeout > 0 then
 			self.punch_timeout = self.punch_timeout - dtime
 			local p1 = self:pos()
 			local p2 = self.fight and self.fight:get_pos()
 
 			if not self.hkickedt and p2 and vector.distance(p1,p2) <= 4 and self.punch_timeout < 0.2 then
 				self.hkickedt = true
-
 				local p2 = examobs.pointat(self,50)
 				local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
-				if self.fight:get_luaentity() then
-					self.fight:set_velocity(v)
-				else
-					self.fight:add_velocity(v)
-				end
+				self.fight:add_velocity(v)
 				examobs.punch(self.object,self.fight,15)
 			end
 			if self.punch_timeout <= 0 then
 				self.hkickedt = nil
 			end
 			return self
-		elseif self.rider then
+		elseif self.rider and not (self.punch_timeout and self.punch_timeout > 0) then
 			local key = self.rider and self.rider:get_player_control() or {}
-			if key.right or key.left or key.up then
+
+			if key.jump then
+				if self.in_liquid then
+					local v = self.object:get_velocity() or {x=0,y=0,z=0}
+					self.object:set_velocity({x=0,y=5,z=0})
+				else
+					examobs.jump(self,7)
+				end
+			elseif key.sneak and self.in_liquid then
+				local v = self.object:get_velocity() or {x=0,y=0,z=0}
+				self.object:set_velocity({x=0,y=-5,z=0})
+			end
+
+			if key.LMB then
+				local dir = self.rider:get_look_dir()
+				local pos = vector.offset(self.object:get_pos(),0,2,0)
+				local pos2 = vector.add(pos,vector.multiply(dir,50))
+
+				for v in minetest.raycast(pos,pos2) do
+					if v and v.type == "node" then
+ 						if not minetest.is_protected(v.under, "") and vector.distance(pos,v.under) < 6 then
+							examobs.lookat(self,v.under)
+							self.punch_timeout = 0.5
+							examobs.anim(self,"attack")
+							self.fight = nil
+							nitroglycerin.explode(v.under,{radius=1,set="air",place = {"air","air"},hurt=0})
+							return true
+						end
+						break
+					elseif v and v.type == "object" and v.ref ~= self.object and v.ref ~= self.rider and not default.is_decoration(v.ref,true) then
+						self.fight = v.ref
+						examobs.lookat(self,v.ref)
+						self.punch_timeout = 0.5
+						examobs.anim(self,"attack")
+						break
+					end
+				end
+			end
+
+			if key.right or key.left or key.up or key.down then
+				self.fight = nil
+				self.folow = nil
 				local r = self.rider:get_look_horizontal()
 				self.object:set_yaw(r + (key.right and -math.pi/2 or key.left and math.pi/2 or key.down and math.pi or 0))
 				examobs.walk(self,key.aux1)
-				if key.jump then
-					examobs.jump(self,7)
-				end
-			else
+				return self
+			elseif not self.fight then
 				examobs.stand(self)
+				if self.hp < self.hp_max then
+					local p = self:pos()
+					local np = minetest.find_nodes_in_area_under_air(vector.add(p,3),vector.subtract(p,3),{"group:grass"})
+					for i,v in pairs(np) do
+						if examobs.visiable(self.object,v) then
+							examobs.lookat(self,v)
+							minetest.remove_node(v)
+							self:heal(1)
+							if self.hp >= self.hp_max then
+								break
+							end
+						end
+					end
+				end
+				return self
 			end
-			return self
+		end
+
+		if not self.fight and not self.grass and (math.random(1,100) == 1 or self.hp < self.hp_max) then
+			local p = self:pos()
+			local np = minetest.find_nodes_in_area_under_air(vector.add(p,10),vector.subtract(p,10),{"group:grass"})
+			for i,v in pairs(np) do
+				if examobs.visiable(self.object,v) then
+					self.grass = v
+					examobs.stand(self)
+					return true
+				end
+			end
+		elseif self.grass then
+			examobs.lookat(self,self.grass)
+			examobs.walk(self)
+			if not examobs.visiable(self.object,self.grass) or minetest.get_item_group(minetest.get_node(self.grass).name,"grass") == 0 then
+				self.grass = nil
+			elseif examobs.distance(self.object,self.grass) <= 4 then
+				minetest.remove_node(self.grass)
+				self.grass = nil
+				self.lifetimer = self.lifetime
+				examobs.stand(self)
+				self:heal(1)
+			end
+			return true
 		end
 	end,
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"grass") > 0
+	end,
 	on_click=function(self,clicker)
-		if clicker:is_player() and not self.rider or clicker == self.rider then
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+
+			if minetest.get_item_group(item,"grass") > 0 then
+				self:eat_item(item,2)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+				self.storage.tamed = 1
+				return
+			end
+
 			local name = clicker:get_player_name()
-			if not self.rider then
+			if not self.rider and not player_style.player_attached[name] then
 				self.rider = clicker
 				player_style.player_attached[name] = true
 				clicker:set_attach(self.object, "",{x=0, y=1, z=-3}, {x=0, y=0,z=0})
 				clicker:set_eye_offset({x=0, y=3, z=0}, {x=0, y=0, z=0})
 				player_style.set_animation(name,"sit")
-			else
-				clicker:set_detach()
-				clicker:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+				self.lifetimer = self.lifetime
+				self.storage.tamed = 1
+			elseif clicker == self.rider then
+				self.rider:set_detach()
+				self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 				player_style.player_attached[name] = nil
-
-				--examobs.known(self,clicker,"folow")	-- mess
 				self.rider = nil
+				self.fight = nil
 			end
 		end
 	end,
@@ -2304,12 +2409,15 @@ examobs.register_mob({
 		return minetest.get_item_group(item,"grass") > 0
 	end,
 	on_click=function(self,clicker)
-		if clicker:is_player() and minetest.get_item_group(item,"grass")> 0 then
-			self:eat_item(item,2)
-			default.take_item(clicker)
-			self.folow = clicker
-			examobs.known(self,clicker,"folow")
-			self.storage.tamed = 1
+		if clicker:is_player() then
+			local item = clicker:get_wielded_item():get_name()
+			if minetest.get_item_group(item,"grass") > 0 then
+				self:eat_item(item,2)
+				default.take_item(clicker)
+				self.folow = clicker
+				examobs.known(self,clicker,"folow")
+				self.storage.tamed = 1
+			end
 		end
 	end
 })
