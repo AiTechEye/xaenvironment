@@ -393,12 +393,10 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 	local p = player_style.players[name]
 	if remove then
 		if p.thirst then
-			player:hud_remove(p.thirst.back)
 			player:hud_remove(p.thirst.bar)
 			p.thirst = nil
 		end
 		if p.hunger then
-			player:hud_remove(p.hunger.back)
 			player:hud_remove(p.hunger.bar)
 			p.hunger = nil
 		end
@@ -408,25 +406,17 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			level = player:get_meta():get_int("hunger"),
 			step = 0,
 			num = 0,
-			back=player:hud_add({
-				hud_elem_type="statbar",
-				position={x=0.5,y=1},
-				text="player_style_hunger_bar_back.png",
-				number=20,
-				direction = 0,
-				size={x=24,y=24},
-				direction=0,
-				offset={x=25,y=-120},
-			}),
 			bar=player:hud_add({
 				hud_elem_type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_hunger_bar.png",
+				text2="player_style_hunger_bar_back.png",
 				number=player:get_meta():get_int("hunger"),
+				item=20,
 				direction = 0,
 				size={x=24,y=24},
 				direction=0,
-				offset={x=25,y=-120},
+				offset={x=-265,y=-120},
 			})
 		}
 	end
@@ -436,23 +426,16 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			level = player:get_meta():get_int("thirst"),
 			step = 0,
 			num = 0,
-			back=player:hud_add({
-				hud_elem_type="statbar",
-				position={x=0.5,y=1},
-				text="player_style_thirst_bar_back.png",
-				number=20,
-				size={x=24,y=24},
-				direction=0,
-				offset={x=25,y=-150},
-			}),
 			bar=player:hud_add({
 				hud_elem_type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_thirst_bar.png",
+				text2="player_style_thirst_bar_back.png",
 				number=player:get_meta():get_int("thirst"),
+				item=20,
 				direction = 0,
 				size={x=24,y=24},
-				offset={x=25,y=-150},
+				offset={x=25,y=-88},
 			})
 		}
 	end
@@ -627,6 +610,19 @@ player_style.register_profile=function(def)
 		hotbar =		def.hotbar or "player_api_hotbar.png",
 		hotbar_selected =	def.hotbar_selected or "player_api_hotbar_selected.png",
 	}
+
+	minetest.hud_replace_builtin("breath",{
+		hud_elem_type="statbar",
+		position={x=0.5,y=1},
+		text="bubble.png",
+		number = minetest.PLAYER_MAX_BREATH_DEFAULT * 2,
+		item = minetest.PLAYER_MAX_BREATH_DEFAULT * 2,
+		direction = 0,
+		size={x=24,y=24},
+		offset={x=25, y=-120},
+	})
+
+
 end
 
 player_style.register_profile()
