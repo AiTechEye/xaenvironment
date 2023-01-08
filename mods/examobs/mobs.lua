@@ -12,7 +12,7 @@ examobs.register_mob({
 	aggressivity = 0,
 	walk_speed = 6,
 	run_speed = 20,
-	inv={["examobs:flesh"]=3},
+	inv={["examobs:flesh"]=3,["examobs:leather"]=3},
 	collisionbox={-0.9,-1.1,-0.9, 0.9,0.4,0.9},
 	stepheight = 1.5,
 	spawn_on={"group:spreading_dirt_type"},
@@ -34,6 +34,9 @@ examobs.register_mob({
 		if self.storage.skin then
 			self.object:set_properties({textures={self.storage.skin}})
 		end
+		if self.storage.saddle and not (self.dead or self.dying) then
+			minetest.add_entity(self.object:get_pos(), "examobs:saddle"):set_attach(self.object, "",{x=0, y=0, z=-3}, {x=0, y=0,z=0})
+		end
 	end,
 	punch_timeout = 0,
 	on_punching=function(self)
@@ -48,6 +51,14 @@ examobs.register_mob({
 			self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 			player_style.player_attached[self.rider:get_player_name()] = nil
 			self.rider = nil
+		end
+		if self.storage.saddle then
+			for i,v in ipairs(self.object:get_children()) do
+				v:set_detach()
+				if v:get_luaentity() then
+					v:remove()
+				end
+			end
 		end
 	end,
 	on_abs_step=function(self,dtime)
@@ -170,26 +181,32 @@ examobs.register_mob({
 	end,
 	on_click=function(self,clicker)
 		if clicker:is_player() then
-			local item = clicker:get_wielded_item():get_name()
+			local item = clicker:get_wielded_item()
 
-			if minetest.get_item_group(item,"grass") > 0 then
+			if minetest.get_item_group(item:get_name(),"grass") > 0 then
 				self:eat_item(item,2)
 				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
 				self.storage.tamed = 1
 				return
+			elseif not self.storage.saddle and item:get_name() == "examobs:saddle" then
+				self.storage.tamed = 1
+				self.storage.saddle = 1
+				self.inv["examobs:saddle"] = 1
+				default.take_item(clicker)
+				minetest.add_entity(self.object:get_pos(), "examobs:saddle"):set_attach(self.object, "",{x=0, y=0, z=-3}, {x=0, y=0,z=0})
+				return
 			end
 
 			local name = clicker:get_player_name()
-			if not self.rider and not player_style.player_attached[name] then
+			if self.storage.saddle and not self.rider and not player_style.player_attached[name] then
 				self.rider = clicker
 				player_style.player_attached[name] = true
 				clicker:set_attach(self.object, "",{x=0, y=1, z=-3}, {x=0, y=0,z=0})
 				clicker:set_eye_offset({x=0, y=3, z=0}, {x=0, y=0, z=0})
 				player_style.set_animation(name,"sit")
 				self.lifetimer = self.lifetime
-				self.storage.tamed = 1
 			elseif clicker == self.rider then
 				self.rider:set_detach()
 				self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})

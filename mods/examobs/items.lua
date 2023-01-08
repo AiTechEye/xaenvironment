@@ -1247,3 +1247,67 @@ default.register_chest({
 		return true
 	end,
 })
+
+
+-- ================ Horse stuff ================
+
+minetest.register_craft({
+	output = "examobs:leather",
+	recipe = {
+		{"examobs:pelt","examobs:pelt"},
+	}
+})
+
+minetest.register_craft({
+	output = "examobs:saddle",
+	recipe = {
+		{"group:leather","group:leather","group:leather"},
+		{"group:leather","group:leather","group:leather"},
+		{"default:iron_ingot","materials:string","default:iron_ingot"}
+	}
+})
+
+minetest.register_craftitem("examobs:leather",{
+	description = "Leather",
+	groups = {flammable=3,treasure=1,leather=1},
+	inventory_image = "examobs_leather.png",
+	wield_scale={x=2,y=2,z=1},
+})
+
+minetest.register_node("examobs:saddle", {
+	description = "Saddle",
+	tiles = {"[combine:16x16:0,0=examobs_saddle.png","default_air.png","[combine:16x16:0,-16=examobs_saddle.png","[combine:16x16:0,-16=examobs_saddle.png","default_air.png","default_air.png"},
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {dig_immediate=3,flammable=1},
+	sounds = default.node_sound_defaults(),
+	use_texture_alpha = "clip",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		}
+	}
+})
+
+minetest.register_entity("examobs:saddle",{
+	physical = false,
+	visual = "cube",
+	pointable = false,
+	decoration = true,
+	static_save = false,
+	visual_size = {x=0.9,y=0.9,z=0.9},
+	textures={"[combine:16x16:0,0=examobs_saddle.png","default_air.png","[combine:16x16:0,-16=examobs_saddle.png","[combine:16x16:0,-16=examobs_saddle.png","default_air.png","default_air.png"},
+	t = 2,
+	on_step=function(self,dtime)
+		self.t = self.t - dtime
+		if self.t < 0 then
+			if not self.object:get_attach() then
+				self.object:remove()
+			else
+				self.t = 2
+			end
+		end
+	end
+})
