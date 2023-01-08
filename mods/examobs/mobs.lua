@@ -70,12 +70,17 @@ examobs.register_mob({
 		elseif self.punch_timeout > 0 then
 			self.punch_timeout = self.punch_timeout - dtime
 			local p1 = self:pos()
-			local p2 = self.fight and self.fight:get_pos()
+			local p2 = self.fight and self.fight:get_pos() or self.kickpos
 
-			if not self.hkickedt and p2 and vector.distance(p1,p2) <= 4 and self.punch_timeout < 0.2 then
+			if not self.hkickedt and p2 and (self.kickpos and vector.distance(p1,self.kickpos) < 6 or vector.distance(p1,p2) <= 4) and self.punch_timeout < 0.2 then
 				self.hkickedt = true
 				local p2 = examobs.pointat(self,50)
 				local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
+				if self.kickpos then
+					nitroglycerin.explode(self.kickpos,{radius=1,set="air",place = {"air","air"},hurt=0})
+					self.kickpos = nil
+					return
+				end
 				self.fight:add_velocity(v)
 				examobs.punch(self.object,self.fight,15)
 			end
@@ -110,7 +115,7 @@ examobs.register_mob({
 							self.punch_timeout = 0.5
 							examobs.anim(self,"attack")
 							self.fight = nil
-							nitroglycerin.explode(v.under,{radius=1,set="air",place = {"air","air"},hurt=0})
+							self.kickpos = v.under
 							return true
 						end
 						break
