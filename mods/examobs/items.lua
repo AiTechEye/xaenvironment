@@ -1251,6 +1251,14 @@ default.register_chest({
 
 -- ================ Horse stuff ================
 
+
+minetest.register_craft({
+	output = "examobs:rope",
+	recipe = {
+		{"materials:string","examobs:leather","materials:string"},
+	}
+})
+
 minetest.register_craft({
 	output = "examobs:leather",
 	recipe = {
@@ -1291,6 +1299,151 @@ minetest.register_node("examobs:saddle", {
 	}
 })
 
+minetest.register_node("examobs:rope", {
+	stack_max = 1,
+	description = "Rope (for mobs)",
+	inventory_image="hook_rope2.png^[colorize:#9509",
+	wield_image="hook_rope2.png^[colorize:#9509",
+	tiles = {"hook_rope2.png^[colorize:#9509"},
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates=true,
+	groups = {dig_immediate=3,flammable=1,on_load=1,},
+	sounds = default.node_sound_defaults(),
+	use_texture_alpha = "clip",
+	walkable = false,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.48, 0.5},
+		}
+	},
+	on_use = function(itemstack, user, pointed_thing)
+		local id = itemstack:get_meta():get_int("id")
+		for _, ob in ipairs(minetest.get_objects_inside_radius(user:get_pos(),50)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "examobs:rope" and en.id == id then
+				itemstack:get_meta():set_int("id",0)
+				itemstack:get_meta():set_string("description","")
+				en.target = nil
+				return itemstack
+			end
+		end
+
+		local ob = pointed_thing.ref
+		local en1 = ob and ob:get_luaentity()
+
+		if not ob or not (en1 and en1.examob) then
+			ob = nil
+			local dir = user:get_look_dir()
+			local pos1 = projectilelauncher.bulletpos(user)
+			local pos2 = vector.add(pos1,vector.multiply(dir,20))
+
+			for v in minetest.raycast(pos1,pos2) do
+				if v and v.type == "node" then
+					break
+				elseif v and v.type == "object" then
+					local en = v.ref:get_luaentity()
+					if en and en.examob then
+						ob = v.ref
+						break
+					end
+				end
+			end
+		end
+		if ob then
+			local self = ob:get_luaentity()
+			self.storage.rope = math.random(1,9999)
+			local pos = user:get_pos()
+			local rope = minetest.add_entity(pos,"examobs:rope"):get_luaentity()
+			rope.attach = user
+			rope.target = ob
+			rope.id = self.storage.rope
+			itemstack:get_meta():set_int("id",self.storage.rope)
+			itemstack:get_meta():set_string("description","Rope (..rope.id..)")
+			return itemstack
+		end
+	end,
+	on_load=function(pos)
+		local id = minetest.get_meta(pos):get_int("id")
+		minetest.after(0.5,function()
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,50)) do
+				local en = ob:get_luaentity()
+				if en and en.examob and en.storage.rope == id then
+					local rope = minetest.add_entity(pos,"examobs:rope"):get_luaentity()
+					rope.attachpos = pos
+					rope.target = ob
+					rope.id = id
+					return
+				end
+			end
+		end)
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if not minetest.is_protected(pos, player:get_player_name()) then
+			local id = minetest.get_meta(pos):get_int("id")
+			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,50)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "examobs:rope" and en.id == id then
+					en.attach = player
+					en.attachpos = nil
+					local item = ItemStack("examobs:rope")
+					item:get_meta():set_int("id",id)
+					item:get_meta():set_string("description","Rope ("..id..")")
+					player:get_inventory():add_item("main", item)
+					minetest.remove_node(pos)
+					return
+				end
+			end
+		end
+	end,
+	after_place_node = function(pos, placer, itemstack)
+		local id = itemstack:get_meta():get_int("id")
+		minetest.get_meta(pos):set_int("id",id)
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos,20)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "examobs:rope" and en.id == id then
+				en.attachpos = pos
+				en.attach = nil
+				break
+			end
+		end
+	end
+})
+
+minetest.register_entity("examobs:rope",{
+	physical = false,
+	decoration = true,
+	visual = "cube",
+	visual_size={x=0.1,y=0.1,z=0.1},
+	pointable = false,
+	static_save = false,
+	textures={"hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509"},
+	on_step=function(self,dtime)
+		local pos1 = self.attachpos or self.attach and self.attach:get_pos()
+		local pos2 = self.target and self.target:get_pos()
+
+		if not (pos1 and pos2) or self.attach and self.attach:is_player() and self.attach:get_wielded_item():get_name() ~= "examobs:rope" then
+			self.object:remove()
+			return
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		if pos1.x >= pos2.x then y = y+math.pi end
+
+		self.object:set_rotation({x=0,y=y,z=z})
+		self.object:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		self.object:set_properties({visual_size={x=vector.distance(pos1,pos2),y=0.05,z=0.05}})
+
+		if vector.distance(pos1,pos2) > 10 then
+			self.target:set_velocity(vec)
+		end
+	end
+})
+
 minetest.register_entity("examobs:saddle",{
 	physical = false,
 	visual = "cube",
@@ -1310,4 +1463,12 @@ minetest.register_entity("examobs:saddle",{
 			end
 		end
 	end
+})
+
+player_style.register_manual_page({
+	name = "Horses",
+	item = true,
+	itemstyle = "examobs:horse_spawner",
+	text = player_style.itemstrings_to_image("examobs:saddle The animal you can rinde on, to do that you have to give it a saddle.\nWhile riding it you can point/punch to a object up to 50 blocks away and the horse will attack it.\nBut if you points a block near you the horse will istead blow it up.\nNote that horses need grass to reffil its health, simply stand close to grass and let it eat."),
+	tags = {"examobs:saddle"},
 })
