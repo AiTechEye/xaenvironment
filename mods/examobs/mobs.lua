@@ -184,7 +184,7 @@ examobs.register_mob({
 			local item = clicker:get_wielded_item()
 
 			if minetest.get_item_group(item:get_name(),"grass") > 0 then
-				self:eat_item(item,2)
+				self:eat_item(item:get_name(),2)
 				default.take_item(clicker)
 				self.folow = clicker
 				examobs.known(self,clicker,"folow")
