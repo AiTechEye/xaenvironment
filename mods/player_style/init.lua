@@ -65,6 +65,17 @@ player_style.set_saturation=function(player,stat)
 		end
 	end
 end
+player_style.reset_player=function(player)
+	local name = player:get_player_name()
+	local profile = player_style.registered_profiles[player_style.players[name].profile]
+	player_style.player_dive[name] = nil
+	player_style.player_attached[name] = nil
+	player:set_properties({
+		eye_height = profile.eye_height,
+		collisionbox = profile.collisionbox,
+		stepheight = profile.stepheight,
+	})
+end
 
 player_style.drinkable=function(pos,player)
 	return minetest.get_item_group(minetest.get_node(pos).name,"drinkable") > 0 and not minetest.is_protected(pos,player and player:get_player_name() or "") 
