@@ -17,6 +17,7 @@ examobs.register_mob({
 	collisionbox={-0.9,-1.1,-0.9, 0.9,0.4,0.9},
 	stepheight = 1.5,
 	spawn_on={"group:spreading_dirt_type"},
+	hunger = 1,
 	animation = {
 		stand = {x=0,y=2,speed=0},
 		eat = {x=2,y=8},
@@ -89,6 +90,7 @@ examobs.register_mob({
 
 			if not self.hkickedt and p2 and (self.kickpos and vector.distance(p1,self.kickpos) < 6 or vector.distance(p1,p2) <= 4) and self.punch_timeout < 0.2 then
 				self.hkickedt = true
+				self.hunger = self.hunger - 0.5
 				local p2 = examobs.pointat(self,50)
 				local v = {x=p2.x-p1.x,y=(p2.y+20)-p1.y,z=p2.z-p1.z}
 				if self.kickpos then
@@ -116,20 +118,38 @@ examobs.register_mob({
 				self.rider:hud_change(self.hud2, "item", 0)
 			end
 
-			if self.last_hp ~= self.hp or self.last_breath ~= self.breath then
+			if self.hp and (self.last_hp ~= self.hp or self.last_breath ~= self.breath or self.hunger < 0) then
+				if self.hunger < 0 then
+					self.hunger = 1
+					self.hp = self.hp - 1
+				end
+
 				self.last_breath = self.breath
 				self.last_hp = self.hp
 				self.rider:hud_change(self.hud1, "number", self.hp)
+
+				if self.hp < self.hp_max/3 then
+					self.rider:hud_change(self.hud1, "text", "default_rubyblock.png")
+				elseif self.hp < self.hp_max/1.5 then
+					self.rider:hud_change(self.hud1, "text", "default_peridotblock.png")
+				else
+					self.rider:hud_change(self.hud1, "text", "quads_petrolbar.png")
+				end
+
 				if drowning > 0 then
 					self.rider:hud_change(self.hud2, "number", self.breath)
 				end
+			end
+
+			if self.in_liquid then
+				self.hunger = self.hunger - dtime*0.01
 			end
 
 			if key.jump then
 				if self.in_liquid then
 					local v = self.object:get_velocity() or {x=0,y=0,z=0}
 					self.object:set_velocity({x=0,y=5,z=0})
-				else
+				elseif self.hp > self.hp_max/3 then
 					examobs.jump(self,7)
 				end
 			elseif key.sneak and self.in_liquid then
@@ -164,23 +184,33 @@ examobs.register_mob({
 			end
 
 			if key.right or key.left or key.up or key.down then
+				if self.hp < self.hp_max/3 or self.in_liquid then
+					self.walk_speed = 3
+					self.run_speed = 5
+				else
+					self.walk_speed = 6
+					self.run_speed = self.hp > self.hp_max/1.5 and 20 or 10
+				end
+
 				self.fight = nil
 				self.folow = nil
 				local r = self.rider:get_look_horizontal()
 				self.object:set_yaw(r + (key.right and -math.pi/2 or key.left and math.pi/2 or key.down and math.pi or 0))
 				examobs.walk(self,key.aux1)
+				self.hunger = self.hunger - dtime*(key.aux1 and 0.1 or 0.01)
 				return self
 			elseif not self.fight then
 				examobs.stand(self)
 				if self.hp < self.hp_max then
 					local p = self:pos()
-					local np = minetest.find_nodes_in_area_under_air(vector.add(p,5),vector.subtract(p,5),{"group:grass"})
+					local np = minetest.find_nodes_in_area_under_air(vector.add(p,5),vector.subtract(p,5),{"group:grass","group:wheat","plants:pear","plants:apple"})
 					for i,v in pairs(np) do
 						if examobs.visiable(self.object,v) then
 							examobs.lookat(self,v)
 							minetest.remove_node(v)
 							self:heal(1)
 							self.eattime = 0.2
+							self.hunger = 1
 							examobs.anim(self,"eat")
 							return
 						end
@@ -192,7 +222,7 @@ examobs.register_mob({
 
 		if not self.fight and not self.grass and (math.random(1,100) == 1 or self.hp < self.hp_max) then
 			local p = self:pos()
-			local np = minetest.find_nodes_in_area_under_air(vector.add(p,10),vector.subtract(p,10),{"group:grass"})
+			local np = minetest.find_nodes_in_area_under_air(vector.add(p,10),vector.subtract(p,10),{"group:grass","group:wheat","plants:pear","plants:apple"})
 			local d1 = 100
 			for i,v in pairs(np) do
 				local d2 = vector.distance(p,v)
@@ -227,14 +257,27 @@ examobs.register_mob({
 		if clicker:is_player() then
 			local item = clicker:get_wielded_item()
 
-			if minetest.get_item_group(item:get_name(),"grass") > 0 then
-				self:eat_item(item:get_name(),2)
-				default.take_item(clicker)
-				self.folow = clicker
-				examobs.known(self,clicker,"folow")
-				self.storage.tamed = 1
-				return
-			elseif not self.storage.saddle and item:get_name() == "examobs:saddle" then
+			if item:get_name() ~= "" then
+				local eat = true
+				if minetest.get_item_group(item:get_name(),"grass") > 0 then
+					self:eat_item(item:get_name(),2)
+				elseif minetest.get_item_group(item:get_name(),"wheat") > 0 then
+					self:eat_item(item:get_name(),10)
+				elseif item:get_name() == "plants:pear" or item:get_name() == "plants:apple" then
+					self:eat_item(item:get_name(),5)
+				else
+					eat = nil
+				end
+				if eat then
+					if self.fight == clicker then
+						self.fight = nil
+					end
+					default.take_item(clicker)
+					return
+				end
+			end
+
+			if not self.storage.saddle and item:get_name() == "examobs:saddle" then
 				self.storage.tamed = 1
 				self.storage.saddle = 1
 				self.inv["examobs:saddle"] = 1
@@ -246,14 +289,17 @@ examobs.register_mob({
 			local name = clicker:get_player_name()
 			if self.storage.saddle and not self.rider and not player_style.player_attached[name] then
 				self.rider = clicker
+				player_style.reset_player(clicker)
+
 				player_style.player_attached[name] = true
 				clicker:set_attach(self.object, "",{x=0, y=1, z=-3}, {x=0, y=0,z=0})
-				clicker:set_eye_offset({x=0, y=3, z=0}, {x=0, y=0, z=0})
+				clicker:set_eye_offset({x=0, y=1.5, z=0}, {x=0, y=0, z=0})
+
 				player_style.set_animation(name,"sit")
 				self.lifetimer = self.lifetime
 				self.grass = nil
-				self.last_hp = self.hp
-				self.last_breath = self.breath	
+				self.last_hp = 0
+				self.last_breath = 0
 
 				self.hud1 = clicker:hud_add({
 					hud_elem_type = "statbar",
@@ -261,7 +307,7 @@ examobs.register_mob({
 					text2 ="quads_backbar.png",
 					number = self.hp_max,
 					item = self.hp_max,
-					size = {x=10,y=10},
+					size = {x=10,y=30},
 					position = {x=1,y=0},
 					direction = 1,
 				})
@@ -271,10 +317,10 @@ examobs.register_mob({
 					text2 = "bubble.png^[colorize:#000",
 					number = 0,
 					item = 0,
-					size = {x=10,y=10},
+					size = {x=30,y=30},
 					position = {x=1,y=0},
 					direction = 1,
-					offset = {x=0,y=20},
+					offset = {x=-30,y=50},
 				})
 			elseif clicker == self.rider then
 				self.rider:set_detach()

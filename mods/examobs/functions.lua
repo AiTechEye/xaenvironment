@@ -266,13 +266,16 @@ examobs.environment=function(self)
 			if v.y < -10 and not self.falling_expression then
 				self.falling_expression = true
 				self:on_expression("fall")
-			elseif v.y >= 0 and walkable(apos(pos,0,-1)) then
-				local d = math.floor(self.falling+0.5) - math.floor(pos.y+0.5)
-				if d >= 10 then
-					self:hurt(d)
+			else
+				local m = self.moveresult
+				if m and m.collides then
+					local vy = m.collisions[1] and m.collisions[1].old_velocity. y or 0 
+					if vy < -10 then
+						self:hurt(math.floor(vy*-1))
+					end
+					self.falling = nil
+					self.falling_expression = nil
 				end
-				self.falling = nil
-				self.falling_expression = nil
 			end
 		end
 	end

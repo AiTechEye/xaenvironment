@@ -1282,6 +1282,12 @@ minetest.register_craftitem("examobs:leather",{
 	wield_scale={x=2,y=2,z=1},
 })
 
+minetest.register_craftitem("examobs:horse",{
+	description = "Horse",
+	inventory_image = "examobs_horse_image.png",
+	wield_scale={x=3,y=3,z=3},
+})
+
 minetest.register_node("examobs:saddle", {
 	description = "Saddle",
 	tiles = {"[combine:16x16:0,0=examobs_saddle.png","default_air.png","[combine:16x16:0,-16=examobs_saddle.png","[combine:16x16:0,-16=examobs_saddle.png","default_air.png","default_air.png"},
@@ -1474,7 +1480,7 @@ minetest.register_entity("examobs:saddle",{
 player_style.register_manual_page({
 	name = "Horses",
 	item = true,
-	itemstyle = "examobs:horse_spawner",
-	text = player_style.itemstrings_to_image("examobs:saddle The animal you can rinde on, to do that you have to give it a saddle.\nWhile riding it you can with empty hand point/punch to a object up to 50 blocks away and the horse will attack it.\nBut if you points a block near you the horse will istead blow it up.\nNote that horses need grass to reffil its health, simply stand close to grass and let it eat."),
-	tags = {"examobs:saddle"},
+	itemstyle = "examobs:horse",
+	tags = {"examobs:saddle","group:wheat","group:grass","plants:pear","plants:apple"},
+	text = player_style.itemstrings_to_image("examobs:saddle plants:wheat3 plants:grass4 plants:pear plants:apple The animal you can rinde on, to do that you have to give it a saddle.\nWhile riding it you can with empty hand point/punch to a object up to 50 blocks away and the horse will attack it.\nBut if you points a block near you the horse will instead blow it up.\nNote that horses need grass to reffil its health, simply stand close to grass and let it eat or just give it.\nThey especial like wheat, pears and apples.")
 })
