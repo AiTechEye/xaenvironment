@@ -941,6 +941,7 @@ for i=1,3 do
 default.register_plant({
 	name="wheat"..i,
 	tiles={"plants_wheat"..i..".png"},
+	groups={wheat=1},
 	drop= i == 3 and {max_items = 1,items = {{items = {"plants:wheat_seed 3"}, rarity = 3},{items = {"plants:wheat"..i}}}} or "plants:wheat"..i,
 	on_timer = i < 3 and function(pos, elapsed)
 		if minetest.get_item_group(minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name,"wet_soil") == 0 then
@@ -970,7 +971,7 @@ minetest.register_node("plants:wheat_seed", {
 	description = "Wheat seed",
 	drawtype = "raillike",
 	tiles={"plants_wheat_seed.png"},
-	groups = {dig_immediate = 3,flammable=1},
+	groups = {dig_immediate = 3,flammable=1,wheat=1},
 	sunlight_propagates = true,
 	paramtype = "light",
 	walkable=false,
