@@ -7,6 +7,7 @@ examobs.register_mob({
 	hp = 80,
 	coin = 5,
 	dmg = 0,
+	bottom = -0.5,
 	textures = {"examobs_horse_brown.png"},
 	mesh = "examobs_horse.x",
 	aggressivity = 0,
@@ -17,7 +18,8 @@ examobs.register_mob({
 	stepheight = 1.5,
 	spawn_on={"group:spreading_dirt_type"},
 	animation = {
-		stand = {x=0,y=5},
+		stand = {x=0,y=2,speed=0},
+		eat = {x=2,y=8},
 		walk = {x=10,y=30,speed=50},
 		run = {x=10,y=30,speed=80},
 		lay = {x=60,y=61,speed=0},
@@ -31,12 +33,14 @@ examobs.register_mob({
 		self.on_load(self)
 	end,
 	on_load=function(self)
-		if self.storage.skin then
-			self.object:set_properties({textures={self.storage.skin}})
-		end
+		local skin = self.storage.skin or "examobs_horse_brown.png"
+
 		if self.storage.saddle and not (self.dead or self.dying) then
 			minetest.add_entity(self.object:get_pos(), "examobs:saddle"):set_attach(self.object, "",{x=0, y=0, z=-3}, {x=0, y=0,z=0})
+			skin = skin .. "^examobs_horse_bridle.png"
 		end
+		self.object:set_properties({textures={skin}})
+
 	end,
 	punch_timeout = 0,
 	on_punching=function(self)
@@ -47,6 +51,10 @@ examobs.register_mob({
 	end,
 	death=function(self)
 		if self.rider then
+			if self.hud1 then
+				self.rider:hud_remove(self.hud1)
+				self.rider:hud_remove(self.hud2)
+			end
 			self.rider:set_detach()
 			self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 			player_style.player_attached[self.rider:get_player_name()] = nil
@@ -62,11 +70,18 @@ examobs.register_mob({
 		end
 	end,
 	on_abs_step=function(self,dtime)
-		if self.dead or self.dying then
+		if self.dead or self.dying or self.rider and self.rider:get_hp() == 0 then
 			if self.rider and self.rider then
 				self:on_click(self.rider)
 			end
 			return
+		elseif self.eattime then
+			self.eattime = self.eattime - dtime
+			if self.eattime < 0 then
+				self.eattime = nil
+				examobs.stand(self)
+			end
+			return true
 		elseif self.punch_timeout > 0 then
 			self.punch_timeout = self.punch_timeout - dtime
 			local p1 = self:pos()
@@ -90,6 +105,25 @@ examobs.register_mob({
 			return self
 		elseif self.rider and not (self.punch_timeout and self.punch_timeout > 0) then
 			local key = self.rider and self.rider:get_player_control() or {}
+			local pos = apos(self:pos(),0,self.bottom)
+			local drowning = default.defpos(pos,"drowning") or 0
+			if drowning > 0 and not self.breathbar_set then
+				self.breathbar_set = true
+				self.rider:hud_change(self.hud2, "number", self.breath)
+				self.rider:hud_change(self.hud2, "item", 20)
+			elseif drowning == 0 and self.breathbar_set then
+				self.rider:hud_change(self.hud2, "number", 0)
+				self.rider:hud_change(self.hud2, "item", 0)
+			end
+
+			if self.last_hp ~= self.hp or self.last_breath ~= self.breath then
+				self.last_breath = self.breath
+				self.last_hp = self.hp
+				self.rider:hud_change(self.hud1, "number", self.hp)
+				if drowning > 0 then
+					self.rider:hud_change(self.hud2, "number", self.breath)
+				end
+			end
 
 			if key.jump then
 				if self.in_liquid then
@@ -103,14 +137,14 @@ examobs.register_mob({
 				self.object:set_velocity({x=0,y=-5,z=0})
 			end
 
-			if key.LMB then
+			if key.LMB and self.rider:get_wielded_item():get_name() == "" then
 				local dir = self.rider:get_look_dir()
 				local pos = vector.offset(self.object:get_pos(),0,2,0)
 				local pos2 = vector.add(pos,vector.multiply(dir,50))
 
 				for v in minetest.raycast(pos,pos2) do
 					if v and v.type == "node" then
- 						if not minetest.is_protected(v.under, "") and vector.distance(pos,v.under) < 6 then
+ 						if not minetest.is_protected(v.under, "") and vector.distance(pos,v.under) < 6 and minetest.get_node(v.under).name ~= "examobs:rope" then
 							examobs.lookat(self,v.under)
 							self.punch_timeout = 0.5
 							examobs.anim(self,"attack")
@@ -140,15 +174,15 @@ examobs.register_mob({
 				examobs.stand(self)
 				if self.hp < self.hp_max then
 					local p = self:pos()
-					local np = minetest.find_nodes_in_area_under_air(vector.add(p,3),vector.subtract(p,3),{"group:grass"})
+					local np = minetest.find_nodes_in_area_under_air(vector.add(p,5),vector.subtract(p,5),{"group:grass"})
 					for i,v in pairs(np) do
 						if examobs.visiable(self.object,v) then
 							examobs.lookat(self,v)
 							minetest.remove_node(v)
 							self:heal(1)
-							if self.hp >= self.hp_max then
-								break
-							end
+							self.eattime = 0.2
+							examobs.anim(self,"eat")
+							return
 						end
 					end
 				end
@@ -159,8 +193,11 @@ examobs.register_mob({
 		if not self.fight and not self.grass and (math.random(1,100) == 1 or self.hp < self.hp_max) then
 			local p = self:pos()
 			local np = minetest.find_nodes_in_area_under_air(vector.add(p,10),vector.subtract(p,10),{"group:grass"})
+			local d1 = 100
 			for i,v in pairs(np) do
-				if examobs.visiable(self.object,v) then
+				local d2 = vector.distance(p,v)
+				if d2 < d1 and examobs.visiable(self.object,v) then
+					d1 = d2
 					self.grass = v
 					examobs.stand(self)
 					return true
@@ -176,6 +213,8 @@ examobs.register_mob({
 				self.grass = nil
 				self.lifetimer = self.lifetime
 				examobs.stand(self)
+				self.eattime = 0.2
+				examobs.anim(self,"eat")
 				self:heal(1)
 			end
 			return true
@@ -200,7 +239,7 @@ examobs.register_mob({
 				self.storage.saddle = 1
 				self.inv["examobs:saddle"] = 1
 				default.take_item(clicker)
-				minetest.add_entity(self.object:get_pos(), "examobs:saddle"):set_attach(self.object, "",{x=0, y=0, z=-3}, {x=0, y=0,z=0})
+				self:on_load()
 				return
 			end
 
@@ -212,12 +251,41 @@ examobs.register_mob({
 				clicker:set_eye_offset({x=0, y=3, z=0}, {x=0, y=0, z=0})
 				player_style.set_animation(name,"sit")
 				self.lifetimer = self.lifetime
+				self.grass = nil
+				self.last_hp = self.hp
+				self.last_breath = self.breath	
+
+				self.hud1 = clicker:hud_add({
+					hud_elem_type = "statbar",
+					text ="quads_petrolbar.png",
+					text2 ="quads_backbar.png",
+					number = self.hp_max,
+					item = self.hp_max,
+					size = {x=10,y=10},
+					position = {x=1,y=0},
+					direction = 1,
+				})
+				self.hud2 = clicker:hud_add({
+					hud_elem_type = "statbar",
+					text = "bubble.png",
+					text2 = "bubble.png^[colorize:#000",
+					number = 0,
+					item = 0,
+					size = {x=10,y=10},
+					position = {x=1,y=0},
+					direction = 1,
+					offset = {x=0,y=20},
+				})
 			elseif clicker == self.rider then
 				self.rider:set_detach()
 				self.rider:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
 				player_style.player_attached[name] = nil
 				self.rider = nil
 				self.fight = nil
+				if self.hud1 then
+					clicker:hud_remove(self.hud1)
+					clicker:hud_remove(self.hud2)
+				end
 			end
 		end
 	end,

@@ -1286,6 +1286,7 @@ minetest.register_node("examobs:saddle", {
 	description = "Saddle",
 	tiles = {"[combine:16x16:0,0=examobs_saddle.png","default_air.png","[combine:16x16:0,-16=examobs_saddle.png","[combine:16x16:0,-16=examobs_saddle.png","default_air.png","default_air.png"},
 	paramtype = "light",
+	paramtype2 = "facedir",
 	sunlight_propagates=true,
 	groups = {dig_immediate=3,flammable=1},
 	sounds = default.node_sound_defaults(),
@@ -1294,7 +1295,7 @@ minetest.register_node("examobs:saddle", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+			{-0.5, -0.5, -0.5, 0.5, -0.3, 0.5},
 		}
 	}
 })
@@ -1319,6 +1320,11 @@ minetest.register_node("examobs:rope", {
 			{-0.5, -0.5, -0.5, 0.5, -0.48, 0.5},
 		}
 	},
+	on_secondary_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "object" then
+			return default.def("examobs:rope").on_use(itemstack, user, pointed_thing)
+		end
+	end,
 	on_use = function(itemstack, user, pointed_thing)
 		local id = itemstack:get_meta():get_int("id")
 		for _, ob in ipairs(minetest.get_objects_inside_radius(user:get_pos(),50)) do
@@ -1469,6 +1475,6 @@ player_style.register_manual_page({
 	name = "Horses",
 	item = true,
 	itemstyle = "examobs:horse_spawner",
-	text = player_style.itemstrings_to_image("examobs:saddle The animal you can rinde on, to do that you have to give it a saddle.\nWhile riding it you can point/punch to a object up to 50 blocks away and the horse will attack it.\nBut if you points a block near you the horse will istead blow it up.\nNote that horses need grass to reffil its health, simply stand close to grass and let it eat."),
+	text = player_style.itemstrings_to_image("examobs:saddle The animal you can rinde on, to do that you have to give it a saddle.\nWhile riding it you can with empty hand point/punch to a object up to 50 blocks away and the horse will attack it.\nBut if you points a block near you the horse will istead blow it up.\nNote that horses need grass to reffil its health, simply stand close to grass and let it eat."),
 	tags = {"examobs:saddle"},
 })
