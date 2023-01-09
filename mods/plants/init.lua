@@ -682,7 +682,7 @@ default.register_plant({
 default.register_plant({
 	name="dry_plant",
 	tiles={"plants_dry_plant.png"},
-	groups={dig_immediate=3},
+	groups={dig_immediate=3,grass=1},
 })
 
 for i=1,5 do
