@@ -19,6 +19,12 @@
 --	end,
 --	on_hit_object=function(self,user,target,pos)
 --	end,
+--	on_step=function(itemstack, user, pos1, dtime)
+--	end,
+--	on_just_selected=function(itemstack, user, pos1)
+--	end,
+--	on_previous=function(itemstack, user, pos1)
+--	end,
 --	craft={
 --		{"default:ruby","default:iron_ingot"},
 --	}
@@ -89,7 +95,7 @@ minetest.register_tool("default:projectile_launcher", {
 	inventory_image = "projectile_launcher.png",
 	wield_scale={x=1.5,y=1.5,z=2},
 	range = 2,
-	groups = {store=5000},
+	groups = {store=10000},
 	manual_page = "default:projectile_launcher default:lazer_bullet default:lazer_automatic_bullet default:lightning__bullet default:flash__bullet default:build__bullet default:activate__bullet default:blob__bullet default:torch_bullet default:hookshot_bullet \nThe projectile launcher is a hybrid of a tool and weapon,\nthat you can load with bullets in its inventory instead of carrying it in the inventory like the bows.\nRight click/place it to open its inventory and add items that looks like those above.\nYou can also add a telescope, hold aux1 (run) to zoom in/out.\nAnd you can enable autoaim.",
 	on_use =function(itemstack, user, pointed_thing)
 		projectilelauncher.new_inventory(itemstack, user)

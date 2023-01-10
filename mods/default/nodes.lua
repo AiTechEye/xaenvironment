@@ -195,7 +195,7 @@ minetest.register_node("default:wool", {
 minetest.register_node("default:carpet", {
 	description = "Carpet",
 	tiles={"default_wool.png"},
-	groups = {dig_immediate=2,flammable=2,treasure=1,used_by_npc=1,store=100},
+	groups = {dig_immediate=2,flammable=2,treasure=1,used_by_npc=1,store=300},
 	sounds = default.node_sound_defaults(),
 	palette="default_palette.png",
 	sunlight_propagates = true,
@@ -787,7 +787,7 @@ minetest.register_node("default:brickblock", {
 minetest.register_node("default:obsidian", {
 	description = "Obsidian",
 	tiles={"default_obsidian.png"},
-	groups = {cracky=1,level=3,treasure=2,store=200},
+	groups = {cracky=1,level=3,treasure=2,store=800},
 	sounds = default.node_sound_stone_defaults(),
 	manual_page = "default:obsidian This mysterious mineral can be obtained by cool down lava source, with water as an example",
 })
