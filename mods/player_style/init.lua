@@ -17,7 +17,7 @@ player_style={
 	survive_respawn_anywhere = minetest.settings:get_bool("xaenvironment_respawn_anywhere") ~= false,
 	static_spawnpoint = minetest.settings:get("static_spawnpoint"),
 	saturation = {
-		last="",
+		last="air",
 		status="air",
 		air=1,
 		liquid=2,
@@ -37,7 +37,7 @@ dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 dofile(minetest.get_modpath("player_style") .. "/craftguide.lua")
 
-player_style.set_saturation=function(player,stat)
+player_style.set_saturation=function(player,stat,stat2)
 	local name = player and player:get_player_name() or ""
 	local p = player_style.players[name]
 	if p and player.set_lighting and p.saturation.status ~= stat then
@@ -56,12 +56,25 @@ player_style.set_saturation=function(player,stat)
 			end
 			return
 		end
+
 		local s = p.saturation[stat]
 
-		if s then
-			p.saturation.last = p.saturation.status
-			p.saturation.status = stat
-			player:set_lighting({saturation=s*hp})
+		p.saturation.last = p.saturation.status
+		p.saturation.status = stat
+		player:set_lighting({saturation=s*hp})
+
+		if stat2 then
+			stat2 = stat2 == "last" and p.saturation.last or stat2
+
+			s = p.saturation[stat2]
+			minetest.after(0.1,function()
+				p.saturation.last = p.saturation.status
+				p.saturation.status = stat2
+				player:set_lighting({saturation=s*hp})
+			end)
+			minetest.after(0.3,function()
+				player:set_lighting({saturation=s*hp})
+			end)
 		end
 	end
 end
@@ -123,10 +136,7 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player then
 		if hp_change < 0 then
 			minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
-			player_style.set_saturation(player,"damage")
-			minetest.after(0.1,function()
-				player_style.set_saturation(player,"last")
-			end)
+			player_style.set_saturation(player,"damage","last")
 		else
 			player_style.set_saturation(player,"update")
 		end
