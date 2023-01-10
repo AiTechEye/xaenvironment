@@ -492,8 +492,7 @@ minetest.register_tool("examobs:icecreamball", {
 		e:set_velocity(d)
 		itemstack:add_wear(65536)
 		return itemstack
-	end,
-	groups = {store=100}
+	end
 })
 
 
