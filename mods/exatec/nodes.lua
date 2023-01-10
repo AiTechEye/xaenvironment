@@ -748,7 +748,7 @@ minetest.register_node("exatec:button", {
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	sounds = default.node_sound_wood_defaults(),
-	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1,store=500},
+	groups = {chappy=3,dig_immediate = 2,exatec_wire_connected=1,store=200},
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		exatec.send(pos)
 	end,
@@ -2187,7 +2187,7 @@ minetest.register_node("exatec:industrial_miner", {
 		"default_steelblock.png^exatec_hole.png",
 		"materials_metal_beam.png^materials_pallet_box.png"
 	},
-	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=600},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_wire_connected=1,store=15000},
 	sounds = default.node_sound_glass_defaults(),
 	after_place_node = function(pos, placer)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())

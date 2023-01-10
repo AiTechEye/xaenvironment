@@ -103,7 +103,7 @@ minetest.register_craft({
 	output="exatec:trader",
 	recipe={
 		{"materials:diode","player_style:coin","materials:diode"},
-		{"player_style:coin","default:goldblock","player_style:coin"},
+		{"player_style:coin","default:gold_ingot","player_style:coin"},
 		{"materials:plastic_sheet","player_style:coin","materials:plastic_sheet"},
 	},
 })
@@ -111,9 +111,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output="exatec:industrial_miner",
 	recipe={
-		{"materials:diode","default:cloud","default:gold_ingot"},
-		{"materials:plastic_sheet","default:copperblock","materials:plastic_sheet"},
-		{"materials:plastic_sheet","default:steelblock","materials:plastic_sheet"},
+		{"materials:diode","exatec:node_breaker","default:diamond"},
+		{"materials:aluminium_sheet","default:steelblock","materials:aluminium_sheet"},
+		{"materials:aluminium_sheet","materials:tube_metal","materials:aluminium_sheet"},
 	},
 })
 
