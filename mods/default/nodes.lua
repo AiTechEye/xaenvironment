@@ -1509,7 +1509,6 @@ minetest.register_node("default:stone_spike", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-
 			{-0.1875, -0.5, -0.1875, 0.1875, -0.25, 0.1875},
 			{-0.125, -0.25, -0.125, 0.125, 0.0625, 0.125},
 			{-0.0625, 0.0625, -0.0625, 0.0625, 0.3125, 0.0625},
@@ -1656,3 +1655,115 @@ minetest.register_ore({
 	noise_params = default.ore_noise_params()
 })
 end
+
+local ncinv
+for i=1,6 do
+minetest.register_node("default:xe"..i, {
+	description = "XE",
+	drop = "default:xe1",
+	tiles= {"default_xe.png"},
+	groups = {stone=1,cracky=3, not_in_creative_inventory= ncinv,radioactive=15},
+	sounds = default.node_sound_stone_defaults(),
+	sunlight_propagates = true,
+	paramtype = "light",
+	damage_per_second = 5,
+	light_source = i+8,
+	sounds = default.node_sound_stone_defaults(),
+	on_timer = function(pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local s = m:get_int("state") 
+		local l = m:get_int("level")
+
+		if s == 0 and l > 1 then
+			l = l - 1
+		elseif s == 1 and l < 5 then
+			
+			l = l + 1
+		else
+			s = s == 0 and 1 or 0
+		end
+
+		minetest.swap_node(pos,{name="default:xe"..l+1}) 
+		m:set_int("state",s) 
+		m:set_int("level",l)
+		return true
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_0thing)
+		local dir = {[0]={y=-1},[1]={y=1},[2]={x=-1},[3]={x=1},[4]={z=-1},[5]={z=1}}
+		for i,v in pairs(dir) do
+			local p = vector.offset(pos,v.x or 0,v.y or 0, v.z or 0)
+			if default.defpos(p,"buildable_to") then
+				minetest.set_node(p,{name="default:xe_spike",param2=i}) 
+				minetest.get_node_timer(p):start(math.random(2,5))
+			end
+		end
+		default.punch(player,player,3)
+		minetest.get_node_timer(pos):start(0.5)
+	end,
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5)
+	end,
+})
+ncinv = 1
+end
+
+minetest.register_node("default:xe_spike", {
+	description = "XE Spike",
+	drop = "",
+	tiles = {"default_xe.png"},
+	groups = {cracky=1,stone=1,level=3,not_in_creative_inventory=1,igniter=3,radioactive=5},
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	damage_per_second = 5,
+	walkable = false,
+	light_source = 8,
+	on_timer = function(pos, elapsed)
+		minetest.remove_node(pos)
+	end,
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.1875, -0.5, -0.1875, 0.1875, -0.25, 0.1875},
+			{-0.125, -0.25, -0.125, 0.125, 0.0625, 0.125},
+			{-0.0625, 0.0625, -0.0625, 0.0625, 0.3125, 0.0625},
+			{-0.025, 0.3125, -0.025, 0.025, 0.5, 0.025},
+		}
+	},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("default:xe_crystal", {
+	description = "XE Crystal",
+	tiles = {"default_xe.png"},
+	groups = {cracky=1,stone=1,level=3,igniter=3,radioactive=10},
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	damage_per_second = 5,
+	light_source = 8,
+	drawtype = "mesh",
+	mesh="default_crystal.obj",
+	visual_scale = 0.3,
+	collision_box = {
+		type = "fixed",
+		fixed = {-0.3, -0.5, -0.3, 0.3, 0, 0.3}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.3, -0.5, -0.3, 0.3, 0.5, 0.3}
+	},
+	sounds = default.node_sound_glass_defaults(),
+})
+
+minetest.register_ore({
+	ore_type = "blob",
+	ore="default:xe1",
+	wherein= "default:stone",
+	clust_scarcity = 20 * 20 * 20,
+	clust_size = 2,
+	y_min= -31000,
+	y_max= -100,
+	noise_params = default.ore_noise_params()
+})
