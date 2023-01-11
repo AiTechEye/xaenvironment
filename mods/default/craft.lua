@@ -273,6 +273,14 @@ minetest.register_craft({
 -- ======================= Nodes
 --||||||||||||||||
 
+
+minetest.register_craft({
+	output="default:xe_crystal 3",
+	recipe={
+		{"default:xe1"},
+	},
+})
+
 minetest.register_craft({
 	output="default:brickblock",
 	recipe={
