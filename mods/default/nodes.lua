@@ -1662,13 +1662,14 @@ minetest.register_node("default:xe"..i, {
 	description = "XE",
 	drop = "default:xe1",
 	tiles= {"default_xe.png"},
-	groups = {stone=1,cracky=3, not_in_creative_inventory= ncinv,radioactive=15},
+	groups = {stone=1,cracky=3,xe=1, not_in_creative_inventory= ncinv,radioactive=15},
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
 	paramtype = "light",
 	damage_per_second = 5,
 	light_source = i+8,
 	sounds = default.node_sound_stone_defaults(),
+	manual_page = not ncinv and "default:xe1 Please don't carry this alien ore home." or nil,
 	on_timer = function(pos, elapsed)
 		local m = minetest.get_meta(pos)
 		local s = m:get_int("state") 
@@ -1756,6 +1757,8 @@ minetest.register_node("default:xe_crystal", {
 	},
 	sounds = default.node_sound_glass_defaults(),
 })
+--[[
+not yet
 
 minetest.register_ore({
 	ore_type = "blob",
@@ -1767,3 +1770,4 @@ minetest.register_ore({
 	y_max= -100,
 	noise_params = default.ore_noise_params()
 })
+]]
