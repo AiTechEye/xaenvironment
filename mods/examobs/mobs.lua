@@ -23,14 +23,6 @@ examobs.register_mob({
 	spawn_on={"group:stone"},
 	max_spawn_y = -100,
 	resist_nodes = {["examobs:barbed_wire"]=1},
-	floating = {["examobs:barbed_wire"]=1},
-	a=function(a)
-		local c = {}
-		for i,v in pairs(a) do
-			c[i] = v > 0 and 1 or v < 0 and -1 or 0
-		end
-		return c
-	end,
 	step=function(self,time)
 		local pos2 = self.fight and self.fight:get_pos()
 		local c
