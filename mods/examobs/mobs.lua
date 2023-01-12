@@ -1,4 +1,119 @@
 examobs.register_mob({
+	description = "Another spider, avoid it",
+	name = "spider",
+	team = "spider",
+	type = "monster",
+	hp = 10,
+	coin = 20,
+	dmg = 10,
+	swiming = 0,
+	textures = {"[combine:32x32:0,0=default_obsidian.png:16,0=bones_bone2.png:0,16=default_xe.png:16,16=default_xe.png"},
+	mesh = "examobs_spider2.x",
+	aggressivity = 1,
+	animation = {
+		stand={x=1,y=5,speed=0,loop=false},
+		walk={x=10,y=20},
+		run = {x=10,y=30,speed=60},
+		lay = {x=41,y=42,speed=0,loop=false},
+		attack = {x=25,y=35},
+
+	},
+	inv={["bones:bone"]=8,["default:xe"]=1,["default:obsidian"]=1},
+	collisionbox={-0.2,-0.2,-0.2,0.2,0.2,0.2},
+	spawn_on={"group:stone"},
+	max_spawn_y = -100,
+	resist_nodes = {["examobs:barbed_wire"]=1},
+	floating = {["examobs:barbed_wire"]=1},
+	step=function(self,time)
+		local pos2 = self.fight and self.fight:get_pos()
+		if pos2 and vector.distance(self:pos(),pos2) > 10 then
+			self.am = (self.am or 0) -0.1
+			if self.am <= 0 then
+				examobs.shoot_arrow(self,pos2,"examobs:arrow_barbed_wire")
+				self.am = math.random(1,5) * 0.1
+			end
+		end
+	end,
+	on_spawn=function(self)
+		local skin1 = {"default_xe","default_steelblock","default_ironblock","default_steelblock","default_copperblock","default_diamondblock","default_electricblock","default_obsidian","default_silverblock","default_uraniumactiveblock","default_uraniumblock","default_bronzeblock","default_goldblock","default_lava"}
+		local skin2 = {"default_peridotblock","default_rubyblock","default_taaffeiteblock","default_uraniumactiveblock","default_xe","default_ore_mineral","default_oil","default_lava","default_jadeiteblock","default_lava","default_electricblock","default_diamondblock_blank","default_amethystblock","default_amberblock"}
+		skin1 = skin1[math.random(1,#skin1)]..".png"
+		skin2 = skin2[math.random(1,#skin2)]..".png"
+
+		self.storage.skin = "[combine:32x32:0,0="..skin1..":16,0=bones_bone2.png:0,16="..skin2..":16,16="..skin2
+		self.storage.size = math.random(1,5)
+
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			local s = self.storage.size
+			self.dmg = 10+(s*2)
+			self.walk_speed = 2*s
+			self.run_speed = 4*s
+			self.hp = 10*s
+			self.object:set_properties({
+				textures={self.storage.skin},
+				visual_size = {x=s,y=s},
+				collisionbox={-0.2*s,-0.2*s,-0.2*s,0.2*s,0.1*s,0.2*s},
+				hp_max = 10*s,
+			})
+		end
+	end,
+	death=function(self)
+		if not self.ex then
+			self.ex = 1
+			local pos = self.object:get_pos()
+			if pos then
+				nitroglycerin.explode(pos,{radius=2*(self.storage.size or 1),set="examobs:barbed_wire"})
+				self.object:remove()
+			end
+		end
+	end,
+	use_bow=function(pos1,pos2,arrow)
+		if not (pos2 and pos2.x and pos1 and pos1.x) then
+			return
+		end
+		local d=math.floor(vector.distance(pos1,pos2)+0.5)
+		local dir = {x=(pos1.x-pos2.x)/-d,y=((pos1.y-pos2.y)/-d)+(d*0.005),z=(pos1.z-pos2.z)/-d}
+		local user = {
+			get_look_dir=function()
+				return dir
+			end,
+			punch=function()
+			end,
+			get_pos=function()
+				return pos1
+			end,
+			set_pos=function(pos)
+				return self.object:set_pos(pos)
+			end,
+			get_player_control=function()
+				return {}
+			end,
+			get_look_horizontal=function()
+				return self.object:get_yaw() or 0
+			end,
+			get_player_name=function()
+				return self.examob ..""
+			end,
+			is_player=function()
+				return true
+			end,
+			examob=self.examob,
+			object=self.object,
+		}
+		local item = ItemStack({
+			name="default:bow_wood_loaded",
+			metadata=minetest.serialize({arrow=arrow,shots=1})
+		})
+		bows.shoot(item, user,nil,function(item)
+			item:remove()
+		end)
+	end
+})
+
+examobs.register_mob({
 	description = "The most rideable and useful animal in the history.",
 	name = "horse",
 	team = "horse",
@@ -1799,6 +1914,7 @@ examobs.register_mob({
 	type = "npc",
 	dmg = 1,
 	coin = 2,
+	reach = 3,
 	textures={"character.png"},
 	aggressivity = 1,
 	walk_speed = 4,
@@ -1832,6 +1948,7 @@ examobs.register_mob({
 	textures = {"examobs_villager.png"},
 	dmg = 1,
 	coin = 2,
+	reach = 3,
 	aggressivity = 1,
 	walk_speed = 4,
 	run_speed = 8,
@@ -1865,6 +1982,7 @@ examobs.register_mob({
 	speaking = 0,
 	dmg = 1,
 	coin = 2,
+	reach = 3,
 	aggressivity = 1,
 	walk_speed = 3,
 	run_speed = 6,
