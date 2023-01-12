@@ -24,14 +24,67 @@ examobs.register_mob({
 	max_spawn_y = -100,
 	resist_nodes = {["examobs:barbed_wire"]=1},
 	floating = {["examobs:barbed_wire"]=1},
+	a=function(a)
+		local c = {}
+		for i,v in pairs(a) do
+			c[i] = v > 0 and 1 or v < 0 and -1 or 0
+		end
+		return c
+	end,
 	step=function(self,time)
 		local pos2 = self.fight and self.fight:get_pos()
-		if pos2 and vector.distance(self:pos(),pos2) > 10 then
+		local c
+		local rot = self.object:get_rotation()
+		local pos = self.object:get_pos()
+
+		if pos2 and vector.distance(pos,pos2) > 10 then
 			self.am = (self.am or 0) -0.1
 			if self.am <= 0 then
 				examobs.shoot_arrow(self,pos2,"examobs:arrow_barbed_wire")
 				self.am = math.random(1,5) * 0.1
 			end
+		end
+
+		if self.wall then
+			if math.random(0,1) == 1 then
+				local s = self.storage.size*2
+				local x = self.wall.z ~= 0 and math.random(-s,s) or 0
+				local z = self.wall.x ~= 0 and math.random(-s,s) or 0
+				self.object:set_rotation({
+					x = x * math.pi/2,
+					y = rot.y,
+					z = z * math.pi/2
+				})
+				self.object:set_velocity({
+					x = x,
+					y = math.random(-s,s),
+					z = z
+				})
+			else
+				examobs.stand(self)
+			end
+		end
+
+		for _,r in pairs(exatec.wire_rules) do
+			if r.y == 0 and default.defpos(vector.add(pos,r),"walkable") then
+				c = r
+				break
+			end
+		end
+
+		if c then
+			local p = math.pi/2
+			self.object:set_rotation({
+				x=c.z*p,
+				y=0,
+				z=c.x*p*-1
+			})
+			self.wall = c
+			self.floating.air = 1
+		elseif self.wall then
+			self.wall = nil
+			self.floating.air = nil
+			self.object:set_rotation({x=0,y=rot.y,z=0})
 		end
 	end,
 	on_spawn=function(self)
@@ -46,6 +99,7 @@ examobs.register_mob({
 		self.on_load(self)
 	end,
 	on_load=function(self)
+		self.floating = {["examobs:barbed_wire"]=1}
 		if self.storage.skin then
 			local s = self.storage.size
 			self.dmg = 10+(s*2)
@@ -58,16 +112,6 @@ examobs.register_mob({
 				collisionbox={-0.2*s,-0.2*s,-0.2*s,0.2*s,0.1*s,0.2*s},
 				hp_max = 10*s,
 			})
-		end
-	end,
-	death=function(self)
-		if not self.ex then
-			self.ex = 1
-			local pos = self.object:get_pos()
-			if pos then
-				nitroglycerin.explode(pos,{radius=2*(self.storage.size or 1),set="examobs:barbed_wire"})
-				self.object:remove()
-			end
 		end
 	end,
 	use_bow=function(pos1,pos2,arrow)
@@ -473,7 +517,6 @@ examobs.register_mob({
 	spawn_on={"group:stone"},
 	max_spawn_y = -50,
 	resist_nodes = {["examobs:barbed_wire"]=1},
-	floating = {["examobs:barbed_wire"]=1},
 	step=function(self,time)
 		if self.fight then
 			self.am = (self.am or 0) -0.1
