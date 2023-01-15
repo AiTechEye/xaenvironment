@@ -16,11 +16,31 @@ player_style={
 	survive_black_death = minetest.settings:get_bool("xaenvironment_black_death") ~= false,
 	survive_respawn_anywhere = minetest.settings:get_bool("xaenvironment_respawn_anywhere") ~= false,
 	static_spawnpoint = minetest.settings:get("static_spawnpoint"),
+	exposure = {
+		default = {
+               	exposure_correction = 2,
+			center_weight_power = 1,
+			luminance_max = 0,
+			luminance_min = -5,
+			speed_dark_bright = 100,
+			speed_bright_dark = 100
+      		 },
+		death = {
+			luminance_max = 20,
+			luminance_min = 20,
+		},
+		respawn = {
+			luminance_max = -20,
+			luminance_min = -20,
+			speed_dark_bright = 500,
+			speed_bright_dark = 500
+		},
+	},
 	saturation = {
 		last="air",
 		status="air",
-		air=1,
-		liquid=2,
+		air=1.5,
+		liquid=5,
 		damage=10,
 	},
 }
@@ -37,19 +57,29 @@ dofile(minetest.get_modpath("player_style") .. "/special.lua")
 dofile(minetest.get_modpath("player_style") .. "/skins.lua")
 dofile(minetest.get_modpath("player_style") .. "/craftguide.lua")
 
-player_style.set_saturation=function(player,stat,stat2)
+player_style.set_lighting=function(player,def)
 	local name = player and player:get_player_name() or ""
 	local p = player_style.players[name]
-	if p and player.set_lighting and p.saturation.status ~= stat then
+
+	if def.exposure and player.set_lighting then
+		player:set_lighting({exposure=player_style.exposure[def.exposure]})
+		if def.exposure == "respawn" then
+			minetest.after(1.5,function()
+				player:set_lighting({exposure=player_style.exposure.default})
+			end)
+		end
+	end
+
+	if def.saturation1 and p and player.set_lighting and p.saturation.status ~= def.saturation1 then
 		local max = player:get_properties().hp_max
 		local h = player:get_hp()
 		max = max >= h and max or h
 		local hp = h / max
 		hp = hp+(1-hp)/2
 
-		if stat == "last" then
-			stat = p.saturation.last
-		elseif stat == "update" then
+		if def.saturation1 == "last" then
+			def.saturation1 = p.saturation.last
+		elseif def.saturation1 == "update" then
 			local s = p.saturation[p.saturation.status]
 			if s then
 				player:set_lighting({saturation=s*hp})
@@ -57,19 +87,19 @@ player_style.set_saturation=function(player,stat,stat2)
 			return
 		end
 
-		local s = p.saturation[stat]
+		local s = p.saturation[def.saturation1]
 
 		p.saturation.last = p.saturation.status
-		p.saturation.status = stat
+		p.saturation.status = def.saturation1
 		player:set_lighting({saturation=s*hp})
 
-		if stat2 then
-			stat2 = stat2 == "last" and p.saturation.last or stat2
+		if def.saturation2 then
+			def.saturation2 = def.saturation2 == "last" and p.saturation.last or def.saturation2
 
-			s = p.saturation[stat2]
+			s = p.saturation[def.saturation2]
 			minetest.after(0.1,function()
 				p.saturation.last = p.saturation.status
-				p.saturation.status = stat2
+				p.saturation.status = def.saturation2
 				player:set_lighting({saturation=s*hp})
 			end)
 			minetest.after(0.3,function()
@@ -136,9 +166,9 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 	if player then
 		if hp_change < 0 then
 			minetest.sound_play("default_hurt", {to_player=player:get_player_name(), gain = 2})
-			player_style.set_saturation(player,"damage","last")
+			player_style.set_lighting(player,{saturation1="damage",saturation2="last"})
 		else
-			player_style.set_saturation(player,"update")
+			player_style.set_lighting(player,{saturation1="update"})
 		end
 	end
 	return hp_change
@@ -146,19 +176,28 @@ end,true)
 
 minetest.register_on_dieplayer(function(player)
 	local p = player_style.players[player:get_player_name()]
-	if player_style.survive_black_death and not p.black_death_id then
-		p.black_death_id = player:hud_add({
-			hud_elem_type="image",
-			scale = {x=-100, y=-100},
-			name="black_death",
-			position={x=0,y=0},
-			text="player_style_black.png",
-			alignment = {x=1, y=1},
-		})
+
+	if player.set_lighting then
+		player_style.set_lighting(player,{exposure="death"})
+	else
+		if player_style.survive_black_death and not p.black_death_id then
+			p.black_death_id = player:hud_add({
+				hud_elem_type="image",
+				scale = {x=-100, y=-100},
+				name="black_death",
+				position={x=0,y=0},
+				text="player_style_black.png",
+				alignment = {x=1, y=1},
+			})
+		end
 	end
 end)
 
 minetest.register_on_respawnplayer(function(player)
+
+player_style.set_lighting(player,{exposure="respawn"})
+
+
 	local size = default.mapgen_limit-2000
 	local rpos = vector.new(math.random(-size,size),math.random(1,30),math.random(-size,-size))
 	local ppr = player_style.players[player:get_player_name()]
@@ -243,7 +282,7 @@ player_style.respawn=function(player,pos)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
-	player_style.set_saturation(player,"update")
+	player_style.set_lighting(player,{saturation1="update"})
 
 	for i, v in pairs(player_style.players[name].sounds) do
 		minetest.sound_stop(v)
@@ -333,9 +372,9 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	player_style.set_profile(player,"default")
-	player_style.set_saturation(player,"update")
+	player_style.set_lighting(player,{saturation1="update"})
 	minetest.after(0.1, function()
-		player_style.set_saturation(player,"update")
+		player_style.set_lighting(player,{saturation1="update"})
 	end)
 end)
 
@@ -343,6 +382,7 @@ player_style.set_profile=function(player,pr)
 	player:set_eye_offset({x=0,y=0,z=0},{x=5,y=0,z=5})
 	if player.set_lighting then
 		player:set_lighting({shadows={intensity=0.1}})
+		player_style.set_lighting(player,{exposure="default"})
 	end
 	local profile=player_style.registered_profiles[pr]
 	local name=player:get_player_name()
@@ -691,7 +731,7 @@ minetest.register_globalstep(function(dtime)
 
 		if minetest.get_item_group(minetest.get_node({x=p.x,y=p.y+0.6,z=p.z}).name,"water") > 0 then
 			if not ppr.dive_sound.dive then
-				player_style.set_saturation(player,"liquid")
+				player_style.set_lighting(player,{saturation1="liquid"})
 				ppr.dive_sound.dive = true
 				ppr.dive_sound.time = 4
 			end
@@ -702,7 +742,7 @@ minetest.register_globalstep(function(dtime)
 
 			end
 		elseif ppr.dive_sound.dive then
-			player_style.set_saturation(player,"air")
+							player_style.set_lighting(player,{saturation1="air"})
 			ppr.dive_sound.dive = false
 			minetest.sound_stop(ppr.sounds["default_underwater"])
 		end
