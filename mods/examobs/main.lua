@@ -484,7 +484,7 @@ examobs.register_mob=function(def)
 					if not minetest.registered_entities[name].before_spawn(bp) then
 						return
 					end
-					local ob = minetest.add_entity(apos(pos1,0,bottom), name)
+					local ob = minetest.add_entity(apos(pos1,0,bottom+0.5), name)
 					ob:set_yaw(math.random(0,6.28))
 					ob:get_luaentity().storage.self_spawned = true
 				end

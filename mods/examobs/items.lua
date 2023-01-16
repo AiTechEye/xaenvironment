@@ -1307,6 +1307,7 @@ minetest.register_node("examobs:saddle", {
 
 minetest.register_node("examobs:rope", {
 	stack_max = 1,
+	manual_page = "examobs:rope Is greate for catching mobs, eg horses.\nCatch them 20 blocks away but the rope length will only be 10.\nAim to a mob and use it to catch, use again to release, or right click on them for same thing.\nBut if you right click in air you shorten the rope, down to 2 block length, release to restore.",
 	description = "Rope (for mobs)",
 	inventory_image="hook_rope2.png^[colorize:#9509",
 	wield_image="hook_rope2.png^[colorize:#9509",
@@ -1328,6 +1329,18 @@ minetest.register_node("examobs:rope", {
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "object" then
 			return default.def("examobs:rope").on_use(itemstack, user, pointed_thing)
+		else
+
+			local id = itemstack:get_meta():get_int("id")
+			for _, ob in ipairs(minetest.get_objects_inside_radius(user:get_pos(),50)) do
+				local en = ob:get_luaentity()
+				if en and en.name == "examobs:rope" and en.id == id then
+					if en.range > 2 then
+						en.range = en.range - 1
+					end
+					return itemstack
+				end
+			end
 		end
 	end,
 	on_use = function(itemstack, user, pointed_thing)
@@ -1393,16 +1406,25 @@ minetest.register_node("examobs:rope", {
 	end,
 	on_punch = function(pos, node, player, itemstack, pointed_thing)
 		if not minetest.is_protected(pos, player:get_player_name()) then
-			local id = minetest.get_meta(pos):get_int("id")
+			local m = minetest.get_meta(pos)
+			local id = m:get_int("id")
+			local range = m:get_int("range")
+
 			for _, ob in ipairs(minetest.get_objects_inside_radius(pos,50)) do
 				local en = ob:get_luaentity()
 				if en and en.name == "examobs:rope" and en.id == id then
+					en.range = range
 					en.attach = player
 					en.attachpos = nil
 					local item = ItemStack("examobs:rope")
 					item:get_meta():set_int("id",id)
 					item:get_meta():set_string("description","Rope ("..id..")")
-					player:get_inventory():add_item("main", item)
+
+					if player:get_wielded_item():get_name() == "" then
+						player:set_wielded_item(item)
+					else
+						player:get_inventory():add_item("main", item)
+					end
 					minetest.remove_node(pos)
 					return
 				end
@@ -1411,12 +1433,14 @@ minetest.register_node("examobs:rope", {
 	end,
 	after_place_node = function(pos, placer, itemstack)
 		local id = itemstack:get_meta():get_int("id")
-		minetest.get_meta(pos):set_int("id",id)
+		local m = minetest.get_meta(pos)
+		m:set_int("id",id)
 		for _, ob in ipairs(minetest.get_objects_inside_radius(pos,20)) do
 			local en = ob:get_luaentity()
 			if en and en.name == "examobs:rope" and en.id == id then
 				en.attachpos = pos
 				en.attach = nil
+				m:set_int("range",en.range)
 				break
 			end
 		end
@@ -1431,6 +1455,7 @@ minetest.register_entity("examobs:rope",{
 	pointable = false,
 	static_save = false,
 	textures={"hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509","hook_rope.png^[colorize:#9509"},
+	range = 10,
 	on_step=function(self,dtime)
 		local pos1 = self.attachpos or self.attach and self.attach:get_pos()
 		local pos2 = self.target and self.target:get_pos()
@@ -1449,7 +1474,7 @@ minetest.register_entity("examobs:rope",{
 		self.object:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
 		self.object:set_properties({visual_size={x=vector.distance(pos1,pos2),y=0.05,z=0.05}})
 
-		if vector.distance(pos1,pos2) > 10 then
+		if vector.distance(pos1,pos2) > self.range then
 			self.target:set_velocity(vec)
 		end
 	end
