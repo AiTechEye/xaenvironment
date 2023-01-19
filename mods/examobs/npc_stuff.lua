@@ -240,15 +240,45 @@ examobs.npc_setup=function(self)
 
 	local on_spawn = self.on_spawn
 	local on_load = self.on_load
-
+	local death = self.death
+	local on_despawn = self.on_despawn
 	self.on_spawn=function(self)
 		table.insert(examobs.npc.list,self.object)
+
 		on_spawn(self)
 	end
 
 	self.on_load=function(self)
 		table.insert(examobs.npc.list,self.object)
+
+		if self.name == "examobs:npc" and (self.storage.skin or math.random(1,3) > 1) then
+			local skin = self.storage.skin or player_style.skins.skins[math.random(1,28)].skin
+			self.object:set_properties({textures={skin}})
+		end
+
+		if self.storage.property_area_pos and not minetest.is_protected(self.storage.property_area_pos, "") and math.random(1,5) > 1 then
+			local p = self.storage.property_area_pos
+       		local c = self.storage.property_area
+			self.storage.area_id = protect.add_game_rule_area(apos(p,c,c,c),apos(p,-c,-c,-c),self.storage.npcname.."'s home","*"..self.storage.npcname,nil,{type="s",count=1})
+		end
+
 		on_load(self)
+	end
+
+	self.death=function(self)
+		if self.storage.area_id then
+			protect.remove_game_rule_area(self.storage.area_id)
+		end
+
+		death(self)
+	end
+
+	self.on_despawn=function(self)
+		if self.storage.area_id then
+			protect.remove_game_rule_area(self.storage.area_id)
+		end
+
+		on_despawn(self)
 	end
 end
 

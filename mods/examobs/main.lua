@@ -149,7 +149,7 @@ examobs.register_mob=function(def)
 	def.on_punching =			def.on_punching or			function() end
 	def.before_punching =		def.before_punching or		function() end
 	def.on_click =			def.on_click or			function() end
-	def.on_despawn =			def.deon_spawn or			function() end
+	def.on_despawn =			def.on_despawn or			function() end
 	def.on_spawn =			def.on_spawn or			function() end
 	def.on_load =			def.on_load or			function() end
 	def.on_abs_step =			def.on_abs_step or			function() end
@@ -253,7 +253,7 @@ examobs.register_mob=function(def)
 		examobs.active.num = examobs.active.num - 1
 		examobs.active.types[self.name] = examobs.active.types[self.name] -1
 		examobs.terminal_update_users()
-		def.on_despawn(self)
+		self.on_despawn(self)
 	end
 
 	def.on_activate=function(self, staticdata)

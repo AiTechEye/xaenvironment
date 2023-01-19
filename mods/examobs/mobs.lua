@@ -186,13 +186,11 @@ examobs.register_mob({
 	end,
 	on_load=function(self)
 		local skin = self.storage.skin or "examobs_horse_brown.png"
-
 		if self.storage.saddle and not (self.dead or self.dying) then
 			minetest.add_entity(self.object:get_pos(), "examobs:saddle"):set_attach(self.object, "",{x=0, y=0, z=-3}, {x=0, y=0,z=0})
 			skin = skin .. "^examobs_horse_bridle.png"
 		end
 		self.object:set_properties({textures={skin}})
-
 	end,
 	punch_timeout = 0,
 	on_punching=function(self)
@@ -1974,6 +1972,55 @@ examobs.register_mob({
 	on_lifedeadline=function(self)
 		return self.storage.npc_generated
 	end,
+	on_spawn=function(self)
+		local r = math.random(1,5)
+		local p = self.object:get_pos()
+
+		if r == 1 then
+			self.storage.skin = player_style.skins.skins[math.random(1,28)].skin
+		elseif r == 2 then
+			self.storage.skin = player_style.skins.skins[2].skin
+		else
+			minetest.after(0.01,function()
+				if r >= 3 and not self.storage.family then
+					local lad = minetest.add_entity(p,"examobs:npc"):get_luaentity()
+					lad.storage.npc_generated = true
+					lad.storage.skin = player_style.skins.skins[2].skin
+					lad.storage.family = true
+					examobs.known(lad,self.object,"folow")
+					lad:on_load()
+					if r >= 4 then
+						local par = {lad.object,self.object}
+						for i=1,math.random(1,4) do
+							local chi = minetest.add_entity(p,"examobs:npc"):get_luaentity()
+							chi.storage.npc_generated = true
+							chi.storage.skin = player_style.skins.skins[math.random(1,2)].skin
+							chi.storage.family = true
+							chi.storage.child_size = math.random(5,9)*0.1
+							examobs.known(chi,par[math.random(1,2)],"folow")
+							chi:on_load()
+						end
+					end
+				end
+			end)
+		end
+		self:on_load()
+	end,
+	on_load=function(self)
+		if self.storage.skin then
+			self.object:set_properties({textures={self.storage.skin}})
+		end
+		if self.storage.child_size then
+			local s = self.storage.child_size
+			local c = self.object:get_properties().collisionbox
+			local c2 = {}
+			for i,v in pairs(c) do
+				c2[i] = v*s
+			end
+			self.object:set_properties({collisionbox=c2, visual_size={x=s,y=s,z=s}})
+			self.aggressivity = -1
+		end
+	end,
 })
 
 examobs.register_mob({
@@ -2007,6 +2054,15 @@ examobs.register_mob({
 	end,
 	on_lifedeadline=function(self)
 		return self.storage.npc_generated
+	end,
+	on_spawn=function(self)
+		self.storage.is_girl = math.random(1,2) == 1
+		self.on_load(self)
+	end,
+	on_load=function(self)
+		if self.storage.is_girl then
+			self.object:set_properties({textures={"examobs_villagergirl.png"}})
+		end
 	end,
 })
 

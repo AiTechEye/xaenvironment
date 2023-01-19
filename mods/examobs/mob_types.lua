@@ -284,7 +284,7 @@ examobs.register_roadwalker=function(def)
 	end
 
 	def.on_spawn = function(self)
-		local skin = player_style.skins.skins[math.random(1,26)].skin
+		local skin = player_style.skins.skins[math.random(1,28)].skin
 		self.object:set_properties({textures={skin}})
 	end
 
