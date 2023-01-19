@@ -24,10 +24,10 @@ player_style.skins = {
 		{name="Sporty",skin="player_style_sporty.png",cost=200,info="",origin="Aliveai"},
 		{name="Dum",skin="player_style_dum.png",cost=200,info="Alone survival npc",origin="Aliveai"},
 		{name="Jezy",skin="player_style_jezy.png",cost=200,info="Alone survival npc",origin="Aliveai"},
-		{name="Tomato NPC",skin="examobs_tomato_npc.png",cost=500,info="Tomato farmer that is farming its own family",origin="XaEnvironment"},
 		{name="Mrs tree",skin="player_style_mrs_tree.png",cost=200,info="Random npc",origin="XaEnvironment"},
 		{name="Non girl",skin="player_style_nyongirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
 		{name="Sporty girl",skin="player_style_sportygirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
+		{name="Tomato NPC",skin="examobs_tomato_npc.png",cost=500,info="Tomato farmer that is farming its own family",origin="XaEnvironment"},
 		{name="Underground npc",skin="examobs_underground_npc.png",cost=300,info="An underground living thing",origin="XaEnvironment"},
 		{name="Diplazer bot",skin="player_style_diplazerbot.png",cost=200,info="The diplazer service bot",origin="diplazer"},
 
