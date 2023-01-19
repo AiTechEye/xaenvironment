@@ -3,6 +3,7 @@ player_style.skins = {
 		{name="ASDASD",skin="character.png",cost=0,info="Default character, random made npc from aliveai",origin="Aliveai"},
 		{name="Dacy",skin="player_style_dacy.png",cost=0,info="Another default character, random made npc from aliveai",origin="Aliveai"},
 		{name="Villager",skin="examobs_villager.png",cost=100,info="Just another fool",origin="XaEnvironment"},
+		{name="Villager girl",skin="examobs_villagergirl.png",cost=100,info="Yes",origin="XaEnvironment"},
 		{name="Spacesuit",skin="spacestuff_spacesuit2.png",cost=200,info="Suit used to protect against non breathable areas",origin="Marssurvive"},
 		{name="Jamie",skin="player_style_jamie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
 		{name="Rainybowie",skin="player_style_rainybowie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
