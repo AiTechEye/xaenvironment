@@ -1,39 +1,39 @@
 default.register_eatable("craftitem","examobs:crab_claw",1,2,{
 	description = "Crab claw",
-	groups={meat=1,store=100},
+	groups={meat=1,store=100,treasure=1},
 	inventory_image = "examobs_crab_claw.png",
 	wet = 0.5
 })
 default.register_eatable("craftitem","examobs:flesh",1,4,{
 	description = "Flesh",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "examobs_flesh.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 default.register_eatable("craftitem","examobs:meat",3,4,{
 	description = "Cooked meat",
-	groups={meat=1,store=50},
+	groups={meat=1,store=50,treasure=1},
 	inventory_image = "examobs_meat.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
 default.register_eatable("craftitem","examobs:bugflesh",-5,4,{
 	description = "Bug flesh",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "default_coalblock.png^[colorize:#00550044^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 default.register_eatable("craftitem","examobs:bugmeat",4,5,{
 	description = "Cooked bug meat",
-	groups={meat=1,store=50},
+	groups={meat=1,store=50,treasure=1},
 	inventory_image = "default_coalblock.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0"
 })
 
 default.register_eatable("craftitem","examobs:flesh_piece",1,2,{
 	description = "Flesh piece",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "examobs_flesh.png^default_alpha_lump.png^[makealpha:0,255,0"
 })
 default.register_eatable("craftitem","examobs:meat_piece",1,2,{
 	description = "Cooked meat piece",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "examobs_meat.png^default_alpha_lump.png^[makealpha:0,255,0"
 })
 
@@ -175,7 +175,7 @@ minetest.register_craft({
 minetest.register_node("examobs:mud", {
 	description = "Mud",
 	tiles={"default_dirt.png^default_stonemoss.png"},
-	groups = {dirt=1,soil=1,crumbly=3},
+	groups = {dirt=1,soil=1,crumbly=3,treasure=1},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -183,12 +183,12 @@ minetest.register_node("examobs:mud", {
 
 default.register_eatable("craftitem","examobs:chickenleg",1,2,{
 	description = "Chicken leg",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "examobs_skin.png^examobs_alpha_chickenleg.png^[makealpha:0,255,0"
 })
 default.register_eatable("craftitem","examobs:chickenleg_fried",2,3,{
 	description = "Fried chicken leg",
-	groups={meat=1},
+	groups={meat=1,treasure=1},
 	inventory_image = "examobs_meat.png^examobs_alpha_chickenleg.png^[makealpha:0,255,0"
 })
 minetest.register_craft({
@@ -216,7 +216,7 @@ minetest.register_node("examobs:egg", {
 	sunlight_propagates = true,
 	walkable = false,
 	visual_scale = 0.3,
-	groups = {dig_immediate=3},
+	groups = {dig_immediate=3,treasure=1},
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.1, -0.5, -0.1, 0.1, -0.2, 0.1}
@@ -1230,7 +1230,7 @@ default.register_chest({
 		end
 	end,
 	on_timer = function (pos, elapsed)
-		if math.random(0,5) == 1 then
+		if math.random(0,20) == 1 then
 			local m = math.random(0,10) == 0 and "examobs:airmonster" or "examobs:cloud"
 			local p = vector.new(pos.x+math.random(-1,1),pos.y+math.random(-1,1),pos.z+math.random(-1,1))
 			local e = minetest.add_entity(pos,m)

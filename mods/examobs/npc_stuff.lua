@@ -157,7 +157,57 @@ examobs.npc_setup=function(self)
 
 		local p = self:pos()
 		local addressed
-		if math.random(1,100) == 1 then
+		local r = math.random(1,100)
+
+		if self.nodetarget then
+			examobs.lookat(self,self.nodetarget)
+			examobs.walk(self)
+
+			if vector.distance(p,self.nodetarget) < 3 then
+				examobs.stand(self)
+				local m = minetest.get_meta(self.nodetarget)
+				if not minetest.is_protected(self.nodetarget, "") and m:get_string("owner") == "" then
+
+ 					local m2 = m:to_table()
+					local key1 = next(m2.inventory)
+					local key2 = next(m2.inventory,key1)
+					if key1 and key2 then
+						self.nodetarget = nil
+						self.nodetarget_name = nil
+						return self
+					elseif m2.inventory.main then
+						local items = {}
+						for i,v in ipairs(m2.inventory.main) do
+							if v:get_name() ~= "" then
+								table.insert(items,v)
+							end
+						end
+						if #items > 0 then
+							local take = items[math.random(1,#items)]
+							self.inv[take:get_name()] = (self.inv[take:get_name()] or 0) + take:get_count()
+							m:get_inventory():remove_item("main",take)
+
+							if math.random(1,3) > 1 then
+								self.nodetarget = nil
+								self.nodetarget_name = nil
+							end
+							return
+						end
+					end
+
+					minetest.remove_node(self.nodetarget)
+					for i,v in pairs(minetest.get_node_drops(self.nodetarget_name)) do
+						self.inv[v] = (self.inv[v] or 0) + 1
+					end
+				end
+				self.nodetarget = nil
+				self.nodetarget_name = nil
+			elseif not examobs.visiable(self.object,self.nodetarget) or minetest.get_node(self.nodetarget).name ~= self.nodetarget_name  then
+				self.nodetarget = nil
+				self.nodetarget_name = nil
+			end
+			return self
+		elseif r == 1 then
 			local exp
 
 			if self.folow or self.folow_jset then
@@ -235,6 +285,19 @@ examobs.npc_setup=function(self)
 				exp = exp or "random"
 			end
 			examobs.on_expression(self,exp,addressed)
+		elseif r == 2 then
+			local nodes = {}
+			for i,v in pairs(minetest.find_nodes_in_area(apos(p,-20,-1,-20),apos(p,20,5,20),"group:choppy","group:snappy","group:cracky","group:treasure","group:dig_immediate")) do
+				local n = minetest.get_node(v)
+				if minetest.get_item_group(v.name,"grass") == 0 and minetest.get_item_group(v.name,"stone") == 0 and minetest.get_item_group(v.name,"unbreakable") == 0 and examobs.visiable(self.object,v) then
+					table.insert(nodes,v)
+				end
+			end
+			if #nodes > 0 then
+				local n = nodes[math.random(1,#nodes)]
+				self.nodetarget = n
+				self.nodetarget_name = minetest.get_node(n).name
+			end
 		end
 	end
 

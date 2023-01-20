@@ -367,20 +367,21 @@ examobs.following=function(self)
 end
 
 examobs.exploring=function(self)
-	if math.random(1,2) == 1 and examobs.find_objects(self) then return end
-
 	local r = math.random(1,10)
-	if r <= 5 and self.walking then		-- keep walk
+
+	if math.random(1,2) == 1 and examobs.find_objects(self) then
+		return
+	elseif r <= 5 and self.walking then				-- keep walk
 		examobs.walk(self)
-	elseif r <= 2 then					-- rnd walk
+	elseif r <= 2 then								-- rnd walk
 		self.object:set_yaw(math.random(0,6.28))
 		self.walking = true
 		examobs.walk(self)
-	elseif r == 3 then					-- rnd look
+	elseif r == 3 then								-- rnd look
 		self.walking = nil
 		examobs.stand(self)
 		self.object:set_yaw(math.random(0,6.28))
-	else						-- stand
+	else											-- stand
 		self.walking = nil
 		examobs.stand(self)
 	end
@@ -601,11 +602,11 @@ examobs.find_objects=function(self)
 				end
 			end
 			if hiding then
+			elseif known == "flee" or (flee and team ~= self.team and (self.flee_from_threats_only == 0 or player)) or (en and en.type == "monster" and (self.aggressivity == -1 or en.hp_max >= self.hp*2)) then
+				self.flee = ob
+				return
 			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
 				self.fight = ob
-				return
-			elseif known == "flee" or (flee and team ~= self.team and (self.flee_from_threats_only == 0 or player)) or (self.aggressivity == -1 and en and en.type == "monster") then
-				self.flee = ob
 				return
 			elseif known == "folow" then
 				self.folow = ob
