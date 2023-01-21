@@ -26,7 +26,7 @@ player_style.skins = {
 		{name="Old Dan",type=1,skin="player_style_old_dan.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
 		{name="Trader",type=2,skin="player_style_trader.png",cost=200,info="Trader npc from aliveai",origin="Aliveai"},
 		{name="Clown",type=1,skin="player_style_clown.png",cost=200,info="The juggling clown npc from aliveai",origin="Aliveai"},
-		{name="Sporty",type=2,skin="player_style_sporty.png",cost=200,info="",origin="Aliveai"},
+		{name="Sporty",type=1,skin="player_style_sporty.png",cost=200,info="",origin="Aliveai"},
 		{name="Dum",type=1,type=1,skin="player_style_dum.png",cost=200,info="Alone survival npc",origin="Aliveai"},
 		{name="Jezy",type=1,skin="player_style_jezy.png",cost=200,info="Alone survival npc",origin="Aliveai"},
 		{name="Mrs tree",type=2,skin="player_style_mrs_tree.png",cost=200,info="Random npc",origin="XaEnvironment"},
