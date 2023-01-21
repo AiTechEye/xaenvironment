@@ -1,66 +1,70 @@
 player_style.skins = {
+	type0={},	--males & females
+	type1={},	--males	
+	type2={},	--females
+	type3={},	--other
 	skins={
-		{name="ASDASD",skin="character.png",cost=0,info="Default character, random made npc from aliveai",origin="Aliveai"},
-		{name="Dacy",skin="player_style_dacy.png",cost=0,info="Another default character, random made npc from aliveai",origin="Aliveai"},
-		{name="Villager",skin="examobs_villager.png",cost=100,info="Just another fool",origin="XaEnvironment"},
-		{name="Villager girl",skin="examobs_villagergirl.png",cost=100,info="Yes",origin="XaEnvironment"},
-		{name="Spacesuit",skin="spacestuff_spacesuit2.png",cost=200,info="Suit used to protect against non breathable areas",origin="Marssurvive"},
-		{name="Jamie",skin="player_style_jamie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Rainybowie",skin="player_style_rainybowie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Hej",skin="player_style_hej.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="James",skin="player_style_james.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Danny",skin="player_style_danny.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Jack",skin="player_style_jack.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Bugy",skin="player_style_bugy.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Litle boy",skin="player_style_litleboy.png",cost=200,info="Litle boy npc from aliveai",origin="Aliveai"},
-		{name="Litle girl",skin="player_style_litlegirl.png",cost=200,info="Litle girl npc from aliveai",origin="Aliveai"},
-		{name="Military",skin="player_style_military.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Sneaky",skin="player_style_sneaky.png",cost=200,info="Light shade stealing npc from aliveai",origin="Aliveai"},
-		{name="Stubborn",skin="player_style_stubborn.png",cost=200,info="Stubborn half npc from aliveai",origin="Aliveai"},
-		{name="Admin",skin="player_style_admin.png",cost=200,info="Admin npc from aliveai",origin="Aliveai"},
-		{name="Police",skin="player_style_police.png",cost=500,info="Pilice officer npc",origin="XaEnvironment"},
-		{name="Old Dan",skin="player_style_old_dan.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
-		{name="Trader",skin="player_style_trader.png",cost=200,info="Trader npc from aliveai",origin="Aliveai"},
-		{name="Clown",skin="player_style_clown.png",cost=200,info="The juggling clown npc from aliveai",origin="Aliveai"},
-		{name="Sporty",skin="player_style_sporty.png",cost=200,info="",origin="Aliveai"},
-		{name="Dum",skin="player_style_dum.png",cost=200,info="Alone survival npc",origin="Aliveai"},
-		{name="Jezy",skin="player_style_jezy.png",cost=200,info="Alone survival npc",origin="Aliveai"},
-		{name="Mrs tree",skin="player_style_mrs_tree.png",cost=200,info="Random npc",origin="XaEnvironment"},
-		{name="Non girl",skin="player_style_nyongirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
-		{name="Sporty girl",skin="player_style_sportygirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
-		{name="Tomato NPC",skin="examobs_tomato_npc.png",cost=500,info="Tomato farmer that is farming its own family",origin="XaEnvironment"},
-		{name="Underground npc",skin="examobs_underground_npc.png",cost=300,info="An underground living thing",origin="XaEnvironment"},
-		{name="Diplazer bot",skin="player_style_diplazerbot.png",cost=200,info="The diplazer service bot",origin="diplazer"},
+		{name="ASDASD",type=1,skin="character.png",cost=0,info="Default character, random made npc from aliveai",origin="Aliveai"},
+		{name="Dacy",type=2,skin="player_style_dacy.png",cost=0,info="Another default character, random made npc from aliveai",origin="Aliveai"},
+		{name="Villager",type=1,skin="examobs_villager.png",cost=100,info="Just another fool",origin="XaEnvironment"},
+		{name="Villager girl",type=2,skin="examobs_villagergirl.png",cost=100,info="Yes",origin="XaEnvironment"},
+		{name="Spacesuit",type=3,skin="spacestuff_spacesuit2.png",cost=200,info="Suit used to protect against non breathable areas",origin="Marssurvive"},
+		{name="Jamie",type=1,skin="player_style_jamie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Rainybowie",type=1,skin="player_style_rainybowie.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Hej",type=1,skin="player_style_hej.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="James",type=1,skin="player_style_james.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Danny",type=1,skin="player_style_danny.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Jack",type=1,skin="player_style_jack.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Bugy",type=1,skin="player_style_bugy.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Litle boy",type=1,skin="player_style_litleboy.png",cost=200,info="Litle boy npc from aliveai",origin="Aliveai"},
+		{name="Litle girl",type=2,skin="player_style_litlegirl.png",cost=200,info="Litle girl npc from aliveai",origin="Aliveai"},
+		{name="Military",type=1,skin="player_style_military.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Sneaky",type=1,skin="player_style_sneaky.png",cost=200,info="Light shade stealing npc from aliveai",origin="Aliveai"},
+		{name="Stubborn",type=1,skin="player_style_stubborn.png",cost=200,info="Stubborn half npc from aliveai",origin="Aliveai"},
+		{name="Admin",type=1,skin="player_style_admin.png",cost=200,info="Admin npc from aliveai",origin="Aliveai"},
+		{name="Police",type=1,skin="player_style_police.png",cost=500,info="Pilice officer npc",origin="XaEnvironment"},
+		{name="Old Dan",type=1,skin="player_style_old_dan.png",cost=200,info="Random npc from aliveai",origin="Aliveai"},
+		{name="Trader",type=2,skin="player_style_trader.png",cost=200,info="Trader npc from aliveai",origin="Aliveai"},
+		{name="Clown",type=1,skin="player_style_clown.png",cost=200,info="The juggling clown npc from aliveai",origin="Aliveai"},
+		{name="Sporty",type=2,skin="player_style_sporty.png",cost=200,info="",origin="Aliveai"},
+		{name="Dum",type=1,type=1,skin="player_style_dum.png",cost=200,info="Alone survival npc",origin="Aliveai"},
+		{name="Jezy",type=1,skin="player_style_jezy.png",cost=200,info="Alone survival npc",origin="Aliveai"},
+		{name="Mrs tree",type=2,skin="player_style_mrs_tree.png",cost=200,info="Random npc",origin="XaEnvironment"},
+		{name="Nyon girl",type=2,skin="player_style_nyongirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
+		{name="Sporty girl",type=2,skin="player_style_sportygirl.png",cost=200,info="Random npc",origin="XaEnvironment"},
+		{name="Tomato NPC",type=3,skin="examobs_tomato_npc.png",cost=500,info="Tomato farmer that is farming its own family",origin="XaEnvironment"},
+		{name="Underground npc",type=3,skin="examobs_underground_npc.png",cost=300,info="An underground living thing",origin="XaEnvironment"},
+		{name="Diplazer bot",type=3,skin="player_style_diplazerbot.png",cost=200,info="The diplazer service bot",origin="diplazer"},
 
-		{name="Terminator",skin="examobs_terminator.png",cost=2000,info="Destruction machine",origin="Aliveai"},
-		{name="Bronze terminator",skin="player_style_terminator_bronze.png",cost=200,info="Murder machine",origin="Aliveai"},
-		{name="Eletric terminator",skin="player_style_eletric_terminator.png",cost=200,info="War machine",origin="Aliveai"},
-		{name="Fast eleltric Terminator",skin="player_style_eletric_terminator.png^[colorize:#00ff0033",cost=200,info="War machine",origin="Aliveai"},
-		{name="Lightning terminator",skin="player_style_eletric_terminator.png^[colorize:#fa7fff44",cost=200,info="War machine",origin="Aliveai"},
+		{name="Terminator",type=3,skin="examobs_terminator.png",cost=2000,info="Destruction machine",origin="Aliveai"},
+		{name="Bronze terminator",type=3,skin="player_style_terminator_bronze.png",cost=200,info="Murder machine",origin="Aliveai"},
+		{name="Eletric terminator",type=3,skin="player_style_eletric_terminator.png",cost=200,info="War machine",origin="Aliveai"},
+		{name="Fast eleltric Terminator",type=3,skin="player_style_eletric_terminator.png^[colorize:#00ff0033",cost=200,info="War machine",origin="Aliveai"},
+		{name="Lightning terminator",type=3,skin="player_style_eletric_terminator.png^[colorize:#fa7fff44",cost=200,info="War machine",origin="Aliveai"},
 
-		{name="Gassman",skin="examobs_gassman.png",cost=500,info="High explosive machine",origin="Pollution"},
-		{name="Acid axov",skin="examobs_gassman.png^[colorize:#00dd00cc",cost=500,info="Acid machine",origin="Pollution"},
-		{name="Uranium axov",skin="examobs_gassman.png^[colorize:#aaff00aa",cost=500,info="Uranium machine",origin="Pollution"},
-		{name="Crystal axov",skin="player_style_pollutioncrystal.png",cost=500,info="Crystal machine",origin="Pollution"},
-		{name="Ice axov",skin="player_style_pollutionice.png",cost=500,info="Nitrogen machine",origin="Pollution"},
+		{name="Gassman",type=3,skin="examobs_gassman.png",cost=500,info="High explosive machine",origin="Pollution"},
+		{name="Acid axov",type=3,skin="examobs_gassman.png^[colorize:#00dd00cc",cost=500,info="Acid machine",origin="Pollution"},
+		{name="Uranium axov",type=3,skin="examobs_gassman.png^[colorize:#aaff00aa",cost=500,info="Uranium machine",origin="Pollution"},
+		{name="Crystal axov",type=3,skin="player_style_pollutioncrystal.png",cost=500,info="Crystal machine",origin="Pollution"},
+		{name="Ice axov",type=3,skin="player_style_pollutionice.png",cost=500,info="Nitrogen machine",origin="Pollution"},
 
-		{name="Acidman",skin="player_style_acidman.png",cost=200,info="Acid machine",origin="Aliveai"},
-		{name="Negative gassman",skin="player_style_negativegassman.png",cost=200,info="Came to life through a dream",origin="Aliveai"},
-		{name="Uranium",skin="player_style_uranium.png",cost=1000,info="Massdestruction machine",origin="Aliveai"},
-		{name="Nuker",skin="player_style_nuker.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
-		{name="Blackhole bot",skin="player_style_blackholebot.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
-		{name="Nitrogen bomb",skin="player_style_nitrogenbomb.png",cost=200,info="Nitrogen bomb",origin="Aliveai"},
-		{name="Nitrogen",skin="player_style_nitrogen.png",cost=200,info="Nitrogen monster",origin="Aliveai"},
+		{name="Acidman",type=3,skin="player_style_acidman.png",cost=200,info="Acid machine",origin="Aliveai"},
+		{name="Negative gassman",type=3,skin="player_style_negativegassman.png",cost=200,info="Came to life through a dream",origin="Aliveai"},
+		{name="Uranium",type=3,skin="player_style_uranium.png",cost=1000,info="Massdestruction machine",origin="Aliveai"},
+		{name="Nuker",type=3,skin="player_style_nuker.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
+		{name="Blackhole bot",type=3,skin="player_style_blackholebot.png",cost=200,info="Massdestruction machine",origin="Aliveai"},
+		{name="Nitrogen bomb",type=3,skin="player_style_nitrogenbomb.png",cost=200,info="Nitrogen bomb",origin="Aliveai"},
+		{name="Nitrogen",type=3,skin="player_style_nitrogen.png",cost=200,info="Nitrogen monster",origin="Aliveai"},
 
-		{name="Air monster",skin="examobs_airmonster.png",cost=2000,info="Odd phenomenon",origin="XaEnvironment"},
-		{name="Mummy",skin="pyramids_mummy.png",cost=1000,info="Living in ancient pyramids civilizations",origin="Aliveai"},
-		{name="Slime",skin="player_style_slime.png",cost=400,info="Slime monster",origin="Aliveai"},
-		{name="Pull",skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
-		{name="Storm",skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
-		{name="Ninja",skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
-		{name="UjE",skin="player_style_uje.png",cost=1000,info="AiTechEye's first skin for minetest"},
+		{name="Air monster",type=3,skin="examobs_airmonster.png",cost=2000,info="Odd phenomenon",origin="XaEnvironment"},
+		{name="Mummy",type=3,skin="pyramids_mummy.png",cost=1000,info="Living in ancient pyramids civilizations",origin="Aliveai"},
+		{name="Slime",type=3,skin="player_style_slime.png",cost=400,info="Slime monster",origin="Aliveai"},
+		{name="Pull",type=3,skin="player_style_pull.png",cost=400,info="Pull monster",origin="Aliveai"},
+		{name="Storm",type=3,skin="player_style_storm.png",cost=500,info="Storm",origin="Aliveai"},
+		{name="Ninja",type=3,skin="player_style_ninja.png",cost=500,info="Invisible ninja",origin="Aliveai"},
+		{name="UjE",type=3,skin="player_style_uje.png",cost=1000,info="AiTechEye's first skin for minetest"},
 
-		{name="Quantum",skin="player_style_quantum_monster.png",cost=1000,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
+		{name="Quantum",type=3,skin="player_style_quantum_monster.png",cost=1000,info="Teleporting monster\nRight click to random teleport yourself",origin="Aliveai",
 			on_step=function(self,player,dtime)
 				self.timer = self.timer + dtime
 				if self.timer > 0.1 then
@@ -104,7 +108,7 @@ player_style.skins = {
 				end
 			end,
 		},
-		{name="Snowman",skin="player_style_snowman.png",cost=1000,info="Just a snowman\nIt thrive in snow\nRight click to throw snowballs",origin="XaEnvironment",
+		{name="Snowman",type=3,skin="player_style_snowman.png",cost=1000,info="Just a snowman\nIt thrive in snow\nRight click to throw snowballs",origin="XaEnvironment",
 			on_stop_using=function(self,player)
 				default.hand_on_secondary_use[player:get_player_name().."-Snowman-skin"]  = nil
 				if self.hat and self.hat:get_luaentity() then
@@ -145,8 +149,8 @@ player_style.skins = {
 				end
 			end,
 		},
-		{name="Slimy",skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
-		{name="Glitch",skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive",
+		{name="Slimy",type=3,skin="player_style_alienslimy.png",cost=200,info="Alien from mars",origin="Marssurvive"},
+		{name="Glitch",type=3,skin="player_style_alienglitch.png",cost=200,info="Alien from mars",origin="Marssurvive",
 			on_step=function(self,player,dtime)
 				self.timer = self.timer + dtime
 				if self.timer > 0.5 then
@@ -161,16 +165,30 @@ player_style.skins = {
 				self.r = {"r","g","b","a","rb","gr","gb","br","bg","rgb"}
 			end,
 		},
-		{name="Alien1",skin="player_style_alien1.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien2",skin="player_style_alien2.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien3",skin="player_style_alien3.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien4",skin="player_style_alien4.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien5",skin="player_style_alien5.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien6",skin="player_style_alien6.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien7",skin="player_style_alien7.png",cost=200,info="Alien from space",origin="Aliveai"},
-		{name="Alien8",skin="player_style_alien8.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien1",type=3,skin="player_style_alien1.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien2",type=3,skin="player_style_alien2.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien3",type=3,skin="player_style_alien3.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien4",type=3,skin="player_style_alien4.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien5",type=3,skin="player_style_alien5.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien6",type=3,skin="player_style_alien6.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien7",type=3,skin="player_style_alien7.png",cost=200,info="Alien from space",origin="Aliveai"},
+		{name="Alien8",type=3,skin="player_style_alien8.png",cost=200,info="Alien from space",origin="Aliveai"},
 	},
 }
+
+player_style.random_skin_type=function(typ)
+	local a = player_style.skins["type"..typ]
+	return a[math.random(1,#a)]
+end
+
+minetest.register_on_mods_loaded(function(player)
+	for i,v in ipairs(player_style.skins.skins) do
+		table.insert(player_style.skins["type"..v.type],v.skin)
+		if v.type < 3 then
+			table.insert(player_style.skins.type0,v.skin)
+		end
+	end
+end)
 
 player_style.register_button({
 	name="Skins",
