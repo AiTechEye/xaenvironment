@@ -166,16 +166,34 @@ examobs.npc_setup=function(self)
 			if vector.distance(p,self.nodetarget) < 3 then
 				examobs.stand(self)
 				local m = minetest.get_meta(self.nodetarget)
-				if not minetest.is_protected(self.nodetarget, "") and m:get_string("owner") == "" then
 
+				if self.nodetarget_name == "xesmartshop:shop" then		--smartshop
+					local list = {1,2,3,4,1,2,3,4}
+					local ri = math.random(1,4)
+					local sinv = m:get_inventory()
+					for i=ri,ri+4 do
+						local stack = sinv:get_stack("give"..i,1)
+						if not sinv:is_empty("give"..i) and sinv:contains_item("main",stack) then
+							self.inv[stack:get_name()] = (self.inv[stack:get_name()] or 0) + stack:get_count()
+							if m:get_int("type") == 1 then
+								local pay = tonumber(m:get_string("pay"..i)) or 0
+								m:get_inventory():remove_item("main",stack)
+								Coin(m:get_string("owner"),pay)
+							end
+							self.nodetarget = nil
+							self.nodetarget_name = nil
+							return
+						end
+					end
+				elseif m:get_string("owner") == "" then					--if "chest"
  					local m2 = m:to_table()
 					local key1 = next(m2.inventory)
 					local key2 = next(m2.inventory,key1)
-					if key1 and key2 then
+					if key1 and key2 or minetest.is_protected(self.nodetarget, "") then	-- not a chest, abort
 						self.nodetarget = nil
 						self.nodetarget_name = nil
 						return self
-					elseif m2.inventory.main then
+					elseif m2.inventory.main then						-- if something to take
 						local items = {}
 						for i,v in ipairs(m2.inventory.main) do
 							if v:get_name() ~= "" then
@@ -187,7 +205,7 @@ examobs.npc_setup=function(self)
 							self.inv[take:get_name()] = (self.inv[take:get_name()] or 0) + take:get_count()
 							m:get_inventory():remove_item("main",take)
 
-							if math.random(1,3) > 1 then
+							if math.random(1,3) > 1 then				--random abort
 								self.nodetarget = nil
 								self.nodetarget_name = nil
 							end
@@ -195,7 +213,7 @@ examobs.npc_setup=function(self)
 						end
 					end
 
-					minetest.remove_node(self.nodetarget)
+					minetest.remove_node(self.nodetarget)				-- take the node
 					for i,v in pairs(minetest.get_node_drops(self.nodetarget_name)) do
 						self.inv[v] = (self.inv[v] or 0) + 1
 					end
