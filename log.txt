@@ -1,0 +1,8 @@
+11.2
+
++ npc buys from shops
++ npc takes from chests/inventories
++ npc is looking for nodes & digs
++ npc spawns with families
++ npc is protecting their buildnings
++ 4 new girl skins
