@@ -1981,39 +1981,44 @@ examobs.register_mob({
 		else
 			minetest.after(0,function()
 				if not self.storage.family then
+					local lad
 					local skin1 = player_style.random_skin_type(1)
 					local skin2 = player_style.random_skin_type(2)
 					local skins = {skin1,skin2}
 
 					if r == 3 then										--family
 						self.storage.skin = skin1
-						self.object:set_properties({textures={skin1}})
 
-						local lad = minetest.add_entity(p,"examobs:npc"):get_luaentity()
+						lad = minetest.add_entity(p,"examobs:npc"):get_luaentity()
 						lad.storage.npc_generated = true
-						lad.storage.skin = skin2
 						lad.storage.family = true
 						examobs.known(lad,self.object,"folow")
 						examobs.known(self,lad.object,"folow")
-						lad:on_load()
+						minetest.after(0,function()
+							lad.storage.skin = skin2
+							lad:on_load()
+						end)
 					else
-						skin1 = self.storage.skin
-						skin2 = self.storage.skin
+						self.storage.skin = player_style.random_skin_type(0)
 						skins = {self.storage.skin,self.storage.skin}
 					end
+
+					self.object:set_properties({textures={self.storage.skin}})
 
 					if r >= 3 then										--family/single with children
 						for i=1,math.random(1,4) do
 							local chi = minetest.add_entity(p,"examobs:npc"):get_luaentity()
 							chi.storage.npc_generated = true
-							chi.storage.skin = skins[math.random(1,2)]
 							chi.storage.family = true
 							chi.storage.child_size = math.random(5,9)*0.1
 							examobs.known(chi,self.object,"folow")
 							if lad then
 								examobs.known(chi,lad.object,"folow")
 							end
-							chi:on_load()
+							minetest.after(0,function()
+								chi.storage.skin = skins[math.random(1,2)]
+								chi:on_load()
+							end)
 						end
 					end
 				end
