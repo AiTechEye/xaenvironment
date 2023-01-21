@@ -246,6 +246,7 @@ examobs.register_mob=function(def)
 		self.storage.hp = self.hp
 		self.storage.lifetimer = self.lifetimer
 		self.storage.inv = self.inv
+		self.storage.examob = self.examob or self.storage.examob
 		return minetest.serialize(self.storage)
 	end
 	def.on_deactivate=function(self)
@@ -264,7 +265,7 @@ examobs.register_mob=function(def)
 		examobs.active.types[self.name] = (examobs.active.types[self.name] or 0) + 1
 		examobs.terminal_update_users()
 
-		self.examob = math.random(1,9999)
+		self.examob = self.storage.examob or math.random(1,9999)
 		self.dead = self.storage.dead or nil
 		self.dying = self.storage.dying or nil
 		self.hp = self.storage.hp or def.hp

@@ -628,15 +628,13 @@ examobs.find_objects=function(self)
 	end
 end
 
-examobs.known=function(self,ob,type,get)
+examobs.known=function(self,ob,type)
 	if not ob then return end
 	self.storage.known = self.storage.known or {}
 	local en = ob:get_luaentity()
 	local name = (en and (en.examob or en.type or en.name)) or (ob:is_player() and ob:get_player_name()) or ""
 	if not type then
 		return self.storage.known[name]
-	elseif get then
-		return self.storage.known[name] == type
 	else
 		self.storage.known[name] = type
 	end

@@ -1973,31 +1973,46 @@ examobs.register_mob({
 		return self.storage.npc_generated
 	end,
 	on_spawn=function(self)
-		local r = math.random(1,5)
+		local r = math.random(0,4)
 		local p = self.object:get_pos()
 
-		if r == 1 then
-			self.storage.skin = player_style.skins.skins[math.random(1,28)].skin
-		elseif r == 2 then
-			self.storage.skin = player_style.skins.skins[2].skin
+		if r <= 2 then										--single
+			self.storage.skin = player_style.random_skin_type(0)
 		else
-			minetest.after(0.01,function()
-				if r >= 3 and not self.storage.family then
-					local lad = minetest.add_entity(p,"examobs:npc"):get_luaentity()
-					lad.storage.npc_generated = true
-					lad.storage.skin = player_style.skins.skins[2].skin
-					lad.storage.family = true
-					examobs.known(lad,self.object,"folow")
-					lad:on_load()
-					if r >= 4 then
-						local par = {lad.object,self.object}
+			minetest.after(0,function()
+				if not self.storage.family then
+					local skin1 = player_style.random_skin_type(1)
+					local skin2 = player_style.random_skin_type(2)
+					local skins = {skin1,skin2}
+
+					if r == 3 then										--family
+						self.storage.skin = skin1
+						self.object:set_properties({textures={skin1}})
+
+						local lad = minetest.add_entity(p,"examobs:npc"):get_luaentity()
+						lad.storage.npc_generated = true
+						lad.storage.skin = skin2
+						lad.storage.family = true
+						examobs.known(lad,self.object,"folow")
+						examobs.known(self,lad.object,"folow")
+						lad:on_load()
+					else
+						skin1 = self.storage.skin
+						skin2 = self.storage.skin
+						skins = {self.storage.skin,self.storage.skin}
+					end
+
+					if r >= 3 then										--family/single with children
 						for i=1,math.random(1,4) do
 							local chi = minetest.add_entity(p,"examobs:npc"):get_luaentity()
 							chi.storage.npc_generated = true
-							chi.storage.skin = player_style.skins.skins[math.random(1,2)].skin
+							chi.storage.skin = skins[math.random(1,2)]
 							chi.storage.family = true
 							chi.storage.child_size = math.random(5,9)*0.1
-							examobs.known(chi,par[math.random(1,2)],"folow")
+							examobs.known(chi,self.object,"folow")
+							if lad then
+								examobs.known(chi,lad.object,"folow")
+							end
 							chi:on_load()
 						end
 					end
