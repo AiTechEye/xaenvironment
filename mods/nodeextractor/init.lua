@@ -120,8 +120,14 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	local file = io.open(filepath, "r") or {}
 	local f = file:read()
 	file:close()
+
 	pos = vector.round(pos)
 	local dat = minetest.deserialize(f)
+
+	if not dat then
+		minetest.log("warning","Nodeextractor: Could not properly read & deserialize: (Probably too big)\n"..filepath)
+		return false
+	end
 
 	minetest.emerge_area(pos,vector.add(pos,dat.size))
 
