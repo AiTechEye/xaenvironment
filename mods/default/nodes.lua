@@ -1771,3 +1771,106 @@ minetest.register_ore({
 	noise_params = default.ore_noise_params()
 })
 ]]
+
+minetest.register_node("default:treasure_chest_spawner", {
+	description = "Treasure chest spawner",
+	tiles = {
+		"default_goldblock.png^default_chest_top.png",
+		"default_goldblock.png^default_chest_top.png",
+		"default_goldblock.png^default_chest_side.png",
+		"default_goldblock.png^default_chest_side.png",
+		"default_goldblock.png^default_chest_side.png",
+		"default_goldblock.png^default_chest_front.png",
+	},
+	paramtype2 = "facedir",
+	groups = {choppy=3,on_load=1,not_in_craftguide=1},
+	sounds = default.node_sound_wood_defaults(),
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("level",1)
+		m:set_int("chance",8)
+		m:set_string("formspec","size[2,1]button[0,0;2,1;setup;Setup]")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if formname == "" then
+			local m = minetest.get_meta(pos)
+
+			if not pressed.set then
+				local level = pressed.level or m:get_int("level")
+				local chance = pressed.chance or m:get_int("chance")
+
+				m:set_int("level",level)
+				m:set_int("chance",chance)
+				m:get_inventory():set_size("main", 32)
+				m:get_inventory():set_size("setchest", 1)
+				m:set_string("infotext","Setup")
+				m:set_string("formspec",
+					"size[8,9]listcolors[#77777777;#777777aa;#000000ff]"
+					.. "list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";setchest;0,0;1,1;]"
+					.. "dropdown[1,0;1,1;level;1,2,3;"..level.."]"
+					.. "dropdown[2,0;1,1;chance;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32;"..chance.."]"
+					.. "button_exit[3,0;2,1;set;Set]"
+					.. "list[current_player;main;0,5;8,4;]"
+					.. "list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,1;8,4;]"
+					.. "tooltip[level;Treasure level]"
+					.. "tooltip[set;Ready for spawning on next load]"
+					.. "tooltip[0,0;1,1;Chest to place]"
+					.. "tooltip[chance;Chance to spawn items]"
+					.. "tooltip[1,5;8,4;Items to set or leave empty for random items]"
+					.. "listring[current_player;main]"
+					.. "listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+				)
+			else
+				local n = minetest.get_node(pos)
+				local item = m:get_inventory():get_stack("setchest",1)
+				local level = m:get_int("level")
+				local chance = m:get_int("chance")
+				local items = ""
+
+				if not m:get_inventory():is_empty("main") then
+					for i,v in ipairs(m:get_inventory():get_list("main")) do
+						items = items .. v:get_name() .. ","
+					end
+				end
+
+				minetest.set_node(pos, n)
+				minetest.after(0.1,function()
+					local m = minetest.get_meta(pos)
+					m:set_string("formspec","")
+					m:set_int("set",1)
+					m:set_int("level",level)
+					m:set_int("chance",chance)
+					m:set_string("item",item:get_name())
+					m:set_string("items",items)
+				end)
+			end
+		end
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		return minetest.registered_nodes[stack:get_name()] and 1 or 0
+	end,
+	on_load = function(pos)
+		local m = minetest.get_meta(pos)
+		local item = m:get_string("item")
+		local items = m:get_string("items")
+		local level = m:get_int("level")
+		local chance = m:get_int("chance")
+		local node = minetest.get_node(pos)
+		if m:get_int("set") == 1 then
+			node.name = item
+			default.treasure({
+				pos = pos,
+				node = item ~= "" and minetest.registered_nodes[item] and node or nil,
+				level = level,
+				chance = chance,
+				items = items ~= "" and items:split(",") or nil
+			})
+			local node2 = minetest.get_node(pos)
+			node2.param2 = node.param2
+			minetest.after(0,function()
+				minetest.swap_node(pos, node2)
+			end)
+
+		end
+	end
+})
