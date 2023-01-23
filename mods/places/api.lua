@@ -1,7 +1,7 @@
 places = {
 	buildings = {
 		["cloud castle"]={
-			chance=100,sx=112,sy=16,miny=200,maxy=300,spawn_at={"air"},
+			chance=200,sx=112,sy=16,miny=200,maxy=300,spawn_at={"air"},
 			on_spawn=function(pos)
 				minetest.place_schematic(pos,minetest.get_modpath("places").."/schematics/places_cloudcastle.mts","random",nil,true,"place_center_x,place_center_z")
 				local nodes = minetest.find_nodes_in_area(vector.subtract(pos,50),vector.add(pos,50),"examobs:cloud_chest")
@@ -70,7 +70,7 @@ places = {
 			end
 		},
 		["stairs to sky"]={
-			chance=50,sx=10,sy=250,miny=-20,maxy=70,spawn_at={"default:dirt"},
+			chance=100,sx=10,sy=250,miny=-20,maxy=70,spawn_at={"default:dirt"},
 			on_spawn=function(pos)
 				local p2
 				for y=0,5 do
@@ -153,6 +153,29 @@ places = {
 				end
 			end
 		},
+		["space sender"]={
+			chance=50,sx=53,sy=57,miny=-20,maxy=70,spawn_at={"default:dirt_with_snow","default:snow"},
+			on_spawn=function(pos)
+				local r = 11
+				for y=-11,50,1 do
+				for x=-26,26,1 do
+				for z=-26,26,1 do
+					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+					local c = vector.length(vector.new({x=x,y=0,z=z}))/r
+					if c <= 1 then
+						minetest.remove_node(p)
+					end
+				end
+				end
+					if y == 0 then
+						r = 26
+					end
+				end
+
+				nodeextractor.set(apos(pos,-26,-11,-26),minetest.get_modpath("places").."/nodeextractor/places_space_sender1.exexn")
+				nodeextractor.set(apos(pos,-26,12,-26),minetest.get_modpath("places").."/nodeextractor/places_space_sender2.exexn")
+			end
+		}
 	},
 }
 
@@ -195,7 +218,7 @@ minetest.register_tool("places:spawn", {
 	groups={not_in_creative_inventory=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
-		--places.buildings["lava castle"].on_spawn(vector.round(pos))
+		--places.buildings["places_space_sender"].on_spawn(vector.round(pos))
 		places.city(pos)
 	end,
 	on_place=function(itemstack, user, pointed_thing)
