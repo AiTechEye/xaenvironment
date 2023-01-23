@@ -1,5 +1,7 @@
 11.2
 
++ place: tropic tower
++ place: space sender
 + npc buys from shops
 + npc takes from chests/inventories
 + npc is looking for nodes & digs
