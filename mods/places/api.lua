@@ -175,8 +175,37 @@ places = {
 				nodeextractor.set(apos(pos,-26,-11,-26),minetest.get_modpath("places").."/nodeextractor/places_space_sender1.exexn")
 				nodeextractor.set(apos(pos,-26,12,-26),minetest.get_modpath("places").."/nodeextractor/places_space_sender2.exexn")
 			end
-		}
-	},
+		},
+		["tropic tower"]={
+			chance=50,sx=20,sy=50,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
+			on_spawn=function(pos)
+				local r = 9
+				for y=-50,50,1 do
+				for x=-11,11,1 do
+				for z=-11,11,1 do
+					local p = {x=pos.x+x,y=pos.y+y,z=pos.z+z}
+					local c = vector.length(vector.new({x=x,y=0,z=z}))/r
+					if c <= 1 then
+
+						if y == -50 or y <= 0 and c >= 0.85 then
+							minetest.set_node(p,{name=math.random(1,5) == 1 and "default:mossycobble" or "default:cobble"})
+						elseif y <= -40 then
+							minetest.set_node(p,{name="default:water_source"})
+						else
+							minetest.remove_node(p)
+						end
+					end
+				end
+				end
+					if y == -1 then
+						r = 11
+					end
+				end
+
+				nodeextractor.set(apos(pos,-10,0,-10),minetest.get_modpath("places").."/nodeextractor/places_tropic_tower.exexn")
+			end
+		},
+	}
 }
 
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -218,8 +247,8 @@ minetest.register_tool("places:spawn", {
 	groups={not_in_creative_inventory=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
-		--places.buildings["places_space_sender"].on_spawn(vector.round(pos))
-		places.city(pos)
+		places.buildings["tropic tower"].on_spawn(vector.round(pos))
+		--places.city(pos)
 	end,
 	on_place=function(itemstack, user, pointed_thing)
 	end
