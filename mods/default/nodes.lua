@@ -231,9 +231,9 @@ minetest.register_node("default:vacuum", {
 	on_update = function(pos)
 		minetest.get_node_timer(pos):start(0.1)
 	end,
-	on_timer = function (pos, elapsed)
+	on_timer = function(pos, elapsed)
 		local ne = minetest.find_node_near(pos,1.5,"air")
-		if ne then
+		if ne and pos.y >= 2000 then
 			minetest.add_node(ne,{name="default:vacuum"})
 			default.def("default:vacuum").on_update(ne)
 			return true
