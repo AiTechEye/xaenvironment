@@ -1,4 +1,19 @@
 minetest.register_craft({
+	output = "exatec:metal_block_tube",
+	recipe = {{"default:iron_ingot","default:iron_ingot",""},
+		{"exatec:tube","default:iron_ingot",""},
+	}
+})
+
+minetest.register_craft({
+	output="exatec:wire_block",
+	recipe={
+		{"exatec:wire","default:xe_crystal",""},
+		{"materials:aluminium_sheet","materials:aluminium_sheet",""},
+	},
+})
+
+minetest.register_craft({
 	output = "exatec:cmdphone",
 	recipe = {{"materials:plastic_sheet","default:glass_tabletop",""},
 		{"default:silver_ingot","materials:diode",""},

@@ -50,6 +50,37 @@ minetest.register_node("exatec:tube", {
 		on_input=function(pos,stack,opos)
 			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
 		end
+	}
+})
+
+minetest.register_node("exatec:wire_block", {
+	description = "Wire block",
+	tiles = {{name="default_ironblock.png^[colorize:#ff07"}},
+	drop="exatec:wire_block",
+	paramtype2="colorwallmounted",
+	palette="default_palette.png",
+	groups = {cracky = 2,exatec_wire=1,store=1000},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos, placer)
+		minetest.set_node(pos,{name="exatec:wire_block",param2=112})
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.swap_node(pos,{name="exatec:wire_block",param2=112})
+	end,
+})
+
+minetest.register_node("exatec:metal_block_tube", {
+	description = "Metal block tube",
+	tiles = {"default_ironblock.png^exatec_hole.png"},
+	groups = {cracky=2,exatec_tube=1,store=1000},
+	sounds = default.node_sound_metal_defaults(),
+	exatec={
+		test_input=function(pos,stack,opos)
+			return true
+		end,
+		on_input=function(pos,stack,opos)
+			minetest.add_entity(pos,"exatec:tubeitem"):get_luaentity():new_item(stack,opos)
+		end
 	},
 })
 
@@ -1250,6 +1281,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 			local i = m:get_int("toggleable") == 1 and 0 or 1
 			local a = m:get_int("auto")
 			m:set_int("toggleable",i)
+			m:set_int("on",1)
 			m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable, auto: "..(a == 1 and "On" or "Off"))
 		end
 	end,
@@ -1258,6 +1290,7 @@ minetest.register_node("exatec:wire_gate_toggleable", {
 		local a = m:get_int("auto") == 1 and 0 or 1
 		local i = m:get_int("toggleable")
 		m:set_int("auto",a)
+		m:set_int("on",1)
 		m:set_string("infotext","On, "..(i == 0 and "not " or "") .. "toggleable, auto: "..(a == 1 and "On" or "Off"))
 	end,
 	on_construct=function(pos)
