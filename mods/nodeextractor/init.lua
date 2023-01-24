@@ -58,6 +58,16 @@ nodeextractor.create=function(pos1,pos2,filename)
 		end
 
 		if m1.node.name ~= "air" or m1.fields or m1.timer then
+			m1.n = table.copy(m1.node)
+			m1.n.n = m1.node.name
+			m1.n.p1 = m1.node.param1
+			m1.n.p2 = m1.node.param2
+
+			m1.node = nil
+			m1.n.name = nil
+			m1.n.param1 = nil
+			m1.n.param2 = nil
+
 			m[x..","..y..","..z] = m1
 		end
 
@@ -66,7 +76,7 @@ nodeextractor.create=function(pos1,pos2,filename)
 	end
 	local s = vector.new((pos2.x-pos1.x)+1,(pos2.y-pos1.y)+1,(pos2.z-pos1.z)+1)
 	minetest.log("size: "..minetest.pos_to_string(s))
-	return minetest.serialize({nodes=m,size=s})
+	return minetest.serialize({nodes=m,size=s,version=1})
 end
 
 nodeextractor.mirror_param2=function(node,m)
@@ -158,6 +168,16 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 			data[area:index(x,y,z)] = air
 		end
 		end
+		end
+	end
+
+	if (dat.version or 0) > 0 then 
+		for i,v in pairs(dat.nodes) do
+			v.node = table.copy(v.n)
+			v.node.name = v.n.n
+			v.node.param1 = v.n.p1
+			v.node.param2 = v.n.p2
+			v.n = nil
 		end
 	end
 
