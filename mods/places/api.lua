@@ -206,12 +206,18 @@ places = {
 			end
 		},
 		["bomb factory"]={
-			chance=100,sx=40,sy=20,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
+			chance=100,sx=40,sy=16,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
 			on_spawn=function(pos)
-				for y=-10,-1 do
+				for y=-10,16 do
 				for x=-20,19 do
 				for z=-20,19 do
-					minetest.set_node({x=pos.x+x,y=pos.y+y,z=pos.z+z},{name="default:stone"})
+					local p = vector.new(pos.x+x,pos.y+y,pos.z+z)
+					local n = minetest.get_node(p).name
+					if y < 0 then
+						minetest.set_node(p,{name="default:stone"})
+					elseif minetest.get_item_group(n,"stone") + minetest.get_item_group(n,"dirt") > 0 then
+						minetest.remove_node(p)
+					end
 				end
 				end
 				end
