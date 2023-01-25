@@ -177,7 +177,7 @@ places = {
 			end
 		},
 		["tropic tower"]={
-			chance=50,sx=20,sy=50,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
+			chance=100,sx=20,sy=50,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
 			on_spawn=function(pos)
 				local r = 9
 				for y=-50,50,1 do
@@ -203,6 +203,19 @@ places = {
 				end
 
 				nodeextractor.set(apos(pos,-10,0,-10),minetest.get_modpath("places").."/nodeextractor/places_tropic_tower.exexn")
+			end
+		},
+		["bomb factory"]={
+			chance=100,sx=40,sy=20,miny=-20,maxy=70,spawn_at={"default:dirt_with_grass"},
+			on_spawn=function(pos)
+				for y=-10,-1 do
+				for x=-20,19 do
+				for z=-20,19 do
+					minetest.set_node({x=pos.x+x,y=pos.y+y,z=pos.z+z},{name="default:stone"})
+				end
+				end
+				end
+				nodeextractor.set(apos(pos,-20,0,-20),minetest.get_modpath("places").."/nodeextractor/places_bomb_factory.exexn")
 			end
 		},
 	}
@@ -247,7 +260,7 @@ minetest.register_tool("places:spawn", {
 	groups={not_in_creative_inventory=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
-		places.buildings["tropic tower"].on_spawn(vector.round(pos))
+		places.buildings["bomb factory"].on_spawn(vector.round(pos))
 		--places.city(pos)
 	end,
 	on_place=function(itemstack, user, pointed_thing)
