@@ -3,6 +3,7 @@
 fixed: prevent vacuum from spreading less then y=2000
 + tech: metal block tube
 + tech: wire block
++ place: bomb factory
 + place: tropic tower
 + place: space sender
 + npc buys from shops
