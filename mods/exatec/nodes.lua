@@ -2769,3 +2769,49 @@ minetest.register_node("exatec:burner", {
 		return true
 	end
 })
+
+minetest.register_node("exatec:radioactivity_meter", {
+	description = "Radioactivity meter",
+	tiles = {
+		"default_ironblock.png^default_radioactivity.png^default_chest_top.png",
+		"default_ironblock.png",
+		"default_ironblock.png^exatec_wire.png"},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=150},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name()) == false then
+			local meta = minetest.get_meta(pos)
+			local rad = meta:get_int("rad") + 10
+			rad = rad <= 1000 and rad or 0
+			meta:set_int("rad",rad)
+			meta:set_string("infotext","Radioactivity meter (Rad " .. meta:get_string("type") .. " " .. rad ..")")
+		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name()) == false then
+			local meta = minetest.get_meta(pos)
+			local typ = meta:get_string("type") == ">" and "<" or ">"
+			meta:set_string("type",typ)
+			meta:set_string("infotext","Radioactivity meter (Rad " .. typ .. " " .. meta:get_int("rad") ..")")
+		end
+	end,
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(2)
+		minetest.get_meta(pos):set_string("type",">")
+	end,
+	on_timer = function(pos, elapsed)
+		local meta = minetest.get_meta(pos)
+		local range = meta:get_int("rad")
+		local typ = meta:get_string("type")
+		local rad = default.get_radioactivity(pos)
+		meta:set_string("infotext","Radioactivity meter (" .. rad .. " " .. typ .." " .. meta:get_int("rad") ..")")
+		if (typ == ">" and rad > range ) or (typ == "<" and rad < range) then
+			exatec.send(pos)
+		end
+		return true
+	end
+})
