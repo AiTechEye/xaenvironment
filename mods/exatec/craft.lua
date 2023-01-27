@@ -6,6 +6,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:radioactivity_meter",
+	recipe={
+		{"default:copper_ingot","exatec:pcb","exatec:wire"},
+		{"materials:aluminium_sheet","default:xe_crystal","materials:aluminium_sheet"},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:wire_block",
 	recipe={
 		{"exatec:wire","default:xe_crystal",""},
