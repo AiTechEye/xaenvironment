@@ -17,13 +17,6 @@ toxic = {
 	}
 }
 
-minetest.register_craft({
-	output="default:uraniumactive_ingot",
-	recipe={
-		{"toxic:barrel"},
-	},
-})
-
 default.register_fence({
 	name = "chain",
 	texture = "examobs_barbed_wire.png",
@@ -111,21 +104,60 @@ minetest.register_node("toxic:barrel", {
 	drop = "toxic:barrel",
 	wield_scale = {x=1, y=1, z=1},
 	use_texture_alpha = "clip",
-selection_box = {
+	selection_box = {
 		type = "fixed",
 		fixed = {-0.4, -0.5, -0.4, 0.4,  0.9, 0.4}
 	},
-collision_box = {
+	collision_box = {
 		type = "fixed",
 		fixed = {{-0.4, -0.5, -0.4, 0.4,  0.9, 0.4},}},
 	tiles = {"toxic_barrel1.png"},
-	groups = {barrel=1,cracky = 1, level = 2}, --, not_in_creative_inventory=0
+	groups = {barrel=1,cracky = 1, level = 2},
 	sounds = toxic.node_sound_plate(),
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
-	--on_punch = function(pos, node, puncher, pointed_thing)
-	--end,
+	liquids_pointable = true,
+	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" and itemstack:get_count() == 1
+		and minetest.get_node(pointed_thing.under).name == "toxic:radioactive_waste_source"
+		and not minetest.is_protected(pointed_thing.under,user:get_player_name())	then
+			minetest.set_node(pointed_thing.under,{name="air"})
+			user:set_wielded_item("toxic:barrel_full")
+		end
+	end
+})
+
+minetest.register_node("toxic:barrel_full", {
+	stack_max = 1,
+	description = "Toxic barrel (full)",
+	drawtype = "mesh",
+	mesh = "toxic_barrel.obj",
+	drop = "toxic:barrel",
+	wield_scale = {x=1, y=1, z=1},
+	use_texture_alpha = "clip",
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.4, -0.5, -0.4, 0.4,  0.9, 0.4}
+	},
+	collision_box = {
+		type = "fixed",
+		fixed = {{-0.4, -0.5, -0.4, 0.4,  0.9, 0.4},}},
+	tiles = {"toxic_barrel1.png"},
+	groups = {barrel=1,cracky = 1, level = 2},
+	sounds = toxic.node_sound_plate(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	liquids_pointable = true,
+	on_use=function(itemstack, user, pointed_thing)
+		if pointed_thing.type == "node" and itemstack:get_count() == 1
+		and default.defpos(pointed_thing.above,"buildable_to")
+		and not minetest.is_protected(pointed_thing.above,user:get_player_name())	then
+			minetest.set_node(pointed_thing.above,{name="toxic:radioactive_waste_source"})
+			user:set_wielded_item("toxic:barrel")
+		end
+	end
 })
 
 default.register_tree({
@@ -176,7 +208,6 @@ minetest.register_node("toxic:snowblock_thin", {
 minetest.register_node("toxic:water_source", {
 	description = "Toxic water Source",
 	drawtype = "liquid",
-	tiles = {name = "default_water.png^[colorize:#7c7750cc",},
 	tiles = {
 		{
 		name = "default_water.png^[colorize:#7c7750cc",
@@ -210,16 +241,15 @@ minetest.register_node("toxic:water_source", {
 minetest.register_node("toxic:water_flowing", {
 	description = "Toxic flowing Water",
 	drawtype = "flowingliquid",
-	tiles = {"default_water.png^[colorize:#7c7750cc"},
 	special_tiles = {
-		{
+	{
 		name = "default_water_animated.png^[colorize:#7c7750cc",
 		backface_culling = false,
 		animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
-		},{
+	},{
 		name = "default_water_animated.png^[colorize:#7c7750cc",
 		backface_culling = true,animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
-		},},
+	},},
 	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
@@ -238,6 +268,78 @@ minetest.register_node("toxic:water_flowing", {
 	sounds = default.node_sound_water_defaults(),
 	post_effect_color = {a = 220, r = 150, g = 150, b = 90},
 	groups = {liquid = 3, puts_out_fire = 1,not_in_creative_inventory = 1,toxic_spreading=1},
+})
+
+minetest.register_node("toxic:radioactive_waste_source", {
+	description = "Radioactive Waste Source",
+	drawtype = "liquid",
+	tiles = {
+		{
+		name = "default_water.png^[colorize:#dcfe22cc",
+		animation = {
+			type = "vertical_frames",
+			aspect_w = 16,
+			aspect_h = 16,
+			length = 2.0,
+		},
+	},},
+	use_texture_alpha = "blend",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "toxic:radioactive_waste_flowing",
+	liquid_alternative_source = "toxic:radioactive_waste_source",
+	liquid_viscosity = 3,
+	light_source=14,
+	damage_per_second = 15,
+	post_effect_color = {a = 220, r = 150, g = 150, b = 90},
+	sounds = default.node_sound_water_defaults(),
+	groups = {liquid = 3, puts_out_fire = 1,not_in_creative_inventory=0,toxic_spreading=1,igniter=10,radioactive=20},
+	on_construct = function(pos)
+		default.set_radioactivity(pos,20)
+	end,
+	on_destruct = function(pos)
+		default.remove_radioactivity(pos)
+	end,
+})
+
+minetest.register_node("toxic:radioactive_waste_flowing", {
+	description = "Radioactive flowing Waste",
+	drawtype = "flowingliquid",
+	special_tiles = {
+	{
+		name = "default_water_animated.png^[colorize:#dcfe22cc^default_flowing_animated17.png",
+		backface_culling = false,
+		animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
+	},{
+		name = "default_water_animated.png^[colorize:#dcfe22cc^default_flowing_animated17.png",
+		backface_culling = true,animation = {type = "vertical_frames",aspect_w = 16,aspect_h = 16,length = 0.8,},
+	},},
+	use_texture_alpha = "blend",
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	walkable = false,
+	pointable = false,
+	diggable = false, 
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "toxic:radioactive_waste_flowing",
+	liquid_alternative_source = "toxic:radioactive_waste_source",
+	liquid_viscosity = 3,
+	light_source=14,
+	damage_per_second = 15,
+	sounds = default.node_sound_water_defaults(),
+	post_effect_color = {a = 220, r = 150, g = 150, b = 90},
+	groups = {liquid = 3, puts_out_fire = 1,not_in_creative_inventory = 1,toxic_spreading=1,igniter=10,radioactive=20},
 })
 
 minetest.register_node("toxic:dirt", {
