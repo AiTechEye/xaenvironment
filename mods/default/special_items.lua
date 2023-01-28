@@ -173,7 +173,7 @@ minetest.register_node("default:atom_core", {
 	},
 	drawtype="mesh",
 	mesh = "default_atomcore.obj",
-	groups = {cracky=3,on_load=1,radioactive=50},
+	groups = {cracky=3,on_load=1,radioactive=20},
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
 	paramtype = "light",
@@ -189,7 +189,7 @@ minetest.register_node("default:atom_core", {
 	},
 	on_construct=function(pos)
 		minetest.registered_nodes["default:atom_core"].on_load(pos)
-		default.set_radioactivity(pos,50)
+		default.set_radioactivity(pos,20)
 	end,
 	on_destruct = function(pos)
 		default.remove_radioactivity(pos)
