@@ -868,7 +868,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		m:set_string("infotext", "Nuclear generator (" .. (on and "Active" or "Inactive") .. ")\nHeat: "..heat.."\nPower: "..effect ..(heat > 400 and "\nWarning, too hot!" or ""))
 		default.effect(pos,effect)
 		if heat > 0 then
-			default.set_radioactivity(pos,heat)
+			default.set_radioactivity(pos,heat/100)
 		else
 			default.remove_radioactivity(pos)
 		end
