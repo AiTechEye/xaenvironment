@@ -5,11 +5,12 @@ minetest.register_node("nitroglycerin:timed_bomb", {
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
-		minetest.after(0.1, function(pos)
+		minetest.after(0.01, function(pos)
+			nitroglycerin.explode(pos,{radius=5,set="air"})
 			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
 				ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=250}})
 			end
-		nitroglycerin.explode(pos,{radius=5,set="air"})
+
 		end,pos)
 	end,
 	on_timer=function(pos, elapsed)
@@ -44,8 +45,9 @@ minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
-		minetest.after(0.1, function()
-			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 60)) do
+		minetest.after(0.01, function()
+			nitroglycerin.explode(pos,{radius=25,set="air",drops=0})
+			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 40)) do
 				local pos2 = ob:get_pos()
 				local impact = true
 				if ob:is_player() then
@@ -61,7 +63,6 @@ minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=2000}})
 				end
 			end
-			nitroglycerin.explode(pos,{radius=25,set="air",drops=0})
 		end)
 	end,
 	on_timer=function(pos, elapsed)
