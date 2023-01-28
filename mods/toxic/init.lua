@@ -300,9 +300,9 @@ minetest.register_node("toxic:radioactive_waste_source", {
 	damage_per_second = 15,
 	post_effect_color = {a = 220, r = 150, g = 150, b = 90},
 	sounds = default.node_sound_water_defaults(),
-	groups = {liquid = 3, puts_out_fire = 1,not_in_creative_inventory=0,toxic_spreading=1,igniter=10,radioactive=20},
+	groups = {liquid = 3, puts_out_fire = 1,not_in_creative_inventory=0,toxic_spreading=1,igniter=10,radioactive=40},
 	on_construct = function(pos)
-		default.set_radioactivity(pos,20)
+		default.set_radioactivity(pos,200)
 	end,
 	on_destruct = function(pos)
 		default.remove_radioactivity(pos)
