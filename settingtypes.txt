@@ -2,6 +2,8 @@ xaenvironment_thirst (Thirst) bool true
 
 xaenvironment_hunger (Hunger) bool true
 
+xaenvironment_radiation (Radiation) bool true
+
 xaenvironment_quadruplet_fall_damage (4x Fall Damage) bool true
 
 xaenvironment_itemlosing (Itemlosing / Bones) bool true
