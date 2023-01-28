@@ -101,6 +101,41 @@ default.is_decoration=function(object,item)
 	return en and (en.decoration ~= nil or item and en.name == "__builtin:item")
 end
 
+default.set_radioactivity=function(pos,rad)
+	default.radioactivity[vector.to_string(pos)] = {pos=pos,rad=rad}
+end
+
+default.remove_radioactivity=function(pos)
+	default.radioactivity[vector.to_string(pos)] = nil
+end
+
+default.get_radioactivity=function(pos)
+	local rad = 0
+	for i,v in pairs(default.radioactivity) do
+		local d = vector.distance(v.pos,pos)
+		if d <= v.rad then
+			rad = rad + (v.rad - d)
+		end
+	end
+	return rad
+end
+
+default.ray=function(pos1,pos2,texture)
+	local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+	local y = math.atan(vec.z/vec.x)
+	local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+	local t = texture or "default_cloud.png"
+	if pos1.x >= pos2.x then y = y+math.pi end
+	local ray = minetest.add_entity(pos1, "default:arrow_lightning")
+	ray:set_rotation({x=0,y=y,z=z})
+	ray:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+	ray:set_properties({
+		visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+		textures = {t,t,t,t,t,t},
+		glow = 1
+	})
+end
+
 default.smoke=function(pos,def)
 	if not (pos and pos.x) then
 			return

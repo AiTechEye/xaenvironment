@@ -170,3 +170,12 @@ minetest.register_lbm({
 		end
 	end
 })
+minetest.register_lbm({
+	name="default:radioactive",
+	nodenames={"group:radioactive"},
+	run_at_every_load = true,
+	action=function(pos,node)
+		local r = minetest.get_item_group(node.name,"radioactive")
+		default.set_radioactivity(pos,r)
+	end
+})

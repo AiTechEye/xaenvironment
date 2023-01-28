@@ -47,6 +47,10 @@ minetest.register_node("default:xe"..i, {
 	end,
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(0.5)
+		default.set_radioactivity(pos,15)
+	end,
+	on_destruct = function(pos)
+		default.remove_radioactivity(pos)
 	end,
 })
 ncinv = 1
@@ -77,6 +81,12 @@ minetest.register_node("default:xe_spike", {
 		}
 	},
 	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		default.set_radioactivity(pos,5)
+	end,
+	on_destruct = function(pos)
+		default.remove_radioactivity(pos)
+	end,
 })
 
 minetest.register_node("default:xe_crystal", {
@@ -100,6 +110,13 @@ minetest.register_node("default:xe_crystal", {
 		fixed = {-0.3, -0.5, -0.3, 0.3, 0.5, 0.3}
 	},
 	sounds = default.node_sound_glass_defaults(),
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5)
+		default.set_radioactivity(pos,15)
+	end,
+	on_destruct = function(pos)
+		default.remove_radioactivity(pos)
+	end,
 })
 
 --[[
@@ -171,7 +188,7 @@ minetest.register_node("default:atom_core", {
 	},
 	drawtype="mesh",
 	mesh = "default_atomcore.obj",
-	groups = {cracky=3,on_load=1},
+	groups = {cracky=3,on_load=1,radioactive=50},
 	sounds = default.node_sound_stone_defaults(),
 	sunlight_propagates = true,
 	paramtype = "light",
@@ -187,6 +204,10 @@ minetest.register_node("default:atom_core", {
 	},
 	on_construct=function(pos)
 		minetest.registered_nodes["default:atom_core"].on_load(pos)
+		default.set_radioactivity(pos,50)
+	end,
+	on_destruct = function(pos)
+		default.remove_radioactivity(pos)
 	end,
 	on_load = function(pos)
 		minetest.add_entity(pos,"default:core_orbit")

@@ -331,3 +331,63 @@ minetest.register_entity("default:watersplash_ring",{
 		end
 	end,
 })
+
+minetest.register_entity("default:skeleton",{
+	physical = true,
+	visual="mesh",
+	mesh = "examobs_skeleton.b3d",
+	textures = {"bones_bone3.png","default_air.png"},
+	collisionbox = {-0.35,-1.1,-0.35,0.35,0.8,0.35},
+	decoration=true,
+	static_save = false,
+	from_character=function(self,ob)
+		local p = ob:get_properties()
+		if p.mesh == "character.b3d" then
+			self.object:set_properties({
+				visual_size = p.visual_size
+			})
+			if ob:get_luaentity() then
+				self.object:set_yaw(ob:get_yaw())
+			else
+				self.object:set_yaw(ob:get_look_horizontal())
+			end
+			local pos = self.object:get_pos()
+			self.object:set_pos(apos(pos,0,1))
+		else
+			self.object:remove()
+		end
+	end,
+	on_activate=function(self, staticdata)
+		self.object:set_acceleration({x=0,y=-10,z =0})
+		self.t = 10
+	end,
+	on_step=function(self, dtime)
+		self.t = self.t - dtime
+		if self.t < 0 then
+			self:cruch(self)
+		end
+	end,
+	on_punch=function(self, puncher, time_from_last_punch, tool_capabilities, dir)
+		self:cruch(self)
+	end,
+	cruch=function(self)
+		local pos = self.object:get_pos()
+		minetest.add_particlespawner({
+			amount = 40,
+			time = 0.1,
+			minpos = vector.add(pos,0.5,1,0.5),
+			maxpos = vector.subtract(pos,0.5,1,0.5),
+			minvel = {x=-5, y=0, z=-5},
+			maxvel = {x=5, y=5, z=5},
+			minacc = {x=0, y=-10, z=0},
+			maxacc = {x=0, y=-10, z=0},
+			minexptime = 2,
+			maxexptime = 1,
+			minsize = 1,
+			maxsize = 5,
+			texture = "bones_bone.png",
+			collisiondetection = true,
+		})
+		self.object:remove()
+	end
+})

@@ -273,6 +273,14 @@ minetest.register_craft({
 -- ======================= Nodes
 --||||||||||||||||
 
+minetest.register_craft({
+	output="default:atom_core",
+	recipe={
+		{"default:xe_crystal","default:xe_crystal","default:xe_crystal"},
+		{"default:xe_crystal","default:quantumblock","default:xe_crystal"},
+		{"default:xe_crystal","default:xe_crystal","default:xe_crystal"}
+	}
+})
 
 minetest.register_craft({
 	output="default:xe_crystal 3",

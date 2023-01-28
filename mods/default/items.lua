@@ -297,6 +297,63 @@ minetest.register_tool("default:cudgel", {
 	sound=default.tool_breaks_defaults()
 })
 
+minetest.register_tool("default:radioactivity_meter", {
+	description = "Radioactivity meter",
+	inventory_image = "default_radioactivity_meter.png",
+	on_just_selected=function(itemstack, user)
+		local name = user:get_player_name()
+		player_style.players[name].radioactivity_meter = {
+			time = -1,
+			image = user:hud_add({
+				hud_elem_type="image",
+				scale = {x=3,y=3},
+				position={x=1,y=0},
+				text="default_radioactivity.png",
+				offset={x=-45,y=45},
+			}),
+			text = user:hud_add({
+				hud_elem_type="image",
+				scale = {x=3,y=3},
+				position={x=1,y=0},
+				text="",
+				offset={x=-150,y=80},
+			})
+		}
+	end,
+	on_previous=function(itemstack, user)
+		local name = user:get_player_name()
+		local p = player_style.players[name].radioactivity_meter
+		if p then
+			user:hud_remove(p.image)
+			user:hud_remove(p.text)
+			player_style.players[name].radioactivity_meter = nil
+		end
+	end,
+	on_step=function(itemstack, user, dtime)
+		local name = user:get_player_name()
+		local p = player_style.players[name].radioactivity_meter
+		if p then
+			p.time = p.time - dtime
+			if p.time < 0 then
+				p.time = 0.5
+				local n = default.get_radioactivity(user:get_pos())
+				user:hud_change(p.text, "text","[combine:32x32:default_air.png^" .. sign.to_texture({s=tostring(math.floor(n*10)/10),size=1000}) .. "^[colorize:#0f0")
+				if n > 0 then
+					local a = n < 100 and (n*0.1) or 10
+					local pos = user:get_pos()
+					local t = 0
+					for i=1,math.floor(a) do
+						minetest.after(t,function()
+							minetest.sound_play("default_radioactivity_meter", {pos=pos})
+						end)
+						t = t + 1/a
+					end
+				end
+			end
+		end
+	end
+})
+
 minetest.register_craftitem("default:paper", {
 	description = "Paper",
 	inventory_image = "default_paper.png",

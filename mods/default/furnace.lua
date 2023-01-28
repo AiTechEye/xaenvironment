@@ -664,6 +664,209 @@ minetest.register_node("default:steam_powered_generator", {
 	end
 })
 
+minetest.register_node("default:nuclear_powered_reactor", {
+	description = "Nuclear powered reactor (Fuel power)",
+	tiles = {
+		"default_silverblock.png^default_glass.png^default_chest_top.png",
+		"default_silverblock.png^default_glass.png^default_chest_top.png",
+		"default_silverblock.png^default_glass.png^default_chest_top.png^exatec_wirecon.png",
+	},
+	drop = "default:nuclear_powered_reactor",
+	sounds = default.node_sound_metal_defaults(),
+	groups = {cracky=1,level=2,exatec_tube_connected=1,tech_connect=1,exatec_tube=1,exatec_wire_connected=1,store=5000},
+	paramtype2 = "color4dir",
+	palette="default_palette64x.png",
+	color=function(pos,e)
+		local m = minetest.get_meta(pos)
+		local color = 0
+		local heat = {57,50,47,43,40,37,35,32,28,24,20,15,11,8,5,1,0}
+		for i,v in ipairs({56,44,52,53,54,34,33,32,19,18,17,16,8,9,10,11,0}) do
+			if e >= heat[i] then
+				color = v*4
+				break
+			end
+		end
+		minetest.swap_node(pos,{name="default:nuclear_powered_reactor",param2=m:get_int("param2")+color})
+	end,
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:get_inventory():set_size("main", 1)
+		m:set_string("infotext", "Nuclear generator (Inactive)")
+		m:set_int("param2", minetest.get_node(pos).param2)
+		minetest.registered_nodes["default:nuclear_powered_reactor"].update_formspec(pos)
+	end,
+	update_formspec=function(pos)
+		local m = minetest.get_meta(pos)
+		local p = m:get_int("usage") / 10000
+
+		m:set_string("formspec",
+			"size[8,6]"
+			.."listcolors[#77777777;#777777aa;#000000ff]"
+			.."item_image[0,0;1,1;default:atom_core]"
+			.."list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main;0,0;8,4;]"
+			.."list[current_player;main;0,2;8,4;]"
+			.."listring[current_player;main]"
+			.."listring[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z  .. ";main]"
+			.."box[1,0;7,0.9;#000f]"
+			.."box[1,0;"..(p * 7)..",0.9;#0f0f]"
+			.."label[3.5,0.25;"..(p * 100).."%]"
+		)
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		local m = minetest.get_meta(pos)
+		return m:get_inventory():is_empty("main") and stack:get_name() == "default:atom_core" and 1 or 0
+	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		if minetest.get_meta(pos):get_int("usage") <= 0 then
+			minetest.get_node_timer(pos):stop()
+			return 1
+		end
+		return 0
+	end,
+	--on_metadata_inventory_put=function(pos)
+	--	local t = minetest.get_node_timer(pos)
+	--	if not t:is_started() then
+	--		t:start(1)
+	--	end
+	--end,
+	exatec = {
+		input_list="main",
+		test_input=function(pos,stack,opos,cpos)
+			local inv = minetest.get_meta(pos):get_inventory()
+			return inv:is_empty("main") and stack:get_name() == "default:atom_core"
+		end,
+		on_wire = function(pos)
+			local t = minetest.get_node_timer(pos)
+			local m = minetest.get_meta(pos)
+			local e = m:get_int("on")
+			if m:get_inventory():is_empty("main") then
+				m:set_int("on",0)
+				m:set_string("infotext", "Nuclear generator (Inactive)")
+				t:stop()
+				return
+			elseif not t:is_started() then
+				if m:get_int("usage") == 0 then
+					m:set_int("usage",10000)
+				end
+				t:start(1)
+			end
+			m:set_int("on",e == 1 and 0 or 1)
+		end
+	},
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_inventory():is_empty("main")
+	end,
+	on_blast=function(pos)
+		minetest.remove_node(pos)
+		minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
+	end,
+	on_timer = function (pos, elapsed)
+		local m = minetest.get_meta(pos)
+		local inv = m:get_inventory()
+		local heat = m:get_int("heat")
+		local on = m:get_int("on") == 1
+		local u = m:get_int("usage")
+
+		if on and u > 0 then
+			m:set_int("usage",m:get_int("usage")-1)
+			minetest.registered_nodes["default:nuclear_powered_reactor"].update_formspec(pos)
+		elseif on then
+			on = false
+			m:set_int("on",0)
+		end
+
+		for i=0,heat*0.1 do
+			minetest.after(i*0.02,function()
+				local x = math.random(-50,50)
+				local y = math.random(-50,50)
+				local z = math.random(-50,50)
+				local rpos = vector.add(pos,vector.new(x,y,z))
+				local cracky = 6
+				local level = {3,2,1}
+				for v in minetest.raycast(pos,rpos) do
+					if v and v.type == "node" then
+						local c = minetest.get_item_group(minetest.get_node(v.under).name,"cracky")
+						cracky = cracky - (level[c] or 1)
+						if cracky <= 0 then
+							rpos = v.under
+							break
+						end
+					elseif v and v.type == "object" then
+						local en = v.ref:get_luaentity()
+						local pos = v.ref:get_pos()
+						local hp = examobs.gethp(v.ref)
+		
+						if v.ref:is_player() and hp <= 10 then
+							local s = minetest.add_entity(pos,"default:skeleton")
+							s:get_luaentity():from_character(v.ref)
+							v.ref:respawn()
+						elseif en and en.examob and en.type == "npc" and hp <= 10 then
+							local s = minetest.add_entity(pos,"default:skeleton")
+							s:get_luaentity():from_character(v.ref)
+							v.ref:remove()
+						elseif not (en and en.decoration) then
+							default.punch(v.ref,v.ref,10)
+						end
+					end
+				end
+				default.ray(pos,rpos,"default_xe.png")
+			end)
+		end
+
+
+		heat = heat + (on and 10 or -10)
+		m:set_int("heat",heat)
+		local effect = math.ceil(heat*0.1)
+		minetest.registered_nodes["default:nuclear_powered_reactor"].color(pos,effect)
+
+		if heat > 400 then
+			local x = math.random(-6,6)
+			local y = math.random(0,6)
+			local z = math.random(-6,6)
+			local rpos = vector.add(pos,vector.new(x*0.1,y*0.1,z*0.1))
+
+			if heat > 500 then
+				local rpos2 = vector.add(pos,vector.new(x*0.5,y*0.5,z*0.5))
+				if default.defpos(rpos2,"buildable_to") then
+					minetest.set_node(rpos2,{name="fire:basic_flame"})
+				end
+			end
+
+			if heat > 600 then
+				for _, player in pairs(minetest.get_connected_players()) do
+					if vector.distance(player:get_pos(),pos) <= 100 then
+						player_style.set_lighting(player,{exposure="respawn"})
+					end
+				end
+				minetest.remove_node(pos)
+				minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
+				return
+			elseif heat > 510 then
+				heat = heat * 20
+				default.smoke(rpos,{minsize=10,maxsize=15})
+			elseif heat > 450 then
+				heat = heat * 10
+				default.smoke(rpos)
+			elseif heat > 430 then
+				heat = heat * 5
+				default.smoke(rpos,{item=true})
+			elseif heat > 400 then
+				heat = heat * 2
+				default.smoke(rpos,{torch=true})
+			end
+		end
+		effect = effect * 10
+		m:set_string("infotext", "Nuclear generator (" .. (on and "Active" or "Inactive") .. ")\nHeat: "..heat.."\nPower: "..effect ..(heat > 400 and "\nWarning, too hot!" or ""))
+		default.effect(pos,effect)
+		if heat > 0 then
+			default.set_radioactivity(pos,heat*10)
+		else
+			default.remove_radioactivity(pos)
+		end
+		return heat > 0
+	end
+})
+
 minetest.register_node("default:wire", {
 	description = "Power Wire",
 	tiles = {{name="default_cloud.png"}},
