@@ -98,7 +98,7 @@ toxic.node_sound_plate=function(a)
 end
 
 minetest.register_node("toxic:barrel", {
-	description = "Toxic barrel",
+	description = "Toxic barrel (use to pick up radioactive waste)",
 	drawtype = "mesh",
 	mesh = "toxic_barrel.obj",
 	drop = "toxic:barrel",
@@ -130,7 +130,7 @@ minetest.register_node("toxic:barrel", {
 
 minetest.register_node("toxic:barrel_full", {
 	stack_max = 1,
-	description = "Toxic barrel (full)",
+	description = "Toxic barrel (full, use to place radioactive waste)",
 	drawtype = "mesh",
 	mesh = "toxic_barrel.obj",
 	drop = "toxic:barrel",
