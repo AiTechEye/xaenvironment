@@ -2782,35 +2782,52 @@ minetest.register_node("exatec:radioactivity_meter", {
 	sunlight_propagates = true,
 	drawtype="nodebox",
 	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
-	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name()) == false then
-			local meta = minetest.get_meta(pos)
-			local rad = meta:get_int("rad") + 10
-			rad = rad <= 1000 and rad or 0
-			meta:set_int("rad",rad)
-			meta:set_string("infotext","Radioactivity meter (Rad " .. meta:get_string("type") .. " " .. rad ..")")
-		end
-	end,
-	on_punch = function(pos, node, player, itemstack, pointed_thing)
-		if minetest.is_protected(pos, player:get_player_name()) == false then
-			local meta = minetest.get_meta(pos)
-			local typ = meta:get_string("type") == ">" and "<" or ">"
-			meta:set_string("type",typ)
-			meta:set_string("infotext","Radioactivity meter (Rad " .. typ .. " " .. meta:get_int("rad") ..")")
-		end
-	end,
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(2)
-		minetest.get_meta(pos):set_string("type",">")
+		local m = minetest.get_meta(pos)
+		m:set_int("typen",1)
+		m:set_int("once", 1)
+		m:set_string("formspec","size[2,1]button_exit[0,0;2,1;save;Setup]")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if minetest.is_protected(pos, sender:get_player_name()) == false then
+			local m = minetest.get_meta(pos)
+			local t = pressed.type == "rad >" and 1 or pressed.type == "rad <" and 2 or pressed.type == "rad =" and 3 or m:get_int("typen")
+			local r = pressed.rad or m:get_int("rad")
+			local o = pressed.once == "once" and 1 or pressed.once == "constant" and 2 or m:get_int("once")
+			local op = {">","<","="}
+
+			m:set_int("once", o)
+			m:set_int("rad", tonumber(r))
+			m:set_int("typen", t)
+			m:set_string("type", op[t])
+
+			m:set_string("formspec",
+				"size[5,0.7]"
+				.."bgcolor[#ffd800]"
+				.."dropdown[-0.3,0;1.5,1;type;rad >,rad <,rad =;"..t.."]"
+				.."field[1.45,0.25;1.5,1;rad;;"..r.."]"
+				.."dropdown[2.5,0;1.5,1;once;once,constant;"..o.."]"
+				.."button_exit[3.9,-0.05;1.4,1;update;Update]"
+				.."tooltip[once;Send signal once or constant]"
+				.."tooltip[rad;Radioactivity range]"
+			)
+			minetest.get_node_timer(pos):start(1)
+		end
 	end,
 	on_timer = function(pos, elapsed)
-		local meta = minetest.get_meta(pos)
-		local range = meta:get_int("rad")
-		local typ = meta:get_string("type")
-		local rad = default.get_radioactivity(pos)
-		meta:set_string("infotext","Radioactivity meter (" .. rad .. " " .. typ .." " .. meta:get_int("rad") ..")")
-		if (typ == ">" and rad > range ) or (typ == "<" and rad < range) then
-			exatec.send(pos)
+		local m = minetest.get_meta(pos)
+		local typn = m:get_int("typen")
+		local range = m:get_int("rad")
+		local rad = math.floor(default.get_radioactivity(pos))
+		local k = {rad > range,rad < range,rad == range,}
+		m:set_string("infotext","Radioactivity meter (" .. rad .. " " .. m:get_string("type") .." " .. range ..")")
+		if k[typn] == true then
+			if m:get_int("once") == 2 or m:get_int("sent") == 0 then
+				m:set_int("sent", 1)
+				exatec.send(pos)
+			end
+		else
+			m:set_int("sent", 0)
 		end
 		return true
 	end
