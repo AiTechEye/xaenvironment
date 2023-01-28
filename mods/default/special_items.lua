@@ -119,21 +119,6 @@ minetest.register_node("default:xe_crystal", {
 	end,
 })
 
---[[
-not yet
-
-minetest.register_ore({
-	ore_type = "blob",
-	ore="default:xe1",
-	wherein= "default:stone",
-	clust_scarcity = 20 * 20 * 20,
-	clust_size = 2,
-	y_min= -31000,
-	y_max= -100,
-	noise_params = default.ore_noise_params()
-})
-]]
-
 -- atom core ============
 
 minetest.register_node("default:core_orbit", {

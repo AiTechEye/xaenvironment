@@ -8,6 +8,15 @@ minetest.register_craft({
 --||||||||||||||||
 
 minetest.register_craft({
+	output="default:radioactivity_meter",
+	recipe={
+		{"exatec:pcb","materials:plastic_sheet",""},
+		{"default:xe_crystal","materials:aluminium_sheet",""},
+		{"default:copper_ingot","default:ironstick",""},
+	},
+})
+
+minetest.register_craft({
 	output="default:knuckles",
 	recipe={
 		{"default:steel_ingot","default:steel_ingot",""},
@@ -59,7 +68,6 @@ minetest.register_craft({
 --||||||||||||||||
 -- ======================= Node-tools
 --||||||||||||||||
-
 
 minetest.register_craft({
 	output="default:sign 3",
@@ -182,6 +190,15 @@ minetest.register_craft({
 		{"default:steel_ingot","default:wire","materials:fanblade_metal"},
 		{"default:steel_ingot","materials:gear_metal","materials:tube_metal"},
 	}
+})
+
+minetest.register_craft({
+	output="default:nuclear_powered_reactor",
+	recipe={
+		{"default:steelblock","materials:diode","default:xe_crystal"},
+		{"materials:gear_metal","materials:tube_metal","default:copper_ingot"},
+		{"default:electric_lump","default:wire","default:uraniumactive_ingot"},
+	},
 })
 
 minetest.register_craft({

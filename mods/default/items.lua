@@ -1538,6 +1538,7 @@ default.registry_mineral({
 	name="uranium",
 	texture="default_uraniumblock.png",
 	lump={groups={treasure=2}},
+	block={groups={radioactive=5}},
 	ore_settings={
 		clust_scarcity= 10 * 10 * 10,
 		clust_num_ores=7,
@@ -1565,6 +1566,7 @@ default.registry_mineral({
 	name="uraniumactive",
 	armchair = "default:uraniumactive_ingot",
 	texture="default_uraniumactiveblock.png",
+	block={groups={radioactive=10}},
 	not_lump=true,
 	not_ore=true,
 	not_pick=true,

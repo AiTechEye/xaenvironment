@@ -666,8 +666,9 @@ minetest.register_node("default:steam_powered_generator", {
 
 minetest.register_node("default:nuclear_powered_reactor", {
 	description = "Nuclear powered reactor (Fuel power)",
+	manual_page = "default:nuclear_powered_reactor default:atom_core exatec:radioactivity_meter default:furnace_industrial Is used to heat up the industrial furnace with a lot of power.\nTo use it you have to put in a atom core and activate with technic, eg a button.\nJust be carefull, when it is hot enought it blows up as nuclear reactors usually does and destroys everything around it.\nTo protect your self from the deadly rays, place 'cracky' blocks, eg stone, glass and metal, 1 layer of metal or 3 layers of stone/glass is enough to stop the rays.\nA good security measure is to connect and setup a radioactivity meter to the reactors to disable it when it becomes too hot.",
 	tiles = {
-		"default_silverblock.png^default_glass.png^default_chest_top.png",
+		"default_silverblock.png^default_glass.png^default_radioactivity.png^default_chest_top.png",
 		"default_silverblock.png^default_glass.png^default_chest_top.png",
 		"default_silverblock.png^default_glass.png^default_chest_top.png^exatec_wirecon.png",
 	},
@@ -723,12 +724,6 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		end
 		return 0
 	end,
-	--on_metadata_inventory_put=function(pos)
-	--	local t = minetest.get_node_timer(pos)
-	--	if not t:is_started() then
-	--		t:start(1)
-	--	end
-	--end,
 	exatec = {
 		input_list="main",
 		test_input=function(pos,stack,opos,cpos)
@@ -739,13 +734,13 @@ minetest.register_node("default:nuclear_powered_reactor", {
 			local t = minetest.get_node_timer(pos)
 			local m = minetest.get_meta(pos)
 			local e = m:get_int("on")
-			if m:get_inventory():is_empty("main") then
+			if m:get_inventory():get_stack("main",1):get_name() ~= "default:atom_core" then
 				m:set_int("on",0)
 				m:set_string("infotext", "Nuclear generator (Inactive)")
 				t:stop()
 				return
 			elseif not t:is_started() then
-				if m:get_int("usage") == 0 then
+				if m:get_int("usage") <= 0 then
 					m:set_int("usage",10000)
 				end
 				t:start(1)
@@ -757,8 +752,20 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		return minetest.get_meta(pos):get_inventory():is_empty("main")
 	end,
 	on_blast=function(pos)
-		minetest.remove_node(pos)
-		minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
+		local m = minetest.get_meta(pos)
+		if m:get_inventory():get_stack("main",1):get_name() == "default:atom_core" then
+			minetest.remove_node(pos)
+			minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
+
+			minetest.after(0.1,function()
+				local np = minetest.find_nodes_in_area_under_air(vector.add(pos,30),vector.subtract(pos,70),{"group:flammable","group:cracky"})
+				for i,v in pairs(np) do
+					if math.random(1,100) == 1 and not minetest.is_protected(pos,"") then
+						minetest.set_node(v,{name="toxic:radioactive_waste_source"})
+					end
+				end
+			end)
+		end
 	end,
 	on_timer = function (pos, elapsed)
 		local m = minetest.get_meta(pos)
@@ -768,11 +775,14 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		local u = m:get_int("usage")
 
 		if on and u > 0 then
-			m:set_int("usage",m:get_int("usage")-1)
+			m:set_int("usage",u-1)
 			minetest.registered_nodes["default:nuclear_powered_reactor"].update_formspec(pos)
 		elseif on then
 			on = false
 			m:set_int("on",0)
+			if u <= 0 and m:get_inventory():get_stack("main",1):get_name() == "default:atom_core" then
+				m:get_inventory():set_stack("main",1,"toxic:barrel_full")
+			end
 		end
 
 		for i=0,heat*0.1 do
@@ -838,8 +848,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 						player_style.set_lighting(player,{exposure="respawn"})
 					end
 				end
-				minetest.remove_node(pos)
-				minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
+				minetest.registered_nodes["default:nuclear_powered_reactor"].on_blast(pos)
 				return
 			elseif heat > 510 then
 				heat = heat * 20
@@ -859,7 +868,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		m:set_string("infotext", "Nuclear generator (" .. (on and "Active" or "Inactive") .. ")\nHeat: "..heat.."\nPower: "..effect ..(heat > 400 and "\nWarning, too hot!" or ""))
 		default.effect(pos,effect)
 		if heat > 0 then
-			default.set_radioactivity(pos,heat*10)
+			default.set_radioactivity(pos,heat)
 		else
 			default.remove_radioactivity(pos)
 		end

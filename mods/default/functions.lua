@@ -103,6 +103,12 @@ end
 
 default.set_radioactivity=function(pos,rad)
 	default.radioactivity[vector.to_string(pos)] = {pos=pos,rad=rad}
+	for i,v in pairs(default.radioactivity) do
+		if minetest.compare_block_status(v.pos,"active") == false then
+			default.radioactivity[vector.to_string(v.pos)] = nil
+		end
+	end
+
 end
 
 default.remove_radioactivity=function(pos)
@@ -113,9 +119,12 @@ default.get_radioactivity=function(pos)
 	local rad = 0
 	for i,v in pairs(default.radioactivity) do
 		local d = vector.distance(v.pos,pos)
-		if d <= v.rad then
+		if minetest.compare_block_status(v.pos,"active") == false then
+			default.radioactivity[vector.to_string(v.pos)] = nil
+		elseif d <= v.rad then
 			rad = rad + (v.rad - d)
 		end
+
 	end
 	return rad
 end
