@@ -10,6 +10,7 @@ player_style={
 	sounds = {},
 	creative = minetest.settings:get_bool("creative_mode") == true,
 	damage = minetest.settings:get_bool("enable_damage") == true,
+	survive_radiation = minetest.settings:get_bool("xaenvironment_radiation") ~= false,
 	survive_thirst = minetest.settings:get_bool("xaenvironment_thirst") ~= false,
 	survive_hunger = minetest.settings:get_bool("xaenvironment_hunger") ~= false,
 	survive_fall_damage = minetest.settings:get_bool("xaenvironment_quadruplet_fall_damage") ~= false,
@@ -48,6 +49,7 @@ player_style={
 if player_style.damage == false then
 	player_style.survive_thirst = false
 	player_style.survive_hunger = false
+	player_style.survive_radiation = false
 end
 
 dofile(minetest.get_modpath("player_style") .. "/inv.lua")
@@ -282,6 +284,7 @@ player_style.respawn=function(player,pos)
 	player_style.set_animation(name,"stand")
 	player_style.hunger(player,0,true)
 	player_style.thirst(player,0,true)
+	player_style.radiation(player,0,true)
 	player_style.set_lighting(player,{saturation1="update"})
 
 	for i, v in pairs(player_style.players[name].sounds) do
@@ -357,6 +360,7 @@ minetest.register_on_newplayer(function(player)
 		if player and player:get_pos() then
 			player_style.thirst(player,0,true)
 			player_style.hunger(player,0,true)
+			player_style.radiation(player,0,true)
 		end
 	end,player)
 end)
@@ -461,6 +465,10 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			player:hud_remove(p.hunger.bar)
 			p.hunger = nil
 		end
+		if p.radiation then
+			player:hud_remove(p.radiation.bar)
+			p.radiation = nil
+		end
 		return
 	elseif player_style.survive_hunger == true then
 		player_style.players[name].hunger={
@@ -478,6 +486,27 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 				size={x=24,y=24},
 				direction=0,
 				offset={x=-265,y=-120},
+			})
+		}
+	end
+
+	if player_style.survive_radiation == true then
+		player_style.players[name].radiation = {
+			level = player:get_meta():get_int("radiation"),
+			step = 0,
+			num = 0,
+			timer = 0,
+			bar=player:hud_add({
+				hud_elem_type="statbar",
+				position={x=0.5,y=1},
+				text="default_radioactivity.png",
+				--text2="default_radioactivity.png^[colorize:#000",
+				number=player:get_meta():get_int("radiation"),
+				item=20,
+				direction = 0,
+				size={x=24,y=24},
+				direction=0,
+				offset={x=-265,y=-144},
 			})
 		}
 	end
@@ -519,6 +548,50 @@ player_style.register_environment_sound=function(def)
 		max_y = def.max_y or 31000,
 		count = def.count or 1,
 	}
+end
+
+player_style.radiation=function(player,dtime,reset)
+
+	if player_style.survive_radiation == false then
+		return
+	end
+
+	local name = player:get_player_name()
+	local p = player_style.players[name]
+	local add = 0
+
+	if reset then
+		player:get_meta():set_int("radiation",0)
+		if p and p.radiation then
+			p.radiation.level = 0
+		end
+	elseif not (p and p.radiation) then
+		return
+	end
+
+	p.radiation.timer = p.radiation.timer - dtime
+	if p.radiation.timer < 0 then
+		p.radiation.timer = 5
+		local rad = default.get_radioactivity(player:get_pos())*0.01
+		add = rad > 0 and rad or -0.2
+	else
+		return
+	end
+
+	local a = p.radiation.level+add
+
+	if a >= 20 then
+		a = 0
+		player:set_hp(0)
+	elseif a >= 15 then
+		player:set_hp(player:get_hp() - 1)
+	end
+
+	p.radiation.num = math.ceil(a)
+	p.radiation.level = a >= 0 and a or 0
+
+	player:get_meta():set_int("radiation",p.radiation.num)
+	player:hud_change(p.radiation.bar, "number", p.radiation.num)
 end
 
 player_style.hunger=function(player,add,reset)
@@ -1142,6 +1215,7 @@ minetest.register_globalstep(function(dtime)
 			player_style.hunger(player,hunger)
 			player_style.thirst(player,hunger*2)
 			player_style.tired(name,player)
+			player_style.radiation(player,dtime)
 
 			if ppr.on_step_skin then
 				ppr.on_step_skin(ppr.skin_self,player,dtime)
