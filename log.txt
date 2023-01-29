@@ -1,3 +1,12 @@
+11.3
+
+changed: spidrs only spawns in desert caves (desert stone y-10)
++ atom core (reactor fuel)
++ nuclear reactor
++ radioactivity meter & radioactivity meter tech
++ radioactive stuff
++ radiation bar (hurts > 14, death: 20)
+
 11.2
 
 fixed: prevent vacuum from spreading less then y=2000
