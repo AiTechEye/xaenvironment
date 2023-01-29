@@ -770,7 +770,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 			minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
 
 			minetest.after(0.1,function()
-				local np = minetest.find_nodes_in_area_under_air(vector.add(pos,50),vector.subtract(pos,50),{"group:flammable","group:cracky"})
+				local np = minetest.find_nodes_in_area_under_air(vector.add(pos,30),vector.subtract(pos,30),{"group:flammable","group:cracky"})
 				for i,v in pairs(np) do
 					if math.random(1,100) == 1 and not minetest.is_protected(pos,"") then
 						minetest.set_node(v,{name="toxic:radioactive_waste_source"})
