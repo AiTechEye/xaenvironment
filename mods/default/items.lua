@@ -1,4 +1,11 @@
 player_style.register_manual_page({
+	name = "Radioactivity",
+	itemstyle = "default:radioactivity_meter",
+	text = "In this game you can be affacted by radioactivity / radiation, use this tool to detect it before it is too late.",
+	tags = {"radioactivity"},
+})
+
+player_style.register_manual_page({
 	name = "Tree/Wood",
 	itemstyle = "plants:apple_tree",
 	text = "In this game you cant break natural tree or wood by hand, you need a kind of tool, like an axe",
