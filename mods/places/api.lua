@@ -224,6 +224,25 @@ places = {
 				nodeextractor.set(apos(pos,-20,0,-20),minetest.get_modpath("places").."/nodeextractor/places_bomb_factory.exexn")
 			end
 		},
+		["powerplant"]={
+			chance=100,sx=40,sy=14,miny=-20,maxy=70,spawn_at={"group:spreading_dirt_type"},
+			on_spawn=function(pos)
+				for y=-10,16 do
+				for x=-20,19 do
+				for z=-20,19 do
+					local p = vector.new(pos.x+x,pos.y+y,pos.z+z)
+					local n = minetest.get_node(p).name
+					if y < 0 then
+						minetest.set_node(p,{name="default:stone"})
+					elseif minetest.get_item_group(n,"stone") + minetest.get_item_group(n,"dirt") > 0 then
+						minetest.remove_node(p)
+					end
+				end
+				end
+				end
+				nodeextractor.set(apos(pos,-20,0,-20),minetest.get_modpath("places").."/nodeextractor/places_powerplant.exexn")
+			end
+		},
 	}
 }
 
@@ -266,7 +285,7 @@ minetest.register_tool("places:spawn", {
 	groups={not_in_creative_inventory=1},
 	on_use=function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
-		places.buildings["bomb factory"].on_spawn(vector.round(pos))
+		places.buildings["powerplant"].on_spawn(vector.round(pos))
 		--places.city(pos)
 	end,
 	on_place=function(itemstack, user, pointed_thing)
