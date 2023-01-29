@@ -18,10 +18,10 @@ examobs.register_mob({
 		attack = {x=25,y=35},
 
 	},
-	inv={["bones:bone"]=8,["default:xe"]=1,["default:obsidian"]=1},
+	inv={["bones:bone"]=8,["default:obsidian"]=1},
 	collisionbox={-0.2,-0.2,-0.2,0.2,0.2,0.2},
-	spawn_on={"group:stone"},
-	max_spawn_y = -100,
+	spawn_on={"default:desert_stone"},
+	max_spawn_y = -10,
 	resist_nodes = {["examobs:barbed_wire"]=1},
 	step=function(self,time)
 		local pos2 = self.fight and self.fight:get_pos()
