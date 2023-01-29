@@ -698,7 +698,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 	end,
 	update_formspec=function(pos)
 		local m = minetest.get_meta(pos)
-		local p = m:get_int("usage") / 10000
+		local p = m:get_int("usage") / 1000
 
 		m:set_string("formspec",
 			"size[8,6]"
@@ -726,9 +726,14 @@ minetest.register_node("default:nuclear_powered_reactor", {
 	end,
 	exatec = {
 		input_list="main",
+		output_list="main",
 		test_input=function(pos,stack,opos,cpos)
 			local inv = minetest.get_meta(pos):get_inventory()
 			return inv:is_empty("main") and stack:get_name() == "default:atom_core"
+		end,
+		test_output=function(pos,stack,opos)
+			local inv = minetest.get_meta(pos):get_inventory()
+			return inv:get_stack("main",1):get_name() ~= "default:atom_core"
 		end,
 		on_wire = function(pos)
 			local t = minetest.get_node_timer(pos)
@@ -741,7 +746,7 @@ minetest.register_node("default:nuclear_powered_reactor", {
 				return
 			elseif not t:is_started() then
 				if m:get_int("usage") <= 0 then
-					m:set_int("usage",10000)
+					m:set_int("usage",1000)
 				end
 				t:start(1)
 			end
@@ -755,10 +760,17 @@ minetest.register_node("default:nuclear_powered_reactor", {
 		local m = minetest.get_meta(pos)
 		if m:get_inventory():get_stack("main",1):get_name() == "default:atom_core" then
 			minetest.remove_node(pos)
+
+			for _, player in pairs(minetest.get_connected_players()) do
+				if vector.distance(player:get_pos(),pos) <= 100 then
+					player_style.set_lighting(player,{exposure="respawn"})
+				end
+			end
+
 			minetest.registered_nodes["nitroglycerin:timed_nuclear_bomb"].on_blast(pos)
 
 			minetest.after(0.1,function()
-				local np = minetest.find_nodes_in_area_under_air(vector.add(pos,30),vector.subtract(pos,70),{"group:flammable","group:cracky"})
+				local np = minetest.find_nodes_in_area_under_air(vector.add(pos,50),vector.subtract(pos,50),{"group:flammable","group:cracky"})
 				for i,v in pairs(np) do
 					if math.random(1,100) == 1 and not minetest.is_protected(pos,"") then
 						minetest.set_node(v,{name="toxic:radioactive_waste_source"})
@@ -823,7 +835,6 @@ minetest.register_node("default:nuclear_powered_reactor", {
 			end)
 		end
 
-
 		heat = heat + (on and 10 or -10)
 		m:set_int("heat",heat)
 		local effect = math.ceil(heat*0.1)
@@ -843,11 +854,6 @@ minetest.register_node("default:nuclear_powered_reactor", {
 			end
 
 			if heat > 600 then
-				for _, player in pairs(minetest.get_connected_players()) do
-					if vector.distance(player:get_pos(),pos) <= 100 then
-						player_style.set_lighting(player,{exposure="respawn"})
-					end
-				end
 				minetest.registered_nodes["default:nuclear_powered_reactor"].on_blast(pos)
 				return
 			elseif heat > 510 then
