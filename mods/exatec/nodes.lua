@@ -952,22 +952,17 @@ minetest.register_node("exatec:extraction", {
 				.."listcolors[#77777777;#777777aa;#000000ff]"
 				..'label[0,-0.2;Logical problems:\nStacks can disappear\nin "Full" mode in some cases]'
 				.."button[0,1;2,1;stack;"..(m:get_int("stack") == 0 and "Single" or "Full").."]"
+				.."button_exit[2,1;2,1;hide;Hide]"
 			)
 		end
 	end,
-	--on_construct = function(pos)
-	--	local m = minetest.get_meta(pos)
-	--	m:set_string("formspec",
-	--		"size[2,1]"
-	--		.."listcolors[#77777777;#777777aa;#000000ff]"
-	--		.."button[0,0;2,1;stack;"..(m:get_int("stack") == 0 and "Single" or "Full").."]"
-	--	)
-	--end,
 	on_receive_fields=function(pos, formname, pressed, sender)
-		if pressed.stack then
 			local m = minetest.get_meta(pos)
+		if pressed.stack then
 			m:set_int("stack",m:get_int("stack") == 0 and 1 or 0)
 			minetest.registered_nodes["exatec:extraction"].after_place_node(pos, sender)
+		elseif pressed.hide then
+			m:set_string("formspec","")
 		end
 	end,
 	exatec={
