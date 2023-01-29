@@ -225,7 +225,7 @@ places = {
 			end
 		},
 		["powerplant"]={
-			chance=100,sx=40,sy=14,miny=-20,maxy=70,spawn_at={"group:spreading_dirt_type"},
+			chance=100,sx=40,sy=14,miny=-20,maxy=70,spawn_at={"default:dirt_with_coniferous_grass","default:dirt_with_jungle_grass"},
 			on_spawn=function(pos)
 				for y=-10,16 do
 				for x=-20,19 do
