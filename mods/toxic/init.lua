@@ -144,7 +144,7 @@ minetest.register_node("toxic:barrel_full", {
 		type = "fixed",
 		fixed = {{-0.4, -0.5, -0.4, 0.4,  0.9, 0.4},}},
 	tiles = {"toxic_barrel1.png"},
-	groups = {barrel=1,cracky = 1, level = 2},
+	groups = {barrel=1, cracky = 1, level = 2, radioactive=30},
 	sounds = toxic.node_sound_plate(),
 	paramtype = "light",
 	paramtype2 = "facedir",
