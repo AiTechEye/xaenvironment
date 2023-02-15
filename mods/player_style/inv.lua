@@ -313,6 +313,7 @@ player_style.inventory=function(player)
 	local coins = "label[4,-0.3;"..minetest.colorize("#FFFF00",Getcoin(player)).."]tooltip[4,-0.3;2,0.4;Coins]"
 	local skin = minetest.formspec_escape(player:get_properties().textures[1] or "character.png")
 	local model = "model[4,0.3;2,3;character_preview;character.b3d;"..skin..";0,180;false;true;1,31]"
+	local music = "item_image_button[7,0;1,1;player_style:earphone_hat" .. ";music;]tooltip[music;Music]"
 	local itemmagnet = "image_button[7,1;1,1;default_megenet.png" .. (invp.itemmagnet == 1 and "" or "^default_cross.png") .. ";itemmagnet;]tooltip[itemmagnet;Item Magnet]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
 	..player_style.buttons.text
@@ -332,6 +333,7 @@ player_style.inventory=function(player)
 			.."listring[current_player;main]"
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:"..name.."_backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. music
 			.. itemmagnet
 			..model
 			..buttons
@@ -393,6 +395,7 @@ player_style.inventory=function(player)
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.."listring[current_player;main]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craft grid]" or "listring[detached:"..name.."_backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
+			.. music
 			.. itemmagnet
 
 			..buttons
@@ -444,6 +447,9 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				return
 			elseif pressed.craftguide then
 				player_style.craftguide.show(player)
+				return
+			elseif pressed.music then
+				music.show(player)
 				return
 			elseif pressed.creinvright and invp.index+invp.size < (invp.search and #invp.search.items or #player_style.inventory_items) then
 				invp.index = invp.index + invp.size+1
