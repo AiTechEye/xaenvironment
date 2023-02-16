@@ -112,3 +112,29 @@ player_style.register_button({
 		end
 	end
 })
+
+player_style.register_button({
+	exit=true,
+	type="image",
+	image="commands_sun.png",
+	name="day",
+	info="Day",
+	lower_priority = true,
+	privs = {settime=true},
+	action=function(player)
+		minetest.set_timeofday(0.3)
+	end
+})
+
+player_style.register_button({
+	exit=true,
+	type="image",
+	image="commands_moon.png",
+	name="night",
+	info="Night",
+	lower_priority = true,
+	privs = {settime=true},
+	action=function(player)
+		minetest.set_timeofday(0.8)
+	end
+})
