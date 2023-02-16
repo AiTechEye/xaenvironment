@@ -1,5 +1,6 @@
 11.31
 
+fix: dont walk or talk in death
 + Roadwalkers doent attack while hungry
 + attack the driver not the car
 + Music player + 5 tracks
@@ -15,7 +16,7 @@ changed: spidrs only spawns in desert caves (desert stone y-10)
 
 11.2
 
-fixed: prevent vacuum from spreading less then y=2000
+fix: prevent vacuum from spreading less then y=2000
 + tech: metal block tube
 + tech: wire block
 + place: bomb factory
