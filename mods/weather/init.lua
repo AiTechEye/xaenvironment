@@ -36,6 +36,8 @@ player_style.register_button({
 	image="player_style_thirst_bar.png",
 	name="setweather",
 	info="Set Weather 100%",
+	lower_priority = true,
+	privs = {settime=true},
 	action=function(player)
 		local c = minetest.registered_chatcommands["weather"]
 		local name = player:get_player_name()
@@ -52,6 +54,8 @@ player_style.register_button({
 	image="player_style_thirst_bar.png^default_cross.png",
 	name="clearweather",
 	info="Set clear Weather",
+	lower_priority = true,
+	privs = {settime=true},
 	action=function(player)
 		local name = player:get_player_name()
 		local c = minetest.registered_chatcommands["weather"]
