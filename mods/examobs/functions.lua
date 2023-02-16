@@ -601,11 +601,12 @@ examobs.find_objects=function(self)
 					examobs.hiding[ob:get_player_name()] = nil
 				end
 			end
+
 			if hiding then
 			elseif known == "flee" or (flee and team ~= self.team and (self.flee_from_threats_only == 0 or player)) or (en and en.type == "monster" and (self.aggressivity == -1 or en.hp_max >= self.hp*2)) then
 				self.flee = ob
 				return
-			elseif infield and ((self.aggressivity == 1 and self.hp < self.hp_max and self.team ~= team) or known == "fight") then
+			elseif infield and ((self.hunger == 1 and self.aggressivity == 1 and hungry and self.team ~= team) or known == "fight") then
 				self.fight = ob
 				return
 			elseif known == "folow" then

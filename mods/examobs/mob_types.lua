@@ -271,6 +271,7 @@ examobs.register_roadwalker=function(def)
 	def.team = def.team or "fish"
 	def.dmg = def.dmg or 1
 	def.hp = def.hp or 20
+	def.hunger = 0
 	def.walk_speed = def.walk_speed or 4
 	def.run_speed = def.run_speed or 8
 	def.animation = def.animation or "default"
