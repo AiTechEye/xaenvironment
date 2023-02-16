@@ -1,11 +1,11 @@
 beds={}
 
-minetest.after(0,function()
 player_style.register_button({
 	name="Bed",
 	image="beds:bed",
 	type="item_image",
 	info="Go to bed",
+	low_priority = true,
 	action=function(player)
 		if player:get_meta():get_int("respawn_disallowed") == 1 then
 			minetest.chat_send_player(player:get_player_name(),"Beds is disallowed in this case")
@@ -14,7 +14,7 @@ player_style.register_button({
 		end
 	end
 })
-end)
+
 minetest.register_on_respawnplayer(function(player)
 	return beds.respawn(player)
 end)
