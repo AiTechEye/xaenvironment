@@ -1,5 +1,4 @@
 player_style.register_button=function(def)
-
 	if def.low_priority then
 		def.low_priority = nil
 		table.insert(player_style.buttons.low_priority,def)
@@ -10,19 +9,19 @@ player_style.register_button=function(def)
 		return
 	end
 
-	local b = (def.type and (def.type .. "_button") or "button")
-	.. (def.exit and "_exit" or "")
-	.. "["..player_style.buttons.num..",0;1,1;" -- ",7.2;1,1;"
+	local a = (def.type and (def.type .. "_button") or "button")
+	.. (def.exit and "_exit" or "") .. "["
+
+	local b = ",0;1,1;"
 	.. (((def.type == "image" or def.type == "item_image") and def.image and (def.image .. ";")) or "")
 	.. def.name ..";"
 	.. (def.label or "") .."]"
 	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
 
-	player_style.buttons.num = player_style.buttons.num + 0.8
 	player_style.buttons.num_of_buttons = player_style.buttons.num_of_buttons + 1
 	player_style.buttons.action[def.name]=def.action
 
-	table.insert(player_style.buttons.buttons,{text=b,privs=def.privs})
+	table.insert(player_style.buttons.buttons,{text1=a,text2=b,privs=def.privs})
 end
 
 player_style.register_manual_page=function(def)
@@ -317,13 +316,15 @@ player_style.inventory=function(player)
 --inventory
 	local buttons_bar = ""
 	local adds = ""
+	local buttons_pos = 0
 	for i,v in pairs(invp.adds) do
 		adds = adds .. v
 	end
 
 	for i,v in ipairs(player_style.buttons.buttons) do
 		if minetest.check_player_privs(player, v.privs) then
-			buttons_bar = buttons_bar .. v.text
+			buttons_bar = buttons_bar .. v.text1 .. buttons_pos .. v.text2
+			buttons_pos = buttons_pos + 0.8
 		end
 	end
 

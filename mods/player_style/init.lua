@@ -1,6 +1,6 @@
 player_style={
 	players={},
-	buttons={buttons={},low_priority={},lower_priority={},num=0,num_of_buttons=0,action={}},
+	buttons={buttons={},low_priority={},lower_priority={},num_of_buttons=0,action={}},
 	registered_profiles={},
 	manual_pages = {},
 	player_attached={},
