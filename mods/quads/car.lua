@@ -275,7 +275,8 @@ minetest.register_entity("quads:car",{
 		local key = self.user and self.user:get_player_control() or {}
 
 		if self.bot then
-			if self.user:get_luaentity() == nil then
+			local en = self.user:get_luaentity()
+			if en == nil or en.dying or en.dead then
 				self.user = nil
 				self.user_name = ""
 				self.bot = nil
@@ -446,7 +447,7 @@ minetest.register_entity("quads:car",{
 						v.object:add_velocity({x=x*2,y=y,z=z*2})
 						local en=v.object:get_luaentity()
 						if not (en and en.dead) then
-							default.punch(v.object,self.object,self.speed)
+							default.punch(v.object,self.user or self.object,self.speed)
 						end
 					end
 				end
