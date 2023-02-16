@@ -1,4 +1,15 @@
 player_style.register_button=function(def)
+
+	if def.low_priority then
+		def.low_priority = nil
+		table.insert(player_style.buttons.low_priority,def)
+		return
+	elseif def.lower_priority then
+		def.lower_priority = nil
+		table.insert(player_style.buttons.lower_priority,def)
+		return
+	end
+
 	local b = (def.type and (def.type .. "_button") or "button")
 	.. (def.exit and "_exit" or "")
 	.. "["..player_style.buttons.num..",0;1,1;" -- ",7.2;1,1;"
@@ -6,10 +17,12 @@ player_style.register_button=function(def)
 	.. def.name ..";"
 	.. (def.label or "") .."]"
 	..(def.info and ("tooltip["..def.name..";"..def.info.."]") or "")
-	player_style.buttons.text = player_style.buttons.text .. b
+
 	player_style.buttons.num = player_style.buttons.num + 0.8
 	player_style.buttons.num_of_buttons = player_style.buttons.num_of_buttons + 1
 	player_style.buttons.action[def.name]=def.action
+
+	table.insert(player_style.buttons.buttons,{text=b,privs=def.privs})
 end
 
 player_style.register_manual_page=function(def)
@@ -28,19 +41,17 @@ player_style.register_manual_page=function(def)
 	table.insert(player_style.manual_pages,{name=def.name,text=t,tags=def.tags,action=def.action,item=def.item,itemstyle=def.itemstyle})
 end
 
+minetest.register_on_priv_grant(function(name, granter, priv)
+	player_style.inventory(minetest.get_player_by_name(name))
+end)
+
+minetest.register_on_priv_revoke(function(name, revoker, priv)
+	player_style.inventory(minetest.get_player_by_name(name))
+end)
+
 minetest.register_privilege("creative", {
 	description = "Creative",
 	give_to_singleplayer= false,
-	on_grant=function(name)
-		minetest.after(0,function(name)
-			player_style.inventory(minetest.get_player_by_name(name))
-		end,name)
-	end,
-	on_revoke=function(name)
-		minetest.after(0,function(name)
-			player_style.inventory(minetest.get_player_by_name(name))
-		end,name)
-	end
 })
 
 player_style.register_button({
@@ -304,10 +315,16 @@ player_style.inventory=function(player)
 	end
 
 --inventory
-
+	local buttons_bar = ""
 	local adds = ""
 	for i,v in pairs(invp.adds) do
 		adds = adds .. v
+	end
+
+	for i,v in ipairs(player_style.buttons.buttons) do
+		if minetest.check_player_privs(player, v.privs) then
+			buttons_bar = buttons_bar .. v.text
+		end
 	end
 
 	local coins = "label[4,-0.3;"..minetest.colorize("#FFFF00",Getcoin(player)).."]tooltip[4,-0.3;2,0.4;Coins]"
@@ -316,8 +333,8 @@ player_style.inventory=function(player)
 	local music = "item_image_button[7,0;1,1;player_style:earphone_hat" .. ";music;]tooltip[music;Music]"
 	local itemmagnet = "image_button[7,1;1,1;default_megenet.png" .. (invp.itemmagnet == 1 and "" or "^default_cross.png") .. ";itemmagnet;]tooltip[itemmagnet;Item Magnet]"
 	local buttons = "scrollbaroptions[max="..((player_style.buttons.num_of_buttons-10)*10).."]scrollbar[0,8;12,0.5;horizontal;scrollbar;]scroll_container[0,8.2;15,1.5;scrollbar;horizontal]"
-	..player_style.buttons.text
-	.."scroll_container_end[scrollbar]"
+	.. buttons_bar
+	.. "scroll_container_end[scrollbar]"
 
 	if not (player_style.creative or minetest.check_player_privs(name, {creative=true})) then
 --default inventory
@@ -672,6 +689,13 @@ player_style.itemstrings_to_image=function(text,label)
 end
 
 minetest.register_on_mods_loaded(function(player)
+	for i, def in ipairs(player_style.buttons.low_priority) do
+		player_style.register_button(def)
+	end
+	for i, def in ipairs(player_style.buttons.lower_priority) do
+		player_style.register_button(def)
+	end
+
 	for i,v in pairs(minetest.registered_items) do
 		if (v.manual_page or v.manual_page_func) and not (v.groups and (v.groups.unbreakable)) then
 			player_style.register_manual_page({
