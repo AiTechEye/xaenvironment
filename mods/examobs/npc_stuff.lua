@@ -364,6 +364,10 @@ examobs.npc_setup=function(self)
 end
 
 examobs.on_expression=function(self,key,addressed)
+	if self.dead or self.dying then
+		return
+	end
+
 	local e = examobs.npc.expressions[key]
 	local x = e[math.random(1,#e)]:gsub("@",(addressed or ""))
 	self:say(x)

@@ -292,7 +292,7 @@ examobs.register_roadwalker=function(def)
 	def.on_abs_step=function(self,dtime)
 		local pos = self.object:get_pos()
 
-		if self.step(self) then
+		if self.step(self) or self.dead or self.dying then
 			return self
 		elseif self.fight or self.flee then
 			return
