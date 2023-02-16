@@ -500,11 +500,9 @@ player_style.register_button({
 	image="examobs:wolf_spawner",
 	type="item_image",
 	info="Mobs (requires the mobs privilege)",
+	privs={mobs=true},
 	action=function(user)
-		local name = user:get_player_name()
-		if minetest.check_player_privs(name, {mobs=true}) then
-			examobs.terminal(name)
-		end
+		examobs.terminal(user:get_player_name())
 	end
 })
 
