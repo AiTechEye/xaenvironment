@@ -2827,3 +2827,178 @@ minetest.register_node("exatec:radioactivity_meter", {
 		return true
 	end
 })
+
+minetest.register_node("exatec:conveyor", {
+	description = "Conveyor",
+	tiles={
+		{
+			name = "exatec_conveyor.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 1,
+			}
+		},
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	drawtype="nodebox",
+	paramtype = "light",
+	sunlight_propagates=true,
+	groups = {chappy=3,dig_immediate = 2,exatec_tube=1,store=600,on_load=1},
+	paramtype2 = "facedir",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5}
+		}
+	},
+	exatec={
+		test_input=function(pos,stack,opos)
+			return true
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local ob = minetest.add_entity(pos,"exatec:tubeitem")
+			local en = ob:get_luaentity()
+			en:new_item(stack,opos)
+			en.storage.dir = d
+			ob:set_velocity(d)
+		end,
+		on_tube = function(pos,stack,opos,ob)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local olddir = ob:get_luaentity().storage.dir
+			local f = vector.add(pos,d)
+			ob:get_luaentity().storage.dir = d
+			ob:set_velocity(d)
+
+			if not exatec.getnodedefpos(f).walkable then
+				ob:move_to(apos(f,0,0.15))
+			elseif olddir ~= d then
+				ob:move_to(apos(pos,0,0.15))
+			end
+		end,
+	},
+	on_load=function(pos)
+		minetest.after(math.random(1,60)*0.01,function()
+			minetest.get_node_timer(pos):start(1)
+		end)
+	end,
+	on_construct=function(pos)
+		minetest.after(math.random(1,60)*0.01,function()
+			minetest.get_node_timer(pos):start(1)
+		end)
+	end,
+	on_timer = function(pos, elapsed)
+		local v
+		local m = minetest.get_meta(pos)
+		for _, ob in pairs(minetest.get_objects_inside_radius(vector.offset(pos,0,0.5,0), 0.75)) do
+			local en = ob:get_luaentity()
+
+			if en and en.name == "__builtin:item" then
+				local stack = ItemStack(en.itemstring)
+				local insertstack = ItemStack(en.itemstring)
+
+				insertstack:set_count(1)
+				exatec.input(pos,insertstack,pos)
+				stack:take_item()
+
+				if stack:get_count() <= 0 then
+					ob:remove()
+				else
+					en:set_item(stack:to_string())
+				end
+
+				v = v or minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			elseif not (en and en.exatec_item) then
+				v = v or minetest.facedir_to_dir(minetest.get_node(pos).param2)
+				if ob:is_player() then
+					ob:add_velocity(vector.multiply(minetest.facedir_to_dir(minetest.get_node(pos).param2),3))
+				else
+					ob:set_velocity(v)
+				end
+			end
+		end
+		if v then
+			minetest.get_node_timer(pos):start(0.1)
+		else
+			minetest.get_node_timer(pos):start(1)
+		end
+	end
+})
+
+minetest.register_node("exatec:mob_breaker", {
+	description = "Mob breaker (kills and outputs the mobs drops behind the node)",
+	tiles={
+		"default_ironblock.png^[colorize:#5005",
+		"default_ironblock.png^[colorize:#5005",
+		"default_ironblock.png^[colorize:#5005^default_crafting_arrowright.png^exatec_wirecon.png",
+		"default_ironblock.png^[colorize:#5005^default_crafting_arrowleft.png^exatec_wirecon.png",
+		"default_ironblock.png^[colorize:#5005^exatec_hole.png^exatec_wirecon.png",
+		"default_ironblock.png^[colorize:#5005^exatec_hole_big.png^materials_sawblade.png^exatec_wirecon.png",
+	},
+	groups = {cracky=3,oddly_breakable_by_hand=3,exatec_tube_connected=1,exatec_wire_connected=1,store=400},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype2 = "facedir",
+	exatec={
+		test_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = pos+d
+			return exatec.test_input(f,stack,pos,pos)
+		end,
+		on_input=function(pos,stack,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local f = pos+d
+			if exatec.test_input(f,stack,pos) then
+				exatec.input(f,stack,pos)
+			end
+			minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
+		end,
+		on_wire = function(pos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local b = pos - d
+			local f = pos + d
+
+			for _, ob in pairs(minetest.get_objects_inside_radius(b,1)) do
+				local en = ob:get_luaentity()
+
+				if en and en.examob and en.hp <= 10 then
+					for i,v in pairs(en.inv) do
+						local s = ItemStack(i)
+						for c=1,v do
+							if exatec.test_input(f,s,pos) then
+								exatec.input(f,s,pos)
+							else
+								minetest.add_item(f,s)
+							end
+						end
+					end
+					minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
+					default.splat(ob:get_pos(),{texture=ob:get_properties().textures[1]})
+					ob:remove()
+				elseif not default.is_decoration(ob) and not (en and en.exatec_item) then
+					default.punch(ob,ob,10)
+				end
+
+				if en and en.name == "__builtin:item" then
+					local s = ItemStack(en.itemstring)
+					local s2 = ItemStack(en.itemstring)
+					s2:set_count(1)
+					for i=1,s:get_count() do
+						if exatec.test_input(f,s2,pos) then
+							exatec.input(f,s2,pos)
+						else
+							minetest.add_item(f,s2)
+						end
+					end
+					ob:remove()
+					minetest.sound_play("default_pipe", {pos=pos, gain = 2, max_hear_distance = 10})
+				end
+			end
+		end
+	}
+})

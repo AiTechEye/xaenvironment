@@ -1,4 +1,22 @@
 minetest.register_craft({
+	output="exatec:mob_breaker",
+	recipe={
+		{"exatec:metal_block_tube","materials:sawblade","exatec:wire"},
+		{"default:iron_ingot","materials:fanblade_metal","default:iron_ingot"},
+		{"default:iron_ingot","materials:gear_metal","default:iron_ingot"}
+	},
+})
+
+minetest.register_craft({
+	output="exatec:conveyor",
+	recipe={
+		{"materials:tube_metal","materials:tube_metal","materials:tube_metal"},
+		{"materials:gear_metal","materials:gear_metal","materials:gear_metal"},
+		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"}
+	},
+})
+
+minetest.register_craft({
 	output = "exatec:metal_block_tube",
 	recipe = {{"default:iron_ingot","default:iron_ingot",""},
 		{"exatec:tube","default:iron_ingot",""},
