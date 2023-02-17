@@ -219,7 +219,33 @@ default.lighteffect=function(pos,def)
 	return minetest.add_particlespawner(def)
 end
 
+default.splat=function(pos,def)
+	if not (pos and pos.x) then
+			return
+	end
 
+	for i=1,def.count or math.random(15,25) do
+		def = def or {}
+		def.maxacc = def.maxacc or vector.new(0,-7,0)
+		def.minacc = def.minacc or vector.new(0,-10,0)
+		def.maxvel = def.maxvel or vector.new(3,9,3)
+		def.minvel = def.minvel or vector.new(-3,5,-3)
+		def.amount = def.amount or math.random(1,3)
+		def.time = def.time or 0.1
+		def.minexptime = def.minexptime or 1
+		def.maxexptime = def.maxexptime or 2
+		def.minpos = def.minpos or vector.add(pos,0.5)
+		def.maxpos = def.maxpos or vector.subtract(pos,0.5)
+		def.minsize = def.minsize or 2
+		def.maxsize = def.maxsize or 5
+		def.texture = def.texture or "default_item_smoke.png"
+		def.collisiondetection = def.collisiondetection ~= false
+		local size = math.random(2,4)
+		def.texture = def.texture.."^[resize:16x16"
+		def.texture = "[combine:" .. size .."x" .. size .. ":"..math.random(0,-16)..","..math.random(0,-16).."="..def.texture
+		minetest.add_particlespawner(def)
+	end
+end
 
 default.watersplash=function(pos,item)
 	local def = default.def(minetest.get_node(pos).name)
