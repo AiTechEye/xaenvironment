@@ -1,5 +1,7 @@
 11.31
 
++ Mob breaker
++ Conveyor
 fix: dont walk or talk in death
 + Roadwalkers doent attack while hungry
 + attack the driver not the car
