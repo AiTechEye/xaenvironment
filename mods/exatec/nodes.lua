@@ -2981,7 +2981,11 @@ minetest.register_node("exatec:mob_breaker", {
 					default.splat(ob:get_pos(),{texture=ob:get_properties().textures[1]})
 					ob:remove()
 				elseif not default.is_decoration(ob) and not (en and en.exatec_item) then
-					default.punch(ob,ob,10)
+					if ob:is_player() and ob:get_hp() <= 10 then
+						ob:respawn()
+					else
+						default.punch(ob,ob,10)
+					end
 				end
 
 				if en and en.name == "__builtin:item" then
