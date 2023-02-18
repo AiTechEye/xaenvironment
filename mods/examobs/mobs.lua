@@ -2677,6 +2677,7 @@ examobs.register_mob({
 		end
 	end,
 })
+
 examobs.register_mob({
 	description = "A little bird that strange enough only lives on ground",
 	name = "chicken",
@@ -2704,17 +2705,69 @@ examobs.register_mob({
 		attack = {x=20,y=30},
 	},
 	collisionbox={-0.3,-0.35,-0.3,0.3,0.4,0.3},
+	to_chick=function(self)
+		self.storage.chick_collbox = self.object:get_properties().collisionbox
+		self.storage.chick_size = 0.1
+		self.object:set_properties({
+			textures={"examobs_chick.png"},
+		})
+		self:chick()
+	end,
+	chick=function(self)
+		self.storage.chick_size = self.storage.chick_size + 0.01
+
+		local s = self.storage.chick_size
+		local c1 = self.storage.chick_collbox
+		local c2 = {}
+		for i=1,6 do
+			c2[i] = c1[i] * s
+		end
+
+		self.object:set_properties({
+			collisionbox = c2,
+			visual_size={x=s,y=s,z=s}
+		})
+
+		if self.storage.chick_size >= 1 then
+			self.storage.chick_size = nil
+			self.storage.chick_collbox = nil
+			self.storage.chick_halfgrown = nil
+			self:on_spawn()
+		elseif not self.storage.chick_halfgrown and s >= 0.5 then
+			self.storage.chick_halfgrown = 1
+			self:on_spawn()
+		end
+	end,
 	spawn_on={"group:spreading_dirt_type"},
 	egg_timer = math.random(1,600),
 	on_spawn=function(self)
+		local r = math.random(1,3)
 		self.inv["examobs:feather"]=math.random(1,3)
-		self.storage.skin="examobs_chicken" .. math.random(1,3) ..".png"
+		self.storage.skin="examobs_chicken" .. r ..".png"
 		self.object:set_properties({textures={self.storage.skin}})
+		self.storage.rooster = r == 2
 	end,
 	on_load=function(self)
+		if self.storage.chick_size then
+			self:chick()
+			if not self.storage.chick_halfgrown then
+				self.object:set_properties({textures={"examobs_chick.png"}})
+				return
+			end
+		end
+
 		self.object:set_properties({textures={self.storage.skin or "examobs_chicken1.png"}})
 	end,
 	step=function(self)
+		if self.storage.chick_size then
+			self:chick()
+			return
+		end
+
+		if self.storage.rooster and math.random(1,60) == 1 then
+			minetest.sound_play("examobs_rooster", {object=self.object, gain = 1, max_hear_distance = 30, pitch = math.random(8,15)*0.1})
+		end
+
 		self.egg_timer = self.egg_timer -1
 		if self.egg_timer < 1 then
 			if self.flee or self.fight then
@@ -2722,10 +2775,6 @@ examobs.register_mob({
 			elseif minetest.get_item_group(minetest.get_node(apos(self:pos(),0,-1)).name,"soil") > 0 and self.object:get_velocity().y == 0 then
 				local pos = self:pos()
 				minetest.add_node(pos,{name="examobs:egg"})
-				local meta = minetest.get_meta(pos)
-				meta:set_int("date",default.date("get"))
-				meta:set_int("hours",math.random(1,6))
-				minetest.get_node_timer(pos):start(10)
 				self.egg_timer = math.random(1,600)
 			end
 		end

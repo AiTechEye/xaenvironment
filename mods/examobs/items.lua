@@ -216,18 +216,30 @@ minetest.register_node("examobs:egg", {
 	sunlight_propagates = true,
 	walkable = false,
 	visual_scale = 0.3,
-	groups = {dig_immediate=3,treasure=1},
+	groups = {dig_immediate=3,treasure=1,on_load=1},
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.1, -0.5, -0.1, 0.1, -0.2, 0.1}
 	},
 	tiles={"default_snowball.png^[colorize:#ffffff^examobs_alpha_egg.png^[makealpha:0,255,0"},
 	sounds = default.node_sound_dirt_defaults(),
+	on_load=function(pos)
+		local m = minetest.get_meta(pos)
+		if m:get_int("date") == 0 then
+			m:set_int("date",default.date("get")+math.random(1,600))
+			minetest.get_node_timer(pos):start(1)
+		end
+	end,
+	on_construct=function(pos)
+		local m = minetest.get_meta(pos)
+		m:set_int("date",default.date("get")+math.random(1,600))
+		minetest.get_node_timer(pos):start(1)
+	end,
 	on_timer = function (pos, elapsed)
-		local meta = minetest.get_meta(pos)
-		if default.date("h",meta:get_int("date")) > meta:get_int("hours") then
+		local m = minetest.get_meta(pos)
+		if default.date("s",m:get_int("date")) > 0 then
 			minetest.remove_node(pos)
-			return false
+			minetest.add_entity(pos, "examobs:chicken"):get_luaentity():to_chick()
 		end
 		return true
 	end
