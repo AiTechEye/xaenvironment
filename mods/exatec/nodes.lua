@@ -2593,6 +2593,7 @@ minetest.register_node("exatec:codelock", {
 	end,
 	on_receive_fields=function(pos, form, pressed, sender)
 		local meta = minetest.get_meta(pos)
+		minetest.sound_play("exatec_button_pressed", {pos=pos, gain = 2, max_hear_distance = 10})
 		if pressed.save and sender:get_player_name() == meta:get_string("owner") then
 			if not tonumber(pressed.current) then
 				minetest.chat_send_player(sender:get_player_name(), "Not a valid code")
@@ -2602,12 +2603,14 @@ minetest.register_node("exatec:codelock", {
 			minetest.chat_send_player(sender:get_player_name(), "Code set!")
 			meta:set_string("current","")
 			minetest.registered_nodes["exatec:codelock"].update_panel(pos)
+			minetest.sound_play("exatec_code_accepted", {pos=pos, gain = 2, max_hear_distance = 10})
 		elseif pressed.ok then
 			meta:set_string("current","")
 			minetest.registered_nodes["exatec:codelock"].update_panel(pos)
 			if pressed.current == meta:get_string("code") or sender:get_player_name() == meta:get_string("owner") then
 				local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 				exatec.send({x=pos.x+d.x,y=pos.y+d.y,z=pos.z+d.z})
+				minetest.sound_play("exatec_code_accepted", {pos=pos, gain = 2, max_hear_distance = 10})
 			end
 			return
 		end
