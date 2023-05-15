@@ -532,25 +532,40 @@ minetest.register_node("default:recycling_mill", {
 minetest.register_node("default:pellets_mill", {
 	description = "Pellets mill",
 	tiles={"default_steelblock.png^fire_basic_flame.png^synth_repeat.png"},
-	groups = {cracky=3,used_by_npc=1,exatec_tube_connected=1,store=6000},
+	groups = {cracky=3,used_by_npc=1,exatec_tube_connected=1,store=6000,on_load=1},
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos, placer, itemstack)
 		minetest.get_meta(pos):set_int("colortest",minetest.check_player_privs(placer:get_player_name(), {server=true}) and 1 or 0)
 	end,
+	on_load = function(pos)
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
+		if meta:get_inventory():get_size("input") ~= 9 then
+			local a = inv:get_stack("input",1)
+			local b = inv:get_stack("output1",1)
+			local c = inv:get_stack("output2",1)
+			minetest.registered_nodes["default:pellets_mill"].on_construct(pos)
+			inv:set_stack("input",1,a)
+			inv:set_stack("output1",1,b)
+			inv:set_stack("output2",1,c)
+		end
+	end,
 	on_construct=function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		inv:set_size("input", 1)
+		inv:set_size("input", 9)
 		inv:set_size("output1", 1)
 		inv:set_size("output2", 1)
 		meta:set_string("formspec",
-			"size[8,5]" ..
+			"size[8,6.5]" ..
 			"listcolors[#77777777;#777777aa;#000000ff]"..
-			"image[2,0;1,1;fire_basic_flame.png]" ..
-			"list[context;input;2,0;1,1;]" ..
-			"list[context;output1;3.5,0;3,3;]" ..
-			"list[context;output2;5,0;3,3;]" ..
-			"list[current_player;main;0,1.5;8,4;]" ..
+			"image[0.2,0.2;3,3;fire_basic_flame.png]" ..
+			"list[context;input;0,0;3,3;]" ..
+
+			"list[context;output1;4,1;3,3;]" ..
+			"list[context;output2;6,1;3,3;]" ..
+
+			"list[current_player;main;0,3;8,4;]" ..
 			"listring[current_player;main]" ..
 			"listring[current_name;input]" ..
 			"listring[current_name;output2]" ..
@@ -576,22 +591,100 @@ minetest.register_node("default:pellets_mill", {
 	end,
 	on_timer = function(pos, elapsed)
 		local timer = false
+		local meta = minetest.get_meta(pos)
+		local skip = meta:get_int("skip") == 1
 		local inv = minetest.get_meta(pos):get_inventory()
-		local stack1= inv:get_stack("input",1)
+		local stack1
 
-		local c = minetest.get_item_group(stack1:get_name(),"wood") > 0 and 4 or minetest.get_item_group(stack1:get_name(),"tree") > 0 and 12 or 1
+		for i=1,16 do
+			stack1 = inv:get_stack("input",i)
+			if stack1:get_count() > 0 then
+				break
+			end
+		end
+
+		local craft = minetest.get_craft_recipe(stack1:get_name())
+
+		if not skip and stack1:get_count() > 0 and craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
+			local same_items = false
+			for i,v in pairs(craft.items) do
+				if v == stack1:get_name() then
+					if same_items == false then
+						same_items = true
+					else
+						return
+					end
+				end
+			end
+
+			for i,v in pairs(craft.items) do
+				local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
+				if a.item:get_name() == stack1:get_name() or minetest.get_item_group(v,"not_recycle_return") > 0 then
+					meta:set_int("skip",1)
+					return true
+				elseif v:sub(1,6) == "group:" then
+					local g = v:sub(7,-1)
+					for i2,v2 in pairs(minetest.registered_items) do
+						if v2.groups and (v2.groups[g] or 0) > 0 and not v2.groups.not_recycle_return then
+							craft.items[i]=i2
+							break
+						end
+					end
+				end
+			end
+
+			local w = stack1:get_wear()
+			for i,v in pairs(craft.items) do
+				if v == stack1:get_name() or not minetest.registered_items[v] or w > 0 and math.random(1,math.ceil(w*0.00005)) > 1 then
+					craft.items[i] = ""
+				end
+			end
+
+			if #craft.items == 0 then
+				return false
+			else
+				for i,v in pairs(craft.items) do
+					if inv:room_for_item("input",v) then
+						inv:add_item("input",v)
+					else
+						return false
+					end
+				end
+				inv:remove_item("input",stack1:get_name())
+			end
+			return true
+		elseif skip then
+			meta:set_int("skip",0)
+		end
+
+		local c = minetest.get_item_group(stack1:get_name(),"wood") > 0 and 4 or minetest.get_item_group(stack1:get_name(),"tree") > 0 and 12 or minetest.get_item_group(stack1:get_name(),"flammable")
+
+		if c == 0 and stack1:get_name() ~= "" then
+			local ob = minetest.add_entity(vector.offset(pos,0,1,0),"exatec:tubeitem")
+			local en = ob:get_luaentity()
+			en:new_item(stack1,pos)
+			en.storage.dir = vector.new(0,1,0)
+			ob:set_velocity(en.storage.dir)
+			inv:remove_item("input",stack1)
+			return true
+		end
+
 		local pellets = ItemStack("materials:pellets "..c)
 		local pelletsblock = ItemStack("materials:pelletsblock")
 
 		if inv:is_empty("input") and inv:is_empty("output1") then	
 			return false
+		elseif stack1:get_count() >= 10 and inv:room_for_item("output1",ItemStack("materials:pellets "..(c*stack1:get_count()))) then
+			inv:add_item("output1",ItemStack("materials:pellets "..(c*stack1:get_count())))
+			inv:remove_item("input",stack1)
+			timer = true
 		elseif stack1:get_count() >= 10 and inv:room_for_item("output1",ItemStack("materials:pellets "..(c*10))) then
 			inv:add_item("output1",ItemStack("materials:pellets "..(c*10)))
-			inv:set_stack("input",1,ItemStack(stack1:get_name() .. " "..stack1:get_count()-10))
+			inv:remove_item("input",stack1:get_name() .. " 10")
 			timer = true
 		elseif stack1:get_count() >= 1 and inv:room_for_item("output1",pellets) then
 			inv:add_item("output1",pellets)
-			inv:set_stack("input",1,ItemStack(stack1:get_name() .. " "..stack1:get_count()-1))
+			inv:remove_item("input",stack1:get_name() .. " 1")
 			timer = true
 		end
 
@@ -612,7 +705,6 @@ minetest.register_node("default:pellets_mill", {
 		return inv:is_empty("input") and inv:is_empty("output1") and inv:is_empty("output2")
 	end,
 	exatec={
-		--input_max=10,
 		input_list="input",
 		output_list="output2",
 		test_input=function(pos,stack)
