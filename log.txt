@@ -1,3 +1,5 @@
++ bed waypoint
++ home waypoint
 + upgrade Pellets mill
 
 11.31
