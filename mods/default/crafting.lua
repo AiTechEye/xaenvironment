@@ -541,13 +541,7 @@ minetest.register_node("default:pellets_mill", {
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		if meta:get_inventory():get_size("input") ~= 9 then
-			local a = inv:get_stack("input",1)
-			local b = inv:get_stack("output1",1)
-			local c = inv:get_stack("output2",1)
 			minetest.registered_nodes["default:pellets_mill"].on_construct(pos)
-			inv:set_stack("input",1,a)
-			inv:set_stack("output1",1,b)
-			inv:set_stack("output2",1,c)
 		end
 	end,
 	on_construct=function(pos)
