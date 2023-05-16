@@ -1,3 +1,38 @@
+places.rentpanel = {}
+
+places.rentpanel.update_waypoint=function(user,pos)
+	local name = user:get_player_name()
+	local p = player_style.players[name]
+	p.rent = p.rent or {}
+
+	if not user then
+		return
+	elseif not pos then
+		if p.rent.waypoint then
+			user:hud_remove(p.rent.waypoint)
+			p.rent.waypoint = nil
+		end
+	elseif not p.rent.waypoint then
+		p.rent.waypoint = user:hud_add({
+			hud_elem_type="image_waypoint",
+			scale = {x=1, y=1},
+			name="aim",
+			text="places_rentalpanel.png",
+			world_pos = pos
+		})
+	else
+		user:hud_change(p.rent.waypoint, "world_pos", pos)
+	end
+end
+
+minetest.register_on_joinplayer(function(player)
+	local s = player:get_meta():get_string("places_rentpanel_pos")
+	if s ~="" then
+		local pos = minetest.string_to_pos(s)
+		places.rentpanel.update_waypoint(player,pos)
+	end
+end)
+
 minetest.register_craft({
 	output="places:rental",
 	recipe={
@@ -24,27 +59,7 @@ minetest.register_craft({
 	},
 })
 
-minetest.register_node("places:rental", {
-	description = "Rental panel",
-	tiles={
-		"places_wood.png",
-		"places_wood.png",
-		"places_wood.png",
-		"places_wood.png",
-		"places_wood.png",
-		"places_rentalpanel.png",
-	},
-	paramtype2 = "facedir",
-	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy=3,oddly_breakable_by_hand=3,store=200,on_load=1},
-	drawtype="nodebox",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.4, -0.4, 0.5, 0.4, 0.4, 0.45},
-		}
-	},
-	on_load=function(pos)
+	places.rentpanel.on_load = function(pos)
 		local m = minetest.get_meta(pos)
 		if m:get_int("npc_randomly") == 1 then
 			if math.random(1,10) > 1 then
@@ -58,19 +73,23 @@ minetest.register_node("places:rental", {
 				end
 			end
 			m:set_int("npc_randomly",2)
+
+		elseif minetest.get_node(pos).name == "places:rental" and m:get_string("renter") == "" and m:get_string("pos1") ~= "" then
+			local p2 = minetest.get_node(pos).param2
+			minetest.swap_node(pos,{name="places:rental_free",param2=p2})
 		end
-	end,
-	after_place_node=function(pos, placer, itemstack, pointed_thing)
+	end
+	places.rentpanel.after_place_node = function(pos, placer, itemstack, pointed_thing)
 		minetest.get_meta(pos):set_string("owner",placer:get_player_name())
-	end,
-	on_construct=function(pos)
+	end
+	places.rentpanel.on_construct = function(pos)
 		local m = minetest.get_meta(pos)
 		m:set_int("amount",1)
 		m:set_int("price",1)
 		m:set_int("list",3)
 		m:set_int("npc_randomly",0)
-	end,
-	panel=function(pos,user,preview)
+	end
+	places.rentpanel.panel = function(pos,user,preview)
 		local m = minetest.get_meta(pos)
 		local name = user and user:is_player() and user:get_player_name() or ""
 		local form = "size[3,3.6]listcolors[#77777777;#777777aa;#000000ff]"
@@ -101,11 +120,11 @@ minetest.register_node("places:rental", {
 
 		end
 		m:set_string("formspec",form)
-	end,
-	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-		minetest.registered_nodes["places:rental"].panel(pos, player)
-	end,
-	counts = function(pos)
+	end
+	places.rentpanel.on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		places.rentpanel.panel(pos, player)
+	end
+	places.rentpanel.counts = function(pos)
 		local m = minetest.get_meta(pos)
 		local l = m:get_int("list")
 		local a = m:get_int("amount")
@@ -126,8 +145,8 @@ minetest.register_node("places:rental", {
 		end
 		m:set_int("amount",a)
 		m:set_int("price",p)
-	end,
-	on_receive_fields=function(pos, formname, pressed, sender)
+	end
+	places.rentpanel.on_receive_fields = function(pos, formname, pressed, sender)
 		local m = minetest.get_meta(pos)
 		local name = sender and sender:get_player_name() or m:get_string("renter")
 
@@ -152,19 +171,22 @@ minetest.register_node("places:rental", {
 			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):start((l== 1 or l == 2) and 1 or 10)
 			Coin(sender,-p)
-
+			local p2 = minetest.get_node(pos).param2
+			minetest.swap_node(pos,{name="places:rental",param2=p2})
 			pm:set_string("places_rentpanel_pos",minetest.pos_to_string(pos))
 			pm:set_string("places_rentpanel_node",minetest.get_node(pos).name)
-			minetest.registered_nodes["places:rental"].panel(pos, sender)
+			places.rentpanel.panel(pos, sender)
+			places.rentpanel.update_waypoint(sender,pos)
 		elseif pressed.cancelrenting then
 			m:set_int("cancel",1)
 			minetest.chat_send_player(m:get_string("owner"),"The renting is canceling")
 			minetest.chat_send_player(m:get_string("renter"),"The renting is canceling")
-			minetest.registered_nodes["places:rental"].panel(pos, sender)
+			places.rentpanel.panel(pos, sender)
 		elseif pressed.cancel then
 			local pm = sender:get_meta()
 			pm:set_string("places_rentpanel_pos","")
 			pm:set_string("places_rentpanel_node","")
+			places.rentpanel.update_waypoint(sender)
 			local renter = m:get_string("renter")
 			minetest.chat_send_player(name,name == renter and "You as renter is terminated" or "The renter is terminated")
 			local c = Getcoin(renter)
@@ -176,13 +198,15 @@ minetest.register_node("places:rental", {
 			m:set_string("renter","")
 			m:set_int("cancel",0)
 			minetest.get_node_timer(pos):stop()
+			local p2 = minetest.get_node(pos).param2
+			minetest.swap_node(pos,{name="places:rental_free",param2=p2})
 		elseif pressed.cp then
-			minetest.registered_nodes["places:rental"].panel(pos, sender,true)
+			places.rentpanel.panel(pos, sender,true)
 		elseif pressed.set then
 			m:set_int("amount",pressed.amount or m:get_int("amount"))
 			m:set_int("price",pressed.price or m:get_int("price"))
-			minetest.registered_nodes["places:rental"].counts(pos)
-			minetest.registered_nodes["places:rental"].panel(pos, sender)
+			places.rentpanel.counts(pos)
+			places.rentpanel.panel(pos, sender)
 		elseif pressed.setup then
 			local p = protect.user[name]
 			if not (p and p.pos1 and p.pos2) then
@@ -196,19 +220,19 @@ minetest.register_node("places:rental", {
 					m:set_string("pos2",minetest.pos_to_string(vector.subtract(p.pos2,pos)))
 					protect.clear(name)
 					minetest.chat_send_player(name,"The area is confirmed")
-					minetest.registered_nodes["places:rental"].on_receive_fields(pos, formname, {cancel=true}, sender)
-					minetest.registered_nodes["places:rental"].panel(pos, sender)
+					places.rentpanel.on_receive_fields(pos, formname, {cancel=true}, sender)
+					places.rentpanel.panel(pos, sender)
 				end
 			end
 		elseif pressed.list then
 			m:set_int("list",minetest.explode_textlist_event(pressed.list).index)
 			m:set_int("amount",pressed.amount or m:get_int("amount"))
 			m:set_int("price",pressed.price or m:get_int("price"))
-			minetest.registered_nodes["places:rental"].counts(pos)
-			minetest.registered_nodes["places:rental"].panel(pos, sender)
+			places.rentpanel.counts(pos)
+			places.rentpanel.panel(pos, sender)
 		end
-	end,
-	on_timer = function (pos, elapsed)
+	end
+	places.rentpanel.on_timer = function(pos, elapsed)
 		local m = minetest.get_meta(pos)
 		local date = m:get_int("date")
 		local l = m:get_int("list")
@@ -219,7 +243,7 @@ minetest.register_node("places:rental", {
 		local owner = m:get_string("owner")
 		if time >= a and renter ~= "" then
 			if m:get_int("cancel") == 1 then
-				minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+				places.rentpanel.on_receive_fields(pos, "", {cancel=true})
 				return
 			end
 
@@ -229,21 +253,85 @@ minetest.register_node("places:rental", {
 				Coin(renter,-c)
 				Coin(owner,c)
 				minetest.chat_send_player(renter,c.." coin(s) has just been taken from you due your rent ("..minetest.colorize("#FFFF00",Getcoin(renter)).." left)")
-				minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+				places.rentpanel.on_receive_fields(pos, "", {cancel=true})
 				return
 			else
 				Coin(renter,-cost)
 				Coin(owner,cost)
 				minetest.chat_send_player(renter,cost.." coin(s) has just been taken from you due your rent ("..minetest.colorize("#FFFF00",Getcoin(renter)).." left)")
 				if c-cost <= cost then
-					minetest.registered_nodes["places:rental"].on_receive_fields(pos, "", {cancel=true})
+					places.rentpanel.on_receive_fields(pos, "", {cancel=true})
 					return
 				end
 			end
 			m:set_int("date",default.date("get"))
 		end
 		return true
-	end,
+	end
+
+
+minetest.register_node("places:rental", {
+	description = "Rental panel",
+	tiles={
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_rentalpanel.png",
+	},
+	paramtype2 = "facedir",
+	sounds = default.node_sound_wood_defaults(),
+	groups = {choppy=3,oddly_breakable_by_hand=3,store=200,on_load=1},
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4, -0.4, 0.5, 0.4, 0.4, 0.45},
+		}
+	},
+	on_load = places.rentpanel.on_load,
+	panel = places.rentpanel.panel,
+	counts = places.rentpanel.counts,
+	after_place_node = places.rentpanel.after_place_node,
+	on_construct = places.rentpanel.on_construct,
+	on_rightclick = places.rentpanel.on_rightclick,
+	on_receive_fields = places.rentpanel.on_receive_fields,
+	on_timer = places.rentpanel.on_timer,
+	can_dig = function(pos, player)
+		return minetest.get_meta(pos):get_string("renter") == ""
+	end
+})
+
+minetest.register_node("places:rental_free", {
+	description = "Rental panel (free)",
+	tiles={
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_wood.png",
+		"places_rentalpanel.png^[colorize:#0F05",
+	},
+	drop="places:rental",
+	paramtype2 = "facedir",
+	sounds = default.node_sound_wood_defaults(),
+	groups = {choppy=3,oddly_breakable_by_hand=3,store=200,on_load=1,not_in_creative_inventory=1},
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.4, -0.4, 0.5, 0.4, 0.4, 0.45},
+		}
+	},
+	on_load = places.rentpanel.on_load,
+	panel = places.rentpanel.panel,
+	counts = places.rentpanel.counts,
+	after_place_node = places.rentpanel.after_place_node,
+	on_construct = places.rentpanel.on_construct,
+	on_rightclick = places.rentpanel.on_rightclick,
+	on_receive_fields = places.rentpanel.on_receive_fields,
+	on_timer = places.rentpanel.on_timer,
 	can_dig = function(pos, player)
 		return minetest.get_meta(pos):get_string("renter") == ""
 	end
@@ -437,7 +525,7 @@ minetest.register_tool("places:rentpanel_copycard", {
 				m:set_string("pos1",im:get_string("pos1"))
 				m:set_string("pos2",im:get_string("pos2"))
 				minetest.chat_send_player(name,"Panel settings is set")
-				minetest.registered_nodes["places:rental"].panel(pos, user)
+				places.rentpanel.panel(pos, user)
 				return itemstack
 			end
 		else
@@ -472,6 +560,7 @@ player_style.register_button({
 						meta:set_string("places_rentpanel_pos","")
 						meta:set_string("places_rentpanel_node","")
 						minetest.chat_send_player(name,"Looks like you as renter is terminated")
+						places.rentpanel.update_waypoint(player)
 						player:set_pos(pos2)
 					end
 				end)
