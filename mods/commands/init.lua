@@ -1,3 +1,5 @@
+commands = {}
+
 minetest.register_chatcommand("killme", {
 	params = "",
 	description = "Die",
@@ -29,7 +31,39 @@ minetest.register_chatcommand("kill", {
 minetest.register_privilege("home", {
 	description = "Can set/go home",
 	give_to_singleplayer = true,
+	on_revoke=function(name)
+		commands.update_waypoint(name)
+	end
 })
+
+commands.update_waypoint=function(name,pos)
+	local p = player_style.players[name]
+	local user = minetest.get_player_by_name(name)
+	p.home = p.home or {}
+	if not user then
+		return
+	elseif not pos then
+		user:hud_remove(p.home.waypoint)
+	elseif not p.home.waypoint then
+		p.home.waypoint = user:hud_add({
+			hud_elem_type="image_waypoint",
+			scale = {x=1, y=1},
+			name="aim",
+			text="commands_home.png",
+			world_pos = pos,
+		})
+	else
+		user:hud_change(p.home.waypoint, "world_pos", pos)
+	end
+end
+
+minetest.register_on_joinplayer(function(player)
+	local s = player:get_meta():get_string("home")
+	if s ~="" then
+		local pos = minetest.string_to_pos(s)
+		commands.update_waypoint(player:get_player_name(),pos)
+	end
+end)
 
 minetest.register_chatcommand("sethome", {
 	params = "",
@@ -43,6 +77,7 @@ minetest.register_chatcommand("sethome", {
 			if m:get_int("respawn_disallowed") == 1 then
 				minetest.chat_send_player(name,"Homes is disallowed in this case")
 			else
+				commands.update_waypoint(name,pos)
 				m:set_string("home",minetest.pos_to_string(pos))
 				minetest.chat_send_player(name, "Home set!")
 			end
@@ -87,6 +122,7 @@ player_style.register_button({
 			local pos = player:get_pos()
 			m:set_string("home",minetest.pos_to_string(pos))
 			minetest.chat_send_player(name, "Home set!")
+			commands.update_waypoint(name,pos)
 		end
 	end
 })
