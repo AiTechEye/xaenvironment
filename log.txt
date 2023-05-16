@@ -1,3 +1,7 @@
+
+11.35
+
++ rental panel waypoint & upgrade
 + bed waypoint
 + home waypoint
 + upgrade Pellets mill
