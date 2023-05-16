@@ -1,6 +1,5 @@
 beds={}
 
-
 beds.update_waypoint=function(user,pos)
 	local name = user:get_player_name()
 	local p = player_style.players[name]
@@ -8,7 +7,10 @@ beds.update_waypoint=function(user,pos)
 	if not user then
 		return
 	elseif not pos then
-		user:hud_remove(p.bed.waypoint)
+		if p.bed.waypoint then
+			user:hud_remove(p.bed.waypoint)
+		end
+		p.bed.waypoint = nil
 	elseif not p.bed.waypoint then
 		p.bed.waypoint = user:hud_add({
 			hud_elem_type="image_waypoint",
