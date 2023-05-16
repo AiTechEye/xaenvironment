@@ -6,6 +6,8 @@
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
+## [Log](log.txt)
+
 # Contributor: 
 ## [MrRar](https://github.com/MrRar)  (code, models, media)
   [paintnings_tv.obj](mods/paintnings/models/paintnings_tv.obj) CC BY-SA-4.0   
