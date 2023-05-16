@@ -33,8 +33,8 @@ end)
 
 player_style.register_button({
 	name="Bed",
-	image="beds:bed",
-	type="item_image",
+	type="image",
+	image="beds_icon.png",
 	info="Go to bed",
 	low_priority = true,
 	action=function(player)
