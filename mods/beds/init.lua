@@ -1,5 +1,36 @@
 beds={}
 
+
+beds.update_waypoint=function(user,pos)
+	local name = user:get_player_name()
+	local p = player_style.players[name]
+	p.bed = p.bed or {}
+	if not user then
+		return
+	elseif not pos then
+		user:hud_remove(p.bed.waypoint)
+	elseif not p.bed.waypoint then
+		p.bed.waypoint = user:hud_add({
+			hud_elem_type="image_waypoint",
+			scale = {x=1.5, y=1.5},
+			name="aim",
+			text="beds_icon.png",
+			world_pos = pos
+		})
+	else
+		user:hud_change(p.bed.waypoint, "world_pos", pos)
+	end
+end
+
+minetest.register_on_joinplayer(function(player)
+	local s = player:get_meta():get_string("beds_position")
+	if s ~="" then
+		local pos = minetest.string_to_pos(s)
+		beds.update_waypoint(player,pos)
+	end
+end)
+
+
 player_style.register_button({
 	name="Bed",
 	image="beds:bed",
@@ -64,6 +95,7 @@ beds.sleeping=function(pos,player)
 			local m = p:get_meta()
 			if minetest.get_item_group(minetest.get_node(p:get_pos()).name,"tent") == 0 and m:get_int("respawn_disallowed") == 0 then
 				m:set_string("beds_position",minetest.pos_to_string(p:get_pos()))
+				beds.update_waypoint(p,p:get_pos())
 			end
 		end
 		minetest.set_timeofday(0.21)
