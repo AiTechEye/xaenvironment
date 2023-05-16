@@ -43,7 +43,10 @@ commands.update_waypoint=function(name,pos)
 	if not user then
 		return
 	elseif not pos then
-		user:hud_remove(p.home.waypoint)
+		if p.home.waypoint then
+			user:hud_remove(p.home.waypoint)
+		end
+		p.home.waypoint = nil
 	elseif not p.home.waypoint then
 		p.home.waypoint = user:hud_add({
 			hud_elem_type="image_waypoint",
