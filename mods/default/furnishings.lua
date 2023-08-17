@@ -226,7 +226,7 @@ default.register_couch=function(def)
 			description = uname .. " couch "..v.." (rightclick to change in 5s)",
 			tiles = {def.texture},
 			drop = name.."_left",
-			groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,not_in_creative_inventory= i > 1 and 1 or nil},
+			groups = {wood=1,flammable = 1,choppy=3,oddly_breakable_by_hand=3,not_in_creative_inventory= i > 1 and 1 or nil,not_recycle_return=1},
 			drawtype = "nodebox",
 			paramtype = "light",
 			paramtype2 = "facedir",
@@ -333,6 +333,7 @@ default.register_chair=function(def)
 		name = mod .. def.name .. "_armchair"
 		def.description = uname .. " armchair"
 		groups.flammable = 3
+		groups.not_recycle_return = 1
 		def.texture = def.texture or "default_wool.png^[colorize:#000000cc"
 		def.node_box = {
 			type = "fixed",
