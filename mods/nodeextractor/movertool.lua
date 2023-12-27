@@ -42,7 +42,9 @@ end
 nodeextractor.movetoolstage=function(username,itemstack)
 	local m = itemstack:get_meta()
 	local u = nodeextractor.user[username]
-	m:set_string("inventory_image","nodeextractor_movetool" .. u.p .. ".png")
+	if u then
+		m:set_string("inventory_image","nodeextractor_movetool" .. u.p .. ".png")
+	end
 	return itemstack
 end
 
