@@ -235,15 +235,6 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output="materials:spaceyfloor 10",
-	recipe={
-		{"default:steel_lump","default:iron_ingot","default:steel_lump"},
-		{"default:iron_ingot","default:steel_ingot","default:iron_ingot"},
-		{"default:steel_lump","default:iron_ingot","default:steel_lump"},
-	}
-})
-
-minetest.register_craft({
 	output="materials:asphalt 16",
 	recipe={
 		{"default:carbon_lump","quads:bottle_with_oil","default:gravel"},
