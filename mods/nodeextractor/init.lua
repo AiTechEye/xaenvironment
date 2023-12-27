@@ -1,5 +1,8 @@
 nodeextractor = {user={}}
 
+dofile(minetest.get_modpath("nodeextractor") .. "/movertool.lua")
+
+
 minetest.register_on_leaveplayer(function(player)
 	nodeextractor.user[player:get_player_name()] = nil
 end)
@@ -75,7 +78,10 @@ nodeextractor.create=function(pos1,pos2,filename)
 	end
 	end
 	local s = vector.new((pos2.x-pos1.x)+1,(pos2.y-pos1.y)+1,(pos2.z-pos1.z)+1)
-	minetest.log("size: "..minetest.pos_to_string(s))
+
+	if filename ~= "" then
+		minetest.log("size: "..minetest.pos_to_string(s))
+	end
 	return minetest.serialize({nodes=m,size=s,version=1})
 end
 
@@ -114,7 +120,7 @@ nodeextractor.mirror_param2=function(node,m)
 	return node
 end
 
-nodeextractor.set=function(pos,filepath,clearspace,mirror)
+nodeextractor.set=function(pos,filepath,clearspace,mirror,read_from_text)
 	if not filepath then
 		print("nodeextractor set: filepath is missing")
 		return false
@@ -127,9 +133,14 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 		mirror_disabled = true
 	end
 
-	local file = io.open(filepath, "r") or {}
-	local f = file:read()
-	file:close()
+	local f
+	if read_from_text then
+		f = read_from_text
+	else
+		local file = io.open(filepath, "r") or {}
+		f = file:read()
+		file:close()
+	end
 
 	pos = vector.round(pos)
 	local dat = minetest.deserialize(f)
@@ -146,7 +157,6 @@ nodeextractor.set=function(pos,filepath,clearspace,mirror)
 	local area = VoxelArea:new({MinEdge = min, MaxEdge = max})
 	local data = vox:get_data()
 	local contens = {}
-
 
 	if not mirror_disabled then
 		if mirror.x == -1 then
@@ -281,21 +291,21 @@ minetest.register_tool("nodeextractor:creater", {
 	range=20,
 	on_use=function(itemstack, user, pointed_thing)
 		if minetest.check_player_privs(user:get_player_name(), {server=true}) then
-			nodeextractor.a(itemstack, user, pointed_thing,1)
+			nodeextractor.mark(itemstack, user, pointed_thing,1)
 		else
 			minetest.chat_send_player(user:get_player_name(),"the server privilege is required")
 		end
 	end,
 	on_place=function(itemstack, user, pointed_thing)
 		if minetest.check_player_privs(user:get_player_name(), {server=true}) then
-			nodeextractor.a(itemstack, user, pointed_thing,2)
+			nodeextractor.mark(itemstack, user, pointed_thing,2)
 		else
 			minetest.chat_send_player(user:get_player_name(),"the server privilege is required")
 		end
 	end,
 	on_secondary_use=function(itemstack, user, pointed_thing)
 		if minetest.check_player_privs(user:get_player_name(), {server=true}) then
-			nodeextractor.a(itemstack, user, pointed_thing,2)
+			nodeextractor.mark(itemstack, user, pointed_thing,2)
 		else
 			minetest.chat_send_player(user:get_player_name(),"the server privilege is required")
 		end
@@ -324,7 +334,7 @@ minetest.register_tool("nodeextractor:placer", {
 	end,
 })
 
-nodeextractor.a=function(itemstack, user, pointed_thing,typ)
+nodeextractor.mark=function(itemstack, user, pointed_thing,typ)
 	local username = user:get_player_name()
 	if not nodeextractor.user[username ] then
 		nodeextractor.user[username ] = {}
