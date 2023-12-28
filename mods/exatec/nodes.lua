@@ -24,6 +24,50 @@ minetest.register_craftitem("exatec:list", {
 	end
 })
 
+minetest.register_tool("exatec:remote_signal", {
+	description = "Remote signal\nUse on technic to save the position\nUse somewhere else to send signal (activate)",
+	inventory_image = "exatec_remote_signal1.png",
+	on_use=function(itemstack, user, pointed_thing)
+		local m = itemstack:get_meta()
+		local name = user:get_player_name()
+		local pos = pointed_thing.under
+		if pos then
+			local p,nam minetest.is_protected(pos, name)
+			if p == false then
+				minetest.chat_send_player(name,"This node is protected area by " .. nam)
+				return
+			end
+			local n = minetest.get_node(pos).name
+			local def = minetest.registered_items[n] or {}
+			local g = def.groups or {}
+			if g.exatec or g.exatec_tube or g.exatec_tube_connected or g.exatec_wire or g.exatec_wire_connected then
+				m:set_string("pos",minetest.pos_to_string(pos))
+				m:set_string("inventory_image","exatec_remote_signal2.png")
+				m:set_string("name",n)
+				return itemstack
+			end
+		end
+		if m:get_string("pos") ~= "" then
+			local pos2 = minetest.string_to_pos(m:get_string("pos"))
+			local p,nam minetest.is_protected(pos2, name)
+			local rem = exatec.get_node(pos2) ~= m:get_string("name")
+			if rem or p == false then
+				minetest.chat_send_player(name,rem and "The node is removed" or "Unfortunately, the node is now protected by " .. nam)
+				m:set_string("pos","")
+				m:set_string("inventory_image","exatec_remote_signal1.png")
+				m:set_string("name","")
+				return itemstack
+			else
+				local t = m:get_string("inventory_image")
+				t = t == "exatec_remote_signal2.png" and "exatec_remote_signal3.png" or "exatec_remote_signal2.png"
+				exatec.send(pos2,true,true)
+				m:set_string("inventory_image",t)
+				return itemstack
+			end
+		end
+	end
+})
+
 minetest.register_node("exatec:tube", {
 	description = "Tube",
 	tiles = {"exatec_glass.png"},

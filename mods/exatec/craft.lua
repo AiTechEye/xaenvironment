@@ -32,6 +32,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output="exatec:remote_signal",
+	recipe={
+		{"default:tin_ingot","exatec:pcb","exatec:wire"},
+		{"materials:plastic_sheet","default:xe_crystal","materials:plastic_sheet"},
+	},
+})
+
+minetest.register_craft({
 	output="exatec:wire_block",
 	recipe={
 		{"exatec:wire","default:xe_crystal",""},
