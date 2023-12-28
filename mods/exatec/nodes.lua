@@ -25,7 +25,7 @@ minetest.register_craftitem("exatec:list", {
 })
 
 minetest.register_tool("exatec:remote_signal", {
-	description = "Remote signal\nUse on technic to save the position\nUse somewhere else to send signal (activate)",
+	description = "Remote signal controller\nUse on technic to save the position\nUse somewhere else to send signal (activate)",
 	inventory_image = "exatec_remote_signal1.png",
 	on_use=function(itemstack, user, pointed_thing)
 		local m = itemstack:get_meta()
