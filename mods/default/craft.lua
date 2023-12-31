@@ -223,6 +223,14 @@ minetest.register_craft({
 -- ======================= Items
 --||||||||||||||||
 
+
+minetest.register_craft({
+	output="default:waterdrop",
+	recipe={
+		{"default:snow"},
+	},
+})
+
 minetest.register_craft({
 	output="default:stick",
 	recipe={

@@ -1117,6 +1117,17 @@ minetest.register_node("default:snow", {
 			{-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
 		}
 	},
+	on_use=function(itemstack, user, pointed_thing)
+		local item = ItemStack("default:bow_wood_loaded")
+		local meta = item:get_meta()
+		meta:set_string("arrow","examobs:arrow_snowball")
+		meta:set_string("shots",1)
+		bows.shoot(item, user,nil,function(item)
+			item:remove()
+		end)
+		itemstack:take_item()
+		return itemstack
+	end
 })
 
 minetest.register_node("default:ice", {
