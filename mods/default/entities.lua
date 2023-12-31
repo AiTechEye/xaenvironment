@@ -99,7 +99,6 @@ local item = {
 
 			builtin_item.on_step(self,dtime,moveresult)
 		end
-		
 
 		if not pos then
 			self.object:remove()
@@ -178,6 +177,38 @@ local item = {
 					v.z = 0
 				end
 				self.object:set_velocity({x=math.floor((v.x*0.95)*100)/100, y=v.y, z=math.floor((v.z*0.95)*100)/100})
+			end
+		end
+
+
+		if self.dropped_by and not self.trash and not self.igniter_burn_timer and self.age > 30 and moveresult and moveresult.touching_ground then
+			self.trash = 1
+			local itemstack = ItemStack(self.itemstring)
+			local fn = minetest.find_node_near(pos,1.5,"group:trashbag",true)
+
+			if fn then
+				local inv = minetest.get_meta(fn):get_inventory()
+				if inv:room_for_item("main",itemstack) then
+					inv:add_item("main",itemstack)
+					minetest.registered_items["default:trashbag1"].update(fn)
+					self.object:remove()
+					return
+				end
+			end
+
+			local air = minetest.find_node_near(pos,1.5,"air",true)
+			if default.defpos(pos,"buildable_to") and not minetest.is_protected(pos, self.dropped_by or "") then
+				minetest.set_node(pos,{name="default:trashbag1"})
+				minetest.get_meta(pos):get_inventory():add_item("main",itemstack)
+				minetest.registered_items["default:trashbag1"].update(pos)
+				self.object:remove()
+				return
+			elseif air and not minetest.is_protected(air, self.dropped_by or "") then
+				minetest.set_node(air,{name="default:trashbag1"})
+				minetest.get_meta(air):get_inventory():add_item("main",itemstack)
+				minetest.registered_items["default:trashbag1"].update(air)
+				self.object:remove()
+				return
 			end
 		end
 	end

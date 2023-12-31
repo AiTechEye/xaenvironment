@@ -424,6 +424,7 @@ minetest.register_node("default:tankstorage", {
 	drawtype = "glasslike_framed",
 	sunlight_propagates = true,
 	paramtype = "light",
+	use_texture_alpha = "blend",
 	manual_page_func=function()
 		local b = "default:tankstorage "
 		for i,v in pairs(minetest.registered_items) do
