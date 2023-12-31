@@ -282,7 +282,7 @@ examobs.environment=function(self)
 
 --liquid and viscosity
 
-	if def.liquid_viscosity > 0 then
+	if def.liquid_viscosity and def.liquid_viscosity > 0 then
 		if not self.in_liquid and v.y <= 0 then
 			if minetest.get_item_group(def.name,"water") > 0 then
 				default.watersplash(pos)
