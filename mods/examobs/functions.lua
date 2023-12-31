@@ -756,16 +756,23 @@ examobs.dropall=function(self)
 					y=math.random(0.5,1),
 					z=math.random(-1.5,1.5)
 				})
+				if self.type == "npc" then
+					e:get_luaentity().dropped_by = self.storage.npcname and self.storage.npcname .. "*" or "someone*"
+				end
 			end
 		end
 		self.inv[i] = nil
 	end
 	if self.coin > 0 then
-		minetest.add_item(pos,"player_style:coin "..self.coin):set_velocity({
+		local e = minetest.add_item(pos,"player_style:coin "..self.coin)
+		e:set_velocity({
 			x=math.random(-1.5,1.5),
 			y=math.random(0.5,1),
 			z=math.random(-1.5,1.5)
 		})
+		if self.type == "npc" then
+			e:get_luaentity().dropped_by = self.storage.npcname and self.storage.npcname .. "*" or "someone*"
+		end
 		self.coin = 0
 	end
 end
@@ -789,6 +796,7 @@ examobs.dying=function(self,set)
 				examobs.anim(self,"lay")
 			end
 		end, self)
+		examobs.dropall(self)
 		self.object:set_properties({nametag=""})
 		self.type=""
 		self.hp=self.hp_max
@@ -796,7 +804,6 @@ examobs.dying=function(self,set)
 		self.dying=nil
 		self.dead=20
 		self.death(self)
-		examobs.dropall(self)
 	elseif set==3 and (self.dying or self.dead) then
 		self.dying={step=0,try=self.hp_max*2}
 		self.dead=nil
