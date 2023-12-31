@@ -137,13 +137,6 @@ default.register_eatable("craftitem","default:waterdrop",0,2,{
 	wet = 0.5
 })
 
-minetest.register_craftitem("default:waterdrop2", {
-	description = "Water drop",
-	inventory_image = "default_water.png^default_alpha_gem_round.png^[makealpha:0,255,0",
-	wield_scale={x=0.3,y=0.3,z=0.3},
-	groups={treasure=1,not_recycle_return=1,wet=1},
-})
-
 minetest.register_craftitem("default:gold_flake", {
 	description = "Gold flake",
 	inventory_image = "default_goldblock.png^default_alpha_gem_round.png^[makealpha:0,255,0",
