@@ -1,7 +1,7 @@
 minetest.register_node("nitroglycerin:timed_bomb", {
 	description = "Timed bomb",
 	tiles = {"nitroglycerin_timed_bomb.png"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=500},
+	groups = {dig_immediate = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=500},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -23,7 +23,6 @@ minetest.register_node("nitroglycerin:timed_bomb", {
 		minetest.get_node_timer(pos):start(5)
 		minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
 	end,
-
 	exatec={
 		on_wire = function(pos)
 			minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
@@ -41,7 +40,7 @@ minetest.register_node("nitroglycerin:timed_bomb", {
 minetest.register_node("nitroglycerin:timed_nuclear_bomb", {
 	description = "Timed nuclear bomb",
 	tiles = {"nitroglycerin_timed_bomb.png^[colorize:#aaff0055"},
-	groups = {dig_immediate = 2,mesecon = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=4000},
+	groups = {dig_immediate = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=4000},
 	sounds = default.node_sound_wood_defaults(),
 	on_blast=function(pos)
 		minetest.set_node(pos,{name="air"})
@@ -146,4 +145,60 @@ minetest.register_craft({
 	recipe = {
 		{"default:uranium_lump","default:iron_ingot"},
 	}
+})
+
+minetest.register_craft({
+	output = "nitroglycerin:timed_plutonium_bomb 3",
+	recipe = {
+		{"default:iron_ingot","default:electric_lump","default:iron_ingot"},
+		{"default:iron_ingot","default:plutonium_ingot","default:iron_ingot"},
+		{"default:iron_ingot","default:iron_ingot","default:iron_ingot"},
+	}
+})
+
+minetest.register_node("nitroglycerin:timed_plutonium_bomb", {
+	description = "Small timed plutonium bomb",
+	tiles = {"nitroglycerin_timed_bomb.png^[colorize:#00d0ff55"},
+	groups = {dig_immediate = 2,flammable = 5,treasure=2,exatec_wire_connected=1,store=500},
+	sounds = default.node_sound_metal_defaults(),
+	on_blast=function(pos)
+		minetest.set_node(pos,{name="air"})
+		minetest.after(0.01, function()
+			for i, ob in pairs(minetest.get_objects_inside_radius(pos, 20)) do
+				local p = ob:get_pos()
+				if p and default.defpos(p,"buildable_to") and not minetest.is_protected(p,"") then
+					minetest.set_node(p,{name="fire:plutonium_flame"})
+				end
+				local en = ob:get_luaentity()
+				if en and en.name == "__builtin:item" then
+					ob:remove()
+				else
+					ob:punch(ob,1,{full_punch_interval=1,damage_groups={fleshy=10}})
+				end
+			end
+			nitroglycerin.explode(pos,{radius=7,set="fire:plutonium_flame",place={"fire:plutonium_flame","fire:plutonium_flame"}})
+		end)
+	end,
+	on_timer=function(pos, elapsed)
+		minetest.registered_nodes["nitroglycerin:timed_plutonium_bomb"].on_blast(pos)
+	end,
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		local meta=minetest.get_meta(pos)
+		if meta:get_int("b")==1 then return end
+		meta:set_int("b",1)
+		minetest.get_node_timer(pos):start(5)
+		minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
+	end,
+	exatec={
+		on_wire = function(pos)
+			minetest.sound_play("nitroglycerin_activated", {pos=pos, gain = 1, max_hear_distance = 7})
+			minetest.registered_nodes["nitroglycerin:timed_plutonium_bomb"].on_blast(pos)
+		end
+	},
+	on_burn = function(pos)
+		minetest.registered_nodes["nitroglycerin:timed_plutonium_bomb"].on_rightclick(pos)
+	end,
+	on_ignite = function(pos, igniter)
+		minetest.registered_nodes["nitroglycerin:timed_plutonium_bomb"].on_rightclick(pos)
+	end,
 })
