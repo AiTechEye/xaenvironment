@@ -1600,3 +1600,54 @@ default.registry_mineral({
 		cooktime = 100
 	}}
 })
+
+default.registry_mineral({
+	name="plutonium",
+	armchair = "default:plutonium_ingot",
+	texture="default_plutonium.png",
+	block={groups={radioactive=20}},
+	not_lump=true,
+	not_ore=true,
+	not_pick=false,
+	not_axe=true,
+	not_shovel=true,
+	not_hoe=true,
+	not_bow=true,
+	not_arrow=true,
+	not_vineyardknife=true,
+	ingot={groups={store=1500}},
+	pick={
+		range = 7,
+		on_use=function(itemstack, user, pointed_thing)
+			if pointed_thing.type == "node" and not minetest.is_protected(pointed_thing.under,user:get_player_name()) then
+				local n = minetest.get_node(pointed_thing.under)
+				local can_dig = default.def(n.name)
+				if minetest.get_item_group(n.name,"unbreakable") == 0 and (can_dig.can_dig == nil or can_dig.can_dig(pointed_thing.under,user) == true) then
+					minetest.node_dig(pointed_thing.under, n, user)
+					minetest.set_node(pointed_thing.under,{name="fire:plutonium_flame"})
+					itemstack:add_wear(60)
+				end
+			elseif pointed_thing.type == "object" then
+				local p = pointed_thing.ref:get_pos()
+				if default.defpos(p,"buildable_to") and not minetest.is_protected(p,user:get_player_name()) then
+					minetest.set_node(p,{name="fire:plutonium_flame"})
+				end
+				default.punch(pointed_thing.ref,user,7)
+				itemstack:add_wear(60)
+			end
+			return itemstack
+		end,
+		on_place=function(itemstack, user, pointed_thing)
+			if pointed_thing.type == "node" and default.defpos(pointed_thing.above,"buildable_to") and not minetest.is_protected(pointed_thing.above,user:get_player_name()) then
+				minetest.set_node(pointed_thing.above,{name="fire:plutonium_flame"})
+				itemstack:add_wear(60)
+			end
+			return itemstack
+		end,
+	},
+	additional_craft={{
+		output = "default:plutonium_ingot",
+		recipe = {{"default:uraniumactive_ingot","default:xe_crystal","default:steel_ingot"}},
+		cooktime = 100
+	}}
+})
