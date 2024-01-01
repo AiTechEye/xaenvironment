@@ -50,6 +50,83 @@ minetest.register_tool("fire:flint_and_steel", {
 	end,
 })
 
+minetest.register_node("fire:plutonium_flame", {
+	description = "Plutonium fire",
+	tiles={"fire_plutonium_flame.png"},
+	groups = {dig_immediate=3,fire=1,igniter=2,not_in_craftguide=1},
+	sounds = default.node_sound_defaults(),
+	drawtype = "firelike",
+	paramtype = "light",
+	sunlight_propagetes = true,
+	walkable = false,
+	light_source = 13,
+	buildable_to = true,
+	floodable = true,
+	damage_per_second = 15,
+	drop = "",
+	tiles = {
+		{
+			name = "fire_plutonium_flame_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 8,
+				aspect_h = 8,
+				length = 1
+			},
+		},
+	},
+	on_construct=function(pos)
+		minetest.get_node_timer(pos):start(1)
+		fire.add_particle(pos)
+	end,
+	on_destruct=function(pos)
+		fire.remove_particle(pos)
+	end,
+	on_blast=function(pos)
+		minetest.set_node(pos,{name="air"})
+		for x=-2,2 do
+		for y=-2,2 do
+		for z=-2,2 do
+			local p = vector.offset(pos,x,y,z)
+			if default.defpos(p,"buildable_to") and not minetest.is_protected(p,"") then
+				minetest.set_node(p,{name="fire:plutonium_flame"})
+			end
+		end
+		end
+		end
+	end,
+	on_timer = function (pos, elapsed)
+		fire.add_particle(pos)
+		local m = minetest.get_meta(pos)
+		local r = m:get_int("radius")
+		local sr
+		r = r > 0 and r or 1.5
+		for i, ob in ipairs(minetest.get_objects_inside_radius(pos,r)) do
+			local p = ob:get_pos()
+			p = p and {x=p.x,y=p.y+0.1,z=p.z} or pos
+			if default.def(minetest.get_node(p).name).buildable_to then
+				if ob:is_player() and special.have_ability(ob,"fire_resistance") and special.use_ability(ob,"fire_resistance") == 0 then
+					goto conti
+				end
+				minetest.set_node(p,{name="fire:plutonium_flame"})
+				local en = ob:get_luaentity()
+				if en and en.name == "__builtin:item" then
+					ob:remove()
+				end
+				minetest.get_meta(p):set_int("radius",3)
+				minetest.get_node_timer(p):start(0.1)
+				sr = true
+			end
+			::conti::
+		end
+		if not sr and r > 1.5 then
+			minetest.get_meta(pos):set_int("radius",1.5)
+			minetest.get_node_timer(pos):start(1)
+		end
+		return tonumber(memory_mb()) < 22
+	end
+})
+
 minetest.register_node("fire:basic_flame", {
 	description = "Fire",
 	tiles={"fire_basic_flame.png"},
