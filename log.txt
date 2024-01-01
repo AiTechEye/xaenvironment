@@ -1,5 +1,5 @@
 11.4
-
++ plutonium pick, fire, bomb, stuff
 + throw (snow) snowballs & craft snow to drinkable water
 + trashbags, from drops from players & npc's
 + Remote signal controller (toggle technic from controller)
