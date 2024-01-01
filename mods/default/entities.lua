@@ -180,7 +180,6 @@ local item = {
 			end
 		end
 
-
 		if self.dropped_by and not self.trash and not self.igniter_burn_timer and self.age > 30 and moveresult and moveresult.touching_ground then
 			self.trash = 1
 			local itemstack = ItemStack(self.itemstring)
@@ -193,6 +192,17 @@ local item = {
 					minetest.registered_items["default:trashbag1"].update(fn)
 					self.object:remove()
 					return
+				else
+					for i=3,1,-1 do
+						local fn2 = minetest.find_node_near(pos,1.5,"default:trashbag"..i,true)
+						local inv = fn2 and minetest.get_meta(fn2):get_inventory()
+						if fn2 and inv:room_for_item("main",itemstack) then
+							inv:add_item("main",itemstack)
+							minetest.registered_items["default:trashbag1"].update(fn2)
+							self.object:remove()
+							return
+						end
+					end
 				end
 			end
 
