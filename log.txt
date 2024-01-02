@@ -1,4 +1,6 @@
 11.4
+
++ less massive/laggy cities (less npc stuff in apartments, less chance for big cities)
 + plutonium pick, fire, bomb, stuff
 + throw (snow) snowballs & craft snow to drinkable water
 + trashbags, from drops from players & npc's
