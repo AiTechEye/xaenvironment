@@ -23,7 +23,6 @@ minetest.register_entity("examobs:blackhole",{
 				minetest.sound_fade(self.sound,2,0)
 			end
 			self.oldpower = math.floor(self.power*10)*0.1
-
 			self.sound = minetest.sound_play("examobs_blackhole", {object=self.object, gain = 1,max_hear_distance = 50,pitch=self.power <= 1000 and self.power*0.01 or 10})
 		end
 
@@ -70,7 +69,7 @@ minetest.register_entity("examobs:blackhole",{
 			self.power=self.power-(self.power*0.01)
 		end
 
-		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power/10)) do
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, self.power*0.1)) do
 			local en=ob:get_luaentity()
 			local opos=ob:get_pos()
 			if examobs.visiable(self.object,opos) and not (en and en.blackhole and en.power >= self.power) then
