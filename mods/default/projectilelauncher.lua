@@ -1,4 +1,4 @@
---projectilelauncher.register_bullet("bullet",{
+--projectilelauncher.register_bullet("bullet",{			mod:name_bullet
 --	description="Bullet",
 --	texture="default_wood.png^[colorize:#050",
 --	itemtexture = "",
@@ -1198,5 +1198,54 @@ projectilelauncher.register_bullet("ray",{
 	end,
 	craft={
 		{"default:ruby","default:steel_ingot"},
+	}
+})
+
+projectilelauncher.register_bullet("blackhole_",{
+	description="Blackhole bullet",
+	texture="default_ironblock.png^[colorize:#000",
+	itemtexture = "default_ironblock.png^[colorize:#000^default_alpha_gem_round.png^[makealpha:0,255,0^(default_ironblock.png^[colorize:#000^default_alpha_stick.png^[makealpha:0,255,0)",
+	damage=0,
+	craft_count=10,
+	launch_sound = "default_projectilelauncher_shot8",
+	groups={treasure=1,store=15},
+	before_bullet_released=function(itemstack, user,pos1, dir)
+		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
+		local c = minetest.raycast(pos1,pos2)
+		local ob = c:next()
+		while ob do
+			if ob.type == "node" and default.defpos(ob.under,"walkable") then
+				pos2 = ob.intersection_point
+				--pos3 = ob.under
+				minetest.check_for_falling(ob.under)
+				break
+			elseif ob.type == "object" and ob.ref ~= user and not default.is_decoration(ob.ref,true) then
+				pos2 = ob.intersection_point
+				break
+			end
+			ob = c:next()
+		end
+
+		local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
+		local y = math.atan(vec.z/vec.x)
+		local z = math.atan(vec.y/math.sqrt(vec.x^2+vec.z^2))
+		local t = "default_cloud.png^[colorize:#000"
+		if pos1.x >= pos2.x then y = y+math.pi end
+		local lightning = minetest.add_entity(pos1, "default:arrow_lightning")
+		lightning:set_rotation({x=0,y=y,z=z})
+		lightning:set_pos({x=pos1.x+(pos2.x-pos1.x)/2,y=pos1.y+(pos2.y-pos1.y)/2,z=pos1.z+(pos2.z-pos1.z)/2})
+		lightning:set_properties({
+			visual_size={x=vector.distance(pos1,pos2),y=0.03,z=0.03},
+			textures = {t,t,t,t,t,t},
+			glow = 1
+		})
+
+		if pos2 then
+			minetest.add_entity(pos2, "examobs:blackhole")
+		end
+		return true
+	end,
+	craft={
+		{"nitroglycerin:timed_plutonium_bomb","default:steel_ingot","default:xe_crystal"},
 	}
 })
