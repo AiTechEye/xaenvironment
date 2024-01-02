@@ -425,7 +425,7 @@ minetest.register_node("places:npc_furniture_spawner", {
 			end
 		end
 		local n = minetest.get_node(pos)
-		local name = math.random(1,3) == 1 and "air" or default.defpos(apos(pos,0,-1),"walkable") and furn_floor[math.random(1,#furn_floor)] or furn_wall[math.random(1,#furn_wall)]
+		local name = math.random(1,10) < 10 and "air" or default.defpos(apos(pos,0,-1),"walkable") and furn_floor[math.random(1,#furn_floor)] or furn_wall[math.random(1,#furn_wall)]
 		minetest.set_node(pos,{name=name,param2=n.param2})
 	end,
 })

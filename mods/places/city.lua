@@ -96,7 +96,14 @@ places.city=function(pos)
 			end
 		end
 	end
-	
+
+	for i=citysize,1,-1 do
+		if math.random(1,i > 3 and i*2 or i) == 1 then
+			citysize = i
+			break
+		end
+	end
+
 	print("Generating a city",citysize,minetest.pos_to_string(pos))
 	if citysize > 4 then
 		minetest.chat_send_all("Generating a city in size " .. citysize..", expect a long lag")
