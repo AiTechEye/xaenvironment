@@ -1,8 +1,8 @@
 ![Alt text](screenshot.png)
 
-# XaEnvironment V11.4
+# XaEnvironment V11.5
 
-## Compatible for minetest 5.7
+## Compatible for minetest 5.8
 
 Licenses: code: LGPL-2.1, media: CC BY-SA-4.0
 
