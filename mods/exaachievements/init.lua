@@ -234,7 +234,7 @@ end
 
 exaachievements.completed=function(a,player)
 	local back = player:hud_add({
-		hud_elem_type="image",
+		type="image",
 		scale = {x=20,y=5},
 		position={x=0.5,y=0},
 		text="default_steelblock.png",
@@ -242,7 +242,7 @@ exaachievements.completed=function(a,player)
 	})
 
 	local img = player:hud_add({
-		hud_elem_type="image",
+		type="image",
 		scale = {x=2,y=2},
 		position={x=0.5,y=0.03},
 		text="achievements_icon.png",
@@ -250,7 +250,7 @@ exaachievements.completed=function(a,player)
 	})
 
 	local ach = player:hud_add({
-		hud_elem_type="text",
+		type="text",
 		scale = {x=1,y=1},
 		text=a.name:gsub("_"," "),
 		number=0x000000,
@@ -260,7 +260,7 @@ exaachievements.completed=function(a,player)
 	})
 
 	local com = player:hud_add({
-		hud_elem_type="text",
+		type="text",
 		scale = {x=1,y=1},
 		text="Achievement Completed!",
 		number=0x000000,
