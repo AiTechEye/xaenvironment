@@ -197,7 +197,7 @@ end)
 
 minetest.register_on_respawnplayer(function(player)
 
-player_style.set_lighting(player,{exposure="respawn"})
+	player_style.set_lighting(player,{exposure="respawn"})
 
 
 	local size = default.mapgen_limit-2000
@@ -397,6 +397,9 @@ player_style.set_profile=function(player,pr)
 	player_style.players[name].wield_item = {}
 	player_style.players[name].skin = {}
 	player_style.players[name].saturation = table.copy(player_style.saturation)
+	player_style.players[name].volumetric_light = {strength=0.2}
+
+	player:set_lighting({volumetric_light = {player_style.players[name].volumetric_light.strength}})
 
 	if minetest.check_player_privs(name,{ability2d=true}) then
 		player_style.players[name].ability2d = {joining=0}
@@ -856,6 +859,34 @@ minetest.register_globalstep(function(dtime)
 						end
 					end
 				end
+			end
+		end
+
+
+-- ======== volumetric_light
+
+		local t = math.floor(minetest.get_timeofday()*1000)*0.001
+
+		if ppr.volumetric_light.change or t ~= ppr.volumetric_light.oldtime then
+			v = ppr.volumetric_light
+			v.oldtime = t
+
+			if (t > 0.754 or t < 0.235) and v.strength < 1 then
+				v.change = true
+				v.strength = v.strength + dtime*0.05
+				if v.strength >= 1 then
+					v.strength = 1
+					v.change = nil
+				end
+				player:set_lighting({volumetric_light = {strength=v.strength}})
+			elseif t > 0.235 and t < 0.754 and v.strength > 0.1 then
+				v.change = true
+				v.strength = v.strength - dtime*0.05
+				if v.strength <= 0.1 then
+					v.strength = 0.1
+					v.change = nil
+				end
+				player:set_lighting({volumetric_light = {strength=v.strength}})
 			end
 		end
 
