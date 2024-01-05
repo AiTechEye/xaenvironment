@@ -1,5 +1,6 @@
 11.5
 
++ support for volumetric light
 + blackhole / bullet
 + less massive/laggy cities (less npc stuff in apartments, less chance for big cities)
 + plutonium pick, fire, bomb, stuff
