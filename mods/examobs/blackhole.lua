@@ -1,6 +1,6 @@
 minetest.register_entity("examobs:blackhole",{
 	hp_max = 1000,
-	--physical = false,
+	physical = false,
 	pointable = false,
 	visual = "sprite",
 	textures ={"examobs_blackhole.png"},
@@ -111,7 +111,8 @@ minetest.register_entity("examobs:blackhole",{
 			self.object:set_properties({visual_size = {x=0.2+(self.power*0.02), y=0.2+(self.power*0.02)}})
 			if os.clock() - self.time > 0.025 and self.power > 150 then
 				self.time = os.clock()
-				local np = minetest.find_node_near(pos, math.floor(self.power/10),self.pick_nodes,true)
+				local rad = math.floor(self.power/10)
+				local np = minetest.find_node_near(pos,rad < 50 and rad or 50,self.pick_nodes,true)
 				if np and not minetest.is_protected(np,"") then
 					minetest.spawn_falling_node(np)
 					local nn = minetest.get_node(np).name
