@@ -146,7 +146,7 @@ minetest.register_entity("quads:car",{
 			player_style.player_attached[self.user_name] = true
 			self.hud={
 				hp_back=clicker:hud_add({
-					hud_elem_type="statbar",
+					type="statbar",
 					position={x=1,y=0},
 					text="quads_backbar.png",
 					number=100,
@@ -154,7 +154,7 @@ minetest.register_entity("quads:car",{
 					direction=1,
 				}),
 				hp=clicker:hud_add({
-					hud_elem_type="statbar",
+					type="statbar",
 					position={x=1,y=0},
 					text="quads_hpbar.png",
 					number=self.object:get_hp(),
@@ -162,7 +162,7 @@ minetest.register_entity("quads:car",{
 					direction=1,
 				}),
 				petrol_back=clicker:hud_add({
-					hud_elem_type="statbar",
+					type="statbar",
 					position={x=1,y=-2},
 					text="quads_backbar.png",
 					number=100,
@@ -171,7 +171,7 @@ minetest.register_entity("quads:car",{
 					offset={x=0,y=15},
 				}),
 				petrol=clicker:hud_add({
-					hud_elem_type="statbar",
+					type="statbar",
 					position={x=1,y=0},
 					text="quads_petrolbar.png",
 					number=self.petrol,
