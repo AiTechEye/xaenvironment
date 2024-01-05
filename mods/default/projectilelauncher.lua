@@ -1208,7 +1208,7 @@ projectilelauncher.register_bullet("blackhole_",{
 	damage=0,
 	craft_count=10,
 	launch_sound = "default_projectilelauncher_shot1",
-	groups={treasure=1,store=15},
+	groups={treasure=1,store=2000},
 	before_bullet_released=function(itemstack, user,pos1, dir)
 		local pos2,pos3 = vector.add(pos1,vector.multiply(dir,100))
 		local c = minetest.raycast(pos1,pos2)
