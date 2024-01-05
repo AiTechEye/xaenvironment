@@ -184,7 +184,7 @@ minetest.register_on_dieplayer(function(player)
 	else
 		if player_style.survive_black_death and not p.black_death_id then
 			p.black_death_id = player:hud_add({
-				hud_elem_type="image",
+				type="image",
 				scale = {x=-100, y=-100},
 				name="black_death",
 				position={x=0,y=0},
@@ -218,7 +218,7 @@ minetest.register_on_respawnplayer(function(player)
 
 	if not ppr.black_death_id then
 		ppr.black_death_id = player:hud_add({
-			hud_elem_type="image",
+			type="image",
 			scale = {x=-100, y=-100},
 			name="black_death",
 			position={x=0,y=0},
@@ -229,7 +229,7 @@ minetest.register_on_respawnplayer(function(player)
 
 	ppr.respawn = {
 		hud = player:hud_add({
-			hud_elem_type = "statbar",
+			type = "statbar",
 			text ="quads_petrolbar.png",
 			text2 ="quads_backbar.png",
 			number = 1,
@@ -239,7 +239,7 @@ minetest.register_on_respawnplayer(function(player)
 			offset = {x=-40*2.5,y=-20},
 		}),
 		text = player:hud_add({
-			hud_elem_type="text",
+			type="text",
 			scale = {x=1,y=1},
 			text="Respawning...",
 			number=0xFFFFFF,
@@ -397,7 +397,7 @@ player_style.set_profile=function(player,pr)
 	player_style.players[name].wield_item = {}
 	player_style.players[name].skin = {}
 	player_style.players[name].saturation = table.copy(player_style.saturation)
-	player_style.players[name].volumetric_light = {strength=0.2}
+	player_style.players[name].volumetric_light = {strength=0.1}
 
 	player:set_lighting({volumetric_light = {player_style.players[name].volumetric_light.strength}})
 
@@ -479,7 +479,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			step = 0,
 			num = 0,
 			bar=player:hud_add({
-				hud_elem_type="statbar",
+				type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_hunger_bar.png",
 				text2="player_style_hunger_bar_back.png",
@@ -500,7 +500,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			num = 0,
 			timer = 0,
 			bar=player:hud_add({
-				hud_elem_type="statbar",
+				type="statbar",
 				position={x=0.5,y=1},
 				text="default_radioactivity.png",
 				--text2="default_radioactivity.png^[colorize:#000",
@@ -520,7 +520,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			step = 0,
 			num = 0,
 			bar=player:hud_add({
-				hud_elem_type="statbar",
+				type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_thirst_bar.png",
 				text2="player_style_thirst_bar_back.png",
@@ -749,7 +749,7 @@ player_style.register_profile=function(def)
 	}
 
 	minetest.hud_replace_builtin("breath",{
-		hud_elem_type="statbar",
+		type="statbar",
 		position={x=0.5,y=1},
 		text="bubble.png",
 		text2="bubble.png^[colorize:#000",
@@ -868,7 +868,7 @@ minetest.register_globalstep(function(dtime)
 		local t = math.floor(minetest.get_timeofday()*1000)*0.001
 
 		if ppr.volumetric_light.change or t ~= ppr.volumetric_light.oldtime then
-			v = ppr.volumetric_light
+			local v = ppr.volumetric_light
 			v.oldtime = t
 
 			if (t > 0.754 or t < 0.235) and v.strength < 1 then

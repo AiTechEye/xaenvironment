@@ -211,7 +211,7 @@ special.hud=function(player,n)
 	elseif c > 0 then
 		u[n] = {
 		text = player:hud_add({
-			hud_elem_type="text",
+			type="text",
 			scale = {x=200,y=60},
 			text=b.count(player),
 			number=0xFFFFFF,
@@ -220,7 +220,7 @@ special.hud=function(player,n)
 			alignment={x=1,y=1},
 		}),
 		image = player:hud_add({
-			hud_elem_type="image",
+			type="image",
 			scale = {x=2,y=2},
 			position={x=0,y=0.5+(b.i*0.05)},
 			text=b.image,
