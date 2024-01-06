@@ -339,26 +339,27 @@ examobs.npc_setup=function(self)
 
 		if self.storage.property_area_pos and not minetest.is_protected(self.storage.property_area_pos, "") and math.random(1,5) > 1 then
 			local p = self.storage.property_area_pos
-       		local c = self.storage.property_area
-			self.storage.area_id = protect.add_game_rule_area(apos(p,c,c,c),apos(p,-c,-c,-c),self.storage.npcname.."'s home","*"..self.storage.npcname,nil,{type="s",count=1})
+       			local c = self.storage.property_area
+			self.area_id = protect.add_game_rule_area(apos(p,c,c,c),apos(p,-c,-c,-c),self.storage.npcname.."'s home","*"..self.storage.npcname,nil,{type="s",count=1})
 		end
 
 		on_load(self)
 	end
 
 	self.death=function(self)
-		if self.storage.area_id then
-			protect.remove_game_rule_area(self.storage.area_id)
+		if self.area_id then
+			protect.remove_game_rule_area(self.area_id)
+			self.area_id = nil
 		end
 
 		death(self)
 	end
 
 	self.on_despawn=function(self)
-		if self.storage.area_id then
-			protect.remove_game_rule_area(self.storage.area_id)
+		if self.area_id then
+			protect.remove_game_rule_area(self.area_id)
+			self.area_id = nil
 		end
-
 		on_despawn(self)
 	end
 end
