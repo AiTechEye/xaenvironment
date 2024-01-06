@@ -123,7 +123,7 @@ minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	protect.user[name] = {
 		hud = player:hud_add({
-			type="text",
+			hud_elem_type="text",
 			scale = {x=200,y=60},
 			text="",
 			number=0xFFFFFF,
