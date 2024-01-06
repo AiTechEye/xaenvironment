@@ -184,7 +184,7 @@ minetest.register_on_dieplayer(function(player)
 	else
 		if player_style.survive_black_death and not p.black_death_id then
 			p.black_death_id = player:hud_add({
-				type="image",
+				hud_elem_type="image",
 				scale = {x=-100, y=-100},
 				name="black_death",
 				position={x=0,y=0},
@@ -218,7 +218,7 @@ minetest.register_on_respawnplayer(function(player)
 
 	if not ppr.black_death_id then
 		ppr.black_death_id = player:hud_add({
-			type="image",
+			hud_elem_type="image",
 			scale = {x=-100, y=-100},
 			name="black_death",
 			position={x=0,y=0},
@@ -229,7 +229,7 @@ minetest.register_on_respawnplayer(function(player)
 
 	ppr.respawn = {
 		hud = player:hud_add({
-			type = "statbar",
+			hud_elem_type = "statbar",
 			text ="quads_petrolbar.png",
 			text2 ="quads_backbar.png",
 			number = 1,
@@ -239,7 +239,7 @@ minetest.register_on_respawnplayer(function(player)
 			offset = {x=-40*2.5,y=-20},
 		}),
 		text = player:hud_add({
-			type="text",
+			hud_elem_type="text",
 			scale = {x=1,y=1},
 			text="Respawning...",
 			number=0xFFFFFF,
@@ -479,7 +479,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			step = 0,
 			num = 0,
 			bar=player:hud_add({
-				type="statbar",
+				hud_elem_type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_hunger_bar.png",
 				text2="player_style_hunger_bar_back.png",
@@ -500,7 +500,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			num = 0,
 			timer = 0,
 			bar=player:hud_add({
-				type="statbar",
+				hud_elem_type="statbar",
 				position={x=0.5,y=1},
 				text="default_radioactivity.png",
 				--text2="default_radioactivity.png^[colorize:#000",
@@ -520,7 +520,7 @@ player_style.set_hunger_thirst_hud=function(player,remove)
 			step = 0,
 			num = 0,
 			bar=player:hud_add({
-				type="statbar",
+				hud_elem_type="statbar",
 				position={x=0.5,y=1},
 				text="player_style_thirst_bar.png",
 				text2="player_style_thirst_bar_back.png",
@@ -749,7 +749,7 @@ player_style.register_profile=function(def)
 	}
 
 	minetest.hud_replace_builtin("breath",{
-		type="statbar",
+		hud_elem_type="statbar",
 		position={x=0.5,y=1},
 		text="bubble.png",
 		text2="bubble.png^[colorize:#000",
