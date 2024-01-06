@@ -106,6 +106,9 @@ minetest.register_entity("examobs:blackhole",{
 				return
 			elseif self.power>100 then
 				self.object:set_velocity(vector.new(0,0,0))
+				if self.power>1000 then
+					self.power = self.power*0.95
+				end
 			end
 
 			self.object:set_properties({visual_size = {x=0.2+(self.power*0.02), y=0.2+(self.power*0.02)}})
