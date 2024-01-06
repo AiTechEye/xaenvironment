@@ -240,15 +240,18 @@ end
 protect.add_game_rule_area=function(pos1,pos2,title,name,game_rule,outdating)
 	local id = 0
 	local a = {}
+
 	for i,v in pairs(protect.areas) do
 		a[v.id] = true
 	end
+
 	for i=0,#protect.areas+1 do
 		if not a[i] then
 			id = i
 			break
 		end
 	end
+
 	pos1,pos2 = protect.sort(pos1,pos2)
 
 	if outdating then
@@ -391,6 +394,16 @@ minetest.register_entity("protect:mark",{
 	end,
 	timer=0.09
 })
+
+protect.find_data_at_pos=function(pos)
+	for i,v in pairs(protect.areas) do
+		if (pos.x >= v.pos1.x and pos.x <= v.pos2.x)
+		and (pos.y >= v.pos1.y and pos.y <= v.pos2.y)
+		and (pos.z >= v.pos1.z and pos.z <= v.pos2.z) then
+			return v
+		end
+	end
+end
 
 minetest.register_node("protect:area_breaker", {
 	tiles = {"default_goldblock.png"},
