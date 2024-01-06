@@ -1,4 +1,4 @@
-nodeextractor = {user={}}
+nodeextractor = {user={},user={}}
 
 dofile(minetest.get_modpath("nodeextractor") .. "/movertool.lua")
 

@@ -1,4 +1,7 @@
 nodeextractor.max_marking_nodes_count = 5000
+nodeextractor.user_move = {}
+
+
 
 minetest.register_craft({
 	output="nodeextractor:movetool",
@@ -109,6 +112,12 @@ minetest.register_tool("nodeextractor:movetool", {
 
 				nodeextractor.set(pos1,"none",false,nil,text)
 
+				if m:get_string("add_area") ~= "" then
+					protect.add_game_rule_area(pos1,pos2,m:get_string("add_area"),username,false)
+					minetest.chat_send_player(username,minetest.colorize("#0f0","Protected!"))
+					m:set_string("add_area","")
+				end
+
 				m:set_string("inventory_image","nodeextractor_movetool.png")
 				m:set_string("text","")
 				m:set_string("size","")
@@ -145,7 +154,7 @@ minetest.register_tool("nodeextractor:movetool", {
 			return
 		end
 		nodeextractor.mark(itemstack, user, pointed_thing,1)
-		nodeextractor.marking_message(username)
+		nodeextractor.marking_message(username,"Mode: ")
 		itemstack = nodeextractor.movetoolstage(username,itemstack)
 		return itemstack
 	end,
@@ -153,33 +162,44 @@ minetest.register_tool("nodeextractor:movetool", {
 		local m = itemstack:get_meta()
 		local username = user:get_player_name()
 		if m:get_int("storage") == 1 then
-			minetest.chat_send_player(user:get_player_name(),"The item is full, please use the current building first")
+			minetest.chat_send_player(username,"The item is full, please use the current building first")
 			return
 		end
 		nodeextractor.mark(itemstack, user, pointed_thing,2)
 		nodeextractor.marking_message(username)
+		minetest.chat_send_player(username,"Mode: "..nodeextractor.user[username].p)
 		itemstack = nodeextractor.movetoolstage(username,itemstack)
 		return itemstack
 	end,
 	on_secondary_use=function(itemstack, user, pointed_thing)
 		local m = itemstack:get_meta()
 		local username = user:get_player_name()
-
 		if m:get_int("storage") == 1 then
-			minetest.chat_send_player(user:get_player_name(),"The item is full, please use the current building first")
+			minetest.chat_send_player(username,"The item is full, please use the current building first")
 			return
 		end
 		nodeextractor.mark(itemstack, user, pointed_thing,2)
-
 		nodeextractor.marking_message(username)
+		minetest.chat_send_player(username,"Mode: "..nodeextractor.user[username].p)
 		itemstack = nodeextractor.movetoolstage(username,itemstack)
-
 		return itemstack
 	end,
 	on_drop=function(itemstack, user, pos)
 		local username = user:get_player_name()
 		local u = nodeextractor.user[username]
 		local m = itemstack:get_meta()
+
+		if nodeextractor.user_move[username] then
+			local dat = protect.find_data_at_pos(nodeextractor.user_move[username].pos)
+			if dat and dat.owner == username then
+				minetest.chat_send_player(username,minetest.colorize("#0f0","Area removed"))
+				protect.remove_game_rule_area(dat.id)
+				m:set_string("add_area",dat.title)
+				user:set_wielded_item(itemstack)
+			end
+			nodeextractor.user_move[username] = nil
+			return itemstack
+		end
 		if u and u.pos1 and u.pos2 then
 			local p,nam = protect.test(u.pos1,u.pos2,user:get_player_name())
 			if p == false then
@@ -213,12 +233,25 @@ minetest.register_tool("nodeextractor:movetool", {
 			end
 			end
 			end
-
 			minetest.bulk_set_node(poss,{name="air"})
-
 			nodeextractor.user[username] = nil
 			user:set_wielded_item(itemstack)
 			minetest.chat_send_player(username, count .. minetest.colorize("#0f0"," nodes is captured"))
+
+
+			local size2 = vector.floor(vector.divide(size,2))
+			local pos3 = vector.add(pos1,size2)
+			local dat = protect.find_data_at_pos(pos3)
+			if dat and dat.owner == username then
+				minetest.chat_send_player(username,minetest.colorize("#0f0","Drop again to remove your area (in 15s)").."\nThen a new area will automatically be added to the building")
+				nodeextractor.user_move[username] = {pos=pos3}
+				minetest.after(15,function()
+					if nodeextractor.user_move[username] then
+						nodeextractor.user_move[username] = nil
+						minetest.chat_send_player(username,minetest.colorize("#ff0","The time ran out"))
+					end
+				end)
+			end
 		else
 			nodeextractor.user[username] = nil
 			if m:get_int("storage") == 0 then
