@@ -86,18 +86,19 @@ end
 
 beds.sleeping=function(pos,player)
 	local tim = minetest.get_timeofday()
+	local m = player:get_meta()
+	local ppos = player:get_pos()
+
+	if m:get_int("respawn_disallowed") == 0 and not minetest.is_protected(ppos,player:get_player_name()) then
+		m:set_string("beds_position",minetest.pos_to_string(ppos))
+		beds.update_waypoint(player,ppos)
+	end
+
 	if tim >= 0.77 or tim < 0.21 then
 		local players = {}
 		for _, p in pairs(minetest.get_connected_players()) do
 			if p and minetest.get_item_group(minetest.get_node(p:get_pos()).name,"bed") == 0 then
 				return
-			end
-		end
-		for _, p in pairs(minetest.get_connected_players()) do
-			local m = p:get_meta()
-			if minetest.get_item_group(minetest.get_node(p:get_pos()).name,"tent") == 0 and m:get_int("respawn_disallowed") == 0 then
-				m:set_string("beds_position",minetest.pos_to_string(p:get_pos()))
-				beds.update_waypoint(p,p:get_pos())
 			end
 		end
 		minetest.set_timeofday(0.21)
