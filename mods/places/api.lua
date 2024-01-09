@@ -243,6 +243,19 @@ places = {
 				nodeextractor.set(apos(pos,-20,0,-20),minetest.get_modpath("places").."/nodeextractor/places_powerplant.exexn")
 			end
 		},
+		["igloo"]={
+			chance=1.70,sx=13,sy=8,miny=-20,maxy=70,spawn_at={"default:dirt_with_snow","default:ice","default:ice_clear"},
+			on_spawn=function(pos)
+				for y=1,8 do
+				for x=-6,6 do
+				for z=-6,6 do
+					minetest.remove_node(vector.offset(pos,x,y,z))
+				end
+				end
+				end
+				nodeextractor.set(apos(pos,-6,0,-6),minetest.get_modpath("places").."/nodeextractor/places_igloo.exexn")
+			end
+		},
 	}
 }
 
