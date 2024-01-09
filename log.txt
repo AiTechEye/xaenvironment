@@ -1,5 +1,6 @@
 11.5
 
++ fix nodeextractor placer do not accept inputs
 + ice stuff
 allow sleep in bed/set spawnpoint anytime
 fix npc removing player area
