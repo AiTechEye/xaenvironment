@@ -244,7 +244,7 @@ places = {
 			end
 		},
 		["igloo"]={
-			chance=1.70,sx=13,sy=8,miny=-20,maxy=70,spawn_at={"default:dirt_with_snow","default:ice","default:ice_clear"},
+			chance=70,sx=13,sy=8,miny=-20,maxy=70,spawn_at={"default:dirt_with_snow","default:ice","default:ice_clear"},
 			on_spawn=function(pos)
 				for y=1,8 do
 				for x=-6,6 do
