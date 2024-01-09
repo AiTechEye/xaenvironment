@@ -982,7 +982,7 @@ minetest.register_node("default:sand", {
 })
 
 --||||||||||||||||
--- ======================= Water
+-- ======================= Ice/Snow
 --||||||||||||||||
 
 minetest.register_node("default:snowblock_thin", {
@@ -1073,6 +1073,49 @@ default.register_fence({
 		{"group:stick","default:ice_clear","group:stick"}
 	}
 })
+
+default.register_chair({
+	name = "ice",
+	description = "Ice chair",
+	groups = {cracky=3,slippery=30,treasure=1,store=50},
+	texture = "default_ice_clear.png",
+	craft={{"group:stick","",""},{"default:ice_clear","",""},{"group:stick","",""}},
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+})
+
+default.register_chair({
+	name = "ice",
+	description = "Ice chair",
+	armchair=true,
+	couch = true,
+	groups = {cracky=3,slippery=30,treasure=1,store=50},
+	texture = "default_ice_clear.png",
+	craft={{"group:stick","",""},{"default:ice_clear","",""},{"group:stick","",""}},
+	craft={
+		{"materials:piece_of_cloth","materials:piece_of_cloth","default:wool"},
+		{"default:wool","default:ice_clear" ,"default:wool"},
+		{"group:stick","group:wood","group:stick"}
+	},
+	couch_craft={
+		{"materials:piece_of_cloth","materials:piece_of_cloth","default:wool"},
+		{"default:wool","default:ice_clear","default:wool"},
+		{"default:wool","default:wool","default:wool"}
+	},
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+})
+
+--||||||||||||||||
+-- ======================= Water
+--||||||||||||||||
+
 
 minetest.register_node("default:water_source", {
 	description = "Water source (fresh water)",
