@@ -254,6 +254,10 @@ places = {
 				end
 				end
 				nodeextractor.set(apos(pos,-6,0,-6),minetest.get_modpath("places").."/nodeextractor/places_igloo.exexn")
+				local nodes = minetest.find_nodes_in_area(vector.subtract(pos,13),vector.add(pos,13),"default:ice_chest")
+				for i,v in pairs(nodes) do
+					default.treasure({level=2,pos=v,node="default:ice_chest"})
+				end
 			end
 		},
 	}
