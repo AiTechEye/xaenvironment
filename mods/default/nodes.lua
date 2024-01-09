@@ -1044,6 +1044,7 @@ minetest.register_node("default:ice", {
 	groups = {cracky=3,slippery=10,treasure=1,store=50,ice=1},
 	sounds = default.node_sound_glass_defaults(),
 })
+default.register_stair("default:ice")
 
 minetest.register_node("default:ice_clear", {
 	description = "Clear ice",
@@ -1054,6 +1055,23 @@ minetest.register_node("default:ice_clear", {
 	sunlight_propagates=true,
 	paramtype="light",
 	drawtype="glasslike",
+})
+
+default.register_stair("default:ice_clear")
+
+default.register_fence({
+	name = "ice",
+	texture = "default_ice_clear.png",
+	groups = {cracky=3,slippery=30,treasure=1,store=50},
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+	craft={
+		{"group:stick","group:stick","group:stick"},
+		{"group:stick","default:ice_clear","group:stick"}
+	}
 })
 
 minetest.register_node("default:water_source", {
@@ -1565,6 +1583,10 @@ minetest.register_node("default:emerald", {
 	sounds = default.node_sound_glass_defaults(),
 })
 
+
+-- =============== Space
+
+
 minetest.register_node("default:space_gold_ore", {
 	description = "Space gold ore",
 	tiles={"default_space_stone.png^(default_goldblock.png^default_ore_mineral.png^[makealpha:0,255,0)"},
@@ -1586,6 +1608,10 @@ minetest.register_node("default:space_iron_ore", {
 	drop="default:iron_lump 2",
 	sounds = default.node_sound_stone_defaults(),
 })
+
+
+-- =============== Doors
+
 
 default.register_door({
 	name="glass_door",
@@ -1611,6 +1637,67 @@ default.register_door({
 		{"default:iron_ingot","default:iron_ingot",""},
 	}
 })
+
+default.register_door({
+	name="ice_door",
+	description = "Ice Door",
+	texture="default_ice_clear.png",
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+	groups = {cracky=3,slippery=30,treasure=1,ice=1,door=1},
+	craft={
+		{"default:ice_clear","default:ice_clear",""},
+		{"default:ice_clear","default:ice_clear",""},
+		{"default:ice_clear","default:ice_clear",""},
+	}
+})
+
+-- =============== Chests
+
+
+default.register_chest({
+	name = "chest",
+	description = "Chest",
+	burnable = true,
+	texture="default_wood.png",
+	craft={
+		{"group:wood","group:wood","group:wood"},
+		{"group:wood","","group:wood"},
+		{"group:wood","group:wood","group:wood"}
+	}
+})
+
+default.register_chest({
+	name = "locked_chest",
+	description = "Locked chest",
+	locked = true,
+	burnable = true,
+	texture="default_wood.png",
+	craft={{"default:chest","default:steel_ingot"}},
+})
+
+default.register_chest({
+	name = "ice_chest",
+	description = "Ice chest",
+	texture="default_ice_clear.png",
+	sounds = default.node_sound_glass_defaults(),
+	use_texture_alpha = "blend",
+	sunlight_propagates=true,
+	paramtype="light",
+	drawtype="glasslike",
+	groups = {cracky=3,slippery=30,treasure=1,ice=1,chest=1},
+	craft={
+		{"default:ice_clear","default:ice_clear","default:ice_clear"},
+		{"default:ice_clear","","default:ice_clear"},
+		{"default:ice_clear","default:ice_clear","default:ice_clear"},
+	}
+})
+
+
+-- =============== oddstone
 
 for i=1,8 do
 minetest.register_node("default:oddstone"..i, {

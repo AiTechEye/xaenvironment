@@ -476,27 +476,6 @@ minetest.register_craftitem("default:unknown", {
 	manual_page = "default:unknown Simply the most expensive and useless item in the game - it does nothing",
 })
 
-default.register_chest({
-	name = "chest",
-	description = "Chest",
-	burnable = true,
-	texture="default_wood.png",
-	craft={
-		{"group:wood","group:wood","group:wood"},
-		{"group:wood","","group:wood"},
-		{"group:wood","group:wood","group:wood"}
-	}
-})
-
-default.register_chest({
-	name = "locked_chest",
-	description = "Locked chest",
-	locked = true,
-	burnable = true,
-	texture="default_wood.png",
-	craft={{"default:chest","default:steel_ingot"}},
-})
-
 --||||||||||||||||
 -- ======================= minerals
 --||||||||||||||||
