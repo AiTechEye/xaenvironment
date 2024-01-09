@@ -303,15 +303,36 @@ player_style.inventory=function(player)
 		end
 		invp.backpack:set_list("main", list)
 	end
-	for i=1,4 do
-		if invp.backpacki ~= i and minetest.get_item_group(invp["backpackslot"..i]:get_stack("main",1):get_name(),"backpack") > 0 then
-			backpack = backpack .. "button["..(i-1)..",0.8;1,0.2;backpack"..i..";"..i.."]"
-		end
 
+
+	for i=1,4 do
+		if minetest.get_item_group(invp["backpackslot"..i]:get_stack("main",1):get_name(),"backpack") > 0 then
+			if invp.backpacki ~= i then
+				backpack = backpack .. "button["..(i-1)..",0.8;1,0.2;backpack"..i..";"..i.."]"
+			else
+				backpack = backpack .. "image_button["..(i-1)..",0.7;0.6,0.6;player_style_backpack.png;backpackmoveto;]"
+				.. "image_button["..(i-0.6)..",0.7;0.6,0.6;default_craftgreed.png;backpackmovefrom;]"
+				.. "tooltip[backpackmoveto;Move items to backpack]"
+				.. "tooltip[backpackmovefrom;Move items to inventory]"
+			end
+		end
 		backpack = backpack
 		.."image_button["..(i-1)..",-0.2;1,1;player_style_backpack.png;backpack"..i..";]"
 		.."list[detached:"..name.."_backpackslot"..i..";main;"..(i-1)..",-0.2;1,1;]"
 	end
+
+
+
+
+
+	--for i=1,4 do
+	--	if invp.backpacki ~= i and minetest.get_item_group(invp["backpackslot"..i]:get_stack("main",1):get_name(),"backpack") > 0 then
+	--		backpack = backpack .. "button["..(i-1)..",0.8;1,0.2;backpack"..i..";"..i.."]"
+	--	end
+	--	backpack = backpack
+	--	.."image_button["..(i-1)..",-0.2;1,1;player_style_backpack.png;backpack"..i..";]"
+	--	.."list[detached:"..name.."_backpackslot"..i..";main;"..(i-1)..",-0.2;1,1;]"
+	--end
 
 --inventory
 	local buttons_bar = ""
@@ -513,7 +534,35 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				invp.backcraft = m:get_int("backcraftlistring") == 0 and 1 or 0
 				m:set_int("backcraftlistring",invp.backcraft)
 				player_style.inventory(player)
+
+
+			elseif pressed.backpackmoveto or pressed.backpackmovefrom then
+				local inv = player:get_inventory()
+				local d = {}
+
+				if pressed.backpackmoveto then
+					for i,item in pairs(inv:get_list("main")) do
+						if invp.backpack:room_for_item("main",item) then
+							invp.backpack:add_item("main",item)
+							inv:set_stack("main",i,nil)
+						end
+					end
+				else
+					for i,item in pairs(invp.backpack:get_list("main")) do
+						if inv:room_for_item("main",item) then
+							inv:add_item("main",item)
+							invp.backpack:set_stack("main",i,nil)
+						end
+					end
+				end
+				for i,v in pairs(invp.backpack:get_list("main")) do
+					d[i]=v:to_table()
+				end
+				player:get_meta():set_string("backpack"..invp.backpacki,minetest.serialize(d))
 			else
+
+
+
 				for i=1,4 do
 					if pressed["backpack"..i] and minetest.get_item_group(invp["backpackslot"..i]:get_stack("main",1):get_name(),"backpack") > 0 then
 						player:get_meta():set_int("backpackindex",i)
