@@ -255,6 +255,9 @@ minetest.register_node("default:gas", {
 	drowning = 1,
 	buildable_to = true,
 	drop = "",
+	on_timer = function(pos, elapsed)
+		minetest.remove_node(pos)
+	end,
 	on_update = function(pos)
 		minetest.after(0.1,function(pos)
 			for i, p in pairs(minetest.find_nodes_in_area(vector.subtract(pos, 1),vector.add(pos,1),{"air"})) do
