@@ -179,6 +179,26 @@ minetest.register_node("examobs:mud", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
+minetest.register_node("examobs:feces", {
+	description = "Feces",
+	tiles={"examobs_meat.png^[colorize:#544b30aa"},
+	groups = {dirt=1,soil=1,dig_immediate=3,treasure=1},
+	sounds = default.node_sound_clay_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates=true,
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.15, -0.25, -0.15, 0.15, -0.2, 0.15},
+			{-0.25, -0.3, -0.25, 0.25, -0.25, 0.25},
+			{-0.3, -0.4, -0.3, 0.3, -0.3, 0.3},
+			{-0.4, -0.5, -0.4, 0.4, 0.-0.4, 0.4},
+		}
+	}
+})
+
 -- ================ chicken ================
 
 default.register_eatable("craftitem","examobs:chickenleg",1,2,{

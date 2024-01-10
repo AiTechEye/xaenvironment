@@ -4211,3 +4211,118 @@ examobs.register_mob({
 		})
 	end,
 })
+
+examobs.register_mob({
+	description = "Stinky feces monster",
+	name = "feces_monster",
+	hp=50,
+	coin = 5,
+	type = "monster",
+	team = "feces",
+	reach=5,
+	dmg = 0,
+	textures={"examobs_meat.png^[colorize:#544b30aa"},
+	mesh="examobs_icecreammaster.b3d",
+	spawn_on={"default:dirt","","group:spreading_dirt_type"},
+	aggressivity = 2,
+	bottom=-0.5,
+	light_min = 1,
+	light_max = 9,
+	breathing = 0,
+	visual_size={x=0.5,y=0.5,z=0.5},
+	collisionbox={-0.5,-0.5,-0.5,0.5,1.5,0.5},
+	animation={
+		stand={x=40,y=80,speed=30},
+		walk={x=0,y=30,speed=30},
+		run={x=0,y=30,speed=30},
+		attack={x=80,y=105,speed=90},
+		lay={x=142,y=149,speed=0},
+		throw={x=105,y=140,speed=30}
+	},
+	inv={["default:dirt"]=2,["examobs:feces"]=5},
+	is_food=function(self,item)
+		return minetest.get_item_group(item,"meat") > 0 or minetest.get_item_group(item,"dirt") > 0
+	end,
+	step=function(self,dtime)
+		if self.dying or self.dead then
+			return
+		elseif (minetest.get_node_light(self:pos()) or 0) > 9 then
+			self:hurt(1)
+		elseif self.fight and math.random(1,30) == 1 then
+			local pos = self.object:get_pos()
+			local p = minetest.find_nodes_in_area(vector.add(pos, 5),vector.subtract(pos, 5),{"air"})
+			local air = {}
+			for i,n in pairs(p) do
+				if not minetest.is_protected(n, "") then
+					table.insert(air,n)
+				end
+			end
+			if #air > 0 then
+				minetest.sound_play("examobs_fart", {object=self.object, gain = 2, max_hear_distance = 30})
+				minetest.bulk_set_node(air, {name = "default:gas"})
+				for i,n in pairs(air) do
+					if not minetest.is_protected(n, "") then
+						minetest.get_node_timer(n):start(math.random(60,120))
+					end
+				end
+			end
+		elseif math.random(1,20) == 1 and not self.throwing and self.fight and self.fight:get_pos() and examobs.visiable(self.object,self.fight) and examobs.viewfield(self,self.fight) then
+			local pos2=self.fight:get_pos()
+			local pos1=self.object:get_pos()
+			local d=vector.distance(pos1,pos2)
+			if d>5 then
+				self.is_throwing=1
+				self.throwing=1
+				self.time=self.otime
+				examobs.stand(self)
+				examobs.lookat(self,pos2)
+				examobs.anim(self,"throw")
+				d=d*0.05
+				local p=examobs.pointat(self,4)
+				minetest.after(0.7, function(p,d,self)
+					if self.fight and not (self.dying or self.dead) then
+						local pos2=self.fight:get_pos()
+						local pos1=self.object:get_pos()
+						if not (pos1 and pos2 and self) then
+							return
+						end
+						local d={x=examobs.num((pos2.x-pos1.x)*d),y=examobs.num((pos2.y-pos1.y)*d),z=examobs.num((pos2.z-pos1.z)*d)}
+						examobs.lookat(self,pos2)
+						local ob = minetest.add_entity(vector.offset(p,0,1.5,0), "examobs:icecreamball")
+						ob:set_velocity(d)
+						local t = self.object:get_properties().textures
+						ob:set_properties({
+							textures = t,
+							visual_size={x=0.5,y=0.5,z=0.5},
+						})
+					end
+				end,p,d,self)
+					minetest.after(1.2, function(self)
+						self.throwing=nil
+						if not self.object:get_pos() or self.dying or self.dead then
+							return
+						end
+						examobs.stand(self)
+					end,self)
+				return self
+			end
+		elseif not self.throwing and self.is_throwing then
+			self.is_throwing=nil
+			examobs.stand(self)
+		elseif self.throwing and self.fight then
+			examobs.lookat(self,self.fight:get_pos())
+			return self
+		end
+	end,
+	on_punching=function(self,target)
+		local pos=self.object:get_pos()
+		pos.y=pos.y-0.5
+		for _, ob in ipairs(minetest.get_objects_inside_radius(pos, 5)) do
+			local pos2=vector.round(ob:get_pos())
+			if examobs.team(ob)~=self.team and examobs.visiable(self.object,ob) and examobs.viewfield(self.object,ob) then
+				examobs.punch(self.object,ob,5)
+				ob:add_velocity({x=(pos2.x-pos.x)*10, y=((pos2.y-pos.y))*20, z=(pos2.z-pos.z)*10})
+			end
+		end
+	end
+})
