@@ -1,6 +1,6 @@
 11.5
 
-+ feces monster
++ dirt monster
 + fart song
 + move items from inventory to backpack & the opposite
 + igloo
