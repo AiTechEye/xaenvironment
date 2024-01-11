@@ -2,7 +2,7 @@
 
 + dirt monster
 + move items from inventory to backpack & the opposite
-+ igloo places
++ igloo spawning places
 + fix nodeextractor placer do not accept inputs
 + ice stuff
 allow sleep in bed/set spawnpoint anytime
