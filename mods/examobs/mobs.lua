@@ -4213,12 +4213,14 @@ examobs.register_mob({
 })
 
 examobs.register_mob({
-	description = "Stinky feces monster",
-	name = "feces_monster",
+	description = "Dirt monster",
+	name = "dirtmonster",
 	hp=50,
 	coin = 5,
 	type = "monster",
-	team = "feces",
+	team = "dirt",
+	walk_speed = 1,
+	run_speed = 3,
 	reach=5,
 	dmg = 0,
 	textures={"examobs_meat.png^[colorize:#544b30aa"},
@@ -4239,7 +4241,7 @@ examobs.register_mob({
 		lay={x=142,y=149,speed=0},
 		throw={x=105,y=140,speed=30}
 	},
-	inv={["default:dirt"]=2,["examobs:feces"]=5},
+	inv={["default:dirt"]=5,["examobs:poop"]=5},
 	is_food=function(self,item)
 		return minetest.get_item_group(item,"meat") > 0 or minetest.get_item_group(item,"dirt") > 0
 	end,

@@ -179,8 +179,8 @@ minetest.register_node("examobs:mud", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-minetest.register_node("examobs:feces", {
-	description = "Feces",
+minetest.register_node("examobs:poop", {
+	description = "Poop",
 	tiles={"examobs_meat.png^[colorize:#544b30aa"},
 	groups = {dirt=1,soil=1,dig_immediate=3,treasure=1},
 	sounds = default.node_sound_clay_defaults(),
