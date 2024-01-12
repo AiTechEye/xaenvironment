@@ -1,5 +1,6 @@
 11.6
 
++consequence to damage/kill npc's: pay 500, currency under 0 will hurt until death
 +insurance slot: insurances no longer work in the inventory, put them in the slot/use them
 
 11.5
