@@ -177,7 +177,8 @@ minetest.register_on_player_hpchange(function(player,hp_change,modifer)
 end,true)
 
 minetest.register_on_dieplayer(function(player)
-	local p = player_style.players[player:get_player_name()]
+	local name = player:get_player_name()
+	local p = player_style.players[name]
 
 	if player.set_lighting then
 		player_style.set_lighting(player,{exposure="death"})
@@ -193,6 +194,14 @@ minetest.register_on_dieplayer(function(player)
 			})
 		end
 	end
+
+	if p and p.coins_guilty then
+		p.coins_guilty = nil
+		if Getcoin(name) < 0 then
+			Coin(player,0,true)
+		end
+	end
+
 end)
 
 minetest.register_on_respawnplayer(function(player)
@@ -286,6 +295,13 @@ player_style.respawn=function(player,pos)
 	player_style.thirst(player,0,true)
 	player_style.radiation(player,0,true)
 	player_style.set_lighting(player,{saturation1="update"})
+
+	if ppr.coins_guilty then
+		ppr.coins_guilty = nil
+		if Getcoin(name) < 0 then
+			Coin(player,0,true)
+		end
+	end
 
 	for i, v in pairs(player_style.players[name].sounds) do
 		minetest.sound_stop(v)
@@ -1253,6 +1269,20 @@ minetest.register_globalstep(function(dtime)
 			else
 				ppr.on_step_skin = nil
 			end
+
+			if ppr.coins_guilty then
+				ppr.coins_guilty.time = ppr.coins_guilty.time + dtime
+				if ppr.coins_guilty.time > 1 then
+					ppr.coins_guilty.time = 0
+					if Getcoin(player) >= 0 then
+						ppr.coins_guilty = nil
+					else
+						Coin(player,1)
+						player:set_hp(player:get_hp()-1)
+					end
+				end
+			end
+
 		end
 	end
 end)

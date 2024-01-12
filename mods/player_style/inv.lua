@@ -319,6 +319,8 @@ player_style.inventory=function(player)
 
 
 --BackPacks
+
+
 	local backpack = ""
 
 	if invp.backpacki ~= 0 and minetest.get_item_group(invp["backpackslot"..invp.backpacki]:get_stack("main",1):get_name(),"backpack") > 0 then
@@ -346,7 +348,18 @@ player_style.inventory=function(player)
 		.."list[detached:"..name.."_backpackslot"..i..";main;"..(i-1)..",-0.2;1,1;]"
 	end
 
+
+--Coins
+
+
+	if Getcoin(name) < 0 then
+		player_style.players[name].coins_guilty = {time=0}
+	end
+
+
 --inventory
+
+
 	local buttons_bar = ""
 	local adds = ""
 	local buttons_pos = 0
