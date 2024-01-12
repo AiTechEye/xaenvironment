@@ -322,6 +322,7 @@ examobs.npc_setup=function(self)
 	local on_spawn = self.on_spawn
 	local on_load = self.on_load
 	local death = self.death
+	local on_punched = self.on_punched
 	local on_despawn = self.on_despawn
 	self.on_spawn=function(self)
 		table.insert(examobs.npc.list,self.object)
@@ -346,10 +347,24 @@ examobs.npc_setup=function(self)
 		on_load(self)
 	end
 
+	self.on_punched=function(self,puncher)
+		if puncher:is_player() then
+			self.punched_by_player = puncher:get_player_name()
+		end
+		on_punched(self,puncher)
+	end
+
 	self.death=function(self)
 		if self.area_id then
 			protect.remove_game_rule_area(self.area_id)
 			self.area_id = nil
+		end
+
+		if self.punched_by_player then
+			if minetest.get_player_by_name(self.punched_by_player) then
+				minetest.sound_play("default_lose_coins", {to_player=self.punched_by_player, gain = 2})
+			end
+			Coin(self.punched_by_player,-500)
 		end
 
 		death(self)
