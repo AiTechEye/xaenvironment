@@ -299,6 +299,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 				local m = player:get_meta()
 				if c >= 100 and m:get_int(b.meta)+b.amount <= 10000 then
 					Coin(player,-100)
+					minetest.sound_play("default_lose_coins", {to_player=player:get_player_name(), gain = 2})
 					b.trigger(player)
 					special.show(player)
 				end

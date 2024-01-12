@@ -347,6 +347,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 					m:set_string("skins", minetest.serialize(own))
 					Coin(player,-v.cost)
 					index = "skinuse="
+					minetest.sound_play("default_lose_coins", {to_player=name, gain = 2})
 					exaachievements.customize(player,"artist")
 				end
 			end

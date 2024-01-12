@@ -127,6 +127,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 							end
 							inv:add_item("main",t.." "..store.amount)
 							Coin(player,-c*store.amount)
+							minetest.sound_play("default_lose_coins", {to_player=name, gain = 2})
 							player_style.store(player)
 							return
 						elseif Getcoin(player) < c*store.amount and Getcoin(player) >= c then
