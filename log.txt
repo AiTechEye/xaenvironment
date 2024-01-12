@@ -1,3 +1,7 @@
+11.6
+
++insurance slot: insurances no longer work in the inventory, put them in the slot/use them
+
 11.5
 
 + dirt monster
