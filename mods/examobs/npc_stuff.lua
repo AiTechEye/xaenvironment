@@ -350,6 +350,8 @@ examobs.npc_setup=function(self)
 	self.on_punched=function(self,puncher)
 		if puncher:is_player() then
 			self.punched_by_player = puncher:get_player_name()
+		else
+			self.punched_by_player = nil
 		end
 		on_punched(self,puncher)
 	end
