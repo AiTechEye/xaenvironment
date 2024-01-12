@@ -130,6 +130,7 @@ xesmartshop.receive_fields=function(player,pressed)
 						pinv:add_item("main",stack)
 						Coin(meta:get_string("owner"),pay)
 						Coin(player,-pay)
+						minetest.sound_play("default_lose_coins", {to_player=pname, gain = 2})
 						if meta:get_int("type") == 1 then
 							inv:remove_item("main", stack)
 							if meta:get_int("del") == 1 and not inv:contains_item("main", stack) then
