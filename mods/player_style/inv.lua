@@ -91,11 +91,14 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 		if handle.hide then
 			m:set_int("hiding_inventory",1)
 			m:set_string("hat_hide",m:get_string("hat"))
+			m:set_string("insurance_hide",m:get_string("insurance"))
 			m:set_string("main_hide",minetest.serialize(items1))
 			m:set_string("craft_hide",minetest.serialize(items2))
 			m:set_string("armor_hide",m:get_string("armor"))
 		end
+
 		m:set_string("hat","")
+		m:set_string("insurance","")
 		inv:set_list("main",{})
 		inv:set_list("craft",{})
 		armor.user[name].inv:set_list("main", {})
@@ -107,6 +110,7 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 		end
 
 		player_style.players[name].inv["hat"]:set_stack("main",1, "")
+		player_style.players[name].inv["insurance"]:set_stack("main",1, "")
 	elseif handle.show and m:get_int("hiding_inventory") == 1 then
 		for i=1,4 do
 			m:set_string("backpack"..i,m:get_string("backpack"..i.."_hide"))
@@ -134,13 +138,17 @@ player_style.inventory_handle=function(player,handle)-- {hide=true} {show=true} 
 		inv:set_list("craft",items2)
 		armor.user[name].inv:set_list("main", items3)
 		m:set_string("hat",m:get_string("hat_hide"))
+		m:set_string("insurance",m:get_string("insurance_hide"))
 		m:set_string("armor",m:get_string("armor_hide"))
 		player_style.players[name].inv["hat"]:set_stack("main",1, minetest.deserialize(m:get_string("hat_hide")))
+		player_style.players[name].inv["insurance"]:set_stack("main",1, minetest.deserialize(m:get_string("insurance_hide")))
 
 		m:set_string("hat_hide","")
+
 		m:set_string("craft_hide","")
 		m:set_string("main_hide","")
 		m:set_string("armor_hide","")
+		m:set_string("insurance_hide","")
 		m:set_int("hiding_inventory",0)
 	end
 	player_style.inventory(player)
@@ -289,6 +297,24 @@ player_style.inventory=function(player)
 			end,invp,player)
 		end
 
+
+--insurance
+
+
+		invp.insurance = minetest.create_detached_inventory(name .. "_insurance", {
+			allow_put = function(inv, listname, index, stack, player)
+				return stack:get_name() == "bones:insurance" and stack:get_count() or 0
+			end,
+			on_put = function(inv, listname, index, stack, player)
+				player:get_meta():set_string("insurance",minetest.serialize(stack:to_table()))
+			end,
+			on_take = function(inv, listname, index, stack, player)
+				player:get_meta():set_string("insurance",minetest.serialize(stack:to_table()))
+			end
+		})
+		invp.insurance:set_size("main",1)
+		local item = ItemStack(minetest.deserialize(player:get_meta():get_string("insurance") or ""))
+		invp.insurance:set_stack("main",1,item or {})
 	end
 
 
@@ -355,6 +381,9 @@ player_style.inventory=function(player)
 			.."item_image[6,0;1,1;player_style:top_hat]"
 			.."list[detached:"..name.."_hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
+			.."item_image[11,0;1,1;bones:insurance]"
+			.."list[detached:"..name.."_insurance;main;11,0;1,1;]"
+			.."tooltip[11,0;1,1;Insurances]"
 			.."listring[current_player;main]"
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.. (invp.backcraft == 0 and "listring[current_player;craft]image_button[6,1;1,1;default_craftgreed.png;backcraft;]tooltip[backcraft;Shift-move to craftgreed]" or "listring[detached:"..name.."_backpack;main]image_button[6,1;1,1;player_style_backpack.png;backcraft;]tooltip[backcraft;Shift-move to backpack]")
@@ -416,6 +445,14 @@ player_style.inventory=function(player)
 			.."item_image[6,0;1,1;player_style:top_hat]"
 			.."list[detached:"..name.."_hat;main;6,0;1,1;]"
 			.."tooltip[6,0;1,1;Hats]"
+
+			.."item_image[11,0;1,1;bones:insurance]"
+			.."list[detached:"..name.."_insurance;main;11,0;1,1;]"
+			.."tooltip[11,0;1,1;Insurances]"
+
+			.."image[11,2;1,1;default_bucket.png]list[detached:deleteslot;main;11,2;1,1;]"
+			.."tooltip[11,2;1,1;Destroy item]"
+
 
 			.."image_button[6,2;1,1;default_craftgreed.png^default_unknown.png;craftguide;]tooltip[craftguide;Craftguide]"
 			.."listring[current_player;main]"
