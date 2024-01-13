@@ -41,6 +41,7 @@ player_style.skins = {
 		{name="Eletric terminator",type=3,skin="player_style_eletric_terminator.png",cost=200,info="War machine",origin="Aliveai"},
 		{name="Fast eleltric Terminator",type=3,skin="player_style_eletric_terminator.png^[colorize:#00ff0033",cost=200,info="War machine",origin="Aliveai"},
 		{name="Lightning terminator",type=3,skin="player_style_eletric_terminator.png^[colorize:#fa7fff44",cost=200,info="War machine",origin="Aliveai"},
+		{name="Terminator police",type=3,skin="player_style_terminator_police.png",cost=200,info="Police machine",origin="XaEnvironment"},
 
 		{name="Gassman",type=3,skin="examobs_gassman.png",cost=500,info="High explosive machine",origin="Pollution"},
 		{name="Acid axov",type=3,skin="examobs_gassman.png^[colorize:#00dd00cc",cost=500,info="Acid machine",origin="Pollution"},
