@@ -606,7 +606,7 @@ default.register_stair("default:glass_frosted")
 
 minetest.register_node("default:obsidian_glass_tabletop", {
 	description = "Obsidian glass tabletop",
-	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
+	tiles={"default_chest_top.png^[colorize:#fff1","default_chest_top.png^[colorize:#fff1"},
 	groups = {glass=1,cracky=2,level=2,treasure=1,store=10},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
@@ -630,7 +630,7 @@ minetest.register_node("default:obsidian_glass_tabletop", {
 
 minetest.register_node("default:obsidian_glass_corner", {
 	description = "Obsidian glass corner",
-	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
+	tiles={"default_chest_top.png^[colorize:#fff1","default_chest_top.png^[colorize:#fff1"},
 	groups = {glass=1,cracky=2,level=2,treasure=1,store=10},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
