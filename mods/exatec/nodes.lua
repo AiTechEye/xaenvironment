@@ -1264,6 +1264,62 @@ minetest.register_node("exatec:wire_gate", {
 	}
 })
 
+minetest.register_node("exatec:wire_timed_gate", {
+	description = "Timed wire gate (closed in seconds)",
+	tiles={
+		"default_ironblock.png^clock.png^default_crafting_arrowup.png^exatec_wire.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+		"default_ironblock.png",
+	},
+	groups = {dig_immediate = 2,exatec_wire_connected=1,store=100},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	drawtype="nodebox",
+	node_box = {type="fixed",fixed={-0.5,-0.5,-0.5,0.5,-0.4,0.5}},
+	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name()) == false then
+			local meta = minetest.get_meta(pos)
+			local time = meta:get_int("time") + 1
+			time = time < 601 and time or 1
+			meta:set_int("time",time)
+			meta:set_string("infotext","Timed wire gate (" .. time ..")")
+		end
+	end,
+	on_punch = function(pos, node, player, itemstack, pointed_thing)
+		if minetest.is_protected(pos, player:get_player_name()) == false then
+			local meta = minetest.get_meta(pos)
+			local time = meta:get_int("time") + 10
+			time = time < 601 and time or 1
+			meta:set_int("time",time)
+			meta:set_string("infotext","Timed wire gate (" .. time ..")")
+		end
+	end,
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("time",1)
+		meta:set_string("infotext","Timed wire gate (1)")
+	end,
+	on_timer = function (pos, elapsed)
+		minetest.get_meta(pos):set_int("case",0)
+	end,
+	exatec={
+		on_wire = function(pos,opos)
+			local d = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+			local meta = minetest.get_meta(pos)
+			if meta:get_int("case") == 0 and exatec.samepos(opos,vector.offset(pos,-d.x,-d.y,-d.z)) then
+				meta:set_int("case",1)
+				minetest.get_node_timer(pos):start(meta:get_int("time"))
+				exatec.send(vector.offset(pos,d.x,d.y,d.z),true,true)
+			end
+		end,
+	}
+})
+
 minetest.register_node("exatec:wire_dir_gate", {
 	description = "Wire direction gate",
 	tiles={

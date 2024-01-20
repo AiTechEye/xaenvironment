@@ -280,6 +280,18 @@ minetest.register_craft({
 		{"materials:plastic_sheet","clock:clock1","materials:plastic_sheet"},
 	},
 })
+
+minetest.register_craft({
+	output="exatec:wire_timed_gate",
+	recipe={
+		{"default:silver_ingot","exatec:button","exatec:wire"},
+		{"materials:plastic_sheet","clock:clock1","materials:plastic_sheet"},
+		{"group:wood","group:wood","group:wood"},
+	},
+})
+
+
+
 minetest.register_craft({
 	output="exatec:toggleable_storage",
 	recipe={
