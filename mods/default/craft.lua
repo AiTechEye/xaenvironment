@@ -457,6 +457,19 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_craft({
+	output="default:obsidian_glass_tabletop 4",
+	recipe={
+		{"default:obsidian","default:obsidian"},
+	},
+})
+minetest.register_craft({
+	output="default:obsidian_glass_corner 3",
+	recipe={
+		{"default:obsidian","default:obsidian",""},
+		{"","default:obsidian",""},
+	},
+})
 
 --||||||||||||||||
 -- ======================= COOKING

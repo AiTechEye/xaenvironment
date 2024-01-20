@@ -604,10 +604,59 @@ minetest.register_node("default:glass_frosted", {
 
 default.register_stair("default:glass_frosted")
 
+minetest.register_node("default:obsidian_glass_tabletop", {
+	description = "Obsidian glass tabletop",
+	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
+	groups = {glass=1,cracky=2,level=2,treasure=1,store=10},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	use_texture_alpha = "blend",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+		}
+	},
+	on_blast=function(pos)
+		if math.random(1,20) > 1 then
+			return true
+		end
+	end
+})
+
+minetest.register_node("default:obsidian_glass_corner", {
+	description = "Obsidian glass corner",
+	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
+	groups = {glass=1,cracky=2,level=2,treasure=1,store=10},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	use_texture_alpha = "blend",
+	drawtype="nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.45, 0.5},
+			{-0.5, -0.5, -0.5, -0.45, 0.5, 0.5},
+		}
+	},
+	on_blast=function(pos)
+		if math.random(1,20) > 1 then
+			return true
+		end
+	end
+})
+
 minetest.register_node("default:obsidian_glass", {
 	description = "Obsidian glass",
 	tiles={"default_chest_top.png^[colorize:#fff1","default_air.png"},
-	groups = {glass=1,cracky=2,level=2,oddly_breakable_by_hand=3,treasure=1,store=70},
+	groups = {glass=1,cracky=2,level=2,treasure=1,store=70},
 	sounds = default.node_sound_glass_defaults(),
 	drawtype = "glasslike_framed_optional",
 	sunlight_propagates = true,
@@ -621,6 +670,19 @@ minetest.register_node("default:obsidian_glass", {
 			return true
 		end
 	end
+})
+
+default.register_door({
+	name="obsidian_glass_door",
+	description = "Obsidian glass door",
+	texture="default_chest_top.png^[colorize:#fff1",
+	sounds = default.node_sound_glass_defaults(),
+	groups = {cracky=2,level=2},
+	craft={
+		{"default:obsidian","default:obsidian",""},
+		{"default:obsidian","default:obsidian",""},
+		{"default:obsidian","default:obsidian",""},
+	}
 })
 
 --||||||||||||||||
