@@ -21,6 +21,9 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	default.update_nodes(pos)
 end)
 
+minetest.register_on_placenode(function(pos, newnode, placer)
+	default.update_nodes(pos)
+end)
 
 default.update_nodes=function(pos)
 	if minetest.find_node_near(pos,1,"group:on_update") then
