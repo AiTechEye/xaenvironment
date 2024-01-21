@@ -320,3 +320,93 @@ minetest.register_node("maps:protect", {
 		end
 	}
 })
+
+minetest.register_node("maps:spawn_entity", {
+	description = "Spawn entity",
+	tiles={"default_dirt.png^[invert:rb"},
+	groups = {unbreakable=1,exatec_wire_connected=1,not_in_creative_inventory=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		minetest.get_meta(pos):set_string("formspec","size[2,1]button_exit[0,0;2,1;setup;Setup]")
+	end,
+	on_receive_fields=function(pos, formname, pressed, sender)
+		if (pressed.save or pressed.setup) and minetest.check_player_privs(sender:get_player_name(), {server=true}) then
+			local m = minetest.get_meta(pos)
+			local en = minetest.registered_entities[pressed.en]
+			local pos1
+
+			if pressed.save then
+				local name = sender:get_player_name()
+				local p = protect.user[name]
+				if p and p.pos1 then
+					pos1 = p.pos1
+					pressed.pos =  p.pos1.x.." "..p.pos1.y.." "..p.pos1.z 
+					protect.clear(name)
+				else
+					pos1 = minetest.string_to_pos("("..pressed.pos:gsub(" ",",")..")")
+				end
+
+
+				if pos1 and (pos1.y > 26000 and pos1.y < 31000) then
+					m:set_string("pos",minetest.pos_to_string(pos1))
+					
+				else
+					pressed.pos = minetest.string_to_pos(m:get_string("pos"))
+				end
+				if en then
+					m:set_string("en",pressed.en)
+				else
+					pressed.en = m:get_string("en")
+				end
+				if pressed.rad then
+					m:set_int("rad",math.abs(tonumber(pressed.rad)))
+				else
+					pressed.rad = m:get_int("rad")
+				end
+			end
+
+			m:set_string("formspec","size[1.5,3]"
+			.."button_exit[-0.2,-0.2;2,1;save;Save]"
+			.."field[0,1;2,1;en;;"..m:get_string("en").."]"
+			.."field[0,2;2,1;pos;;"..m:get_string("pos").."]"
+			.."field[0,3;2,1;rad;;"..m:get_int("rad").."]"
+			.."tooltip[save;You can also Mark with /protect 1 to select the position/area.\nDo not protect, just mark it then press save]"
+			.."tooltip[en;A valid entity, eg examobs:npc]"
+			.."tooltip[rad;If same entity exists in area from pos: cancel, 0 = disabled]"
+			.."tooltip[pos;Position, (eg 1,0,-5)]"
+			)        
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			local m = minetest.get_meta(pos)
+			local en = m:get_string("en")
+			local rad = m:get_int("rad")
+			local pos1 = minetest.string_to_pos(m:get_string("pos"))
+			if en ~= "" and pos1 then
+				if rad > 0 then
+					for _, ob in pairs(minetest.get_objects_inside_radius(pos1, rad)) do
+						local e = ob:get_luaentity()
+						if e and e.name == en then
+							return
+						end
+					end
+				end
+				minetest.add_entity(pos1,en)
+			end
+		end
+	}
+})
+
+minetest.register_tool("maps:no_dig_hand", {
+	wield_image = "wieldhand.png",
+	wield_scale={x=1,y=1,z=2},
+	groups={not_in_creative_inventory=1},
+	range = 4,
+	tool_capabilities = {
+		full_punch_interval = 1,
+		max_drop_level = 0,
+		groupcaps={},
+		damage_groups = {fleshy=1},
+	}
+})
