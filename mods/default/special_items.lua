@@ -1,3 +1,273 @@
+-- Shredder ============
+
+minetest.register_node("default:shredder", {
+	description="Shredder",
+	drop = "default:shredder",
+	tiles={"default_steelblock.png^materials_gear_metal.png"},
+	groups = {cracky=2,level=2,store=10000,on_load=1,on_update=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype="light",
+	paramtype2="facedir",
+	sunlight_propagates = true,
+	drawtype = "nodebox",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
+		}
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		}
+	},
+	collision_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0.3, 0.5},
+		}
+	},
+	on_load = function(pos)
+		minetest.add_entity(pos,"default:shredder")
+	end,
+	on_place=function(itemstack, placer, pointed_thing)
+		local pos = pointed_thing.above
+		local name = placer:get_player_name()
+		if default.defpos(pointed_thing.under,"buildable_to") then
+			pos = pointed_thing.under
+		end
+		local p = minetest.dir_to_facedir(placer:get_look_dir())
+		local xp = vector.offset(pos,1,0,0)
+		local xm = vector.offset(pos,-1,0,0)
+		local zp = vector.offset(pos,0,0,1)
+		local zm = vector.offset(pos,0,0,-1)
+		local f = {{0,2,zp},{1,3,xp},{2,0,zm},{3,1,xm}}
+		local t = f[p+1]
+
+		if t and default.defpos(t[3],"buildable_to") and not minetest.is_protected(t[3], name) then
+			minetest.set_node(pos,{name="default:shredder",param2=t[1]})
+			minetest.set_node(t[3],{name="default:shredder",param2=t[2]})
+			minetest.add_entity(pos,"default:shredder"):get_luaentity():update()
+			minetest.add_entity(t[3],"default:shredder"):get_luaentity():update()
+			itemstack:take_item()
+			return itemstack
+		end
+	end,
+	after_destruct=function(pos,oldnode)
+		local p = oldnode.param2
+		local f = {vector.offset(pos,0,0,1),vector.offset(pos,1,0,0),vector.offset(pos,0,0,-1),vector.offset(pos,-1,0,0)}
+		local t = f[p+1]
+		if minetest.get_node(t).name == "default:shredder" then
+			minetest.remove_node(t)
+		end
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 0.2)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:shredder" then
+				ob:remove()
+			end
+		end
+	end,
+	on_update = function(pos)
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 1)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:shredder" then
+				ob:get_luaentity():update()
+			end
+		end
+	end
+})
+
+minetest.register_entity("default:shredder",{
+	visual="mesh",
+	physical=false,
+	pointable=false,
+	mesh = "default_shredder.obj",
+	static_save = false,
+	textures={"default_steelblock.png"},
+	on_activate=function(self)
+		local pos = self.object:get_pos()
+		local n = minetest.get_node(pos).param2
+		self.dir = vector.new(0,0,0)
+		local d = {math.pi/2,0,-math.pi/2,math.pi}
+		self.dir.y = d[n+1]
+		self.destroy = default.defpos(vector.offset(pos,0,-1,0),"walkable")
+		if n == 0 or n == 1 then
+			self.dir.z = math.pi/4
+		end
+	end,
+	update=function(self)
+		local pos = self.object:get_pos()
+		local p = minetest.get_node(pos).param2
+		self.destroy = default.defpos(vector.offset(pos,0,-1,0),"walkable")
+		for _, ob in pairs(minetest.get_objects_inside_radius(pos, 5)) do
+			local en = ob:get_luaentity()
+			if en and en.name == "default:shredder" and minetest.get_node(ob:get_pos()).param2 == p then
+				self.dir.z = en.dir.z
+				return
+			end
+		end
+	end,
+	shredding=function(self,ob)
+		self.limit = self.limit + 1
+
+		if os.time()-self.limit_timeout > 0.1 then
+			self.limit_timeout = os.time()
+			self.limit = 0
+		end
+		if self.limit > 10 then
+			return
+		end
+	
+		local img
+		local en = ob:get_luaentity()
+		local pos = ob:get_pos()
+
+		if en and en.name == "__builtin:item" and en.itemstring then
+			local item = ItemStack(en.itemstring)
+			local def = minetest.registered_items[item:get_name()]
+			if def.type == "node" then
+				local tiles = def.tiles or def.special_tiles or {}
+				if type(tiles[1]) == "table" and tiles[1].name then
+					img = tiles[1].name
+				elseif type(tiles[1]) == "string" then
+					img = tiles[math.random(1,#tiles)]
+				end
+			else
+				img = def.wield_image ~= "" and def.wield_image or def.inventory_image
+			end
+
+			local craft = minetest.get_craft_recipe(item:get_name())
+			if craft.items and craft.type == "normal" and ItemStack(craft.output):get_count() == 1 then
+				local same_items = false
+				for i,v in pairs(craft.items) do
+					if v == item then
+						if same_items == false then
+							same_items = true
+						else
+							ob:remove()
+						end
+					end
+				end
+				for i,v in pairs(craft.items) do
+					local a,b = minetest.get_craft_result({method = "normal",width = 3, items = {v}})
+					if a.item:get_name() == item:get_name() or minetest.get_item_group(v,"not_recycle_return") > 0 then
+						ob:remove()
+					elseif v:sub(1,6) == "group:" then
+						local g = v:sub(7,-1)
+						for i2,v2 in pairs(minetest.registered_items) do
+							if v2.groups and (v2.groups[g] or 0) > 0 and not v2.groups.not_recycle_return then
+								craft.items[i]=i2
+								break
+							end
+
+						end
+					end
+				end
+
+				local w = item:get_wear()
+				for i,v in pairs(craft.items) do
+					if v == item:get_name() or not minetest.registered_items[v] or w > 0 and math.random(1,3) > 1 then
+						craft.items[i] = ""
+					end
+				end
+
+				if #craft.items > 0 then
+					for i,v in pairs(craft.items) do
+						if v ~= "" then
+							minetest.add_item(pos,v):set_velocity(vector.new(math.random(-0.5,0.5),math.random(1,3),math.random(-0.5,0.5)))
+						end
+					end
+				end
+			elseif not self.destroy then
+				local spos = self.object:get_pos()
+				minetest.add_item(vector.offset(spos,0,-0.5,0),item:get_name()):set_velocity(vector.new(math.random(-0.5,0.5),math.random(-3,0),math.random(-0.5,0.5)))
+			end
+			local c = item:get_count()-1
+			if c > 0 and not self.destroy then
+				en.itemstring = item:get_name() .. " " .. c
+			else
+				ob:remove()
+			end
+		else
+			img = ob:get_properties().textures[1]
+		end
+
+		if type(img) == "string" then
+			minetest.sound_play("default_radioactivity_meter", {object=self.object, gain = 4,max_hear_distance = 10,pitch=math.random(0.8,2)})
+			minetest.add_particle({
+				pos=vector.offset(pos,math.random(-0.5,0.5),math.random(-0.5,0.5),math.random(-0.5,0.5)),
+				acceleration={x=0,y=-10,z=0},
+				velocity=vector.new(math.random(-2,2),math.random(0,2),math.random(-2,2)),
+				expirationtime=5,
+				size=math.random(0.5,3),
+				collisiondetection=true,
+				collision_removal=true,
+				texture="[combine:16x16:"..math.random(-16,0)..","..math.random(-16,0).."="..img,
+			})
+		end
+		if ob and ob:is_player() and ob:get_hp() <= 0 then
+			ob:respawn()
+		elseif ob and not (en and en.name == "__builtin:item") then
+			default.punch(ob,ob,2)
+		end
+	end,
+	on_step=function(self,dtime,moveresult)
+		self.dir.z = self.dir.z + dtime
+		self.object:set_rotation(self.dir)
+		self.time = self.time + dtime
+
+		if os.time() - self.soundt >= 1 then
+			self.soundt = os.time()
+			minetest.sound_play("default_engine_electric2", {object=self.object, gain = 4,max_hear_distance = 10,pitch=1})
+		end
+
+		if self.time > self.timer then
+			self.time = 0
+			local pos = self.object:get_pos()
+			local d = 100
+			for _, ob in pairs(minetest.get_objects_inside_radius(pos, self.rad)) do
+				local en = ob:get_luaentity()
+				if not (en and en.decoration) then
+					local obp = ob:get_pos()
+					local y = ob:get_velocity().y
+					if obp.y > pos.y then
+						d = math.min(d,vector.distance(pos,obp))
+						self.nearest = d
+						if d <= 3 then
+							self.rad = 3
+							self.timer = 0.1
+						elseif d <= 5 then
+							self.rad = 5
+							self.timer = 0.3
+						elseif d <= 12 then
+							self.rad = 10
+							self.timer = 0.7
+						elseif d <= 20 then
+							self.rad = 1
+							self.timer = 1
+						end
+						if d < 1.5 and obp.y > pos.y and y < 0.01 and y > -0.01 then
+							self:shredding(ob)
+						end
+					end
+				end
+			end
+			if d == 100 and self.rad ~= 20 then
+				self.rad = 20
+				self.timer = 2
+			end
+		end
+	end,
+	decoration = true,
+	rad = 20,
+	time = 0,
+	timer = 2,
+	soundt = os.time()+2,
+	limit=0,
+	limit_timeout=os.time(),
+})
+
 -- Trashbag ============
 for i,v in ipairs({{scale=0.5,box={-0.25,-0.5,-0.25,0.25,-0.1,0.25},bag=1}, {scale=0.75,box={-0.35,-0.5,-0.35,0.35,0.1,0.35},bag=2}, {scale=0.9,box={-0.4,-0.5,-0.4,0.4,0.1,0.4},bag=2}, {scale=1.1,box={-0.5,-0.5,-0.5,0.5,0.35,0.5},bag=3}}) do
 minetest.register_node("default:trashbag"..i, {
