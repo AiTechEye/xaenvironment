@@ -661,3 +661,175 @@ minetest.register_node("spacestuff:door_open_2_safe", {
 		end
 	end,
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+minetest.register_node("spacestuff:door_1_safeu", {
+	description = "Safe door (unbreakable except for owner)",
+	drop="spacestuff:door_1_safeu",
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.125, 0.5, 0.5, 0.125},
+		}
+	},
+	tiles = {"default_ironblock.png","default_ironblock.png","default_ironblock.png","spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:12,0=spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:-12,0=spacestuff_warntape.png"},
+	groups = {exatec_wire_connected=1,unbreakable=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local p={x=pos.x,y=pos.y+1,z=pos.z}
+		local def = minetest.registered_nodes[minetest.get_node(p).name] or {}
+		if def.walkable then
+			return false
+		else
+			minetest.set_node(p, {name = "spacestuff:door_2_safeu",param2=minetest.get_node(pos).param2})
+			minetest.get_meta(pos):set_string("owner",placer:get_player_name())
+			minetest.get_meta(p):set_string("owner",placer:get_player_name())
+		end
+	end,
+	on_punch=function(pos, node, player, pointed_thing)
+		local owner = minetest.get_meta(pos):get_string("owner")
+		if owner == "" or owner == player:get_player_name() then
+			minetest.add_item(pos,"spacestuff:door_1_safeu")
+			minetest.remove_node(pos)
+			local upos = apos(pos,0,1)
+			if minetest.get_node(upos).name == "spacestuff:door_2_safeu" then
+				minetest.remove_node(upos)
+			end
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			minetest.swap_node(apos(pos,0,1), {name="spacestuff:door_open_2_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_open_1_safeu", param2=minetest.get_node(pos).param2})
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.get_node_timer(pos):start(2)
+		end
+	},
+})
+
+minetest.register_node("spacestuff:door_2_safeu", {
+	description = "Door 2-1",
+	drawtype = "nodebox",
+	drop="spacestuff:door_1_safeu",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.125, 0.5, 0.5, 0.125},
+		}
+	},
+	tiles = {"default_ironblock.png","default_ironblock.png","default_ironblock.png","spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:12,0=spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:-12,0=spacestuff_warntape.png"},
+	groups = {exatec_wire_connected=1, not_in_creative_inventory=1,unbreakable=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	on_punch=function(pos, node, player, pointed_thing)
+		local owner = minetest.get_meta(pos):get_string("owner")
+		if owner == "" or owner == player:get_player_name() then
+			minetest.add_item(pos,"spacestuff:door_1_safeu")
+			minetest.remove_node(pos)
+			local dpos = apos(pos,0,-1)
+			if minetest.get_node(dpos).name == "spacestuff:door_1_safeu" then
+				minetest.remove_node(dpos)
+			end
+		end
+	end,
+	exatec={
+		on_wire = function(pos)
+			minetest.swap_node(apos(pos,0,-1), {name="spacestuff:door_open_1_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_open_2_safeu", param2=minetest.get_node(pos).param2})
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.get_node_timer(pos):start(2)
+		end
+	}
+})
+
+minetest.register_node("spacestuff:door_open_1_safeu", {
+	description = "Door (open) 2-o-1",
+	drop="spacestuff:door_1_safeu",
+	drawtype = "nodebox",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{0.495, -0.5, -0.124, 1.41, 0.5, 0.125},
+		}
+	},
+	tiles = {"default_ironblock.png","default_ironblock.png","default_ironblock.png","spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:12,0=spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:-12,0=spacestuff_warntape.png"},
+	groups = {exatec_wire_connected=1, not_in_creative_inventory=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	exatec={
+		on_wire = function(pos)
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.swap_node(apos(pos,0,1), {name="spacestuff:door_2_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_1_safeu", param2=minetest.get_node(pos).param2})
+		end,
+	},
+	on_timer=function(pos, elapsed)
+		if minetest.get_node(pos).name=="spacestuff:door_open_1_safeu" then
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.swap_node(apos(pos,0,1), {name="spacestuff:door_2_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_1_safeu", param2=minetest.get_node(pos).param2})
+		end
+	end,
+})
+
+minetest.register_node("spacestuff:door_open_2_safeu", {
+	description = "Door (open) 2-o-1",
+	drawtype = "nodebox",
+	drop="spacestuff:door_1_safeu",
+	paramtype = "light",
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{0.495, -0.5, -0.124, 1.41, 0.5, 0.125},
+		}
+	},
+	tiles = {"default_ironblock.png","default_ironblock.png","default_ironblock.png","spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:12,0=spacestuff_warntape.png","[combine:16x16:0,0=default_ironblock.png:-12,0=spacestuff_warntape.png"},
+	groups = {exatec_wire_connected=1, not_in_creative_inventory=1},
+	sounds = default.node_sound_metal_defaults(),
+	paramtype = "light",
+	paramtype2 = "facedir",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	exatec={
+		on_wire = function(pos)
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.swap_node(apos(pos,0,-1), {name="spacestuff:door_1_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_2_safeu", param2=minetest.get_node(pos).param2})
+		end
+	},
+	on_timer = function(pos, elapsed)
+		if minetest.get_node(pos).name=="spacestuff:door_open_2_safeu" then
+			minetest.sound_play("spacestuff_door", {pos=pos, gain = 1, max_hear_distance = 5})
+			minetest.swap_node(apos(pos,0,-1), {name="spacestuff:door_1_safeu", param2=minetest.get_node(pos).param2})
+			minetest.swap_node(pos, {name="spacestuff:door_2_safeu", param2=minetest.get_node(pos).param2})
+		end
+	end,
+})
