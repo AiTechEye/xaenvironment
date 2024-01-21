@@ -662,21 +662,6 @@ minetest.register_node("spacestuff:door_open_2_safe", {
 	end,
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 minetest.register_node("spacestuff:door_1_safeu", {
 	description = "Safe door (unbreakable except for owner)",
 	drop="spacestuff:door_1_safeu",
