@@ -1,5 +1,6 @@
 11.6
 
++ shredder
 + obsidian stuff
 + Timed wire gate (closed in seconds)
 + consequence to damage/kill npc's: pay 500, currency under 0 will hurt until death
