@@ -3,6 +3,7 @@
 minetest.register_node("default:shredder", {
 	description="Shredder",
 	drop = "default:shredder",
+	inventory_image = "materials_gear_metal.png",
 	tiles={"default_steelblock.png^materials_gear_metal.png"},
 	groups = {cracky=2,level=2,store=10000,on_load=1,on_update=1},
 	sounds = default.node_sound_metal_defaults(),
