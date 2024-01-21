@@ -78,6 +78,17 @@ minetest.register_craft({
 	},
 })
 
+
+
+minetest.register_craft({
+	output="default:shredder",
+	recipe={
+		{"default:steel_ingot","materials:tube_metal","default:steel_ingot"},
+		{"default:ironstick","quads:engine","materials:fanblade_metal"},
+		{"materials:gear_metal","materials:sawblade","materials:gear_metal"},
+	},
+})
+
 minetest.register_craft({
 	output="default:pellets_mill",
 	recipe={
