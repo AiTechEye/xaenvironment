@@ -397,16 +397,3 @@ minetest.register_node("maps:spawn_entity", {
 		end
 	}
 })
-
-minetest.register_tool("maps:no_dig_hand", {
-	wield_image = "wieldhand.png",
-	wield_scale={x=1,y=1,z=2},
-	groups={not_in_creative_inventory=1},
-	range = 4,
-	tool_capabilities = {
-		full_punch_interval = 1,
-		max_drop_level = 0,
-		groupcaps={},
-		damage_groups = {fleshy=1},
-	}
-})
