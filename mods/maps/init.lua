@@ -37,44 +37,7 @@ maps = {
 			on_respawn=function(player)
 				maps.set_pos(player,{x=60,y=31,z=42})
 			end,
-		},
-		["flesh_factory"]={
-			info = "Flesh factory (WIP) \n(Parkour skills required)",
-			image="examobs_flesh.png^examobs_alpha_fleshpiece.png^[makealpha:0,255,0",
-			pos={x=150,y=-10,z=0},
-			size={x=46,y=46,z=101},
-			locked=true,
-			--unable=true,
-			hide_items = true,
-			singleplayer=true,
-			bones_disabled=true,
-			--bones_drop_only = true,
-			special_disabled=true,
-			store_disabled=true,
-			on_enter=function(player)
-				if default.storage:get_int("flesh_factory") < 1 then
-					local pos = maps.get_pos({x=150,y=-10,z=0})
-					minetest.emerge_area(vector.add(pos,102),vector.subtract(pos,102),function(pos, action, calls_remaining, param)
-						if calls_remaining == 0 then
-							nodeextractor.set(maps.get_pos({x=140,y=-10,z=0}),minetest.get_modpath("maps").."/nodeextractor/".."maps_flesh_factory.exexn",true)
-							default.storage:set_int("flesh_factory",1)
-							maps.set_pos(player,{x=150,y=1,z=5})
-						end
-					end)
-					return
-				end
-				minetest.after(0.1, function(player)
-					maps.set_pos(player,{x=150,y=1,z=5})
-				end,player)
-			end,
-			on_exit=function(player)
-			end,
-			on_die=function(player)
-			end,
-			on_respawn=function(player)
-				maps.set_pos(player,{x=156,y=14,z=63})
-			end,
-		},
+		}
 	}
 }
 
