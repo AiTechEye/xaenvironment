@@ -1,7 +1,7 @@
 -- Shredder ============
 
 minetest.register_node("default:shredder", {
-	description="Shredder",
+	description="Shredder (add space under to not destroy items)",
 	drop = "default:shredder",
 	inventory_image = "materials_gear_metal.png",
 	tiles={"default_steelblock.png^materials_gear_metal.png"},
@@ -56,6 +56,9 @@ minetest.register_node("default:shredder", {
 		end
 	end,
 	after_destruct=function(pos,oldnode)
+		if oldnode.name == minetest.get_node(pos).name then
+			return
+		end
 		local p = oldnode.param2
 		local f = {vector.offset(pos,0,0,1),vector.offset(pos,1,0,0),vector.offset(pos,0,0,-1),vector.offset(pos,-1,0,0)}
 		local t = f[p+1]
@@ -77,6 +80,7 @@ minetest.register_node("default:shredder", {
 			end
 		end
 	end
+
 })
 
 minetest.register_entity("default:shredder",{
