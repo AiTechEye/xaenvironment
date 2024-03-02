@@ -1,7 +1,9 @@
 minetest.register_node("examobs:hat", {
+	description="Snowman's hat",
 	tiles = {"default_coalblock.png^[colorize:#333333aa"},
-	groups = {dig_immediate = 3,not_in_creative_inventory=1},
+	groups = {dig_immediate = 3,not_in_creative_inventory=1,hat=1,store=100,fall_damage_add_percent=-100,flammable=3},
 	use_texture_alpha = "opaque",
+	hat_properties={pos={x=0, y=7, z=0}, rotation={x=0,y=90,z=0},size={x=0.5,y=0.5,z=0.5}},
 	on_construct = function(pos)
 		minetest.get_node_timer(pos):start(math.random(1,10))
 	end,
