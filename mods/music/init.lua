@@ -86,6 +86,11 @@ music.rnd_play=function(player)
 	minetest.sound_fade(m.id,1,0)
 
 	local track = playlist[math.random(1,#playlist)]
+
+	if track == nil then
+		return
+	end
+
 	m.track = track.index
 	m.id = minetest.sound_play(track.file, {to_player=name, gain=m.gain,loop=m.loop,fade=1})
 
@@ -201,11 +206,13 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			music.show(player)
 		elseif pressed.gain then
 			local i = minetest.explode_textlist_event(pressed.gain).index
-			m.gain = i*0.01
+			local g = i*0.01
+			if g < 0.01 then
+				g = 0.005
+			end
+			m.gain = g
 			m.gain_changed = true
-			minetest.sound_stop(m.id)
-			m.id = minetest.sound_play(music.tracks[m.track].file, {to_player=name, gain = m.gain,loop=m.loop})
-			m.timeout = default.date("get") + music.tracks[m.track].length
+			minetest.sound_fade(m.id,1,m.gain)
 		end
 	end
 end)
