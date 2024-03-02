@@ -1328,14 +1328,13 @@ end
 
 player_style.player_diveing=function(name,player,a,water,kong)
 	local pos = player:get_pos()
-
 	if a and not player_style.player_dive[name] then
 		player_style.player_run(name,player)
 		player_style.player_dive[name] = {kong = kong}
 		player:set_properties({
 			eye_height = 0.6,
 			collisionbox = {-0.35,0,-0.35,0.35,0.49,0.35},
-			stepheight=1.1,
+			stepheight=player_style.players[name].rolltimer == nil and 1.1 or nil,
 		})
 		player:set_physics_override({
 			jump= water == 0 and 0 or 1,
