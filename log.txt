@@ -1,3 +1,9 @@
+11.61
+
+fix Changing music volume restarts music
+fix Crash if marking all music tracks red
+fix Eating food fills up your inventory
+
 11.6
 - mindforcer (will never be used)
 - scene api (will never be used)
