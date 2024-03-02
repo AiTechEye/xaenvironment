@@ -187,6 +187,7 @@ minetest.register_node("examobs:poop", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	sunlight_propagates=true,
+	use_texture_alpha = "clip",
 	drawtype="nodebox",
 	node_box = {
 		type = "fixed",
