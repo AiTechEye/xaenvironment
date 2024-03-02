@@ -315,6 +315,7 @@ minetest.register_node("places:rental_free", {
 	},
 	drop="places:rental",
 	paramtype2 = "facedir",
+	use_texture_alpha = "clip",
 	sounds = default.node_sound_wood_defaults(),
 	groups = {choppy=3,oddly_breakable_by_hand=3,store=200,on_load=1,not_in_creative_inventory=1},
 	drawtype="nodebox",
