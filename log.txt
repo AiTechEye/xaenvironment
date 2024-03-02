@@ -1,5 +1,6 @@
 11.61
 
+fix Insurance slot does not save your stuff
 + equip snowman hat
 fix Changing music volume restarts music
 fix Crash if marking all music tracks red
