@@ -257,7 +257,7 @@ end
 player_style.register_button({
 	name="special",
 	image="default:qblock_FF0000",
-	hud_elem_type="item_image",
+	type="item_image",
 	info="Abilities",
 	action=function(user)
 		if user:get_meta():get_int("special_disabled") == 1 then
