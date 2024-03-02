@@ -24,7 +24,7 @@ if not exaachievements.creative then
 		exit=true,
 		name="achievements",
 		image="achievements_icon.png",
-		hud_elem_type="image",
+		type="image",
 		info="Achievements",
 		action=function(user)
 			exaachievements.form(user:get_player_name(),user)
