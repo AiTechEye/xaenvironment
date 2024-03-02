@@ -717,7 +717,10 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 	if gaps > 1 then
 		def.on_use=function(itemstack, user, pointed_thing)
 			local eat = 65536/gaps
+			local inv = user:get_inventory()
 			minetest.sound_play("default_eat", {to_player=user:get_player_name(), gain = 1})
+
+
 			if not minetest.registered_tools[itemstack:get_name()] then
 				local item = ItemStack(itemstack:get_name() .."_eaten")
 				local c = itemstack:get_count()
@@ -726,7 +729,15 @@ default.register_eatable=function(kind,name,hp,gaps,def)
 				item.wear = eat
 				minetest.do_item_eat(hp,nil,itemstack,user,pointed_thing)
 				if c > 1 then
-					user:get_inventory():add_item("main",item)
+					local itemstack2 = itemstack:to_table()
+					if inv:room_for_item("main",item) then
+						minetest.after(0,function()
+							user:get_inventory():add_item("main",itemstack2)
+						end)
+						itemstack:replace(item)
+					else
+						minetest.add_item(user:get_pos(),ItemStack(item))
+					end
 				else
 					itemstack:replace(item)
 				end
