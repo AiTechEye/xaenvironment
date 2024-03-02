@@ -1,5 +1,6 @@
 11.61
 
+change dont roll over blocks, (fix unexpected roll over node)
 fix Insurance slot does not save your stuff
 + equip snowman hat
 fix Changing music volume restarts music
